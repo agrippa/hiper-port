@@ -25,28 +25,28 @@ FILENAME=$(basename $INPUT_PATH)
 EXTENSION="${FILENAME##*.}"
 NAME="${FILENAME%.*}"
 
-WITH_PREPROC=$DIRNAME/$NAME.preproc.$EXTENSION
-WITH_LINE_NO=$DIRNAME/$NAME.lines.$EXTENSION
+INCLUDE=""
+
+for DIR in $(cpp -v < /dev/null 2>&1 | awk 'BEGIN { doPrint = 0; } /#include <...> search starts here:/ { doPrint = 1; } /End of search list/ { doPrint = 0; } { if (doPrint) print $0; }' | tail -n +2); do
+    INCLUDE="$INCLUDE -I$DIR"
+done
+
+echo $INCLUDE
+
 WITH_BRACES=$DIRNAME/$NAME.braces.$EXTENSION
 WITH_HCLIB=$DIRNAME/$NAME.hclib.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
-
-# Preprocess the input file
-$GXX -E $INPUT_PATH -o $WITH_PREPROC -g
-
-# Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
-python $OPENMP_FINDER $WITH_PREPROC > $OMP_INFO
-
-# Insert line number pragmas everywhere in the input line to ensure no
-# transformations mess with that information
-cat $WITH_PREPROC | python $INSERT_LINE_NO $INPUT_PATH > $WITH_LINE_NO
+STRUCT_INFO=$DIRNAME/$NAME.struct.info
 
 # Insert braces to simplify future transformatsion, i.e. to ensure block
 # membership does not change because of inserted code
-$BRACE_INSERT -o $WITH_BRACES $WITH_LINE_NO -- -I/usr/include -I/usr/include/linux
+$BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE
+
+# Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
+python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
-$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO $WITH_BRACES --  -I/usr/include -I/usr/include/linux
+$OMP_TO_HCLIB -o $WITH_HCLIB -s $STRUCT_INFO -m $OMP_INFO $WITH_BRACES -- $INCLUDE
 
-rm -f $WITH_PREPROC $WITH_LINE_NO $WITH_BRACES $OMP_INFO
+# rm -f $WITH_BRACES $OMP_INFO

@@ -11,8 +11,11 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <sstream>
+#include <iostream>
 
 #include "OMPToHClib.h"
+
+extern clang::FunctionDecl *curr_func_decl;
 
 /*
 void OMPToHClib::visitChildren(const clang::Stmt *s) {
@@ -86,6 +89,41 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
 }
 */
 
+std::vector<OMPPragma> *OMPToHClib::getOMPPragmasFor(
+        clang::FunctionDecl *decl, clang::SourceManager &SM) {
+    std::vector<OMPPragma> *result = new std::vector<OMPPragma>();
+    if (!decl->hasBody()) return result;
+
+    clang::SourceLocation start = decl->getBody()->getLocStart();
+    clang::SourceLocation end = decl->getBody()->getLocEnd();
+
+    clang::PresumedLoc startLoc = SM.getPresumedLoc(start);
+    clang::PresumedLoc endLoc = SM.getPresumedLoc(end);
+
+    for (std::vector<OMPPragma>::iterator i = pragmas->begin(),
+            e = pragmas->end(); i != e; i++) {
+        OMPPragma curr = *i;
+
+        bool before = (curr.getLine() < startLoc.getLine());
+        bool after = (curr.getLine() > endLoc.getLine());
+
+        if (!before && !after) {
+            result->push_back(curr);
+        }
+    }
+
+    return result;
+}
+
+OMPPragma *OMPToHClib::getOMPPragmaFor(int lineNo) {
+    for (std::vector<OMPPragma>::iterator i = pragmas->begin(),
+            e = pragmas->end(); i != e; i++) {
+        OMPPragma *curr = &*i;
+        if (curr->getLine() == lineNo) return curr;
+    }
+    return NULL;
+}
+
 void OMPToHClib::setParent(const clang::Stmt *child,
         const clang::Stmt *parent) {
     assert(parentMap.find(child) == parentMap.end());
@@ -111,20 +149,163 @@ void OMPToHClib::visitChildren(const clang::Stmt *s) {
     }
 }
 
+void OMPToHClib::postVisit() {
+    if (curr_func_decl) {
+        std::string fname = curr_func_decl->getNameAsString();
+        int countParallelRegions = 0;
+
+        std::cerr << "Post visiting " << fname << std::endl;
+
+        for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
+                e = predecessors.end(); i != e; i++) {
+            int line = i->first;
+            const clang::Stmt *pred = i->second;
+            assert(successors.find(line) != successors.end());
+            assert(captures.find(line) != captures.end());
+            const clang::Stmt *succ = successors[line];
+            OMPPragma *pragma = getOMPPragmaFor(line);
+
+            if (supportedPragmas.find(pragma->getPragmaName()) != supportedPragmas.end()) {
+                std::string lbl = fname + std::to_string(countParallelRegions++);
+                std::cerr<< "pragma on " << stmtToString(succ) <<
+                    " with lbl " << lbl << std::endl;
+
+                for (std::vector<clang::NamedDecl *>::iterator ii =
+                        captures[line]->begin(), ee = captures[line]->end();
+                        ii != ee; ii++) {
+                    clang::NamedDecl *curr = *ii;
+                    structFile << curr->getNameAsString() << std::endl;
+                }
+                structFile << "======" << std::endl;
+            }
+        }
+
+        successors.clear();
+        predecessors.clear();
+    }
+}
+
+bool OMPToHClib::isScopeCreatingStmt(const clang::Stmt *s) {
+    return clang::isa<clang::CompoundStmt>(s) || clang::isa<clang::ForStmt>(s);
+}
+
+int OMPToHClib::getCurrentLexicalDepth() {
+    return in_scope.size();
+}
+
+void OMPToHClib::addNewScope() {
+    in_scope.push_back(new std::vector<clang::NamedDecl *>());
+}
+
+void OMPToHClib::popScope() {
+    assert(in_scope.size() >= 1);
+    in_scope.pop_back();
+}
+
+void OMPToHClib::addToCurrentScope(clang::NamedDecl *d) {
+    in_scope[in_scope.size() - 1]->push_back(d);
+}
+
+std::vector<clang::NamedDecl *> *OMPToHClib::visibleDecls() {
+    std::vector<clang::NamedDecl *> *visible = new std::vector<clang::NamedDecl *>();
+    for (std::vector<std::vector<clang::NamedDecl *> *>::iterator i =
+            in_scope.begin(), e = in_scope.end(); i != e; i++) {
+        std::vector<clang::NamedDecl *> *currentScope = *i;
+        for (std::vector<clang::NamedDecl *>::iterator ii = currentScope->begin(),
+                ee = currentScope->end(); ii != ee; ii++) {
+            visible->push_back(*ii);
+        }
+    }
+    return visible;
+}
 
 void OMPToHClib::VisitStmt(const clang::Stmt *s) {
-    clang::SourceLocation loc = s->getLocStart();
-    if (loc.isValid()) {
+    clang::SourceLocation start = s->getLocStart();
+    clang::SourceLocation end = s->getLocEnd();
+
+    const int currentScope = getCurrentLexicalDepth();
+    if (isScopeCreatingStmt(s)) {
+        addNewScope();
+    }
+
+    if (start.isValid() && end.isValid() && SM->isInMainFile(end)) {
+        clang::PresumedLoc presumed_start = SM->getPresumedLoc(start);
+        clang::PresumedLoc presumed_end = SM->getPresumedLoc(end);
+        /*
+         * This block of code checks if the current statement is either the
+         * first before (predecessors) or after (successors) the line that an
+         * OMP pragma is on.
+         */
+        std::vector<OMPPragma> *omp_pragmas =
+            getOMPPragmasFor(curr_func_decl, *SM);
+        for (std::vector<OMPPragma>::iterator i = omp_pragmas->begin(),
+                e = omp_pragmas->end(); i != e; i++) {
+            OMPPragma pragma = *i;
+
+            if (presumed_end.getLine() < pragma.getLine()) {
+                if (predecessors.find(pragma.getLine()) ==
+                        predecessors.end()) {
+                    predecessors[pragma.getLine()] = s;
+                    captures[pragma.getLine()] = visibleDecls();
+                } else {
+                    const clang::Stmt *curr = predecessors[pragma.getLine()];
+                    clang::PresumedLoc curr_loc = SM->getPresumedLoc(
+                            curr->getLocEnd());
+                    if (presumed_end.getLine() > curr_loc.getLine() ||
+                            (presumed_end.getLine() == curr_loc.getLine() &&
+                             presumed_end.getColumn() > curr_loc.getColumn())) {
+                        predecessors[pragma.getLine()] = s;
+                        captures[pragma.getLine()] = visibleDecls();
+                    }
+                }
+            }
+
+            if (presumed_start.getLine() >= pragma.getLine()) {
+                if (successors.find(pragma.getLine()) == successors.end()) {
+                    successors[pragma.getLine()] = s;
+                } else {
+                    const clang::Stmt *curr = successors[pragma.getLine()];
+                    clang::PresumedLoc curr_loc =
+                        SM->getPresumedLoc(curr->getLocStart());
+                    if (presumed_start.getLine() < curr_loc.getLine() ||
+                            (presumed_start.getLine() == curr_loc.getLine() &&
+                             presumed_start.getColumn() < curr_loc.getColumn())) {
+                        successors[pragma.getLine()] = s;
+                    }
+                }
+            }
+        }
+
+        if (const clang::DeclStmt *decls = clang::dyn_cast<clang::DeclStmt>(s)) {
+            std::cerr << "Found declaration " << stmtToString(s) << std::endl;
+
+            for (clang::DeclStmt::const_decl_iterator i = decls->decl_begin(),
+                    e = decls->decl_end(); i != e; i++) {
+                clang::Decl *decl = *i;
+                if (clang::NamedDecl *named = clang::dyn_cast<clang::NamedDecl>(decl)) {
+                    addToCurrentScope(named);
+                }
+            }
+        }
     }
 
     visitChildren(s);
+
+    if (isScopeCreatingStmt(s)) {
+        popScope();
+    }
+    assert(currentScope == getCurrentLexicalDepth());
 }
 
 std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     std::vector<OMPPragma> *pragmas = new std::vector<OMPPragma>();
 
     std::ifstream fp;
-    fp.open(std::string(ompPragmaFile, std::ios::in));
+    fp.open(std::string(ompPragmaFile), std::ios::in);
+    if (!fp.is_open()) {
+        std::cerr << "Failed opening " << std::string(ompPragmaFile) << std::endl;
+        exit(1);
+    }
 
     std::string line;
 
@@ -243,9 +424,21 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     }
     fp.close();
 
+    std::cerr << "Parsed " << pragmas->size() << " pragmas from " <<
+        std::string(ompPragmaFile) << std::endl;
+
     return pragmas;
 }
 
-OMPToHClib::OMPToHClib(const char *ompPragmaFile) {
+OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *structFilename) {
     pragmas = parseOMPPragmas(ompPragmaFile);
+
+    supportedPragmas.insert("parallel");
+
+    structFile.open(std::string(structFilename), std::ios::out);
+    assert(structFile.is_open());
+}
+
+OMPToHClib::~OMPToHClib() {
+    structFile.close();
 }

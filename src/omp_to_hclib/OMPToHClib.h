@@ -2,6 +2,7 @@
 #define FUNCTION_UNROLL_H
 
 #include <fstream>
+#include <set>
 
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTConsumer.h"
@@ -19,7 +20,8 @@
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
-        OMPToHClib(const char *ompPragmaFile);
+        OMPToHClib(const char *ompPragmaFile, const char *structFilename);
+        ~OMPToHClib();
 
         void setRewriter(clang::Rewriter &R) {
             rewriter = &R;
@@ -31,6 +33,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         void visitChildren(const clang::Stmt *s);
         void VisitStmt(const clang::Stmt *s);
+        void postVisit();
         std::string stmtToString(const clang::Stmt* s);
         void setParent(const clang::Stmt *child,
                 const clang::Stmt *parent);
@@ -44,8 +47,33 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
     private:
         std::vector<OMPPragma> *parseOMPPragmas(const char *ompPragmaFile);
+        std::vector<OMPPragma> *getOMPPragmasFor(
+                clang::FunctionDecl *decl, clang::SourceManager &SM);
+        OMPPragma *getOMPPragmaFor(int lineNo);
+
+        bool isScopeCreatingStmt(const clang::Stmt *s);
+        int getCurrentLexicalDepth();
+        void addNewScope();
+        void popScope();
+        void addToCurrentScope(clang::NamedDecl *d);
+        std::vector<clang::NamedDecl *> *visibleDecls();
 
         std::vector<OMPPragma> *pragmas;
+
+        /*
+         * Map from line containing a OMP pragma to its immediate predessor. It is
+         * safe to use a line here because no more than one pragma can appear on
+         * each line.
+         */
+        std::map<int, const clang::Stmt *> predecessors;
+        std::map<int, const clang::Stmt *> successors;
+        std::map<int, std::vector<clang::NamedDecl *> *> captures;
+
+        std::set<std::string> supportedPragmas;
+
+        std::vector<std::vector<clang::NamedDecl *> *> in_scope;
+
+        std::ofstream structFile;
 };
 
 #endif
