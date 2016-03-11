@@ -7,6 +7,7 @@ BRACE_INSERT=$SCRIPT_DIR/brace_insert/brace_insert
 INSERT_LINE_NO=$SCRIPT_DIR/insert_line_numbers.py
 OPENMP_FINDER=$SCRIPT_DIR/openmp_finder.py
 OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
+INSERT_STRUCTS=$SCRIPT_DIR/insert_structs.py
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
@@ -35,6 +36,7 @@ echo $INCLUDE
 
 WITH_BRACES=$DIRNAME/$NAME.braces.$EXTENSION
 WITH_HCLIB=$DIRNAME/$NAME.hclib.$EXTENSION
+WITH_STRUCTS=$DIRNAME/$NAME.structs.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
 STRUCT_INFO=$DIRNAME/$NAME.struct.info
@@ -48,5 +50,7 @@ python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
 $OMP_TO_HCLIB -o $WITH_HCLIB -s $STRUCT_INFO -m $OMP_INFO $WITH_BRACES -- $INCLUDE
+
+python $INSERT_STRUCTS $WITH_HCLIB $STRUCT_INFO > $WITH_STRUCTS
 
 # rm -f $WITH_BRACES $OMP_INFO

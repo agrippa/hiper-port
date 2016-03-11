@@ -55,8 +55,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         int getCurrentLexicalDepth();
         void addNewScope();
         void popScope();
-        void addToCurrentScope(clang::NamedDecl *d);
-        std::vector<clang::NamedDecl *> *visibleDecls();
+        void addToCurrentScope(clang::ValueDecl *d);
+        std::vector<clang::ValueDecl *> *visibleDecls();
 
         std::vector<OMPPragma> *pragmas;
 
@@ -67,11 +67,11 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
          */
         std::map<int, const clang::Stmt *> predecessors;
         std::map<int, const clang::Stmt *> successors;
-        std::map<int, std::vector<clang::NamedDecl *> *> captures;
+        std::map<int, std::vector<clang::ValueDecl *> *> captures;
 
         std::set<std::string> supportedPragmas;
 
-        std::vector<std::vector<clang::NamedDecl *> *> in_scope;
+        std::vector<std::vector<clang::ValueDecl *> *> in_scope;
 
         std::ofstream structFile;
 };

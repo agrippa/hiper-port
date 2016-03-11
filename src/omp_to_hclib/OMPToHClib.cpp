@@ -152,6 +152,9 @@ void OMPToHClib::visitChildren(const clang::Stmt *s) {
 void OMPToHClib::postVisit() {
     if (curr_func_decl) {
         std::string fname = curr_func_decl->getNameAsString();
+        clang::PresumedLoc presumedStart = SM->getPresumedLoc(curr_func_decl->getLocStart());
+        const int functionStartLine = presumedStart.getLine();
+
         int countParallelRegions = 0;
 
         std::cerr << "Post visiting " << fname << std::endl;
@@ -170,11 +173,13 @@ void OMPToHClib::postVisit() {
                 std::cerr<< "pragma on " << stmtToString(succ) <<
                     " with lbl " << lbl << std::endl;
 
-                for (std::vector<clang::NamedDecl *>::iterator ii =
+                structFile << "struct name = " << lbl << std::endl;
+                structFile << "declare on line = " << functionStartLine << std::endl;
+                for (std::vector<clang::ValueDecl *>::iterator ii =
                         captures[line]->begin(), ee = captures[line]->end();
                         ii != ee; ii++) {
-                    clang::NamedDecl *curr = *ii;
-                    structFile << curr->getNameAsString() << std::endl;
+                    clang::ValueDecl *curr = *ii;
+                    structFile << curr->getType().getAsString() << " " << curr->getNameAsString() << std::endl;
                 }
                 structFile << "======" << std::endl;
             }
@@ -194,7 +199,7 @@ int OMPToHClib::getCurrentLexicalDepth() {
 }
 
 void OMPToHClib::addNewScope() {
-    in_scope.push_back(new std::vector<clang::NamedDecl *>());
+    in_scope.push_back(new std::vector<clang::ValueDecl *>());
 }
 
 void OMPToHClib::popScope() {
@@ -202,16 +207,16 @@ void OMPToHClib::popScope() {
     in_scope.pop_back();
 }
 
-void OMPToHClib::addToCurrentScope(clang::NamedDecl *d) {
+void OMPToHClib::addToCurrentScope(clang::ValueDecl *d) {
     in_scope[in_scope.size() - 1]->push_back(d);
 }
 
-std::vector<clang::NamedDecl *> *OMPToHClib::visibleDecls() {
-    std::vector<clang::NamedDecl *> *visible = new std::vector<clang::NamedDecl *>();
-    for (std::vector<std::vector<clang::NamedDecl *> *>::iterator i =
+std::vector<clang::ValueDecl *> *OMPToHClib::visibleDecls() {
+    std::vector<clang::ValueDecl *> *visible = new std::vector<clang::ValueDecl *>();
+    for (std::vector<std::vector<clang::ValueDecl *> *>::iterator i =
             in_scope.begin(), e = in_scope.end(); i != e; i++) {
-        std::vector<clang::NamedDecl *> *currentScope = *i;
-        for (std::vector<clang::NamedDecl *>::iterator ii = currentScope->begin(),
+        std::vector<clang::ValueDecl *> *currentScope = *i;
+        for (std::vector<clang::ValueDecl *>::iterator ii = currentScope->begin(),
                 ee = currentScope->end(); ii != ee; ii++) {
             visible->push_back(*ii);
         }
@@ -282,7 +287,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
             for (clang::DeclStmt::const_decl_iterator i = decls->decl_begin(),
                     e = decls->decl_end(); i != e; i++) {
                 clang::Decl *decl = *i;
-                if (clang::NamedDecl *named = clang::dyn_cast<clang::NamedDecl>(decl)) {
+                if (clang::ValueDecl *named = clang::dyn_cast<clang::ValueDecl>(decl)) {
                     addToCurrentScope(named);
                 }
             }
