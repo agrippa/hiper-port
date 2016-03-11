@@ -1,5 +1,5 @@
-#ifndef FUNCTION_UNROLL_H
-#define FUNCTION_UNROLL_H
+#ifndef OMP_TO_HCLIB_H
+#define OMP_TO_HCLIB_H
 
 #include <fstream>
 #include <set>

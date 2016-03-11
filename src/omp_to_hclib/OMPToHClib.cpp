@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "OMPToHClib.h"
+#include "OMPNode.h"
 
 extern clang::FunctionDecl *curr_func_decl;
 
@@ -157,31 +158,77 @@ void OMPToHClib::postVisit() {
 
         int countParallelRegions = 0;
 
-        std::cerr << "Post visiting " << fname << std::endl;
+        OMPNode rootNode(NULL, functionStartLine, NULL, SM);
 
         for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
                 e = predecessors.end(); i != e; i++) {
-            int line = i->first;
+            const int line = i->first;
             const clang::Stmt *pred = i->second;
             assert(successors.find(line) != successors.end());
             assert(captures.find(line) != captures.end());
             const clang::Stmt *succ = successors[line];
             OMPPragma *pragma = getOMPPragmaFor(line);
 
-            if (supportedPragmas.find(pragma->getPragmaName()) != supportedPragmas.end()) {
-                std::string lbl = fname + std::to_string(countParallelRegions++);
-                std::cerr<< "pragma on " << stmtToString(succ) <<
-                    " with lbl " << lbl << std::endl;
+            rootNode.addChild(succ, line, pragma, SM);
+        }
 
-                structFile << "struct name = " << lbl << std::endl;
-                structFile << "declare on line = " << functionStartLine << std::endl;
-                for (std::vector<clang::ValueDecl *>::iterator ii =
-                        captures[line]->begin(), ee = captures[line]->end();
-                        ii != ee; ii++) {
-                    clang::ValueDecl *curr = *ii;
-                    structFile << curr->getType().getAsString() << " " << curr->getNameAsString() << std::endl;
+        rootNode.print();
+
+        for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
+                e = predecessors.end(); i != e; i++) {
+            const int line = i->first;
+            const clang::Stmt *pred = i->second;
+            assert(successors.find(line) != successors.end());
+            assert(captures.find(line) != captures.end());
+            const clang::Stmt *succ = successors[line];
+            OMPPragma *pragma = getOMPPragmaFor(line);
+
+            std::string body = stmtToString(succ);
+
+            clang::SourceLocation bodyStart = succ->getLocStart();
+            clang::SourceLocation bodyEnd = succ->getLocEnd();
+            clang::PresumedLoc presumedBodyStart = SM->getPresumedLoc(bodyStart);
+            clang::PresumedLoc presumedBodyEnd = SM->getPresumedLoc(bodyEnd);
+            const int bodyStartLine = presumedBodyStart.getLine();
+            const int bodyEndLine = presumedBodyEnd.getLine();
+
+            if (supportedPragmas.find(pragma->getPragmaName()) != supportedPragmas.end()) {
+
+                if (pragma->getPragmaName() == "parallel") {
+                    std::map<std::string, std::vector<std::string> > clauses = pragma->getClauses();
+                    if (clauses.find("for") != clauses.end()) {
+                        std::string lbl = fname + std::to_string(countParallelRegions++);
+                        std::cerr<< "pragma on " << stmtToString(succ) <<
+                            " with lbl " << lbl << std::endl;
+
+                        std::string struct_def = "typedef struct _" + lbl + " { ";
+                        for (std::vector<clang::ValueDecl *>::iterator ii =
+                                captures[line]->begin(), ee = captures[line]->end();
+                                ii != ee; ii++) {
+                            clang::ValueDecl *curr = *ii;
+                            struct_def = struct_def +
+                                curr->getType().getAsString() + " " +
+                                curr->getNameAsString() + "; ";
+                        }
+                        struct_def = struct_def + " } " + lbl + ";\n";
+
+                        rewriter->InsertText(curr_func_decl->getLocStart(), struct_def, true, true);
+                    } else {
+                        std::cerr << "Parallel pragma without a for at line " <<
+                            line << std::endl;
+                        exit(1);
+                    }
+                } else if (pragma->getPragmaName() == "simd") {
+                    // ignore
+                } else {
+                    std::cerr << "Unhandled supported pragma \"" <<
+                        pragma->getPragmaName() << "\"" << std::endl;
+                    exit(1);
                 }
-                structFile << "======" << std::endl;
+            } else {
+                std::cerr << "Encountered an unknown pragma \"" <<
+                    pragma->getPragmaName() << "\" at line " << line << std::endl;
+                exit(1);
             }
         }
 
@@ -439,6 +486,7 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *structFilename) {
     pragmas = parseOMPPragmas(ompPragmaFile);
 
     supportedPragmas.insert("parallel");
+    supportedPragmas.insert("simd"); // ignore
 
     structFile.open(std::string(structFilename), std::ios::out);
     assert(structFile.is_open());
