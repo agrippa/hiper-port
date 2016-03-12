@@ -22,6 +22,8 @@
 
 extern clang::FunctionDecl *curr_func_decl;
 
+#define ASYNC_SUFFIX "_hclib_async"
+
 std::vector<OMPPragma> *OMPToHClib::getOMPPragmasFor(
         clang::FunctionDecl *decl, clang::SourceManager &SM) {
     std::vector<OMPPragma> *result = new std::vector<OMPPragma>();
@@ -71,12 +73,14 @@ std::string OMPToHClib::stmtToString(const clang::Stmt* stmt) {
     return s;
 }
 
-void OMPToHClib::visitChildren(const clang::Stmt *s) {
+void OMPToHClib::visitChildren(const clang::Stmt *s, bool firstTraversal) {
     for (clang::Stmt::const_child_iterator i = s->child_begin(),
             e = s->child_end(); i != e; i++) {
         const clang::Stmt *child = *i;
         if (child != NULL) {
-            setParent(child, s);
+            if (firstTraversal) {
+                setParent(child, s);
+            }
             VisitStmt(child);
         }
     }
@@ -168,7 +172,7 @@ void OMPToHClib::postVisit() {
                                 std::string highStr = "";
                                 std::string strideStr = "";
 
-                                accumulatedKernelDefs += "static void " + node->getLbl() + "_async(const int ___iter, void *arg) {\n";
+                                accumulatedKernelDefs += "static void " + node->getLbl() + ASYNC_SUFFIX + "(const int ___iter, void *arg) {\n";
                                 accumulatedKernelDefs += "    " + node->getLbl() + " *ctx = (" + node->getLbl() + " *)arg;\n";
                                 for (std::vector<clang::ValueDecl *>::iterator ii =
                                         captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
@@ -242,7 +246,14 @@ void OMPToHClib::postVisit() {
                                     exit(1);
                                 }
 
+                                /*
+                                 * Insert a one iteration do-loop around the
+                                 * original body so that continues have the same
+                                 * semantics.
+                                 */
+                                accumulatedKernelDefs += "    do {\n";
                                 accumulatedKernelDefs += bodyStr;
+                                accumulatedKernelDefs += "    } while (0);\n";
                                 accumulatedKernelDefs += "}\n\n";
 
                                 std::string contextCreation = "\n" + node->getLbl() +
@@ -255,13 +266,13 @@ void OMPToHClib::postVisit() {
                                         curr->getNameAsString() + " = " +
                                         curr->getNameAsString() + ";\n";
                                 }
-                                contextCreation += "loop_domain_t domain;\n";
+                                contextCreation += "hclib_loop_domain_t domain;\n";
                                 contextCreation += "domain.low = " + lowStr + ";\n";
                                 contextCreation += "domain.high = " + highStr + ";\n";
                                 contextCreation += "domain.stride = " + strideStr + ";\n";
                                 contextCreation += "domain.tile = 1;\n";
-                                contextCreation += "hclib_future_t *fut = hclib_forasync_future(" +
-                                    node->getLbl() + "_async, ctx, NULL, 1, " +
+                                contextCreation += "hclib_future_t *fut = hclib_forasync_future((void *)" +
+                                    node->getLbl() + ASYNC_SUFFIX + ", ctx, NULL, 1, " +
                                     "&domain, FORASYNC_MODE_RECURSIVE);\n";
                                 contextCreation += "hclib_future_wait(fut);\n";
                                 contextCreation += "free(ctx);\n";

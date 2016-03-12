@@ -64,6 +64,7 @@ if [[ $VERBOSE == 1 ]]; then
     echo INPUT_PATH = $INPUT_PATH
     echo OUTPUT_PATH = $OUTPUT_PATH
     echo KEEP = $KEEP
+    echo VERBOSE = $VERBOSE
 fi
 
 DIRNAME=$(dirname $INPUT_PATH)
@@ -88,19 +89,25 @@ STRUCT_INFO=$DIRNAME/$NAME.struct.info
 
 # Insert braces to simplify future transformatsion, i.e. to ensure block
 # membership does not change because of inserted code
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting braces'
 $BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE
 
 # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
 python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
 $OMP_TO_HCLIB -o $WITH_HCLIB -s $STRUCT_INFO -m $OMP_INFO $WITH_BRACES -- $INCLUDE
 
 # Remove any OMP pragmas
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
 cat $WITH_HCLIB | python $REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER > $WITHOUT_PRAGMAS
 
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Producing final output file'
 cp $WITHOUT_PRAGMAS $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'
     rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS $STRUCT_INFO
 fi

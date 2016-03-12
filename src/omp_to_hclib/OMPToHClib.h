@@ -32,7 +32,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
             Context = &setContext;
         }
 
-        void visitChildren(const clang::Stmt *s);
+        void visitChildren(const clang::Stmt *s, bool firstTraversal = true);
         void VisitStmt(const clang::Stmt *s);
         void postVisit();
         std::string stmtToString(const clang::Stmt* s);

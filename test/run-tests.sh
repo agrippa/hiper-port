@@ -6,7 +6,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p $SCRIPT_DIR/test-output
 
-for FILE in $(find cpp -name "*.cpp"); do
+for FILE in $(find $SCRIPT_DIR/cpp -name "*.cpp"); do
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
     EXTENSION="${FILENAME##*.}"
@@ -15,7 +15,7 @@ for FILE in $(find cpp -name "*.cpp"); do
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
     REFERENCE=$SCRIPT_DIR/cpp-ref/$FILENAME
 
-    $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT &> transform.log
+    $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT $* &> transform.log
 
     if [[ ! -f $REFERENCE ]]; then
         echo
@@ -24,7 +24,10 @@ for FILE in $(find cpp -name "*.cpp"); do
         exit 1
     fi
 
+    set +e
     diff $TEST_OUTPUT $REFERENCE > $SCRIPT_DIR/delta
+    set -e
+
     LINES=$(cat $SCRIPT_DIR/delta | wc -l)
     if [[ $LINES != 0 ]]; then
         echo

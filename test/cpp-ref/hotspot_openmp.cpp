@@ -68,7 +68,7 @@ typedef struct _single_iteration62 {
     int chunks_in_col;
  } single_iteration62;
 
-static void single_iteration62_async(const int ___iter, void *arg) {
+static void single_iteration62_hclib_async(const int ___iter, void *arg) {
     single_iteration62 *ctx = (single_iteration62 *)arg;
     FLOAT * result = ctx->result;
     FLOAT * temp = ctx->temp;
@@ -88,6 +88,7 @@ static void single_iteration62_async(const int ___iter, void *arg) {
     int chunks_in_row = ctx->chunks_in_row;
     int chunks_in_col = ctx->chunks_in_col;
     chunk = ___iter;
+    do {
 {
     int r_start = 16 * (chunk / chunks_in_col);
     int c_start = 16 * (chunk % chunks_in_row);
@@ -145,6 +146,7 @@ static void single_iteration62_async(const int ___iter, void *arg) {
         }
     }
 }
+    } while (0);
 }
 
 void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
@@ -178,12 +180,12 @@ ctx->chunk = chunk;
 ctx->num_chunk = num_chunk;
 ctx->chunks_in_row = chunks_in_row;
 ctx->chunks_in_col = chunks_in_col;
-loop_domain_t domain;
+hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = num_chunk;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future(single_iteration62_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)single_iteration62_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 
