@@ -3,23 +3,68 @@
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 BRACE_INSERT=$SCRIPT_DIR/brace_insert/brace_insert
 INSERT_LINE_NO=$SCRIPT_DIR/insert_line_numbers.py
 OPENMP_FINDER=$SCRIPT_DIR/openmp_finder.py
 OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
 INSERT_STRUCTS=$SCRIPT_DIR/insert_structs.py
+REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER=$SCRIPT_DIR/remove_omp_pragmas_and_insert_header.py 
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
     GXX=g++
 fi
 
-if [[ $# != 1 ]]; then
-    echo 'usage: omp_to_hclib.sh <file>'
+INPUT_PATH=
+OUTPUT_PATH=
+KEEP=0
+VERBOSE=0
+
+while getopts "i:o:kvh" opt; do
+    case $opt in 
+        i)
+            INPUT_PATH=$OPTARG
+            ;;
+        o)
+            OUTPUT_PATH=$OPTARG
+            ;;
+        k)
+            KEEP=1
+            ;;
+        v)
+            VERBOSE=1
+            ;;
+        h)
+            echo 'usage: omp_to_hclib.sh <-i input-file> <-o output-file>'
+            exit 1
+            ;;
+        \?)
+            echo "unrecognized option -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "option -$OPTARG requires an argument" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ -z "$INPUT_PATH" ]]; then
+    echo 'Missing input path, must be provided with -i'
     exit 1
 fi
 
-INPUT_PATH=$1
+if [[ -z "$OUTPUT_PATH" ]]; then
+    echo 'Missing output path, must be provided with -o'
+    exit 1
+fi
+
+if [[ $VERBOSE == 1 ]]; then
+    echo INPUT_PATH = $INPUT_PATH
+    echo OUTPUT_PATH = $OUTPUT_PATH
+    echo KEEP = $KEEP
+fi
 
 DIRNAME=$(dirname $INPUT_PATH)
 FILENAME=$(basename $INPUT_PATH)
@@ -34,9 +79,9 @@ done
 
 echo $INCLUDE
 
-WITH_BRACES=$DIRNAME/$NAME.braces.$EXTENSION
-WITH_HCLIB=$DIRNAME/$NAME.hclib.$EXTENSION
-WITH_STRUCTS=$DIRNAME/$NAME.structs.$EXTENSION
+WITH_BRACES=$DIRNAME/____omp_to_hclib.$NAME.braces.$EXTENSION
+WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
+WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
 STRUCT_INFO=$DIRNAME/$NAME.struct.info
@@ -51,6 +96,11 @@ python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
 $OMP_TO_HCLIB -o $WITH_HCLIB -s $STRUCT_INFO -m $OMP_INFO $WITH_BRACES -- $INCLUDE
 
-# python $INSERT_STRUCTS $WITH_HCLIB $STRUCT_INFO > $WITH_STRUCTS
+# Remove any OMP pragmas
+cat $WITH_HCLIB | python $REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER > $WITHOUT_PRAGMAS
 
-# rm -f $WITH_BRACES $OMP_INFO
+cp $WITHOUT_PRAGMAS $OUTPUT_PATH
+
+if [[ $KEEP == 0 ]]; then
+    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS $STRUCT_INFO
+fi

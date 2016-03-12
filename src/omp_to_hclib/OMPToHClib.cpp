@@ -9,7 +9,11 @@
 #include "clang/Tooling/Tooling.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/ArrayRef.h"
 
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 
@@ -17,78 +21,6 @@
 #include "OMPNode.h"
 
 extern clang::FunctionDecl *curr_func_decl;
-
-/*
-void OMPToHClib::visitChildren(const clang::Stmt *s) {
-    for (clang::Stmt::const_child_iterator i = s->child_begin(),
-            e = s->child_end(); i != e; i++) {
-        const clang::Stmt *child = *i;
-        if (child != NULL) {
-            setParent(child, s);
-            VisitStmt(child);
-        }
-    }
-}
-
-std::string OMPToHClib::get_unique_arg_varname() {
-    std::stringstream ss;
-    ss << "____chimes_unroll_var_" << arg_var_counter;
-    arg_var_counter++;
-    return ss.str();
-}
-
-std::string OMPToHClib::get_decl_with_same_type(const clang::Expr *e,
-        std::string varname) {
-    std::stringstream ss;
-    std::string type_str = e->getType().getAsString();
-    if (type_str.find("(*)") != std::string::npos) {
-        assert(type_str.find("(*)") == type_str.rfind("(*)"));
-        size_t index = type_str.find("(*)");
-        type_str.insert(index + 2, varname);
-        ss << " " << type_str;
-    } else {
-        ss << " " << e->getType().getAsString() << " " <<
-            varname;
-    }
-
-    return (ss.str());
-}
-
-const clang::Stmt *OMPToHClib::getParent(const clang::Stmt *s) {
-    assert(parentMap.find(s) != parentMap.end());
-    return parentMap.at(s);
-}
-
-void OMPToHClib::InsertAtFront(const clang::Stmt *s,
-        std::string st) {
-    const clang::Stmt *parent = getParent(s);
-    while (!clang::isa<clang::CompoundStmt>(parent) &&
-            !clang::isa<clang::CaseStmt>(parent)) {
-        s = parent;
-        parent = getParent(s);
-    }
-    clang::SourceLocation start = s->getLocStart();
-    rewriter->InsertText(start, st, true, true);
-}
-
-void OMPToHClib::VisitStmt(const clang::Stmt *s) {
-
-    if (const clang::CallExpr *call = clang::dyn_cast<clang::CallExpr>(s)) {
-        std::string prefix = convert(call);
-        InsertAtFront(call, prefix);
-
-        const clang::FunctionDecl *callee = call->getDirectCallee();
-        if (callee && callee->hasAttrs()) {
-            for (clang::AttrVec::const_iterator i = callee->getAttrs().begin(),
-                    e = callee->getAttrs().end(); i != e; i++) {
-                // TODO
-            }
-        }
-    } else {
-        visitChildren(s);
-    }
-}
-*/
 
 std::vector<OMPPragma> *OMPToHClib::getOMPPragmasFor(
         clang::FunctionDecl *decl, clang::SourceManager &SM) {
@@ -150,15 +82,43 @@ void OMPToHClib::visitChildren(const clang::Stmt *s) {
     }
 }
 
+std::string OMPToHClib::getStructDef(OMPNode *node) {
+    const int pragmaLine = node->getPragmaLine();
+    std::string struct_def = "typedef struct _" + node->getLbl() + " {\n";
+    for (std::vector<clang::ValueDecl *>::iterator ii =
+            captures[pragmaLine]->begin(), ee = captures[pragmaLine]->end();
+            ii != ee; ii++) {
+        clang::ValueDecl *curr = *ii;
+        struct_def += "    " + curr->getType().getAsString() + " " +
+            curr->getNameAsString() + ";\n";
+    }
+    struct_def += " } " + node->getLbl() + ";\n\n";
+
+    return struct_def;
+}
+
+void OMPToHClib::preFunctionVisit(clang::FunctionDecl *func) {
+    assert(getCurrentLexicalDepth() == 0);
+    addNewScope();
+
+    for (int i = 0; i < func->getNumParams(); i++) {
+        clang::ParmVarDecl *param = func->getParamDecl(i);
+        addToCurrentScope(param);
+    }
+}
+
+void OMPToHClib::postFunctionVisit() {
+    assert(getCurrentLexicalDepth() == 1);
+    popScope();
+}
+
 void OMPToHClib::postVisit() {
     if (curr_func_decl) {
         std::string fname = curr_func_decl->getNameAsString();
         clang::PresumedLoc presumedStart = SM->getPresumedLoc(curr_func_decl->getLocStart());
         const int functionStartLine = presumedStart.getLine();
 
-        int countParallelRegions = 0;
-
-        OMPNode rootNode(NULL, functionStartLine, NULL, SM);
+        OMPNode rootNode(NULL, functionStartLine, NULL, NULL, std::string("root"), SM);
 
         for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
                 e = predecessors.end(); i != e; i++) {
@@ -169,67 +129,174 @@ void OMPToHClib::postVisit() {
             const clang::Stmt *succ = successors[line];
             OMPPragma *pragma = getOMPPragmaFor(line);
 
-            rootNode.addChild(succ, line, pragma, SM);
+            std::string lbl = fname + std::to_string(line);
+            rootNode.addChild(succ, line, pragma, lbl, SM);
         }
 
         rootNode.print();
 
-        for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
-                e = predecessors.end(); i != e; i++) {
-            const int line = i->first;
-            const clang::Stmt *pred = i->second;
-            assert(successors.find(line) != successors.end());
-            assert(captures.find(line) != captures.end());
-            const clang::Stmt *succ = successors[line];
-            OMPPragma *pragma = getOMPPragmaFor(line);
+        if (rootNode.nchildren() > 0) {
+            std::vector<OMPNode *> *todo = new std::vector<OMPNode *>();
+            std::vector<OMPNode *> *processing = rootNode.getLeaves();
 
-            std::string body = stmtToString(succ);
+            std::string accumulatedStructDefs = "";
+            std::string accumulatedKernelDefs = "";
 
-            clang::SourceLocation bodyStart = succ->getLocStart();
-            clang::SourceLocation bodyEnd = succ->getLocEnd();
-            clang::PresumedLoc presumedBodyStart = SM->getPresumedLoc(bodyStart);
-            clang::PresumedLoc presumedBodyEnd = SM->getPresumedLoc(bodyEnd);
-            const int bodyStartLine = presumedBodyStart.getLine();
-            const int bodyEndLine = presumedBodyEnd.getLine();
+            while (processing->size() != 0) {
+                for (std::vector<OMPNode *>::iterator i = processing->begin(),
+                        e = processing->end(); i != e; i++) {
+                    OMPNode *node = *i;
+                    const clang::Stmt *succ = successors[node->getPragmaLine()];
+                    const clang::Stmt *pred = predecessors[node->getPragmaLine()];
 
-            if (supportedPragmas.find(pragma->getPragmaName()) != supportedPragmas.end()) {
+                    if (supportedPragmas.find(node->getPragma()->getPragmaName()) != supportedPragmas.end()) {
+                        if (node->getPragma()->getPragmaName() == "parallel") {
+                            std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
+                            if (clauses.find("for") != clauses.end()) {
+                                const std::string structDef = getStructDef(node);
+                                accumulatedStructDefs = accumulatedStructDefs + structDef;
 
-                if (pragma->getPragmaName() == "parallel") {
-                    std::map<std::string, std::vector<std::string> > clauses = pragma->getClauses();
-                    if (clauses.find("for") != clauses.end()) {
-                        std::string lbl = fname + std::to_string(countParallelRegions++);
-                        std::cerr<< "pragma on " << stmtToString(succ) <<
-                            " with lbl " << lbl << std::endl;
+                                const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
+                                assert(forLoop);
+                                const clang::Stmt *init = forLoop->getInit();
+                                const clang::Stmt *cond = forLoop->getCond();
+                                const clang::Expr *inc = forLoop->getInc();
 
-                        std::string struct_def = "typedef struct _" + lbl + " { ";
-                        for (std::vector<clang::ValueDecl *>::iterator ii =
-                                captures[line]->begin(), ee = captures[line]->end();
-                                ii != ee; ii++) {
-                            clang::ValueDecl *curr = *ii;
-                            struct_def = struct_def +
-                                curr->getType().getAsString() + " " +
-                                curr->getNameAsString() + "; ";
+                                std::string bodyStr = stmtToString(forLoop->getBody());
+
+                                std::string lowStr = "";
+                                std::string highStr = "";
+                                std::string strideStr = "";
+
+                                accumulatedKernelDefs += "static void " + node->getLbl() + "_async(const int ___iter, void *arg) {\n";
+                                accumulatedKernelDefs += "    " + node->getLbl() + " *ctx = (" + node->getLbl() + " *)arg;\n";
+                                for (std::vector<clang::ValueDecl *>::iterator ii =
+                                        captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
+                                        ii != ee; ii++) {
+                                    clang::ValueDecl *curr = *ii;
+                                    accumulatedKernelDefs += "    " +
+                                        curr->getType().getAsString() + " " +
+                                        curr->getNameAsString() + " = ctx->" +
+                                        curr->getNameAsString() + ";\n";
+                                }
+
+                                const clang::ValueDecl *condVar = NULL;
+
+                                if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(init)) {
+                                    clang::Expr *lhs = bin->getLHS();
+                                    if (const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
+                                        condVar = declref->getDecl();
+                                        std::string varname = condVar->getNameAsString();
+                                        accumulatedKernelDefs += "    " + varname + " = ___iter;\n";
+
+                                        lowStr = stmtToString(bin->getRHS());
+                                    } else {
+                                        std::cerr << "LHS is unsupported class " << std::string(lhs->getStmtClassName()) << std::endl;
+                                        exit(1);
+                                    }
+                                } else {
+                                    std::cerr << "Unsupported init class " <<
+                                        std::string(init->getStmtClassName()) <<
+                                        std::endl;
+                                    exit(1);
+                                }
+
+                                if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(cond)) {
+                                    if (bin->getOpcode() == clang::BO_LT) {
+                                        clang::Expr *lhs = bin->getLHS();
+                                        while (clang::isa<clang::ImplicitCastExpr>(lhs)) {
+                                            lhs = clang::dyn_cast<clang::ImplicitCastExpr>(lhs)->getSubExpr();
+                                        }
+                                        std::cerr << "LHS = " << std::string(lhs->getStmtClassName()) << std::endl;
+                                        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
+                                        assert(declref);
+                                        const clang::ValueDecl *decl = declref->getDecl();
+                                        assert(condVar == decl);
+                                        highStr = stmtToString(bin->getRHS());
+                                    } else {
+                                        std::cerr << "Unsupported binary operator" << std::endl;
+                                        exit(1);
+                                    }
+                                } else {
+                                    std::cerr << "Unsupported cond class " <<
+                                        std::string(cond->getStmtClassName()) <<
+                                        std::endl;
+                                    exit(1);
+                                }
+
+                                if (const clang::UnaryOperator *uno = clang::dyn_cast<clang::UnaryOperator>(inc)) {
+                                    if (uno->getOpcode() == clang::UO_PostInc ||
+                                            uno->getOpcode() == clang::UO_PreInc) {
+                                        strideStr = "1";
+                                    } else if (uno->getOpcode() == clang::UO_PostDec ||
+                                            uno->getOpcode() == clang::UO_PreDec) {
+                                        strideStr = "-1";
+                                    } else {
+                                        std::cerr << "Unsupported unary operator" << std::endl;
+                                        exit(1);
+                                    }
+                                } else {
+                                    std::cerr << "Unsupported incr class " <<
+                                        std::string(inc->getStmtClassName()) <<
+                                        std::endl;
+                                    exit(1);
+                                }
+
+                                accumulatedKernelDefs += bodyStr;
+                                accumulatedKernelDefs += "}\n\n";
+
+                                std::string contextCreation = "\n" + node->getLbl() +
+                                    " *ctx = (" + node->getLbl() + " *)malloc(sizeof(" + node->getLbl() + "));\n";
+                                for (std::vector<clang::ValueDecl *>::iterator ii =
+                                        captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
+                                        ii != ee; ii++) {
+                                    clang::ValueDecl *curr = *ii;
+                                    contextCreation += "ctx->" +
+                                        curr->getNameAsString() + " = " +
+                                        curr->getNameAsString() + ";\n";
+                                }
+                                contextCreation += "loop_domain_t domain;\n";
+                                contextCreation += "domain.low = " + lowStr + ";\n";
+                                contextCreation += "domain.high = " + highStr + ";\n";
+                                contextCreation += "domain.stride = " + strideStr + ";\n";
+                                contextCreation += "domain.tile = 1;\n";
+                                contextCreation += "hclib_future_t *fut = hclib_forasync_future(" +
+                                    node->getLbl() + "_async, ctx, NULL, 1, " +
+                                    "&domain, FORASYNC_MODE_RECURSIVE);\n";
+                                contextCreation += "hclib_future_wait(fut);\n";
+                                contextCreation += "free(ctx);\n";
+                                rewriter->ReplaceText(succ->getSourceRange(), contextCreation);
+                                // rewriter->InsertTextAfterToken(pred->getLocEnd(),
+                                //         contextCreation);
+                            } else {
+                                std::cerr << "Parallel pragma without a for at line " <<
+                                    node->getPragmaLine() << std::endl;
+                                exit(1);
+                            }
+                        } else if (node->getPragma()->getPragmaName() == "simd") {
+                            // ignore
+                        } else {
+                            std::cerr << "Unhandled supported pragma \"" <<
+                                node->getPragma()->getPragmaName() << "\"" << std::endl;
+                            exit(1);
                         }
-                        struct_def = struct_def + " } " + lbl + ";\n";
-
-                        rewriter->InsertText(curr_func_decl->getLocStart(), struct_def, true, true);
                     } else {
-                        std::cerr << "Parallel pragma without a for at line " <<
-                            line << std::endl;
+                        std::cerr << "Encountered an unknown pragma \"" <<
+                            node->getPragma()->getPragmaName() << "\" at line " << node->getPragmaLine() << std::endl;
                         exit(1);
                     }
-                } else if (pragma->getPragmaName() == "simd") {
-                    // ignore
-                } else {
-                    std::cerr << "Unhandled supported pragma \"" <<
-                        pragma->getPragmaName() << "\"" << std::endl;
-                    exit(1);
+
+                    if (std::find(todo->begin(), todo->end(), node->getParent()) == todo->end() && node->getParent()->getLbl() != "root") {
+                        todo->push_back(node->getParent());
+                    }
                 }
-            } else {
-                std::cerr << "Encountered an unknown pragma \"" <<
-                    pragma->getPragmaName() << "\" at line " << line << std::endl;
-                exit(1);
+
+                processing = todo;
+                todo = new std::vector<OMPNode *>();
             }
+
+            rewriter->InsertText(curr_func_decl->getLocStart(),
+                    accumulatedStructDefs + accumulatedKernelDefs, true, true);
         }
 
         successors.clear();
@@ -329,8 +396,6 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
         }
 
         if (const clang::DeclStmt *decls = clang::dyn_cast<clang::DeclStmt>(s)) {
-            std::cerr << "Found declaration " << stmtToString(s) << std::endl;
-
             for (clang::DeclStmt::const_decl_iterator i = decls->decl_begin(),
                     e = decls->decl_end(); i != e; i++) {
                 clang::Decl *decl = *i;

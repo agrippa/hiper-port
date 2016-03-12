@@ -44,7 +44,9 @@ public:
           std::cerr << "Visiting " << fdecl->getNameAsString() << std::endl;
 
           curr_func_decl = fdecl;
+          transform->preFunctionVisit(fdecl);
           transform->Visit(fdecl->getBody());
+          transform->postFunctionVisit();
       }
   }
 

@@ -2,11 +2,14 @@
 
 #include <iostream>
 
-OMPNode::OMPNode(const clang::Stmt *setBody, int setPragmaLine, OMPPragma *setPragma,
+OMPNode::OMPNode(const clang::Stmt *setBody, int setPragmaLine,
+        OMPPragma *setPragma, OMPNode *setParent, std::string setLbl,
         clang::SourceManager *SM) {
     body = setBody;
     pragmaLine = setPragmaLine;
     pragma = setPragma;
+    parent = setParent;
+    lbl = setLbl;
 
     if (body) {
         clang::PresumedLoc presumedStart = SM->getPresumedLoc(body->getLocStart());
@@ -36,7 +39,19 @@ OMPPragma *OMPNode::getPragma() {
     return pragma;
 }
 
-void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragma,
+std::string OMPNode::getLbl() {
+    return lbl;
+}
+
+const clang::Stmt *OMPNode::getBody() {
+    return body;
+}
+
+OMPNode *OMPNode::getParent() {
+    return parent;
+}
+
+void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragma, std::string lbl,
         clang::SourceManager *SM) {
     clang::PresumedLoc presumedStart = SM->getPresumedLoc(stmt->getLocStart());
     clang::PresumedLoc presumedEnd = SM->getPresumedLoc(stmt->getLocEnd());
@@ -60,11 +75,11 @@ void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragm
             // Should be a child pragma
             assert(childEndLine > existingChild.getStartLine() &&
                     childEndLine < existingChild.getEndLine());
-            existingChild.addChild(stmt, pragmaLine, pragma, SM);
+            existingChild.addChild(stmt, pragmaLine, pragma, lbl, SM);
             return;
         }
     }
-    children.push_back(OMPNode(stmt, pragmaLine, pragma, SM));
+    children.push_back(OMPNode(stmt, pragmaLine, pragma, this, lbl, SM));
 }
 
 void OMPNode::print() {
@@ -78,8 +93,28 @@ void OMPNode::printHelper(int depth) {
         std::cerr << "=";
     }
     std::cerr << "pragma @ line " << pragmaLine << ", " << children.size() <<
-        " children" << std::endl;
+        " children, lbl = " << lbl << std::endl;
     for (int i = 0; i < children.size(); i++) {
         children[i].printHelper(depth + 1);
     }
+}
+
+int OMPNode::nchildren() {
+    return children.size();
+}
+
+void OMPNode::getLeavesHelper(std::vector<OMPNode *> *accum) {
+    if (nchildren() == 0) {
+        accum->push_back(this);
+    } else {
+        for (int i = 0; i < nchildren(); i++) {
+            children[i].getLeavesHelper(accum);
+        }
+    }
+}
+
+std::vector<OMPNode *> *OMPNode::getLeaves() {
+    std::vector<OMPNode *> *accum = new std::vector<OMPNode *>();
+    getLeavesHelper(accum);
+    return accum;
 }

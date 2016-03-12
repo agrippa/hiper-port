@@ -20,18 +20,23 @@
 class OMPNode {
     private:
         std::vector<OMPNode> children;
+        OMPNode *parent;
         const clang::Stmt *body;
         int startLine;
         int endLine;
         int pragmaLine;
         OMPPragma *pragma;
+        std::string lbl;
+
+        void getLeavesHelper(std::vector<OMPNode *> *accum);
 
     public:
-        OMPNode(const clang::Stmt *setBody, int setPragmaLine, OMPPragma *setPragma,
+        OMPNode(const clang::Stmt *setBody, int setPragmaLine,
+                OMPPragma *setPragma, OMPNode *setParent, std::string setLbl,
                 clang::SourceManager *SM);
 
-        void addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragma,
-                clang::SourceManager *SM);
+        void addChild(const clang::Stmt *stmt, int pragmaLine,
+                OMPPragma *pragma, std::string lbl, clang::SourceManager *SM);
 
         int getStartLine();
         int getEndLine();
@@ -39,6 +44,11 @@ class OMPNode {
         OMPPragma *getPragma();
         void print();
         void printHelper(int depth);
+        int nchildren();
+        std::vector<OMPNode *> *getLeaves();
+        std::string getLbl();
+        OMPNode *getParent();
+        const clang::Stmt *getBody();
 };
 
 #endif

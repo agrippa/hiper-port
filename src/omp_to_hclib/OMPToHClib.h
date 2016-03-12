@@ -17,6 +17,7 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include "OMPPragma.h"
+#include "OMPNode.h"
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
@@ -38,6 +39,9 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void setParent(const clang::Stmt *child,
                 const clang::Stmt *parent);
 
+        void preFunctionVisit(clang::FunctionDecl *func);
+        void postFunctionVisit();
+
     protected:
         clang::ASTContext *Context;
         clang::SourceManager *SM;
@@ -57,6 +61,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void popScope();
         void addToCurrentScope(clang::ValueDecl *d);
         std::vector<clang::ValueDecl *> *visibleDecls();
+
+        std::string getStructDef(OMPNode *node);
 
         std::vector<OMPPragma> *pragmas;
 
