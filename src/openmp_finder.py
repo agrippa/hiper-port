@@ -50,6 +50,8 @@ if __name__ == '__main__':
 
                     acc = acc[:len(acc) - 1].strip() # trim the last \
                     acc += ' ' + line
+
+                acc = acc.replace('\t', ' ')
                 sys.stdout.write(str(starting_line_no) + ' ' + str(curr_line_no) + ' ' + acc + '\n')
             else:
                 curr_line_no += 1

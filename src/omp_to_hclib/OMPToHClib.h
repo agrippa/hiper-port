@@ -63,6 +63,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         std::string getStructDef(OMPNode *node);
 
+        clang::Expr *unwrapCasts(clang::Expr *expr);
+
         std::vector<OMPPragma> *pragmas;
 
         /*

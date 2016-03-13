@@ -111,6 +111,13 @@ void OMPToHClib::preFunctionVisit(clang::FunctionDecl *func) {
     }
 }
 
+clang::Expr *OMPToHClib::unwrapCasts(clang::Expr *expr) {
+    while (clang::isa<clang::ImplicitCastExpr>(expr)) {
+        expr = clang::dyn_cast<clang::ImplicitCastExpr>(expr)->getSubExpr();
+    }
+    return expr;
+}
+
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
     assert(getCurrentLexicalDepth() == 1);
     popScope();
@@ -209,11 +216,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                                 if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(cond)) {
                                     if (bin->getOpcode() == clang::BO_LT) {
-                                        clang::Expr *lhs = bin->getLHS();
-                                        while (clang::isa<clang::ImplicitCastExpr>(lhs)) {
-                                            lhs = clang::dyn_cast<clang::ImplicitCastExpr>(lhs)->getSubExpr();
-                                        }
-                                        std::cerr << "LHS = " << std::string(lhs->getStmtClassName()) << std::endl;
+                                        clang::Expr *lhs = unwrapCasts(bin->getLHS());
                                         const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
                                         assert(declref);
                                         const clang::ValueDecl *decl = declref->getDecl();
@@ -231,6 +234,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 }
 
                                 if (const clang::UnaryOperator *uno = clang::dyn_cast<clang::UnaryOperator>(inc)) {
+                                    clang::Expr *target = unwrapCasts(uno->getSubExpr());
+                                    const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
+                                    assert(declref);
+                                    const clang::ValueDecl *decl = declref->getDecl();
+                                    assert(condVar == decl);
+
                                     if (uno->getOpcode() == clang::UO_PostInc ||
                                             uno->getOpcode() == clang::UO_PreInc) {
                                         strideStr = "1";
@@ -239,6 +248,53 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                         strideStr = "-1";
                                     } else {
                                         std::cerr << "Unsupported unary operator" << std::endl;
+                                        exit(1);
+                                    }
+                                } else if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(inc)) {
+                                    if (bin->getOpcode() == clang::BO_Assign) {
+                                        clang::Expr *target = unwrapCasts(bin->getLHS());
+                                        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
+                                        assert(declref);
+                                        assert(condVar == declref->getDecl());
+
+                                        clang::Expr *rhs = unwrapCasts(bin->getRHS());
+                                        if (const clang::BinaryOperator *rhsBin = clang::dyn_cast<clang::BinaryOperator>(rhs)) {
+                                            clang::Expr *lhs = unwrapCasts(rhsBin->getLHS());
+                                            clang::Expr *rhs = unwrapCasts(rhsBin->getRHS());
+                                            clang::Expr *other = NULL;
+
+                                            clang::DeclRefExpr *declref = NULL;
+                                            if (declref = clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
+                                                other = rhs;
+                                            } else if (declref = clang::dyn_cast<clang::DeclRefExpr>(rhs)) {
+                                                other = lhs;
+                                            } else {
+                                                std::cerr << "Neither of the inputs to the RHS binary op for an incr clause are a decl ref" << std::endl;
+                                                exit(1);
+                                            }
+
+                                            assert(condVar == declref->getDecl());
+
+                                            if (rhsBin->getOpcode() == clang::BO_Add) {
+                                                if (const clang::IntegerLiteral *literal = clang::dyn_cast<clang::IntegerLiteral>(other)) {
+                                                    strideStr = stmtToString(literal);
+                                                } else {
+                                                    std::cerr << "unsupported other is a " << other->getStmtClassName() << std::endl;
+                                                    exit(1);
+                                                }
+                                            } else {
+                                                std::cerr << "Unsupported binary operator on RHS of binary incr clause" << std::endl;
+                                                exit(1);
+                                            }
+                                        } else {
+                                            std::cerr << "Unsupported RHS to binary incr clause: " << rhs->getStmtClassName() << std::endl;
+                                            exit(1);
+                                        }
+                                    } else {
+                                        std::cerr << "Unsupported binary "
+                                            "operator in increment clause at "
+                                            "line " << node->getPragmaLine() <<
+                                            std::endl;
                                         exit(1);
                                     }
                                 } else {
@@ -506,7 +562,9 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
         line = line.substr(line.find(' ') + 1);
         assert(line.find("omp") == 0);
 
+        std::cerr << "line before = " << line << std::endl;
         line = line.substr(line.find(' ') + 1);
+        std::cerr << "line after = " << line << std::endl;
 
         // Look for a command like parallel, for, etc.
         end = line.find(' ');
@@ -519,6 +577,8 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
                         pragma_name));
         } else {
             std::string pragma_name = line.substr(0, end);
+
+            std::cerr << "Parsed pragma " << pragma_name << " from line " << line << std::endl;
 
             OMPPragma pragma(line_no, last_line, line, pragma_name);
             std::string clauses = line.substr(end + 1);
