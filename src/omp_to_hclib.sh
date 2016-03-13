@@ -20,8 +20,9 @@ INPUT_PATH=
 OUTPUT_PATH=
 KEEP=0
 VERBOSE=0
+USER_INCLUDES=
 
-while getopts "i:o:kvh" opt; do
+while getopts "i:o:kvhI:" opt; do
     case $opt in 
         i)
             INPUT_PATH=$OPTARG
@@ -35,8 +36,11 @@ while getopts "i:o:kvh" opt; do
         v)
             VERBOSE=1
             ;;
+        I)
+            USER_INCLUDES="$USER_INCLUDES -I$OPTARG"
+            ;;
         h)
-            echo 'usage: omp_to_hclib.sh <-i input-file> <-o output-file>'
+            echo 'usage: omp_to_hclib.sh <-i input-file> <-o output-file> [-k] [-v] [-h] [-I include-path]'
             exit 1
             ;;
         \?)
@@ -89,7 +93,7 @@ OMP_INFO=$DIRNAME/$NAME.omp.info
 # Insert braces to simplify future transformatsion, i.e. to ensure block
 # membership does not change because of inserted code
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting braces'
-$BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE
+$BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE $USER_INCLUDES
 
 # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
@@ -97,7 +101,7 @@ python $OPENMP_FINDER $WITH_BRACES > $OMP_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO $WITH_BRACES -- $INCLUDE
+$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO $WITH_BRACES -- $INCLUDE $USER_INCLUDES
 
 # Remove any OMP pragmas
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'

@@ -112,8 +112,6 @@ void BraceInserter::VisitStmt(const clang::Stmt *s) {
                 std::string cond_str = to_string(f->getCond());
                 std::string then_str = to_string(f->getThen());
 
-                std::cerr << "got cond_str \"" << cond_str << "\" for " << std::string(f->getCond()->getStmtClassName()) << std::endl;
-
                 if_stream << "if (" << cond_str << ") {" << then_str << "; }";
 
                 if (f->getElse() != NULL) {

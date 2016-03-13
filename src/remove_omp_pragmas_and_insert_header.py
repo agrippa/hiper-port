@@ -5,11 +5,16 @@ import sys
 
 sys.stdout.write('#include "hclib.h"\n')
 
-for line in sys.stdin:
+line = sys.stdin.readline()
+while len(line) > 0:
     stripped = line.strip()
     tokens = stripped.split()
 
     if len(tokens) >= 2 and tokens[0] == '#pragma' and tokens[1] == 'omp':
-        pass
+        while stripped.endswith('\\'):
+            line = sys.stdin.readline()
+            stripped = line.strip()
     else:
         sys.stdout.write(line)
+
+    line = sys.stdin.readline()

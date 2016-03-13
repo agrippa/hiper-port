@@ -12,17 +12,15 @@ FILES="$(find $SCRIPT_DIR/c/ -name "*.c") $FILES"
 for FILE in $FILES; do
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
-    EXTENSION="${FILENAME##*.}"
-    NAME="${FILENAME%.*}"
 
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
-    REFERENCE=$(dirname $FILE)-ref/$FILENAME
+    REFERENCE=$(dirname $DIRNAME)-ref/$FILENAME
 
-    $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT $* &> transform.log
+    $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME $* &> transform.log
 
     if [[ ! -f $REFERENCE ]]; then
         echo
-        echo Missing reference output for $FILE, exiting early
+        echo Missing reference output at $REFERENCE for $FILE, exiting early
         echo Generated output is in $TEST_OUTPUT
         exit 1
     fi
