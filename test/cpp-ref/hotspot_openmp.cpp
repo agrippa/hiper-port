@@ -68,7 +68,7 @@ typedef struct _single_iteration62 {
     int chunks_in_col;
  } single_iteration62;
 
-static void single_iteration62_hclib_async(const int ___iter, void *arg) {
+static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     single_iteration62 *ctx = (single_iteration62 *)arg;
     FLOAT * result = ctx->result;
     FLOAT * temp = ctx->temp;
@@ -299,59 +299,56 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-int main(int argc, char **argv)
+typedef struct _main_ctx {
+  int argc;
+  char **argv;
+} main_ctx;
+
+static int main_entrypoint(void *arg) {
+    main_ctx *ctx = (main_ctx *)arg;
+    int argc = ctx->argc;
+    char **argv = ctx->argv;
 {
-	int grid_rows, grid_cols, sim_time, i;
-	FLOAT *temp, *power, *result;
-	char *tfile, *pfile, *ofile;
-	
-	/* check validity of inputs	*/
-	if (argc != 8) {usage(argc, argv); };
-	if ((grid_rows = atoi(argv[1])) <= 0 ||
-		(grid_cols = atoi(argv[2])) <= 0 ||
-		(sim_time = atoi(argv[3])) <= 0 || 
-		(num_omp_threads = atoi(argv[4])) <= 0) {usage(argc, argv); };
-
-	/* allocate memory for the temperature and power arrays	*/
-	temp = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
-	power = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
-	result = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
-	if (!temp || !power) {fatal("unable to allocate memory"); };
-
-	/* read initial temperatures and input power	*/
-	tfile = argv[5];
-	pfile = argv[6];
+    int grid_rows, grid_cols, sim_time, i;
+    FLOAT *temp, *power, *result;
+    char *tfile, *pfile, *ofile;
+    if (argc != 8) {
+        usage(argc, argv);
+    }
+    ;
+    if ((grid_rows = atoi(argv[1])) <= 0 || (grid_cols = atoi(argv[2])) <= 0 || (sim_time = atoi(argv[3])) <= 0 || (num_omp_threads = atoi(argv[4])) <= 0) {
+        usage(argc, argv);
+    }
+    ;
+    temp = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
+    power = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
+    result = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
+    if (!temp || !power) {
+        fatal("unable to allocate memory");
+    }
+    ;
+    tfile = argv[5];
+    pfile = argv[6];
     ofile = argv[7];
-
-	read_input(temp, grid_rows, grid_cols, tfile);
-	read_input(power, grid_rows, grid_cols, pfile);
-
-	printf("Start computing the transient temperature\n");
-	
+    read_input(temp, grid_rows, grid_cols, tfile);
+    read_input(power, grid_rows, grid_cols, pfile);
+    printf("Start computing the transient temperature\n");
     long long start_time = get_time();
-
-    compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
-
+    compute_tran_temp(result, sim_time, temp, power, grid_rows, grid_cols);
     long long end_time = get_time();
-
     printf("Ending simulation\n");
-    printf("Total time: %.3f seconds\n", ((float) (end_time - start_time)) / (1000*1000));
-
-    writeoutput((1&sim_time) ? result : temp, grid_rows, grid_cols, ofile);
-
-	/* output results	*/
-#ifdef VERBOSE
-	fprintf(stdout, "Final Temperatures:\n");
-#endif
-
-#ifdef OUTPUT
-	for(i=0; i < grid_rows * grid_cols; i++)
-	fprintf(stdout, "%d\t%g\n", i, temp[i]);
-#endif
-	/* cleanup	*/
-	free(temp);
-	free(power);
-
-	return 0;
+    printf("Total time: %.3f seconds\n", ((float)(end_time - start_time)) / (1000 * 1000));
+    writeoutput((1 & sim_time) ? result : temp, grid_rows, grid_cols, ofile);
+    free(temp);
+    free(power);
+    return 0;
 }
+}
+int main(int argc, char **argv)
+{ main_ctx *ctx = (main_ctx *)malloc(sizeof(main_ctx));
+ctx->argc = argc;
+ctx->argv = argv;
+hclib_launch(NULL, NULL, (void (*)(void*))main_entrypoint, ctx);
+free(ctx); return 0; }
+
 /* vim: set ts=4 sw=4  sts=4 et si ai: */

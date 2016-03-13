@@ -34,13 +34,12 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         void visitChildren(const clang::Stmt *s, bool firstTraversal = true);
         void VisitStmt(const clang::Stmt *s);
-        void postVisit();
         std::string stmtToString(const clang::Stmt* s);
         void setParent(const clang::Stmt *child,
                 const clang::Stmt *parent);
 
         void preFunctionVisit(clang::FunctionDecl *func);
-        void postFunctionVisit();
+        void postFunctionVisit(clang::FunctionDecl *func);
 
     protected:
         clang::ASTContext *Context;

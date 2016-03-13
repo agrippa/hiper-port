@@ -111,15 +111,13 @@ void OMPToHClib::preFunctionVisit(clang::FunctionDecl *func) {
     }
 }
 
-void OMPToHClib::postFunctionVisit() {
+void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
     assert(getCurrentLexicalDepth() == 1);
     popScope();
-}
 
-void OMPToHClib::postVisit() {
-    if (curr_func_decl) {
-        std::string fname = curr_func_decl->getNameAsString();
-        clang::PresumedLoc presumedStart = SM->getPresumedLoc(curr_func_decl->getLocStart());
+    if (func) {
+        std::string fname = func->getNameAsString();
+        clang::PresumedLoc presumedStart = SM->getPresumedLoc(func->getLocStart());
         const int functionStartLine = presumedStart.getLine();
 
         OMPNode rootNode(NULL, functionStartLine, NULL, NULL, std::string("root"), SM);
@@ -139,12 +137,12 @@ void OMPToHClib::postVisit() {
 
         rootNode.print();
 
+        std::string accumulatedStructDefs = "";
+        std::string accumulatedKernelDefs = "";
+
         if (rootNode.nchildren() > 0) {
             std::vector<OMPNode *> *todo = new std::vector<OMPNode *>();
             std::vector<OMPNode *> *processing = rootNode.getLeaves();
-
-            std::string accumulatedStructDefs = "";
-            std::string accumulatedKernelDefs = "";
 
             while (processing->size() != 0) {
                 for (std::vector<OMPNode *>::iterator i = processing->begin(),
@@ -172,7 +170,7 @@ void OMPToHClib::postVisit() {
                                 std::string highStr = "";
                                 std::string strideStr = "";
 
-                                accumulatedKernelDefs += "static void " + node->getLbl() + ASYNC_SUFFIX + "(const int ___iter, void *arg) {\n";
+                                accumulatedKernelDefs += "static void " + node->getLbl() + ASYNC_SUFFIX + "(void *arg, const int ___iter) {\n";
                                 accumulatedKernelDefs += "    " + node->getLbl() + " *ctx = (" + node->getLbl() + " *)arg;\n";
                                 for (std::vector<clang::ValueDecl *>::iterator ii =
                                         captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
@@ -305,13 +303,41 @@ void OMPToHClib::postVisit() {
                 processing = todo;
                 todo = new std::vector<OMPNode *>();
             }
+        }
 
-            rewriter->InsertText(curr_func_decl->getLocStart(),
+        if (fname == "main") {
+            accumulatedStructDefs += "typedef struct _main_ctx {\n";
+            accumulatedStructDefs += "  int argc;\n";
+            accumulatedStructDefs += "  char **argv;\n";
+            accumulatedStructDefs += "} main_ctx;\n\n";
+
+            accumulatedKernelDefs += "static int main_entrypoint(void *arg) {\n";
+            accumulatedKernelDefs += "    main_ctx *ctx = (main_ctx *)arg;\n";
+            accumulatedKernelDefs += "    int argc = ctx->argc;\n";
+            accumulatedKernelDefs += "    char **argv = ctx->argv;\n";
+            accumulatedKernelDefs += stmtToString(func->getBody());
+            accumulatedKernelDefs += "}\n";
+        }
+
+        if (accumulatedStructDefs.length() > 0 ||
+                accumulatedKernelDefs.length() > 0) {
+            rewriter->InsertText(func->getLocStart(),
                     accumulatedStructDefs + accumulatedKernelDefs, true, true);
         }
 
         successors.clear();
         predecessors.clear();
+
+        if (fname == "main") {
+            std::string launchStr = "";
+            launchStr += "{ main_ctx *ctx = (main_ctx *)malloc(sizeof(main_ctx));\n";
+            launchStr += "ctx->argc = argc;\n";
+            launchStr += "ctx->argv = argv;\n";
+            launchStr += std::string("hclib_launch(NULL, NULL, "
+                "(void (*)(void*))main_entrypoint, ctx);\n");
+            launchStr += "free(ctx); return 0; }\n";
+            rewriter->ReplaceText(func->getBody()->getSourceRange(), launchStr);
+        }
     }
 }
 

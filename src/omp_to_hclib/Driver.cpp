@@ -46,7 +46,7 @@ public:
           curr_func_decl = fdecl;
           transform->preFunctionVisit(fdecl);
           transform->Visit(fdecl->getBody());
-          transform->postFunctionVisit();
+          transform->postFunctionVisit(fdecl);
       }
   }
 
@@ -75,7 +75,6 @@ public:
         }
     }
 
-    transform->postVisit();
     return true;
   }
 
