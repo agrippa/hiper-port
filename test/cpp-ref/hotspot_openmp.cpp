@@ -142,7 +142,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
     int chunks_in_row = col/BLOCK_SIZE_C;
     int chunks_in_col = row/BLOCK_SIZE_R;
 
-	omp_set_num_threads(num_omp_threads);
+	// omp_set_num_threads(num_omp_threads);
     
 single_iteration62 *ctx = (single_iteration62 *)malloc(sizeof(single_iteration62));
 ctx->result = result;

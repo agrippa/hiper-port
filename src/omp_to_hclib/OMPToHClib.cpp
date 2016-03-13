@@ -389,8 +389,24 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
     }
 
     if (start.isValid() && end.isValid() && SM->isInMainFile(end)) {
-        clang::PresumedLoc presumed_start = SM->getPresumedLoc(start);
-        clang::PresumedLoc presumed_end = SM->getPresumedLoc(end);
+        clang::PresumedLoc presumedStart = SM->getPresumedLoc(start);
+        clang::PresumedLoc presumedEnd = SM->getPresumedLoc(end);
+
+        /*
+         * Look for OMP calls and make sure the user has to replace them with
+         * something appropriate.
+         */
+        if (const clang::CallExpr *call = clang::dyn_cast<clang::CallExpr>(s)) {
+            if (call->getDirectCallee()) {
+                const clang::FunctionDecl *callee = call->getDirectCallee();
+                std::string calleeName = callee->getNameAsString();
+                if (calleeName.find("omp_") == 0) {
+                    std::cerr << "Found OMP function call to \"" <<  calleeName << "\" on line " << presumedStart.getLine() << std::endl;
+                    std::cerr << "Please replace or delete, then retry to the translation" << std::endl;
+                    exit(1);
+                }
+            }
+        }
 
         /*
          * First check if this statement is a variable declaration, and if so
@@ -421,7 +437,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                 e = omp_pragmas->end(); i != e; i++) {
             OMPPragma pragma = *i;
 
-            if (presumed_end.getLine() < pragma.getLine()) {
+            if (presumedEnd.getLine() < pragma.getLine()) {
                 if (predecessors.find(pragma.getLine()) ==
                         predecessors.end()) {
                     predecessors[pragma.getLine()] = s;
@@ -430,25 +446,25 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                     const clang::Stmt *curr = predecessors[pragma.getLine()];
                     clang::PresumedLoc curr_loc = SM->getPresumedLoc(
                             curr->getLocEnd());
-                    if (presumed_end.getLine() > curr_loc.getLine() ||
-                            (presumed_end.getLine() == curr_loc.getLine() &&
-                             presumed_end.getColumn() > curr_loc.getColumn())) {
+                    if (presumedEnd.getLine() > curr_loc.getLine() ||
+                            (presumedEnd.getLine() == curr_loc.getLine() &&
+                             presumedEnd.getColumn() > curr_loc.getColumn())) {
                         predecessors[pragma.getLine()] = s;
                         captures[pragma.getLine()] = visibleDecls();
                     }
                 }
             }
 
-            if (presumed_start.getLine() >= pragma.getLine()) {
+            if (presumedStart.getLine() >= pragma.getLine()) {
                 if (successors.find(pragma.getLine()) == successors.end()) {
                     successors[pragma.getLine()] = s;
                 } else {
                     const clang::Stmt *curr = successors[pragma.getLine()];
                     clang::PresumedLoc curr_loc =
                         SM->getPresumedLoc(curr->getLocStart());
-                    if (presumed_start.getLine() < curr_loc.getLine() ||
-                            (presumed_start.getLine() == curr_loc.getLine() &&
-                             presumed_start.getColumn() < curr_loc.getColumn())) {
+                    if (presumedStart.getLine() < curr_loc.getLine() ||
+                            (presumedStart.getLine() == curr_loc.getLine() &&
+                             presumedStart.getColumn() < curr_loc.getColumn())) {
                         successors[pragma.getLine()] = s;
                     }
                 }
