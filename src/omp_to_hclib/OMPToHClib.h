@@ -21,7 +21,7 @@
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
-        OMPToHClib(const char *ompPragmaFile, const char *structFilename);
+        OMPToHClib(const char *ompPragmaFile);
         ~OMPToHClib();
 
         void setRewriter(clang::Rewriter &R) {
@@ -77,8 +77,6 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::set<std::string> supportedPragmas;
 
         std::vector<std::vector<clang::ValueDecl *> *> in_scope;
-
-        std::ofstream structFile;
 };
 
 #endif

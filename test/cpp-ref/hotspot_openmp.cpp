@@ -103,35 +103,17 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
                     }
                     ;
                 } else if ((r == 0) && (c == col - 1)) {
-                    {
-                        delta = (Cap_1) * (power[c] + (temp[c - 1] - temp[c]) * Rx_1 + (temp[c + col] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[c] + (temp[c - 1] - temp[c]) * Rx_1 + (temp[c + col] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
                 } else if ((r == row - 1) && (c == col - 1)) {
-                    {
-                        delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
                 } else if ((r == row - 1) && (c == 0)) {
-                    {
-                        delta = (Cap_1) * (power[r * col] + (temp[r * col + 1] - temp[r * col]) * Rx_1 + (temp[(r - 1) * col] - temp[r * col]) * Ry_1 + (amb_temp - temp[r * col]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[r * col] + (temp[r * col + 1] - temp[r * col]) * Rx_1 + (temp[(r - 1) * col] - temp[r * col]) * Ry_1 + (amb_temp - temp[r * col]) * Rz_1);
                 } else if (r == 0) {
-                    {
-                        delta = (Cap_1) * (power[c] + (temp[c + 1] + temp[c - 1] - 2. * temp[c]) * Rx_1 + (temp[col + c] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[c] + (temp[c + 1] + temp[c - 1] - 2. * temp[c]) * Rx_1 + (temp[col + c] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
                 } else if (c == col - 1) {
-                    {
-                        delta = (Cap_1) * (power[r * col + c] + (temp[(r + 1) * col + c] + temp[(r - 1) * col + c] - 2. * temp[r * col + c]) * Ry_1 + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[r * col + c] + (temp[(r + 1) * col + c] + temp[(r - 1) * col + c] - 2. * temp[r * col + c]) * Ry_1 + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (amb_temp - temp[r * col + c]) * Rz_1);
                 } else if (r == row - 1) {
-                    {
-                        delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c + 1] + temp[r * col + c - 1] - 2. * temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c + 1] + temp[r * col + c - 1] - 2. * temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
                 } else if (c == 0) {
                     delta = (Cap_1) * (power[r * col] + (temp[(r + 1) * col] + temp[(r - 1) * col] - 2. * temp[r * col]) * Ry_1 + (temp[r * col + 1] - temp[r * col]) * Rx_1 + (amb_temp - temp[r * col]) * Rz_1);
                 }
@@ -252,16 +234,15 @@ void writeoutput(FLOAT *vect, int grid_rows, int grid_cols, char *file) {
     FILE *fp;
     char str[STR_SIZE];
 
-    if ((fp = fopen(file, "w" )) == 0) {printf( "The file was not opened\n" ); };
+    if ((fp = fopen(file, "w")) == 0) {printf("The file was not opened\n"); };
 
 
-    for (i=0; i < grid_rows; i++) { for (j=0; j < grid_cols; j++)
-        {
-
-            sprintf(str, "%d\t%g\n", index, vect[i*grid_cols+j]);
-            fputs(str,fp);
-            index++;
-        }; }
+    for (i = 0; i < grid_rows; i++) { for (j = 0; j < grid_cols; j++) {
+    sprintf(str, "%d\t%g\n", index, vect[i * grid_cols + j]);
+    fputs(str, fp);
+    index++;
+}
+; }
 
     fclose(fp);	
 }
@@ -274,7 +255,7 @@ void read_input(FLOAT *vect, int grid_rows, int grid_cols, char *file)
 	FLOAT val;
 
 	fp = fopen (file, "r");
-	if (!fp) {fatal ("file could not be opened for reading"); };
+	if (!fp) {fatal("file could not be opened for reading"); };
 
 	for (i=0; i < grid_rows * grid_cols; i++) {
 		fgets(str, STR_SIZE, fp);

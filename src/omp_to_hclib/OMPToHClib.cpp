@@ -159,7 +159,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 accumulatedStructDefs = accumulatedStructDefs + structDef;
 
                                 const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
-                                assert(forLoop);
+                                if (!forLoop) {
+                                    std::cerr << "Expected to find for loop inside omp parallel for but found a " << node->getBody()->getStmtClassName() << " instead." << std::endl;
+                                    std::cerr << stmtToString(node->getBody()) << std::endl;
+                                    exit(1);
+                                }
                                 const clang::Stmt *init = forLoop->getInit();
                                 const clang::Stmt *cond = forLoop->getCond();
                                 const clang::Expr *inc = forLoop->getInc();
@@ -387,6 +391,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
     if (start.isValid() && end.isValid() && SM->isInMainFile(end)) {
         clang::PresumedLoc presumed_start = SM->getPresumedLoc(start);
         clang::PresumedLoc presumed_end = SM->getPresumedLoc(end);
+
         /*
          * This block of code checks if the current statement is either the
          * first before (predecessors) or after (successors) the line that an
@@ -584,16 +589,12 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     return pragmas;
 }
 
-OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *structFilename) {
+OMPToHClib::OMPToHClib(const char *ompPragmaFile) {
     pragmas = parseOMPPragmas(ompPragmaFile);
 
     supportedPragmas.insert("parallel");
     supportedPragmas.insert("simd"); // ignore
-
-    structFile.open(std::string(structFilename), std::ios::out);
-    assert(structFile.is_open());
 }
 
 OMPToHClib::~OMPToHClib() {
-    structFile.close();
 }

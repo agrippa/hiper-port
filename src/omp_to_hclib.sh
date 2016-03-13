@@ -85,7 +85,6 @@ WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
 WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
-STRUCT_INFO=$DIRNAME/$NAME.struct.info
 
 # Insert braces to simplify future transformatsion, i.e. to ensure block
 # membership does not change because of inserted code
@@ -94,11 +93,11 @@ $BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE
 
 # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
-python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
+python $OPENMP_FINDER $WITH_BRACES > $OMP_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-$OMP_TO_HCLIB -o $WITH_HCLIB -s $STRUCT_INFO -m $OMP_INFO $WITH_BRACES -- $INCLUDE
+$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO $WITH_BRACES -- $INCLUDE
 
 # Remove any OMP pragmas
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
@@ -109,5 +108,5 @@ cp $WITHOUT_PRAGMAS $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'
-    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS $STRUCT_INFO
+    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS
 fi

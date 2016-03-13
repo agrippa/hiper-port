@@ -25,8 +25,6 @@ static llvm::cl::opt<std::string> outputFile("o",
         llvm::cl::desc("Output file"), llvm::cl::value_desc("outputFile"));
 static llvm::cl::opt<std::string> ompPragmaFile("m",
         llvm::cl::desc("OpenMP file"), llvm::cl::value_desc("ompInfo"));
-static llvm::cl::opt<std::string> structFile("s",
-        llvm::cl::desc("Struct file"), llvm::cl::value_desc("structInfo"));
 
 
 static OMPToHClib *transform = NULL;
@@ -121,7 +119,6 @@ int main(int argc, const char **argv) {
 
   check_opt(outputFile, "Output file");
   check_opt(ompPragmaFile, "OpenMP pragma file");
-  check_opt(structFile, "Struct file");
 
   assert(op.getSourcePathList().size() == 1);
 
@@ -129,7 +126,7 @@ int main(int argc, const char **argv) {
       NumDebugFrontendAction<TransformASTConsumer>>();
   FrontendActionFactory *factory = factory_ptr.get();
 
-  transform = new OMPToHClib(ompPragmaFile.c_str(), structFile.c_str());
+  transform = new OMPToHClib(ompPragmaFile.c_str());
 
   ClangTool *Tool = new ClangTool(op.getCompilations(), op.getSourcePathList());
   int err = Tool->run(factory);

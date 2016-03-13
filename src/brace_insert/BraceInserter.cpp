@@ -12,6 +12,8 @@
 
 #include "BraceInserter.h"
 
+#include <iostream>
+
 void BraceInserter::visitChildren(const clang::Stmt *s) {
     for (clang::Stmt::const_child_iterator i = s->child_begin(),
             e = s->child_end(); i != e; i++) {
@@ -23,7 +25,12 @@ void BraceInserter::visitChildren(const clang::Stmt *s) {
 }
 
 std::string BraceInserter::to_string(const clang::Stmt *stmt) {
-    return rewriter->getRewrittenText(stmt->getSourceRange());
+    std::string s;
+    llvm::raw_string_ostream stream(s);
+    stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
+    stream.flush();
+    return s;
+    // return rewriter->getRewrittenText(stmt->getSourceRange());
 }
 
 
@@ -55,7 +62,7 @@ void BraceInserter::VisitStmt(const clang::Stmt *s) {
     visitChildren(s);
 
     // Insert braces around all if and for statement bodies
-    switch(s->getStmtClass()) {
+    switch (s->getStmtClass()) {
         case clang::Stmt::ForStmtClass: {
             const clang::ForStmt *f = clang::dyn_cast<clang::ForStmt>(s);
             assert(f);
@@ -104,6 +111,8 @@ void BraceInserter::VisitStmt(const clang::Stmt *s) {
 
                 std::string cond_str = to_string(f->getCond());
                 std::string then_str = to_string(f->getThen());
+
+                std::cerr << "got cond_str \"" << cond_str << "\" for " << std::string(f->getCond()->getStmtClassName()) << std::endl;
 
                 if_stream << "if (" << cond_str << ") {" << then_str << "; }";
 

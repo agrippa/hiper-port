@@ -6,14 +6,17 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p $SCRIPT_DIR/test-output
 
-for FILE in $(find $SCRIPT_DIR/cpp -name "*.cpp"); do
+FILES=$(find $SCRIPT_DIR/cpp/ -name "*.cpp")
+FILES="$(find $SCRIPT_DIR/c/ -name "*.c") $FILES"
+
+for FILE in $FILES; do
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
     EXTENSION="${FILENAME##*.}"
     NAME="${FILENAME%.*}"
 
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
-    REFERENCE=$SCRIPT_DIR/cpp-ref/$FILENAME
+    REFERENCE=$(dirname $FILE)-ref/$FILENAME
 
     $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT $* &> transform.log
 
