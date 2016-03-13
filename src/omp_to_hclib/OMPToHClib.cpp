@@ -536,6 +536,36 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
     assert(currentScope == getCurrentLexicalDepth());
 }
 
+
+void OMPToHClib::parseHClibPragmas(const char *filename) {
+    std::ifstream fp;
+    fp.open(std::string(filename), std::ios::in);
+    if (!fp.is_open()) {
+        std::cerr << "Failed opening " << std::string(filename) << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+
+    while (getline(fp, line)) {
+        size_t end = line.find(' ');
+        std::string firstToken = line.substr(0, end);
+        if (firstToken == "BODY") {
+            line = line.substr(end + 1);
+            end = line.find(' ');
+            launchStartLine = atoi(line.substr(0, end).c_str());
+            line = line.substr(end + 1);
+            end = line.find(' ');
+            launchEndLine = atoi(line.substr(0, end).c_str());
+        } else {
+            std::cerr << "Unknown label \"" << firstToken << "\"" << std::endl;
+            exit(1);
+        }
+    }
+
+    fp.close();
+}
+
 std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     std::vector<OMPPragma> *pragmas = new std::vector<OMPPragma>();
 
@@ -673,11 +703,15 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     return pragmas;
 }
 
-OMPToHClib::OMPToHClib(const char *ompPragmaFile) {
+OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile) {
     pragmas = parseOMPPragmas(ompPragmaFile);
 
     supportedPragmas.insert("parallel");
     supportedPragmas.insert("simd"); // ignore
+
+    launchStartLine = -1;
+    launchEndLine = -1;
+    parseHClibPragmas(ompToHclibPragmaFile);
 }
 
 OMPToHClib::~OMPToHClib() {

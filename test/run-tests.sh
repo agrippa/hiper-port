@@ -10,6 +10,7 @@ FILES=$(find $SCRIPT_DIR/cpp/ -name "*.cpp")
 FILES="$(find $SCRIPT_DIR/c/ -name "*.c") $FILES"
 
 for FILE in $FILES; do
+    echo Working on $FILE
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
 

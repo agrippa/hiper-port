@@ -21,7 +21,7 @@
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
-        OMPToHClib(const char *ompPragmaFile);
+        OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile);
         ~OMPToHClib();
 
         void setRewriter(clang::Rewriter &R) {
@@ -50,6 +50,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
     private:
         std::vector<OMPPragma> *parseOMPPragmas(const char *ompPragmaFile);
+        void parseHClibPragmas(const char *filename);
         std::vector<OMPPragma> *getOMPPragmasFor(
                 clang::FunctionDecl *decl, clang::SourceManager &SM);
         OMPPragma *getOMPPragmaFor(int lineNo);
@@ -79,6 +80,9 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::set<std::string> supportedPragmas;
 
         std::vector<std::vector<clang::ValueDecl *> *> in_scope;
+
+        int launchStartLine;
+        int launchEndLine;
 };
 
 #endif

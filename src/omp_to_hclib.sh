@@ -10,6 +10,7 @@ OPENMP_FINDER=$SCRIPT_DIR/openmp_finder.py
 OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
 INSERT_STRUCTS=$SCRIPT_DIR/insert_structs.py
 REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER=$SCRIPT_DIR/remove_omp_pragmas_and_insert_header.py 
+OMP_TO_HCLIB_PRAGMA_FINDER=$SCRIPT_DIR/omp_to_hclib_pragma_finder.py
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
@@ -89,6 +90,7 @@ WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
 WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
+OMP_TO_HCLIB_INFO=$DIRNAME/$NAME.omp_to_hclib.info
 
 # Insert braces to simplify future transformatsion, i.e. to ensure block
 # membership does not change because of inserted code
@@ -99,9 +101,13 @@ $BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE $USER_INCLUDES
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
 python $OPENMP_FINDER $WITH_BRACES > $OMP_INFO
 
+# Search for pragmas specific to this framework
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
+cat $WITH_BRACES | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
+
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO $WITH_BRACES -- $INCLUDE $USER_INCLUDES
+$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $WITH_BRACES -- $INCLUDE $USER_INCLUDES
 
 # Remove any OMP pragmas
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
@@ -112,5 +118,5 @@ cp $WITHOUT_PRAGMAS $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'
-    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS
+    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS $OMP_TO_HCLIB_INFO
 fi
