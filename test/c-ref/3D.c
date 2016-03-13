@@ -149,6 +149,7 @@ typedef struct _computeTempOMP150 {
     int count;
     float * tIn_t;
     float * tOut_t;
+    int z;
  } computeTempOMP150;
 
 static void computeTempOMP150_hclib_async(void *arg, const int ___iter) {
@@ -176,6 +177,7 @@ static void computeTempOMP150_hclib_async(void *arg, const int ___iter) {
     int count = ctx->count;
     float * tIn_t = ctx->tIn_t;
     float * tOut_t = ctx->tOut_t;
+    int z = ctx->z;
     z = ___iter;
     do {
 {
@@ -246,6 +248,7 @@ ctx->stepDivCap = stepDivCap;
 ctx->count = count;
 ctx->tIn_t = tIn_t;
 ctx->tOut_t = tOut_t;
+ctx->z = z;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = nz;
