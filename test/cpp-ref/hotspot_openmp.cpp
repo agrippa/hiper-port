@@ -98,10 +98,7 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
         for (r = r_start; r < r_start + 16; ++r) {
             for (c = c_start; c < c_start + 16; ++c) {
                 if ((r == 0) && (c == 0)) {
-                    {
-                        delta = (Cap_1) * (power[0] + (temp[1] - temp[0]) * Rx_1 + (temp[col] - temp[0]) * Ry_1 + (amb_temp - temp[0]) * Rz_1);
-                    }
-                    ;
+                    delta = (Cap_1) * (power[0] + (temp[1] - temp[0]) * Rx_1 + (temp[col] - temp[0]) * Ry_1 + (amb_temp - temp[0]) * Rz_1);
                 } else if ((r == 0) && (c == col - 1)) {
                     delta = (Cap_1) * (power[c] + (temp[c - 1] - temp[c]) * Rx_1 + (temp[c + col] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
                 } else if ((r == row - 1) && (c == col - 1)) {
@@ -143,7 +140,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
     int chunks_in_col = row/BLOCK_SIZE_R;
 
 	// omp_set_num_threads(num_omp_threads);
-    
+     { 
 single_iteration62 *ctx = (single_iteration62 *)malloc(sizeof(single_iteration62));
 ctx->result = result;
 ctx->temp = temp;
@@ -170,7 +167,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)single_iteration62_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
-
+ } 
 }
 
 /* Transient solver driver routine: simply converts the heat 
@@ -234,15 +231,18 @@ void writeoutput(FLOAT *vect, int grid_rows, int grid_cols, char *file) {
     FILE *fp;
     char str[STR_SIZE];
 
-    if ((fp = fopen(file, "w")) == 0) {printf("The file was not opened\n"); };
+    if( (fp = fopen(file, "w" )) == 0 )
+        printf( "The file was not opened\n" );
 
 
-    for (i = 0; i < grid_rows; i++) { for (j = 0; j < grid_cols; j++) {
-    sprintf(str, "%d\t%g\n", index, vect[i * grid_cols + j]);
-    fputs(str, fp);
-    index++;
-}
-; }
+    for (i=0; i < grid_rows; i++) 
+        for (j=0; j < grid_cols; j++)
+        {
+
+            sprintf(str, "%d\t%g\n", index, vect[i*grid_cols+j]);
+            fputs(str,fp);
+            index++;
+        }
 
     fclose(fp);	
 }
@@ -255,12 +255,15 @@ void read_input(FLOAT *vect, int grid_rows, int grid_cols, char *file)
 	FLOAT val;
 
 	fp = fopen (file, "r");
-	if (!fp) {fatal("file could not be opened for reading"); };
+	if (!fp)
+		fatal ("file could not be opened for reading");
 
 	for (i=0; i < grid_rows * grid_cols; i++) {
 		fgets(str, STR_SIZE, fp);
-		if (feof(fp)) {fatal("not enough lines in file"); };
-		if ((sscanf(str, "%f", &val) != 1)) {fatal("invalid file format"); };
+		if (feof(fp))
+			fatal("not enough lines in file");
+		if ((sscanf(str, "%f", &val) != 1) )
+			fatal("invalid file format");
 		vect[i] = val;
 	}
 
@@ -280,56 +283,63 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _main_ctx {
-  int argc;
-  char **argv;
-} main_ctx;
-
-static int main_entrypoint(void *arg) {
-    main_ctx *ctx = (main_ctx *)arg;
-    int argc = ctx->argc;
-    char **argv = ctx->argv;
-{
-    int grid_rows, grid_cols, sim_time, i;
-    FLOAT *temp, *power, *result;
-    char *tfile, *pfile, *ofile;
-    if (argc != 8) {
-        usage(argc, argv);
-    }
-    ;
-    if ((grid_rows = atoi(argv[1])) <= 0 || (grid_cols = atoi(argv[2])) <= 0 || (sim_time = atoi(argv[3])) <= 0 || (num_omp_threads = atoi(argv[4])) <= 0) {
-        usage(argc, argv);
-    }
-    ;
-    temp = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
-    power = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
-    result = (FLOAT *)calloc(grid_rows * grid_cols, sizeof(FLOAT));
-    if (!temp || !power) {
-        fatal("unable to allocate memory");
-    }
-    ;
-    tfile = argv[5];
-    pfile = argv[6];
-    ofile = argv[7];
-    read_input(temp, grid_rows, grid_cols, tfile);
-    read_input(power, grid_rows, grid_cols, pfile);
-    printf("Start computing the transient temperature\n");
-    long long start_time = get_time();
-    compute_tran_temp(result, sim_time, temp, power, grid_rows, grid_cols);
-    long long end_time = get_time();
-    printf("Ending simulation\n");
-    printf("Total time: %.3f seconds\n", ((float)(end_time - start_time)) / (1000 * 1000));
-    writeoutput((1 & sim_time) ? result : temp, grid_rows, grid_cols, ofile);
-    free(temp);
-    free(power);
-    return 0;
-}
-}
 int main(int argc, char **argv)
-{ main_ctx *ctx = (main_ctx *)malloc(sizeof(main_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
-hclib_launch(NULL, NULL, (void (*)(void*))main_entrypoint, ctx);
-free(ctx); return 0; }
+{
+	int grid_rows, grid_cols, sim_time, i;
+	FLOAT *temp, *power, *result;
+	char *tfile, *pfile, *ofile;
+	
+	/* check validity of inputs	*/
+	if (argc != 8)
+		usage(argc, argv);
+	if ((grid_rows = atoi(argv[1])) <= 0 ||
+		(grid_cols = atoi(argv[2])) <= 0 ||
+		(sim_time = atoi(argv[3])) <= 0 || 
+		(num_omp_threads = atoi(argv[4])) <= 0
+		)
+		usage(argc, argv);
 
+	/* allocate memory for the temperature and power arrays	*/
+	temp = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
+	power = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
+	result = (FLOAT *) calloc (grid_rows * grid_cols, sizeof(FLOAT));
+	if(!temp || !power)
+		fatal("unable to allocate memory");
+
+	/* read initial temperatures and input power	*/
+	tfile = argv[5];
+	pfile = argv[6];
+    ofile = argv[7];
+
+	read_input(temp, grid_rows, grid_cols, tfile);
+	read_input(power, grid_rows, grid_cols, pfile);
+
+	printf("Start computing the transient temperature\n");
+	
+    long long start_time = get_time();
+
+    compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
+
+    long long end_time = get_time();
+
+    printf("Ending simulation\n");
+    printf("Total time: %.3f seconds\n", ((float) (end_time - start_time)) / (1000*1000));
+
+    writeoutput((1&sim_time) ? result : temp, grid_rows, grid_cols, ofile);
+
+	/* output results	*/
+#ifdef VERBOSE
+	fprintf(stdout, "Final Temperatures:\n");
+#endif
+
+#ifdef OUTPUT
+	for(i=0; i < grid_rows * grid_cols; i++)
+	fprintf(stdout, "%d\t%g\n", i, temp[i]);
+#endif
+	/* cleanup	*/
+	free(temp);
+	free(power);
+
+	return 0;
+}
 /* vim: set ts=4 sw=4  sts=4 et si ai: */

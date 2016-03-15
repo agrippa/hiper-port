@@ -25,12 +25,12 @@ void BraceInserter::visitChildren(const clang::Stmt *s) {
 }
 
 std::string BraceInserter::to_string(const clang::Stmt *stmt) {
-    std::string s;
-    llvm::raw_string_ostream stream(s);
-    stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
-    stream.flush();
-    return s;
-    // return rewriter->getRewrittenText(stmt->getSourceRange());
+    // std::string s;
+    // llvm::raw_string_ostream stream(s);
+    // stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
+    // stream.flush();
+    // return s;
+    return rewriter->getRewrittenText(stmt->getSourceRange());
 }
 
 

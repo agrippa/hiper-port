@@ -215,7 +215,7 @@ void  kernel_cpu(	par_str par,
 	//	PROCESS INTERACTIONS
 	//======================================================================================================================================================150
 
-	
+	 { 
 kernel_cpu110 *ctx = (kernel_cpu110 *)malloc(sizeof(kernel_cpu110));
 ctx->par = par;
 ctx->dim = dim;
@@ -257,7 +257,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)kernel_cpu110_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
- // for l
+ }  // for l
 
 	time4 = get_time();
 

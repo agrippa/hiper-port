@@ -37,9 +37,25 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string stmtToString(const clang::Stmt* s);
         void setParent(const clang::Stmt *child,
                 const clang::Stmt *parent);
+        const clang::Stmt *getParent(const clang::Stmt *s);
 
         void preFunctionVisit(clang::FunctionDecl *func);
         void postFunctionVisit(clang::FunctionDecl *func);
+
+        bool hasLaunchBody();
+        std::string getLaunchBody();
+        std::vector<clang::ValueDecl *> *getLaunchCaptures();
+        const clang::FunctionDecl *getFunctionContainingLaunch();
+        clang::SourceLocation getLaunchBodyBeginLoc();
+        clang::SourceLocation getLaunchBodyEndLoc();
+
+        std::string getClosureDef(std::string closureName, bool isForasyncClosure,
+                std::string contextName, std::vector<clang::ValueDecl *> *captured,
+                std::string bodyStr, const clang::ValueDecl *condVar = NULL);
+        std::string getStructDef(std::string structName,
+                std::vector<clang::ValueDecl *> *captured);
+        std::string getContextSetup(std::string structName,
+                std::vector<clang::ValueDecl *> *captured);
 
     protected:
         clang::ASTContext *Context;
@@ -62,6 +78,13 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void addToCurrentScope(clang::ValueDecl *d);
         std::vector<clang::ValueDecl *> *visibleDecls();
 
+        std::string getCondVarAndLowerBoundFromInit(const clang::Stmt *init,
+                const clang::ValueDecl **condVar);
+        std::string getUpperBoundFromCond(const clang::Stmt *cond,
+                const clang::ValueDecl *condVar);
+        std::string getStrideFromIncr(const clang::Stmt *inc,
+                const clang::ValueDecl *condVar);
+
         std::string getStructDef(OMPNode *node);
 
         clang::Expr *unwrapCasts(clang::Expr *expr);
@@ -83,6 +106,10 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         int launchStartLine;
         int launchEndLine;
+        const clang::Stmt *firstInsideLaunch;
+        const clang::Stmt *lastInsideLaunch;
+        std::vector<clang::ValueDecl *> *launchCaptures;
+        const clang::FunctionDecl *functionContainingLaunch;
 };
 
 #endif

@@ -92,6 +92,25 @@ public:
   }
 
   void EndSourceFileAction() override {
+    if (transform->hasLaunchBody()) {
+        std::string launchBody = transform->getLaunchBody();
+        std::string launchStruct = transform->getStructDef(
+                "main_entrypoint_ctx", transform->getLaunchCaptures());
+        std::string closureFunction = transform->getClosureDef(
+                "main_entrypoint", false, "main_entrypoint_ctx",
+                transform->getLaunchCaptures(), launchBody);
+        std::string contextSetup = transform->getContextSetup(
+                "main_entrypoint_ctx", transform->getLaunchCaptures());
+        std::string launchStr = contextSetup +
+            "hclib_launch(NULL, NULL, main_entrypoint, main_entrypoint_ctx);\n" +
+            "free(main_entrypoint_ctx);\n";
+
+        rewriter.InsertText(transform->getFunctionContainingLaunch()->getLocStart(),
+                launchStruct + closureFunction, true, true);
+        rewriter.ReplaceText(SourceRange(transform->getLaunchBodyBeginLoc(),
+                    transform->getLaunchBodyEndLoc()), launchStr);
+    }
+
     SourceManager &SM = rewriter.getSourceMgr();
     rewriter.getEditBuffer(SM.getMainFileID()).write(*out);
     out->close();

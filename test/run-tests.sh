@@ -9,8 +9,16 @@ mkdir -p $SCRIPT_DIR/test-output
 FILES=$(find $SCRIPT_DIR/cpp/ -name "*.cpp")
 FILES="$(find $SCRIPT_DIR/c/ -name "*.c") $FILES"
 
+if [[ $# == 1 ]]; then
+    if [[ ! -f $1 ]]; then
+        echo Missing test file $1
+        exit 1
+    fi
+    FILES=$1
+fi
+
 for FILE in $FILES; do
-    echo Working on $FILE
+    echo Processing $FILE
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
 

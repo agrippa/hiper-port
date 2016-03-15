@@ -20,6 +20,15 @@
 #include "OMPToHClib.h"
 #include "OMPNode.h"
 
+/*
+ * NOTE: The one thing to be careful about whenever inserting code in an
+ * existing function is that the brace inserter is not run before this pass
+ * anymore. That means that extra care must be taken to ensure that converting a
+ * single line of code to a multi-line block of code does not change the control
+ * flow of the application. This should be kept in mind anywhere that an
+ * InsertText, ReplaceText, etc API is called.
+ */
+
 extern clang::FunctionDecl *curr_func_decl;
 
 #define ASYNC_SUFFIX "_hclib_async"
@@ -65,6 +74,11 @@ void OMPToHClib::setParent(const clang::Stmt *child,
     parentMap[child] = parent;
 }
 
+const clang::Stmt *OMPToHClib::getParent(const clang::Stmt *s) {
+    assert(parentMap.find(s) != parentMap.end());
+    return parentMap.at(s);
+}
+
 std::string OMPToHClib::stmtToString(const clang::Stmt* stmt) {
     std::string s;
     llvm::raw_string_ostream stream(s);
@@ -86,17 +100,17 @@ void OMPToHClib::visitChildren(const clang::Stmt *s, bool firstTraversal) {
     }
 }
 
-std::string OMPToHClib::getStructDef(OMPNode *node) {
-    const int pragmaLine = node->getPragmaLine();
-    std::string struct_def = "typedef struct _" + node->getLbl() + " {\n";
+std::string OMPToHClib::getStructDef(std::string structName,
+        std::vector<clang::ValueDecl *> *captured) {
+    std::string struct_def = "typedef struct _" + structName + " {\n";
     for (std::vector<clang::ValueDecl *>::iterator ii =
-            captures[pragmaLine]->begin(), ee = captures[pragmaLine]->end();
+            captured->begin(), ee = captured->end();
             ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         struct_def += "    " + curr->getType().getAsString() + " " +
             curr->getNameAsString() + ";\n";
     }
-    struct_def += " } " + node->getLbl() + ";\n\n";
+    struct_def += " } " + structName + ";\n\n";
 
     return struct_def;
 }
@@ -116,6 +130,171 @@ clang::Expr *OMPToHClib::unwrapCasts(clang::Expr *expr) {
         expr = clang::dyn_cast<clang::ImplicitCastExpr>(expr)->getSubExpr();
     }
     return expr;
+}
+
+std::string OMPToHClib::getCondVarAndLowerBoundFromInit(const clang::Stmt *init,
+        const clang::ValueDecl **condVar) {
+    if (const clang::BinaryOperator *bin =
+            clang::dyn_cast<clang::BinaryOperator>(init)) {
+        clang::Expr *lhs = bin->getLHS();
+        if (const clang::DeclRefExpr *declref =
+                clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
+            *condVar = declref->getDecl();
+            return stmtToString(bin->getRHS());
+        } else {
+            std::cerr << "LHS is unsupported class " <<
+                std::string(lhs->getStmtClassName()) << std::endl;
+            exit(1);
+        }
+    } else {
+        std::cerr << "Unsupported init class " <<
+            std::string(init->getStmtClassName()) << std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getUpperBoundFromCond(const clang::Stmt *cond,
+        const clang::ValueDecl *condVar) {
+    if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(cond)) {
+        if (bin->getOpcode() == clang::BO_LT) {
+            clang::Expr *lhs = unwrapCasts(bin->getLHS());
+            const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
+            assert(declref);
+            const clang::ValueDecl *decl = declref->getDecl();
+            assert(condVar == decl);
+            return stmtToString(bin->getRHS());
+        } else {
+            std::cerr << "Unsupported binary operator" << std::endl;
+            exit(1);
+        }
+    } else {
+        std::cerr << "Unsupported cond class " <<
+            std::string(cond->getStmtClassName()) <<
+            std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
+        const clang::ValueDecl *condVar) {
+    if (const clang::UnaryOperator *uno = clang::dyn_cast<clang::UnaryOperator>(inc)) {
+        clang::Expr *target = unwrapCasts(uno->getSubExpr());
+        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
+        assert(declref);
+        const clang::ValueDecl *decl = declref->getDecl();
+        assert(condVar == decl);
+
+        if (uno->getOpcode() == clang::UO_PostInc ||
+                uno->getOpcode() == clang::UO_PreInc) {
+            return "1";
+        } else if (uno->getOpcode() == clang::UO_PostDec ||
+                uno->getOpcode() == clang::UO_PreDec) {
+            return "-1";
+        } else {
+            std::cerr << "Unsupported unary operator" << std::endl;
+            exit(1);
+        }
+    } else if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(inc)) {
+        if (bin->getOpcode() == clang::BO_Assign) {
+            clang::Expr *target = unwrapCasts(bin->getLHS());
+            const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
+            assert(declref);
+            assert(condVar == declref->getDecl());
+
+            clang::Expr *rhs = unwrapCasts(bin->getRHS());
+            if (const clang::BinaryOperator *rhsBin = clang::dyn_cast<clang::BinaryOperator>(rhs)) {
+                clang::Expr *lhs = unwrapCasts(rhsBin->getLHS());
+                clang::Expr *rhs = unwrapCasts(rhsBin->getRHS());
+                clang::Expr *other = NULL;
+
+                clang::DeclRefExpr *declref = NULL;
+                if (declref = clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
+                    other = rhs;
+                } else if (declref = clang::dyn_cast<clang::DeclRefExpr>(rhs)) {
+                    other = lhs;
+                } else {
+                    std::cerr << "Neither of the inputs to the RHS binary op for an incr clause are a decl ref" << std::endl;
+                    exit(1);
+                }
+
+                assert(condVar == declref->getDecl());
+
+                if (rhsBin->getOpcode() == clang::BO_Add) {
+                    if (const clang::IntegerLiteral *literal = clang::dyn_cast<clang::IntegerLiteral>(other)) {
+                        return stmtToString(literal);
+                    } else {
+                        std::cerr << "unsupported other is a " << other->getStmtClassName() << std::endl;
+                        exit(1);
+                    }
+                } else {
+                    std::cerr << "Unsupported binary operator on RHS of binary incr clause" << std::endl;
+                    exit(1);
+                }
+            } else {
+                std::cerr << "Unsupported RHS to binary incr clause: " << rhs->getStmtClassName() << std::endl;
+                exit(1);
+            }
+        } else {
+            std::cerr << "Unsupported binary "
+                "operator in increment clause" << std::endl;
+            exit(1);
+        }
+    } else {
+        std::cerr << "Unsupported incr class " <<
+            std::string(inc->getStmtClassName()) <<
+            std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncClosure,
+        std::string contextName, std::vector<clang::ValueDecl *> *captured,
+        std::string bodyStr, const clang::ValueDecl *condVar) {
+    std::stringstream ss;
+    ss << "static void " << closureName << "(void *arg";
+    if (isForasyncClosure) {
+        ss << ", const int ___iter";
+    }
+    ss << ") {\n";
+
+    ss << "    " << contextName << " *ctx = (" << contextName << " *)arg;\n";
+    for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
+            ee = captured->end(); ii != ee; ii++) {
+        clang::ValueDecl *curr = *ii;
+        ss << "    " << curr->getType().getAsString() << " " <<
+            curr->getNameAsString() << " = ctx->" << curr->getNameAsString() +
+            ";\n";
+    }
+
+    /*
+     * Insert a one iteration do-loop around the
+     * original body so that continues have the same
+     * semantics.
+     */
+    if (isForasyncClosure) {
+        ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
+        ss << "    do {\n";
+    }
+    ss << bodyStr;
+    if (isForasyncClosure) {
+        ss << "    } while (0);\n";
+    }
+    ss << "}\n\n";
+    return ss.str();
+}
+
+std::string OMPToHClib::getContextSetup(std::string structName,
+        std::vector<clang::ValueDecl *> *captured) {
+    std::stringstream ss;
+    ss << structName << " *ctx = (" << structName << " *)malloc(sizeof(" <<
+        structName << "));\n";
+    for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
+            ee = captured->end(); ii != ee; ii++) {
+        clang::ValueDecl *curr = *ii;
+        ss << "ctx->" << curr->getNameAsString() << " = " <<
+            curr->getNameAsString() << ";\n";
+    }
+    return ss.str();
 }
 
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
@@ -162,7 +341,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         if (node->getPragma()->getPragmaName() == "parallel") {
                             std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
                             if (clauses.find("for") != clauses.end()) {
-                                const std::string structDef = getStructDef(node);
+                                const std::string structDef = getStructDef(
+                                        node->getLbl(),
+                                        captures[node->getPragmaLine()]);
                                 accumulatedStructDefs = accumulatedStructDefs + structDef;
 
                                 const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
@@ -177,153 +358,27 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                                 std::string bodyStr = stmtToString(forLoop->getBody());
 
-                                std::string lowStr = "";
-                                std::string highStr = "";
-                                std::string strideStr = "";
-
-                                accumulatedKernelDefs += "static void " + node->getLbl() + ASYNC_SUFFIX + "(void *arg, const int ___iter) {\n";
-                                accumulatedKernelDefs += "    " + node->getLbl() + " *ctx = (" + node->getLbl() + " *)arg;\n";
-                                for (std::vector<clang::ValueDecl *>::iterator ii =
-                                        captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
-                                        ii != ee; ii++) {
-                                    clang::ValueDecl *curr = *ii;
-                                    accumulatedKernelDefs += "    " +
-                                        curr->getType().getAsString() + " " +
-                                        curr->getNameAsString() + " = ctx->" +
-                                        curr->getNameAsString() + ";\n";
-                                }
-
                                 const clang::ValueDecl *condVar = NULL;
+                                std::string lowStr =
+                                    getCondVarAndLowerBoundFromInit(init,
+                                            &condVar);
+                                assert(condVar);
 
-                                if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(init)) {
-                                    clang::Expr *lhs = bin->getLHS();
-                                    if (const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
-                                        condVar = declref->getDecl();
-                                        std::string varname = condVar->getNameAsString();
-                                        accumulatedKernelDefs += "    " + varname + " = ___iter;\n";
+                                std::string highStr = getUpperBoundFromCond(
+                                        cond, condVar);
 
-                                        lowStr = stmtToString(bin->getRHS());
-                                    } else {
-                                        std::cerr << "LHS is unsupported class " << std::string(lhs->getStmtClassName()) << std::endl;
-                                        exit(1);
-                                    }
-                                } else {
-                                    std::cerr << "Unsupported init class " <<
-                                        std::string(init->getStmtClassName()) <<
-                                        std::endl;
-                                    exit(1);
-                                }
+                                std::string strideStr = getStrideFromIncr(inc,
+                                        condVar);
 
-                                if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(cond)) {
-                                    if (bin->getOpcode() == clang::BO_LT) {
-                                        clang::Expr *lhs = unwrapCasts(bin->getLHS());
-                                        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
-                                        assert(declref);
-                                        const clang::ValueDecl *decl = declref->getDecl();
-                                        assert(condVar == decl);
-                                        highStr = stmtToString(bin->getRHS());
-                                    } else {
-                                        std::cerr << "Unsupported binary operator" << std::endl;
-                                        exit(1);
-                                    }
-                                } else {
-                                    std::cerr << "Unsupported cond class " <<
-                                        std::string(cond->getStmtClassName()) <<
-                                        std::endl;
-                                    exit(1);
-                                }
+                                accumulatedKernelDefs += getClosureDef(
+                                        node->getLbl() + ASYNC_SUFFIX, true,
+                                        node->getLbl(),
+                                        captures[node->getPragmaLine()], bodyStr, condVar);
 
-                                if (const clang::UnaryOperator *uno = clang::dyn_cast<clang::UnaryOperator>(inc)) {
-                                    clang::Expr *target = unwrapCasts(uno->getSubExpr());
-                                    const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
-                                    assert(declref);
-                                    const clang::ValueDecl *decl = declref->getDecl();
-                                    assert(condVar == decl);
+                                std::string contextCreation = "\n" +
+                                    getContextSetup(node->getLbl(),
+                                            captures[node->getPragmaLine()]);
 
-                                    if (uno->getOpcode() == clang::UO_PostInc ||
-                                            uno->getOpcode() == clang::UO_PreInc) {
-                                        strideStr = "1";
-                                    } else if (uno->getOpcode() == clang::UO_PostDec ||
-                                            uno->getOpcode() == clang::UO_PreDec) {
-                                        strideStr = "-1";
-                                    } else {
-                                        std::cerr << "Unsupported unary operator" << std::endl;
-                                        exit(1);
-                                    }
-                                } else if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(inc)) {
-                                    if (bin->getOpcode() == clang::BO_Assign) {
-                                        clang::Expr *target = unwrapCasts(bin->getLHS());
-                                        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(target);
-                                        assert(declref);
-                                        assert(condVar == declref->getDecl());
-
-                                        clang::Expr *rhs = unwrapCasts(bin->getRHS());
-                                        if (const clang::BinaryOperator *rhsBin = clang::dyn_cast<clang::BinaryOperator>(rhs)) {
-                                            clang::Expr *lhs = unwrapCasts(rhsBin->getLHS());
-                                            clang::Expr *rhs = unwrapCasts(rhsBin->getRHS());
-                                            clang::Expr *other = NULL;
-
-                                            clang::DeclRefExpr *declref = NULL;
-                                            if (declref = clang::dyn_cast<clang::DeclRefExpr>(lhs)) {
-                                                other = rhs;
-                                            } else if (declref = clang::dyn_cast<clang::DeclRefExpr>(rhs)) {
-                                                other = lhs;
-                                            } else {
-                                                std::cerr << "Neither of the inputs to the RHS binary op for an incr clause are a decl ref" << std::endl;
-                                                exit(1);
-                                            }
-
-                                            assert(condVar == declref->getDecl());
-
-                                            if (rhsBin->getOpcode() == clang::BO_Add) {
-                                                if (const clang::IntegerLiteral *literal = clang::dyn_cast<clang::IntegerLiteral>(other)) {
-                                                    strideStr = stmtToString(literal);
-                                                } else {
-                                                    std::cerr << "unsupported other is a " << other->getStmtClassName() << std::endl;
-                                                    exit(1);
-                                                }
-                                            } else {
-                                                std::cerr << "Unsupported binary operator on RHS of binary incr clause" << std::endl;
-                                                exit(1);
-                                            }
-                                        } else {
-                                            std::cerr << "Unsupported RHS to binary incr clause: " << rhs->getStmtClassName() << std::endl;
-                                            exit(1);
-                                        }
-                                    } else {
-                                        std::cerr << "Unsupported binary "
-                                            "operator in increment clause at "
-                                            "line " << node->getPragmaLine() <<
-                                            std::endl;
-                                        exit(1);
-                                    }
-                                } else {
-                                    std::cerr << "Unsupported incr class " <<
-                                        std::string(inc->getStmtClassName()) <<
-                                        std::endl;
-                                    exit(1);
-                                }
-
-                                /*
-                                 * Insert a one iteration do-loop around the
-                                 * original body so that continues have the same
-                                 * semantics.
-                                 */
-                                accumulatedKernelDefs += "    do {\n";
-                                accumulatedKernelDefs += bodyStr;
-                                accumulatedKernelDefs += "    } while (0);\n";
-                                accumulatedKernelDefs += "}\n\n";
-
-                                std::string contextCreation = "\n" + node->getLbl() +
-                                    " *ctx = (" + node->getLbl() + " *)malloc(sizeof(" + node->getLbl() + "));\n";
-                                for (std::vector<clang::ValueDecl *>::iterator ii =
-                                        captures[node->getPragmaLine()]->begin(), ee = captures[node->getPragmaLine()]->end();
-                                        ii != ee; ii++) {
-                                    clang::ValueDecl *curr = *ii;
-                                    contextCreation += "ctx->" +
-                                        curr->getNameAsString() + " = " +
-                                        curr->getNameAsString() + ";\n";
-                                }
                                 contextCreation += "hclib_loop_domain_t domain;\n";
                                 contextCreation += "domain.low = " + lowStr + ";\n";
                                 contextCreation += "domain.high = " + highStr + ";\n";
@@ -334,9 +389,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     "&domain, FORASYNC_MODE_RECURSIVE);\n";
                                 contextCreation += "hclib_future_wait(fut);\n";
                                 contextCreation += "free(ctx);\n";
-                                rewriter->ReplaceText(succ->getSourceRange(), contextCreation);
-                                // rewriter->InsertTextAfterToken(pred->getLocEnd(),
-                                //         contextCreation);
+                                // Add braces to ensure we don't change control flow
+                                rewriter->ReplaceText(succ->getSourceRange(), " { " + contextCreation + " } ");
                             } else {
                                 std::cerr << "Parallel pragma without a for at line " <<
                                     node->getPragmaLine() << std::endl;
@@ -365,20 +419,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
             }
         }
 
-        if (fname == "main") {
-            accumulatedStructDefs += "typedef struct _main_ctx {\n";
-            accumulatedStructDefs += "  int argc;\n";
-            accumulatedStructDefs += "  char **argv;\n";
-            accumulatedStructDefs += "} main_ctx;\n\n";
-
-            accumulatedKernelDefs += "static int main_entrypoint(void *arg) {\n";
-            accumulatedKernelDefs += "    main_ctx *ctx = (main_ctx *)arg;\n";
-            accumulatedKernelDefs += "    int argc = ctx->argc;\n";
-            accumulatedKernelDefs += "    char **argv = ctx->argv;\n";
-            accumulatedKernelDefs += stmtToString(func->getBody());
-            accumulatedKernelDefs += "}\n";
-        }
-
         if (accumulatedStructDefs.length() > 0 ||
                 accumulatedKernelDefs.length() > 0) {
             rewriter->InsertText(func->getLocStart(),
@@ -387,17 +427,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
         successors.clear();
         predecessors.clear();
-
-        if (fname == "main") {
-            std::string launchStr = "";
-            launchStr += "{ main_ctx *ctx = (main_ctx *)malloc(sizeof(main_ctx));\n";
-            launchStr += "ctx->argc = argc;\n";
-            launchStr += "ctx->argv = argv;\n";
-            launchStr += std::string("hclib_launch(NULL, NULL, "
-                "(void (*)(void*))main_entrypoint, ctx);\n");
-            launchStr += "free(ctx); return 0; }\n";
-            rewriter->ReplaceText(func->getBody()->getSourceRange(), launchStr);
-        }
     }
 }
 
@@ -433,6 +462,52 @@ std::vector<clang::ValueDecl *> *OMPToHClib::visibleDecls() {
         }
     }
     return visible;
+}
+
+bool OMPToHClib::hasLaunchBody() {
+    return launchStartLine > 0;
+}
+
+clang::SourceLocation OMPToHClib::getLaunchBodyBeginLoc() {
+    assert(firstInsideLaunch);
+    return firstInsideLaunch->getLocStart();
+}
+
+clang::SourceLocation OMPToHClib::getLaunchBodyEndLoc() {
+    assert(lastInsideLaunch);
+    return lastInsideLaunch->getLocEnd();
+}
+
+std::string OMPToHClib::getLaunchBody() {
+    assert(launchStartLine > 0 && launchEndLine > 0);
+    assert(firstInsideLaunch);
+    assert(lastInsideLaunch);
+    assert(launchCaptures);
+
+    assert(getParent(firstInsideLaunch) == getParent(lastInsideLaunch));
+
+    const clang::Stmt *parent = getParent(firstInsideLaunch);
+    clang::Stmt::const_child_iterator i = parent->child_begin();
+    while (*i != firstInsideLaunch) {
+        i++;
+    }
+    std::stringstream ss;
+    while (*i != lastInsideLaunch) {
+        ss << stmtToString(*i) << "; ";
+        i++;
+    }
+    ss << stmtToString(lastInsideLaunch) << "; " << std::flush;
+    return ss.str();
+}
+
+std::vector<clang::ValueDecl *> *OMPToHClib::getLaunchCaptures() {
+    assert(launchCaptures);
+    return launchCaptures;
+}
+
+const clang::FunctionDecl *OMPToHClib::getFunctionContainingLaunch() {
+    assert(functionContainingLaunch);
+    return functionContainingLaunch;
 }
 
 void OMPToHClib::VisitStmt(const clang::Stmt *s) {
@@ -526,6 +601,38 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                 }
             }
         }
+
+        if (launchStartLine > 0) {
+            assert(launchEndLine > 0);
+
+            if (presumedEnd.getLine() < launchEndLine) {
+                if (lastInsideLaunch) {
+                    size_t latestSoFar = SM->getPresumedLoc(
+                            lastInsideLaunch->getLocEnd()).getLine();
+                    if (presumedEnd.getLine() > latestSoFar) {
+                        lastInsideLaunch = s;
+                    }
+                } else {
+                    lastInsideLaunch = s;
+                }
+            }
+
+            if (presumedStart.getLine() > launchStartLine) {
+                if (firstInsideLaunch) {
+                    size_t earliestSoFar = SM->getPresumedLoc(
+                            firstInsideLaunch->getLocStart()).getLine();
+                    if (presumedStart.getLine() < earliestSoFar) {
+                        firstInsideLaunch = s;
+                        launchCaptures = visibleDecls();
+                        functionContainingLaunch = curr_func_decl;
+                    }
+                } else {
+                    firstInsideLaunch = s;
+                    launchCaptures = visibleDecls();
+                    functionContainingLaunch = curr_func_decl;
+                }
+            }
+        }
     }
 
     visitChildren(s);
@@ -557,6 +664,8 @@ void OMPToHClib::parseHClibPragmas(const char *filename) {
             line = line.substr(end + 1);
             end = line.find(' ');
             launchEndLine = atoi(line.substr(0, end).c_str());
+            std::cerr << "Parsed HClib body from line " << launchStartLine <<
+                " to " << launchEndLine << std::endl;
         } else {
             std::cerr << "Unknown label \"" << firstToken << "\"" << std::endl;
             exit(1);
@@ -711,6 +820,10 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFi
 
     launchStartLine = -1;
     launchEndLine = -1;
+    firstInsideLaunch = NULL;
+    lastInsideLaunch = NULL;
+    launchCaptures = NULL;
+    functionContainingLaunch = NULL;
     parseHClibPragmas(ompToHclibPragmaFile);
 }
 

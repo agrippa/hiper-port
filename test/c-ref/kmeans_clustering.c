@@ -106,14 +106,15 @@ float euclid_dist_2(float *pt1,
     int i;
     float ans=0.0;
 
-    for (i = 0; i < numdims; i++) { ans += (pt1[i] - pt2[i]) * (pt1[i] - pt2[i]); };
+    for (i=0; i<numdims; i++)
+        ans += (pt1[i]-pt2[i]) * (pt1[i]-pt2[i]);
 
     return(ans);
 }
 
 
 /*----< kmeans_clustering() >---------------------------------------------*/
-typedef struct _kmeans_clustering175 {
+typedef struct _kmeans_clustering183 {
     float ** feature;
     int nfeatures;
     int npoints;
@@ -134,10 +135,10 @@ typedef struct _kmeans_clustering175 {
     int nthreads;
     int ** partial_new_centers_len;
     float *** partial_new_centers;
- } kmeans_clustering175;
+ } kmeans_clustering183;
 
-static void kmeans_clustering175_hclib_async(void *arg, const int ___iter) {
-    kmeans_clustering175 *ctx = (kmeans_clustering175 *)arg;
+static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
+    kmeans_clustering183 *ctx = (kmeans_clustering183 *)arg;
     float ** feature = ctx->feature;
     int nfeatures = ctx->nfeatures;
     int npoints = ctx->npoints;
@@ -161,18 +162,14 @@ static void kmeans_clustering175_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    int tid = get_current_worker();
+    int tid = hclib_get_current_worker();
     index = find_nearest_point(feature[i], nfeatures, clusters, nclusters);
-    if (membership[i] != index) {
+    if (membership[i] != index)
         delta += 1.;
-    }
-    ;
     membership[i] = index;
     partial_new_centers_len[tid][index]++;
-    for (j = 0; j < nfeatures; j++) {
+    for (j = 0; j < nfeatures; j++) 
         partial_new_centers[tid][index][j] += feature[i][j];
-    }
-    ;
 }
     } while (0);
 }
@@ -202,43 +199,50 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     /* allocate space for returning variable clusters[] */
     clusters    = (float**) malloc(nclusters *             sizeof(float*));
     clusters[0] = (float*)  malloc(nclusters * nfeatures * sizeof(float));
-    for (i = 1; i < nclusters; i++) { clusters[i] = clusters[i - 1] + nfeatures; };
+    for (i=1; i<nclusters; i++)
+        clusters[i] = clusters[i-1] + nfeatures;
 
     /* randomly pick cluster centers */
     for (i=0; i<nclusters; i++) {
         //n = (int)rand() % npoints;
-        for (j = 0; j < nfeatures; j++) { clusters[i][j] = feature[n][j]; };
+        for (j=0; j<nfeatures; j++)
+            clusters[i][j] = feature[n][j];
 		n++;
     }
 
-    for (i = 0; i < npoints; i++) { membership[i] = -1; };
+    for (i=0; i<npoints; i++)
+		membership[i] = -1;
 
     /* need to initialize new_centers_len and new_centers[0] to all 0 */
     new_centers_len = (int*) calloc(nclusters, sizeof(int));
 
     new_centers    = (float**) malloc(nclusters *            sizeof(float*));
     new_centers[0] = (float*)  calloc(nclusters * nfeatures, sizeof(float));
-    for (i = 1; i < nclusters; i++) { new_centers[i] = new_centers[i - 1] + nfeatures; };
+    for (i=1; i<nclusters; i++)
+        new_centers[i] = new_centers[i-1] + nfeatures;
 
 
     partial_new_centers_len    = (int**) malloc(nthreads * sizeof(int*));
     partial_new_centers_len[0] = (int*)  calloc(nthreads*nclusters, sizeof(int));
-    for (i = 1; i < nthreads; i++) { partial_new_centers_len[i] = partial_new_centers_len[i - 1] + nclusters; };
+    for (i=1; i<nthreads; i++)
+		partial_new_centers_len[i] = partial_new_centers_len[i-1]+nclusters;
 
 	partial_new_centers    =(float***)malloc(nthreads * sizeof(float**));
     partial_new_centers[0] =(float**) malloc(nthreads*nclusters * sizeof(float*));
-    for (i = 1; i < nthreads; i++) { partial_new_centers[i] = partial_new_centers[i - 1] + nclusters; };
+    for (i=1; i<nthreads; i++)
+        partial_new_centers[i] = partial_new_centers[i-1] + nclusters;
 
 	for (i=0; i<nthreads; i++)
 	{
-        for (j = 0; j < nclusters; j++) { partial_new_centers[i][j] = (float *)calloc(nfeatures, sizeof(float)); };
+        for (j=0; j<nclusters; j++)
+            partial_new_centers[i][j] = (float*)calloc(nfeatures, sizeof(float));
 	}
 	printf("num of threads = %d\n", num_omp_threads);
     do {
         delta = 0.0;
         {
-            
-kmeans_clustering175 *ctx = (kmeans_clustering175 *)malloc(sizeof(kmeans_clustering175));
+             { 
+kmeans_clustering183 *ctx = (kmeans_clustering183 *)malloc(sizeof(kmeans_clustering183));
 ctx->feature = feature;
 ctx->nfeatures = nfeatures;
 ctx->npoints = npoints;
@@ -264,10 +268,10 @@ domain.low = 0;
 domain.high = npoints;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)kmeans_clustering175_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)kmeans_clustering183_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
-
+ } 
         } /* end of #pragma omp parallel */
 
         /* let the main thread perform the array reduction */
@@ -285,7 +289,8 @@ free(ctx);
 		/* replace old cluster centers with new_centers */
 		for (i=0; i<nclusters; i++) {
             for (j=0; j<nfeatures; j++) {
-                if (new_centers_len[i] > 0) {clusters[i][j] = new_centers[i][j] / new_centers_len[i]; };
+                if (new_centers_len[i] > 0)
+					clusters[i][j] = new_centers[i][j] / new_centers_len[i];
 				new_centers[i][j] = 0.0;   /* set back to 0 */
 			}
 			new_centers_len[i] = 0;   /* set back to 0 */
