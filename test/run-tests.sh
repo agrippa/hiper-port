@@ -35,7 +35,7 @@ for FILE in $FILES; do
     fi
 
     set +e
-    diff $TEST_OUTPUT $REFERENCE > $SCRIPT_DIR/delta
+    diff $REFERENCE $TEST_OUTPUT > $SCRIPT_DIR/delta
     set -e
 
     LINES=$(cat $SCRIPT_DIR/delta | wc -l)

@@ -100,6 +100,99 @@ void OMPToHClib::visitChildren(const clang::Stmt *s, bool firstTraversal) {
     }
 }
 
+std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
+        std::string name, std::string soFarBefore, std::string soFarAfter) {
+    const clang::Type *type = qualType.getTypePtr();
+    assert(type);
+
+    if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
+        if (const clang::ConstantArrayType *constantArrayType = clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
+            std::string sizeStr = constantArrayType->getSize().toString(10, true);
+            return getDeclarationTypeStr(constantArrayType->getElementType(),
+                    name, soFarBefore, soFarAfter + "[" + sizeStr + "]");
+        } else {
+            std::cerr << "Unsupported array size modifier " << arrayType->getSizeModifier() << std::endl;
+            exit(1);
+        }
+    } else if (const clang::PointerType *pointerType = type->getAs<clang::PointerType>()) {
+        return getDeclarationTypeStr(pointerType->getPointeeType(), name, soFarBefore + "*", soFarAfter);
+    } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
+        return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
+    } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
+        return getDeclarationTypeStr(typedefType->getDecl()->getUnderlyingType(), name, soFarBefore, soFarAfter);
+    } else if (const clang::ElaboratedType *elaboratedType = type->getAs<clang::ElaboratedType>()) {
+        return getDeclarationTypeStr(elaboratedType->getNamedType(), name, soFarBefore, soFarAfter);
+    } else if (const clang::TagType *tagType = type->getAs<clang::TagType>()) {
+        if (tagType->getDecl()->getDeclName()) {
+            return tagType->getDecl()->getDeclName().getAsString() + " " + soFarBefore + name + soFarAfter;
+        } else if (tagType->getDecl()->getTypedefNameForAnonDecl()) {
+            return tagType->getDecl()->getTypedefNameForAnonDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
+        } else {
+            assert(false);
+        }
+    } else {
+        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getDeclarationStr(clang::ValueDecl *decl) {
+    return getDeclarationTypeStr(decl->getType(), decl->getNameAsString(), "", "") + ";";
+}
+
+std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
+    const clang::Type *type = qualType.getTypePtr();
+    assert(type);
+
+    if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
+        if (const clang::ConstantArrayType *constantArrayType = clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
+            std::string sizeStr = constantArrayType->getSize().toString(10, true);
+            return sizeStr + " * (" + getArraySizeExpr(constantArrayType->getElementType()) + ")";
+        } else {
+            std::cerr << "Unsupported array size modifier " << arrayType->getSizeModifier() << std::endl;
+            exit(1);
+        }
+    } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
+        return "sizeof(" + qualType.getAsString() + ")";
+    } else {
+        std::cerr << "Unsupported type while getting array size expression " <<
+            std::string(type->getTypeClassName()) << std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getUnpackStr(clang::ValueDecl *decl) {
+    const clang::Type *type = decl->getType().getTypePtr();
+    assert(type);
+
+    std::stringstream ss;
+    ss << getDeclarationTypeStr(decl->getType(), decl->getNameAsString(), "",
+            "") << "; ";
+
+    if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
+        std::string arraySizeExpr = getArraySizeExpr(decl->getType());
+        ss << "memcpy(" << decl->getNameAsString() << ", ctx->" <<
+            decl->getNameAsString() << ", " << arraySizeExpr << "); ";
+    } else if (type->getAs<clang::PointerType>() ||
+            type->getAs<clang::BuiltinType>() ||
+            type->getAs<clang::TypedefType>() ||
+            type->getAs<clang::ElaboratedType>() ||
+            type->getAs<clang::TagType>()) {
+        ss << decl->getNameAsString() << " = ctx->" << decl->getNameAsString() << ";";
+    } else {
+        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        exit(1);
+    }
+
+    ss << std::flush;
+    return ss.str();
+}
+
+std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
+    return "ctx->" + decl->getNameAsString() + " = " + decl->getNameAsString() +
+        ";";
+}
+
 std::string OMPToHClib::getStructDef(std::string structName,
         std::vector<clang::ValueDecl *> *captured) {
     std::string struct_def = "typedef struct _" + structName + " {\n";
@@ -107,8 +200,7 @@ std::string OMPToHClib::getStructDef(std::string structName,
             captured->begin(), ee = captured->end();
             ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
-        struct_def += "    " + curr->getType().getAsString() + " " +
-            curr->getNameAsString() + ";\n";
+        struct_def += "    " + getDeclarationStr(curr) + "\n";
     }
     struct_def += " } " + structName + ";\n\n";
 
@@ -261,9 +353,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
     for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
             ee = captured->end(); ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
-        ss << "    " << curr->getType().getAsString() << " " <<
-            curr->getNameAsString() << " = ctx->" << curr->getNameAsString() +
-            ";\n";
+        ss << "    " << getUnpackStr(curr) << "\n";
     }
 
     /*
@@ -291,8 +381,7 @@ std::string OMPToHClib::getContextSetup(std::string structName,
     for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
             ee = captured->end(); ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
-        ss << "ctx->" << curr->getNameAsString() << " = " <<
-            curr->getNameAsString() << ";\n";
+        ss << getCaptureStr(curr) << "\n";
     }
     return ss.str();
 }

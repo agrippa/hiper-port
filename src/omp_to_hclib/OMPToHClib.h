@@ -71,6 +71,13 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 clang::FunctionDecl *decl, clang::SourceManager &SM);
         OMPPragma *getOMPPragmaFor(int lineNo);
 
+        std::string getDeclarationTypeStr(clang::QualType qualType,
+                std::string name, std::string soFarBefore, std::string soFarAfter);
+        std::string getDeclarationStr(clang::ValueDecl *decl);
+        std::string getCaptureStr(clang::ValueDecl *decl);
+        std::string getUnpackStr(clang::ValueDecl *decl);
+        std::string getArraySizeExpr(clang::QualType qualType);
+
         bool isScopeCreatingStmt(const clang::Stmt *s);
         int getCurrentLexicalDepth();
         void addNewScope();

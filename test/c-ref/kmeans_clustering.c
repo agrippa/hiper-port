@@ -115,50 +115,50 @@ float euclid_dist_2(float *pt1,
 
 /*----< kmeans_clustering() >---------------------------------------------*/
 typedef struct _kmeans_clustering183 {
-    float ** feature;
+    float **feature;
     int nfeatures;
     int npoints;
     int nclusters;
     float threshold;
-    int * membership;
+    int *membership;
     int i;
     int j;
     int k;
     int n;
     int index;
     int loop;
-    int * new_centers_len;
-    float ** new_centers;
-    float ** clusters;
+    int *new_centers_len;
+    float **new_centers;
+    float **clusters;
     float delta;
     double timing;
     int nthreads;
-    int ** partial_new_centers_len;
-    float *** partial_new_centers;
+    int **partial_new_centers_len;
+    float ***partial_new_centers;
  } kmeans_clustering183;
 
 static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
     kmeans_clustering183 *ctx = (kmeans_clustering183 *)arg;
-    float ** feature = ctx->feature;
-    int nfeatures = ctx->nfeatures;
-    int npoints = ctx->npoints;
-    int nclusters = ctx->nclusters;
-    float threshold = ctx->threshold;
-    int * membership = ctx->membership;
-    int i = ctx->i;
-    int j = ctx->j;
-    int k = ctx->k;
-    int n = ctx->n;
-    int index = ctx->index;
-    int loop = ctx->loop;
-    int * new_centers_len = ctx->new_centers_len;
-    float ** new_centers = ctx->new_centers;
-    float ** clusters = ctx->clusters;
-    float delta = ctx->delta;
-    double timing = ctx->timing;
-    int nthreads = ctx->nthreads;
-    int ** partial_new_centers_len = ctx->partial_new_centers_len;
-    float *** partial_new_centers = ctx->partial_new_centers;
+    float **feature; feature = ctx->feature;
+    int nfeatures; nfeatures = ctx->nfeatures;
+    int npoints; npoints = ctx->npoints;
+    int nclusters; nclusters = ctx->nclusters;
+    float threshold; threshold = ctx->threshold;
+    int *membership; membership = ctx->membership;
+    int i; i = ctx->i;
+    int j; j = ctx->j;
+    int k; k = ctx->k;
+    int n; n = ctx->n;
+    int index; index = ctx->index;
+    int loop; loop = ctx->loop;
+    int *new_centers_len; new_centers_len = ctx->new_centers_len;
+    float **new_centers; new_centers = ctx->new_centers;
+    float **clusters; clusters = ctx->clusters;
+    float delta; delta = ctx->delta;
+    double timing; timing = ctx->timing;
+    int nthreads; nthreads = ctx->nthreads;
+    int **partial_new_centers_len; partial_new_centers_len = ctx->partial_new_centers_len;
+    float ***partial_new_centers; partial_new_centers = ctx->partial_new_centers;
     i = ___iter;
     do {
 {

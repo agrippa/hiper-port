@@ -133,9 +133,9 @@ float accuracy(float *arr1, float *arr2, int len)
 
 }
 typedef struct _computeTempOMP157 {
-    float * pIn;
-    float * tIn;
-    float * tOut;
+    float *pIn;
+    float *tIn;
+    float *tOut;
     int nx;
     int ny;
     int nz;
@@ -154,35 +154,35 @@ typedef struct _computeTempOMP157 {
     float cc;
     float stepDivCap;
     int count;
-    float * tIn_t;
-    float * tOut_t;
+    float *tIn_t;
+    float *tOut_t;
  } computeTempOMP157;
 
 static void computeTempOMP157_hclib_async(void *arg, const int ___iter) {
     computeTempOMP157 *ctx = (computeTempOMP157 *)arg;
-    float * pIn = ctx->pIn;
-    float * tIn = ctx->tIn;
-    float * tOut = ctx->tOut;
-    int nx = ctx->nx;
-    int ny = ctx->ny;
-    int nz = ctx->nz;
-    float Cap = ctx->Cap;
-    float Rx = ctx->Rx;
-    float Ry = ctx->Ry;
-    float Rz = ctx->Rz;
-    float dt = ctx->dt;
-    int numiter = ctx->numiter;
-    float ce = ctx->ce;
-    float cw = ctx->cw;
-    float cn = ctx->cn;
-    float cs = ctx->cs;
-    float ct = ctx->ct;
-    float cb = ctx->cb;
-    float cc = ctx->cc;
-    float stepDivCap = ctx->stepDivCap;
-    int count = ctx->count;
-    float * tIn_t = ctx->tIn_t;
-    float * tOut_t = ctx->tOut_t;
+    float *pIn; pIn = ctx->pIn;
+    float *tIn; tIn = ctx->tIn;
+    float *tOut; tOut = ctx->tOut;
+    int nx; nx = ctx->nx;
+    int ny; ny = ctx->ny;
+    int nz; nz = ctx->nz;
+    float Cap; Cap = ctx->Cap;
+    float Rx; Rx = ctx->Rx;
+    float Ry; Ry = ctx->Ry;
+    float Rz; Rz = ctx->Rz;
+    float dt; dt = ctx->dt;
+    int numiter; numiter = ctx->numiter;
+    float ce; ce = ctx->ce;
+    float cw; cw = ctx->cw;
+    float cn; cn = ctx->cn;
+    float cs; cs = ctx->cs;
+    float ct; ct = ctx->ct;
+    float cb; cb = ctx->cb;
+    float cc; cc = ctx->cc;
+    float stepDivCap; stepDivCap = ctx->stepDivCap;
+    int count; count = ctx->count;
+    float *tIn_t; tIn_t = ctx->tIn_t;
+    float *tOut_t; tOut_t = ctx->tOut_t;
     z = ___iter;
     do {
 {

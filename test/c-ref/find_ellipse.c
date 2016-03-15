@@ -83,16 +83,16 @@ MAT * chop_flip_image(unsigned char *image, int height, int width, int top, int 
 // Given x- and y-gradients of a video frame, computes the GICOV
 //  score for each sample ellipse at every pixel in the frame
 typedef struct _ellipsematching112 {
-    MAT * grad_x;
-    MAT * grad_y;
+    MAT *grad_x;
+    MAT *grad_y;
     int i;
     int n;
     int k;
-    double [150] sin_angle;
-    double [150] cos_angle;
-    double [150] theta;
-    int [7][150] tX;
-    int [7][150] tY;
+    double sin_angle[150];
+    double cos_angle[150];
+    double theta[150];
+    int tX[7][150];
+    int tY[7][150];
     int MaxR;
     int height;
     int width;
@@ -100,19 +100,19 @@ typedef struct _ellipsematching112 {
 
 static void ellipsematching112_hclib_async(void *arg, const int ___iter) {
     ellipsematching112 *ctx = (ellipsematching112 *)arg;
-    MAT * grad_x = ctx->grad_x;
-    MAT * grad_y = ctx->grad_y;
-    int i = ctx->i;
-    int n = ctx->n;
-    int k = ctx->k;
-    double [150] sin_angle = ctx->sin_angle;
-    double [150] cos_angle = ctx->cos_angle;
-    double [150] theta = ctx->theta;
-    int [7][150] tX = ctx->tX;
-    int [7][150] tY = ctx->tY;
-    int MaxR = ctx->MaxR;
-    int height = ctx->height;
-    int width = ctx->width;
+    MAT *grad_x; grad_x = ctx->grad_x;
+    MAT *grad_y; grad_y = ctx->grad_y;
+    int i; i = ctx->i;
+    int n; n = ctx->n;
+    int k; k = ctx->k;
+    double sin_angle[150]; memcpy(sin_angle, ctx->sin_angle, 150 * (sizeof(double))); 
+    double cos_angle[150]; memcpy(cos_angle, ctx->cos_angle, 150 * (sizeof(double))); 
+    double theta[150]; memcpy(theta, ctx->theta, 150 * (sizeof(double))); 
+    int tX[7][150]; memcpy(tX, ctx->tX, 7 * (150 * (sizeof(int)))); 
+    int tY[7][150]; memcpy(tY, ctx->tY, 7 * (150 * (sizeof(int)))); 
+    int MaxR; MaxR = ctx->MaxR;
+    int height; height = ctx->height;
+    int width; width = ctx->width;
     i = ___iter;
     do {
 {
@@ -225,16 +225,16 @@ MAT * structuring_element(int radius) {
 // Performs an image dilation on the specified matrix
 //  using the specified structuring element
 typedef struct _dilate_f186 {
-    MAT * img_in;
-    MAT * strel;
-    MAT * dilated;
+    MAT *img_in;
+    MAT *strel;
+    MAT *dilated;
  } dilate_f186;
 
 static void dilate_f186_hclib_async(void *arg, const int ___iter) {
     dilate_f186 *ctx = (dilate_f186 *)arg;
-    MAT * img_in = ctx->img_in;
-    MAT * strel = ctx->strel;
-    MAT * dilated = ctx->dilated;
+    MAT *img_in; img_in = ctx->img_in;
+    MAT *strel; strel = ctx->strel;
+    MAT *dilated; dilated = ctx->dilated;
     i = ___iter;
     do {
 {

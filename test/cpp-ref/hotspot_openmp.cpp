@@ -49,9 +49,9 @@ int num_omp_threads;
  * by one time step
  */
 typedef struct _single_iteration62 {
-    FLOAT * result;
-    FLOAT * temp;
-    FLOAT * power;
+    FLOAT *result;
+    FLOAT *temp;
+    FLOAT *power;
     int row;
     int col;
     FLOAT Cap_1;
@@ -69,22 +69,22 @@ typedef struct _single_iteration62 {
 
 static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     single_iteration62 *ctx = (single_iteration62 *)arg;
-    FLOAT * result = ctx->result;
-    FLOAT * temp = ctx->temp;
-    FLOAT * power = ctx->power;
-    int row = ctx->row;
-    int col = ctx->col;
-    FLOAT Cap_1 = ctx->Cap_1;
-    FLOAT Rx_1 = ctx->Rx_1;
-    FLOAT Ry_1 = ctx->Ry_1;
-    FLOAT Rz_1 = ctx->Rz_1;
-    FLOAT step = ctx->step;
-    FLOAT delta = ctx->delta;
-    int r = ctx->r;
-    int c = ctx->c;
-    int chunk = ctx->chunk;
-    int num_chunk = ctx->num_chunk;
-    int chunks_in_row = ctx->chunks_in_row;
+    FLOAT *result; result = ctx->result;
+    FLOAT *temp; temp = ctx->temp;
+    FLOAT *power; power = ctx->power;
+    int row; row = ctx->row;
+    int col; col = ctx->col;
+    FLOAT Cap_1; Cap_1 = ctx->Cap_1;
+    FLOAT Rx_1; Rx_1 = ctx->Rx_1;
+    FLOAT Ry_1; Ry_1 = ctx->Ry_1;
+    FLOAT Rz_1; Rz_1 = ctx->Rz_1;
+    FLOAT step; step = ctx->step;
+    FLOAT delta; delta = ctx->delta;
+    int r; r = ctx->r;
+    int c; c = ctx->c;
+    int chunk; chunk = ctx->chunk;
+    int num_chunk; num_chunk = ctx->num_chunk;
+    int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
     chunk = ___iter;
     do {
 {
