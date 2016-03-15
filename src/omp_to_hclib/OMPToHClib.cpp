@@ -189,8 +189,29 @@ std::string OMPToHClib::getUnpackStr(clang::ValueDecl *decl) {
 }
 
 std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
-    return "ctx->" + decl->getNameAsString() + " = " + decl->getNameAsString() +
-        ";";
+    const clang::Type *type = decl->getType().getTypePtr();
+    assert(type);
+
+    std::stringstream ss;
+
+    if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
+        std::string arraySizeExpr = getArraySizeExpr(decl->getType());
+        ss << "memcpy(ctx->" << decl->getNameAsString() << ", " <<
+            decl->getNameAsString() << ", " << arraySizeExpr << "); ";
+    } else if (type->getAs<clang::PointerType>() ||
+            type->getAs<clang::BuiltinType>() ||
+            type->getAs<clang::TypedefType>() ||
+            type->getAs<clang::ElaboratedType>() ||
+            type->getAs<clang::TagType>()) {
+        ss << "ctx->" << decl->getNameAsString() << " = " << decl->getNameAsString() <<
+            ";";
+    } else {
+        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        exit(1);
+    }
+
+    ss << std::flush;
+    return ss.str();
 }
 
 std::string OMPToHClib::getStructDef(std::string structName,
