@@ -664,7 +664,6 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                 if (predecessors.find(pragma.getLine()) ==
                         predecessors.end()) {
                     predecessors[pragma.getLine()] = s;
-                    captures[pragma.getLine()] = visibleDecls();
                 } else {
                     const clang::Stmt *curr = predecessors[pragma.getLine()];
                     clang::PresumedLoc curr_loc = SM->getPresumedLoc(
@@ -673,7 +672,6 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                             (presumedEnd.getLine() == curr_loc.getLine() &&
                              presumedEnd.getColumn() > curr_loc.getColumn())) {
                         predecessors[pragma.getLine()] = s;
-                        captures[pragma.getLine()] = visibleDecls();
                     }
                 }
             }
@@ -681,6 +679,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
             if (presumedStart.getLine() >= pragma.getLine()) {
                 if (successors.find(pragma.getLine()) == successors.end()) {
                     successors[pragma.getLine()] = s;
+                    captures[pragma.getLine()] = visibleDecls();
                 } else {
                     const clang::Stmt *curr = successors[pragma.getLine()];
                     clang::PresumedLoc curr_loc =
@@ -689,6 +688,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                             (presumedStart.getLine() == curr_loc.getLine() &&
                              presumedStart.getColumn() < curr_loc.getColumn())) {
                         successors[pragma.getLine()] = s;
+                        captures[pragma.getLine()] = visibleDecls();
                     }
                 }
             }

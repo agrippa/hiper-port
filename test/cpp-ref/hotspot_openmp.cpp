@@ -65,6 +65,7 @@ typedef struct _single_iteration62 {
     int chunk;
     int num_chunk;
     int chunks_in_row;
+    int chunks_in_col;
  } single_iteration62;
 
 static void single_iteration62_hclib_async(void *arg, const int ___iter) {
@@ -85,6 +86,7 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     int chunk; chunk = ctx->chunk;
     int num_chunk; num_chunk = ctx->num_chunk;
     int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
+    int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
     chunk = ___iter;
     do {
 {
@@ -156,6 +158,7 @@ ctx->c = c;
 ctx->chunk = chunk;
 ctx->num_chunk = num_chunk;
 ctx->chunks_in_row = chunks_in_row;
+ctx->chunks_in_col = chunks_in_col;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = num_chunk;
