@@ -40,7 +40,6 @@ typedef struct _main_entrypoint_ctx {
     MAT * image_chopped;
     MAT * grad_x;
     MAT * grad_y;
-    long long GICOV_start_time;
  } main_entrypoint_ctx;
 
 static void main_entrypoint(void *arg) {
@@ -80,7 +79,6 @@ static void main_entrypoint(void *arg) {
     MAT * image_chopped = ctx->image_chopped;
     MAT * grad_x = ctx->grad_x;
     MAT * grad_y = ctx->grad_y;
-    long long GICOV_start_time = ctx->GICOV_start_time;
 long long GICOV_start_time = get_time();
 ; MAT *gicov = ellipsematching(grad_x, grad_y);
 ; MAT *max_gicov = m_get(gicov->m, gicov->n);
@@ -287,7 +285,6 @@ ctx->b = b;
 ctx->image_chopped = image_chopped;
 ctx->grad_x = grad_x;
 ctx->grad_y = grad_y;
-ctx->GICOV_start_time = GICOV_start_time;
 hclib_launch(NULL, NULL, main_entrypoint, main_entrypoint_ctx);
 free(main_entrypoint_ctx);
 ;

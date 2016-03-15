@@ -96,7 +96,6 @@ typedef struct _ellipsematching112 {
     int MaxR;
     int height;
     int width;
-    MAT * gicov;
  } ellipsematching112;
 
 static void ellipsematching112_hclib_async(void *arg, const int ___iter) {
@@ -114,7 +113,6 @@ static void ellipsematching112_hclib_async(void *arg, const int ___iter) {
     int MaxR = ctx->MaxR;
     int height = ctx->height;
     int width = ctx->width;
-    MAT * gicov = ctx->gicov;
     i = ___iter;
     do {
 {
@@ -192,7 +190,6 @@ ctx->tY = tY;
 ctx->MaxR = MaxR;
 ctx->height = height;
 ctx->width = width;
-ctx->gicov = gicov;
 hclib_loop_domain_t domain;
 domain.low = MaxR;
 domain.high = width - MaxR;
@@ -231,9 +228,6 @@ typedef struct _dilate_f186 {
     MAT * img_in;
     MAT * strel;
     MAT * dilated;
-    int el_center_i;
-    int el_center_j;
-    int i;
  } dilate_f186;
 
 static void dilate_f186_hclib_async(void *arg, const int ___iter) {
@@ -241,9 +235,6 @@ static void dilate_f186_hclib_async(void *arg, const int ___iter) {
     MAT * img_in = ctx->img_in;
     MAT * strel = ctx->strel;
     MAT * dilated = ctx->dilated;
-    int el_center_i = ctx->el_center_i;
-    int el_center_j = ctx->el_center_j;
-    int i = ctx->i;
     i = ___iter;
     do {
 {
@@ -280,9 +271,6 @@ dilate_f186 *ctx = (dilate_f186 *)malloc(sizeof(dilate_f186));
 ctx->img_in = img_in;
 ctx->strel = strel;
 ctx->dilated = dilated;
-ctx->el_center_i = el_center_i;
-ctx->el_center_j = el_center_j;
-ctx->i = i;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = img_in->m;

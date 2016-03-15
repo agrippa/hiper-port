@@ -540,24 +540,6 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
         }
 
         /*
-         * First check if this statement is a variable declaration, and if so
-         * add it to the list of visible declarations in the current scope. This
-         * step must be done before the block of code below for the case where
-         * the last statement before an OMP pragma is a variable declaration. We
-         * want to make sure that declaration is included in the capture list of
-         * the following pragma.
-         */
-        if (const clang::DeclStmt *decls = clang::dyn_cast<clang::DeclStmt>(s)) {
-            for (clang::DeclStmt::const_decl_iterator i = decls->decl_begin(),
-                    e = decls->decl_end(); i != e; i++) {
-                clang::Decl *decl = *i;
-                if (clang::ValueDecl *named = clang::dyn_cast<clang::ValueDecl>(decl)) {
-                    addToCurrentScope(named);
-                }
-            }
-        }
-
-        /*
          * This block of code checks if the current statement is either the
          * first before (predecessors) or after (successors) the line that an
          * OMP pragma is on.
@@ -602,6 +584,10 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
             }
         }
 
+        /*
+         * If the provided file contained launch pragmas for HClib, search for
+         * the first and last statements inside these pragmas.
+         */
         if (launchStartLine > 0) {
             assert(launchEndLine > 0);
 
@@ -630,6 +616,24 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                     firstInsideLaunch = s;
                     launchCaptures = visibleDecls();
                     functionContainingLaunch = curr_func_decl;
+                }
+            }
+        }
+
+        /*
+         * First check if this statement is a variable declaration, and if so
+         * add it to the list of visible declarations in the current scope. This
+         * step must be done before the block of code below for the case where
+         * the last statement before an OMP pragma is a variable declaration. We
+         * want to make sure that declaration is included in the capture list of
+         * the following pragma.
+         */
+        if (const clang::DeclStmt *decls = clang::dyn_cast<clang::DeclStmt>(s)) {
+            for (clang::DeclStmt::const_decl_iterator i = decls->decl_begin(),
+                    e = decls->decl_end(); i != e; i++) {
+                clang::Decl *decl = *i;
+                if (clang::ValueDecl *named = clang::dyn_cast<clang::ValueDecl>(decl)) {
+                    addToCurrentScope(named);
                 }
             }
         }
