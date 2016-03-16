@@ -427,8 +427,22 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
             const clang::Stmt *succ = successors[line];
             OMPPragma *pragma = getOMPPragmaFor(line);
 
-            std::string lbl = fname + std::to_string(line);
-            rootNode.addChild(succ, line, pragma, lbl, SM);
+            if (supportedPragmas.find(pragma->getPragmaName()) == supportedPragmas.end()) {
+                std::cerr << "Encountered an unknown pragma \"" <<
+                    pragma->getPragmaName() << "\" at line " << line << std::endl;
+                exit(1);
+            }
+
+            if (pragma->getPragmaName() == "parallel") {
+                std::string lbl = fname + std::to_string(line);
+                rootNode.addChild(succ, line, pragma, lbl, SM);
+            } else if (pragma->getPragmaName() == "simd") {
+                // ignore and don't add to pragma tree
+            } else {
+                std::cerr << "Unhandled supported pragma \"" <<
+                    pragma->getPragmaName() << "\"" << std::endl;
+                exit(1);
+            }
         }
 
         rootNode.print();
@@ -447,75 +461,73 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     const clang::Stmt *succ = successors[node->getPragmaLine()];
                     const clang::Stmt *pred = predecessors[node->getPragmaLine()];
 
-                    if (supportedPragmas.find(node->getPragma()->getPragmaName()) != supportedPragmas.end()) {
-                        if (node->getPragma()->getPragmaName() == "parallel") {
-                            std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
-                            if (clauses.find("for") != clauses.end()) {
-                                const std::string structDef = getStructDef(
-                                        node->getLbl(),
-                                        captures[node->getPragmaLine()]);
-                                accumulatedStructDefs = accumulatedStructDefs + structDef;
+                    assert(supportedPragmas.find(node->getPragma()->getPragmaName()) != supportedPragmas.end());
 
-                                const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
-                                if (!forLoop) {
-                                    std::cerr << "Expected to find for loop inside omp parallel for but found a " << node->getBody()->getStmtClassName() << " instead." << std::endl;
-                                    std::cerr << stmtToString(node->getBody()) << std::endl;
-                                    exit(1);
-                                }
-                                const clang::Stmt *init = forLoop->getInit();
-                                const clang::Stmt *cond = forLoop->getCond();
-                                const clang::Expr *inc = forLoop->getInc();
+                    if (node->getPragma()->getPragmaName() == "parallel") {
+                        std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
+                        if (clauses.find("for") != clauses.end()) {
+                            const std::string structDef = getStructDef(
+                                    node->getLbl(),
+                                    captures[node->getPragmaLine()]);
+                            accumulatedStructDefs = accumulatedStructDefs + structDef;
 
-                                std::string bodyStr = stmtToString(forLoop->getBody());
-
-                                const clang::ValueDecl *condVar = NULL;
-                                std::string lowStr =
-                                    getCondVarAndLowerBoundFromInit(init,
-                                            &condVar);
-                                assert(condVar);
-
-                                std::string highStr = getUpperBoundFromCond(
-                                        cond, condVar);
-
-                                std::string strideStr = getStrideFromIncr(inc,
-                                        condVar);
-
-                                accumulatedKernelDefs += getClosureDef(
-                                        node->getLbl() + ASYNC_SUFFIX, true,
-                                        node->getLbl(),
-                                        captures[node->getPragmaLine()], bodyStr, condVar);
-
-                                std::string contextCreation = "\n" +
-                                    getContextSetup(node->getLbl(),
-                                            captures[node->getPragmaLine()]);
-
-                                contextCreation += "hclib_loop_domain_t domain;\n";
-                                contextCreation += "domain.low = " + lowStr + ";\n";
-                                contextCreation += "domain.high = " + highStr + ";\n";
-                                contextCreation += "domain.stride = " + strideStr + ";\n";
-                                contextCreation += "domain.tile = 1;\n";
-                                contextCreation += "hclib_future_t *fut = hclib_forasync_future((void *)" +
-                                    node->getLbl() + ASYNC_SUFFIX + ", ctx, NULL, 1, " +
-                                    "&domain, FORASYNC_MODE_RECURSIVE);\n";
-                                contextCreation += "hclib_future_wait(fut);\n";
-                                contextCreation += "free(ctx);\n";
-                                // Add braces to ensure we don't change control flow
-                                rewriter->ReplaceText(succ->getSourceRange(), " { " + contextCreation + " } ");
-                            } else {
-                                std::cerr << "Parallel pragma without a for at line " <<
-                                    node->getPragmaLine() << std::endl;
+                            const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
+                            if (!forLoop) {
+                                std::cerr << "Expected to find for loop " <<
+                                    "inside omp parallel for at line " <<
+                                    node->getPragmaLine() << " but found a " <<
+                                    node->getBody()->getStmtClassName() <<
+                                    " instead." << std::endl;
+                                std::cerr << stmtToString(node->getBody()) << std::endl;
                                 exit(1);
                             }
-                        } else if (node->getPragma()->getPragmaName() == "simd") {
-                            // ignore
+                            const clang::Stmt *init = forLoop->getInit();
+                            const clang::Stmt *cond = forLoop->getCond();
+                            const clang::Expr *inc = forLoop->getInc();
+
+                            std::string bodyStr = stmtToString(forLoop->getBody());
+
+                            const clang::ValueDecl *condVar = NULL;
+                            std::string lowStr =
+                                getCondVarAndLowerBoundFromInit(init,
+                                        &condVar);
+                            assert(condVar);
+
+                            std::string highStr = getUpperBoundFromCond(
+                                    cond, condVar);
+
+                            std::string strideStr = getStrideFromIncr(inc,
+                                    condVar);
+
+                            accumulatedKernelDefs += getClosureDef(
+                                    node->getLbl() + ASYNC_SUFFIX, true,
+                                    node->getLbl(),
+                                    captures[node->getPragmaLine()], bodyStr, condVar);
+
+                            std::string contextCreation = "\n" +
+                                getContextSetup(node->getLbl(),
+                                        captures[node->getPragmaLine()]);
+
+                            contextCreation += "hclib_loop_domain_t domain;\n";
+                            contextCreation += "domain.low = " + lowStr + ";\n";
+                            contextCreation += "domain.high = " + highStr + ";\n";
+                            contextCreation += "domain.stride = " + strideStr + ";\n";
+                            contextCreation += "domain.tile = 1;\n";
+                            contextCreation += "hclib_future_t *fut = hclib_forasync_future((void *)" +
+                                node->getLbl() + ASYNC_SUFFIX + ", ctx, NULL, 1, " +
+                                "&domain, FORASYNC_MODE_RECURSIVE);\n";
+                            contextCreation += "hclib_future_wait(fut);\n";
+                            contextCreation += "free(ctx);\n";
+                            // Add braces to ensure we don't change control flow
+                            rewriter->ReplaceText(succ->getSourceRange(), " { " + contextCreation + " } ");
                         } else {
-                            std::cerr << "Unhandled supported pragma \"" <<
-                                node->getPragma()->getPragmaName() << "\"" << std::endl;
+                            std::cerr << "Parallel pragma without a for at line " <<
+                                node->getPragmaLine() << std::endl;
                             exit(1);
                         }
                     } else {
-                        std::cerr << "Encountered an unknown pragma \"" <<
-                            node->getPragma()->getPragmaName() << "\" at line " << node->getPragmaLine() << std::endl;
+                        std::cerr << "Unhandled supported pragma \"" <<
+                            node->getPragma()->getPragmaName() << "\"" << std::endl;
                         exit(1);
                     }
 
@@ -815,9 +827,7 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
         line = line.substr(line.find(' ') + 1);
         assert(line.find("omp") == 0);
 
-        std::cerr << "line before = " << line << std::endl;
         line = line.substr(line.find(' ') + 1);
-        std::cerr << "line after = " << line << std::endl;
 
         // Look for a command like parallel, for, etc.
         end = line.find(' ');
@@ -830,8 +840,6 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
                         pragma_name));
         } else {
             std::string pragma_name = line.substr(0, end);
-
-            std::cerr << "Parsed pragma " << pragma_name << " from line " << line << std::endl;
 
             OMPPragma pragma(line_no, last_line, line, pragma_name);
             std::string clauses = line.substr(end + 1);

@@ -227,17 +227,17 @@ MAT * structuring_element(int radius) {
 
 // Performs an image dilation on the specified matrix
 //  using the specified structuring element
-typedef struct _dilate_f186 {
+typedef struct _dilate_f187 {
     MAT *img_in;
     MAT *strel;
     MAT *dilated;
     int el_center_i;
     int el_center_j;
     int i;
- } dilate_f186;
+ } dilate_f187;
 
-static void dilate_f186_hclib_async(void *arg, const int ___iter) {
-    dilate_f186 *ctx = (dilate_f186 *)arg;
+static void dilate_f187_hclib_async(void *arg, const int ___iter) {
+    dilate_f187 *ctx = (dilate_f187 *)arg;
     MAT *img_in; img_in = ctx->img_in;
     MAT *strel; strel = ctx->strel;
     MAT *dilated; dilated = ctx->dilated;
@@ -276,7 +276,7 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	// Split the work among multiple threads, if OPEN is defined
 	// Iterate across the input matrix
 	 { 
-dilate_f186 *ctx = (dilate_f186 *)malloc(sizeof(dilate_f186));
+dilate_f187 *ctx = (dilate_f187 *)malloc(sizeof(dilate_f187));
 ctx->img_in = img_in;
 ctx->strel = strel;
 ctx->dilated = dilated;
@@ -288,7 +288,7 @@ domain.low = 0;
 domain.high = img_in->m;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)dilate_f186_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)dilate_f187_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 

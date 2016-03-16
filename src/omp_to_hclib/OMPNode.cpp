@@ -51,8 +51,8 @@ OMPNode *OMPNode::getParent() {
     return parent;
 }
 
-void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragma, std::string lbl,
-        clang::SourceManager *SM) {
+void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine,
+        OMPPragma *pragma, std::string lbl, clang::SourceManager *SM) {
     clang::PresumedLoc presumedStart = SM->getPresumedLoc(stmt->getLocStart());
     clang::PresumedLoc presumedEnd = SM->getPresumedLoc(stmt->getLocEnd());
     const int childStartLine = presumedStart.getLine();
@@ -73,8 +73,15 @@ void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine, OMPPragma *pragm
         if (childStartLine > existingChild.getStartLine() &&
                 childStartLine < existingChild.getEndLine()) {
             // Should be a child pragma
-            assert(childEndLine > existingChild.getStartLine() &&
-                    childEndLine < existingChild.getEndLine());
+            if (!(childEndLine > existingChild.getStartLine() &&
+                    childEndLine < existingChild.getEndLine())) {
+                std::cerr << "Partially overlapping OMP pragmas? existing " <<
+                    "child (" << existingChild.getLbl() << ") is " <<
+                    existingChild.getStartLine() << "->" <<
+                    existingChild.getEndLine() << ", new child (" << lbl << ") is " <<
+                    childStartLine << "->" << childEndLine << std::endl;
+                exit(1);
+            }
             existingChild.addChild(stmt, pragmaLine, pragma, lbl, SM);
             return;
         }
