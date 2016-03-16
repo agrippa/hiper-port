@@ -122,7 +122,7 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
     } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
         return typedefType->getDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
     } else if (const clang::ElaboratedType *elaboratedType = type->getAs<clang::ElaboratedType>()) {
-        return getDeclarationTypeStr(elaboratedType->getNamedType(), name, soFarBefore, soFarAfter);
+        return elaboratedType->getNamedType().getAsString() + " " + soFarBefore + name + soFarAfter;
     } else if (const clang::TagType *tagType = type->getAs<clang::TagType>()) {
         if (tagType->getDecl()->getTypedefNameForAnonDecl()) {
             return tagType->getDecl()->getTypedefNameForAnonDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
