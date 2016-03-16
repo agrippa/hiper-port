@@ -24,9 +24,9 @@ typedef struct _main67 {
     FP_NUMBER **L;
     FP_NUMBER **U;
     FP_NUMBER **A;
-    _IO_FILE *fl;
-    _IO_FILE *fu;
-    _IO_FILE *fa;
+    FILE *fl;
+    FILE *fu;
+    FILE *fa;
  } main67;
 
 typedef struct _main86 {
@@ -40,9 +40,9 @@ typedef struct _main86 {
     FP_NUMBER **L;
     FP_NUMBER **U;
     FP_NUMBER **A;
-    _IO_FILE *fl;
-    _IO_FILE *fu;
-    _IO_FILE *fa;
+    FILE *fl;
+    FILE *fu;
+    FILE *fa;
  } main86;
 
 static void main67_hclib_async(void *arg, const int ___iter) {
@@ -57,9 +57,9 @@ static void main67_hclib_async(void *arg, const int ___iter) {
     FP_NUMBER **L; L = ctx->L;
     FP_NUMBER **U; U = ctx->U;
     FP_NUMBER **A; A = ctx->A;
-    _IO_FILE *fl; fl = ctx->fl;
-    _IO_FILE *fu; fu = ctx->fu;
-    _IO_FILE *fa; fa = ctx->fa;
+    FILE *fl; fl = ctx->fl;
+    FILE *fu; fu = ctx->fu;
+    FILE *fa; fa = ctx->fa;
     i = ___iter;
     do {
 {
@@ -91,9 +91,9 @@ static void main86_hclib_async(void *arg, const int ___iter) {
     FP_NUMBER **L; L = ctx->L;
     FP_NUMBER **U; U = ctx->U;
     FP_NUMBER **A; A = ctx->A;
-    _IO_FILE *fl; fl = ctx->fl;
-    _IO_FILE *fu; fu = ctx->fu;
-    _IO_FILE *fa; fa = ctx->fa;
+    FILE *fl; fl = ctx->fl;
+    FILE *fu; fu = ctx->fu;
+    FILE *fa; fa = ctx->fa;
     i = ___iter;
     do {
 {

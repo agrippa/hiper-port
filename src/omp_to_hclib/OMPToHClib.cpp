@@ -119,14 +119,14 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
     } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
         return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
     } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
-        return getDeclarationTypeStr(typedefType->getDecl()->getUnderlyingType(), name, soFarBefore, soFarAfter);
+        return typedefType->getDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
     } else if (const clang::ElaboratedType *elaboratedType = type->getAs<clang::ElaboratedType>()) {
         return getDeclarationTypeStr(elaboratedType->getNamedType(), name, soFarBefore, soFarAfter);
     } else if (const clang::TagType *tagType = type->getAs<clang::TagType>()) {
-        if (tagType->getDecl()->getDeclName()) {
-            return tagType->getDecl()->getDeclName().getAsString() + " " + soFarBefore + name + soFarAfter;
-        } else if (tagType->getDecl()->getTypedefNameForAnonDecl()) {
+        if (tagType->getDecl()->getTypedefNameForAnonDecl()) {
             return tagType->getDecl()->getTypedefNameForAnonDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
+        } else if (tagType->getDecl()->getDeclName()) {
+            return tagType->getDecl()->getDeclName().getAsString() + " " + soFarBefore + name + soFarAfter;
         } else {
             assert(false);
         }

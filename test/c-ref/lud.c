@@ -45,11 +45,11 @@ typedef struct _main_entrypoint_ctx {
     int matrix_dim;
     int opt;
     int option_index;
-    _FUNC_RETURN_CODE ret;
+    func_ret_t ret;
     const char *input_file;
     float *m;
     float *mm;
-    __stopwatch_t sw;
+    stopwatch sw;
  } main_entrypoint_ctx;
 
 static void main_entrypoint(void *arg) {
@@ -59,11 +59,11 @@ static void main_entrypoint(void *arg) {
     int matrix_dim; matrix_dim = ctx->matrix_dim;
     int opt; opt = ctx->opt;
     int option_index; option_index = ctx->option_index;
-    _FUNC_RETURN_CODE ret; ret = ctx->ret;
+    func_ret_t ret; ret = ctx->ret;
     const char *input_file; input_file = ctx->input_file;
     float *m; m = ctx->m;
     float *mm; mm = ctx->mm;
-    __stopwatch_t sw; sw = ctx->sw;
+    stopwatch sw; sw = ctx->sw;
 lud_omp(m, matrix_dim); }
 
 int

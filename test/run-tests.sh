@@ -48,7 +48,7 @@ for FILE in $FILES; do
         exit 1
     fi
 
-    rm $SCRIPT_DIR/delta transform.log
+#     rm $SCRIPT_DIR/delta transform.log
 done
 
 echo 'Passed all tests!'
