@@ -260,6 +260,18 @@ std::string OMPToHClib::getCondVarAndLowerBoundFromInit(const clang::Stmt *init,
                 std::string(lhs->getStmtClassName()) << std::endl;
             exit(1);
         }
+    } else if (const clang::DeclStmt *decl = clang::dyn_cast<clang::DeclStmt>(init)) {
+        assert(decl->isSingleDecl());
+
+        const clang::ValueDecl *val = clang::dyn_cast<clang::ValueDecl>(decl->getSingleDecl());
+        assert(val);
+        *condVar = val;
+
+        const clang::VarDecl *var = clang::dyn_cast<clang::VarDecl>(val);
+        assert(var);
+        assert(var->hasInit());
+        const clang::Expr *initialValue = var->getInit();
+        return stmtToString(initialValue);
     } else {
         std::cerr << "Unsupported init class " <<
             std::string(init->getStmtClassName()) << std::endl;
