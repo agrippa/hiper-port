@@ -390,15 +390,25 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
         ss << "    " << getUnpackStr(curr) << "\n";
     }
 
-    /*
-     * Insert a one iteration do-loop around the
-     * original body so that continues have the same
-     * semantics.
-     */
     if (isForasyncClosure) {
+        /*
+         * In the case of C++ style loops with the iterator variable declared inside
+         * the initialization clause, make sure the condition variable still gets
+         * added into the struct definition.
+         */
+        if (std::find(captured->begin(), captured->end(), condVar) == captured->end()) {
+            ss << "    " << getDeclarationTypeStr(condVar->getType(),
+                    condVar->getNameAsString(), "", "") << "; ";
+        }
         ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
+        /*
+         * Insert a one iteration do-loop around the
+         * original body so that continues have the same
+         * semantics.
+         */
         ss << "    do {\n";
     }
+
     ss << bodyStr;
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
@@ -479,10 +489,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     if (node->getPragma()->getPragmaName() == "parallel") {
                         std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
                         if (clauses.find("for") != clauses.end()) {
-                            const std::string structDef = getStructDef(
-                                    node->getLbl(),
-                                    captures[node->getPragmaLine()]);
-                            accumulatedStructDefs = accumulatedStructDefs + structDef;
 
                             const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
                             if (!forLoop) {
@@ -516,6 +522,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     node->getLbl() + ASYNC_SUFFIX, true,
                                     node->getLbl(),
                                     captures[node->getPragmaLine()], bodyStr, condVar);
+
+                            const std::string structDef = getStructDef(
+                                    node->getLbl(),
+                                    captures[node->getPragmaLine()]);
+                            accumulatedStructDefs = accumulatedStructDefs + structDef;
 
                             std::string contextCreation = "\n" +
                                 getContextSetup(node->getLbl(),
