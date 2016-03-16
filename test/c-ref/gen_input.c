@@ -63,20 +63,19 @@ static void main67_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    for (j = 0; j < MatrixDim; j++) {
-        if (i == j) {
-            L[i][j] = 1.;
-            U[i][j] = ((FP_NUMBER)rand() / ((FP_NUMBER)(2147483647) + (FP_NUMBER)(1)));
-        } else if (i < j) {
-            L[i][j] = 0;
-            U[i][j] = ((FP_NUMBER)rand() / ((FP_NUMBER)(2147483647) + (FP_NUMBER)(1)));
-        } else {
-            L[i][j] = ((FP_NUMBER)rand() / ((FP_NUMBER)(2147483647) + (FP_NUMBER)(1)));
-            U[i][j] = 0;
+        for (j=0; j < MatrixDim; j++){
+            if ( i == j) {
+                L[i][j] = 1.0;
+                U[i][j] = GET_RAND_FP;
+            } else if (i < j){
+                L[i][j] = 0;
+                U[i][j] = GET_RAND_FP;
+            } else { // i > j
+                L[i][j] = GET_RAND_FP;
+                U[i][j] = 0;
+            }
         }
-    }
-}
-    } while (0);
+    }    } while (0);
 }
 
 static void main86_hclib_async(void *arg, const int ___iter) {
@@ -97,14 +96,13 @@ static void main86_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    for (j = 0; j < MatrixDim; j++) {
-        sum = 0;
-        for (k = 0; k < MatrixDim; k++) 
-            sum += L[i][k] * U[k][j];
-        A[i][j] = sum;
-    }
-}
-    } while (0);
+        for (j=0; j < MatrixDim; j++){
+            sum = 0;
+            for(k=0; k < MatrixDim; k++)
+                sum += L[i][k]*U[k][j];
+            A[i][j] = sum;
+        }
+    }    } while (0);
 }
 
 int main (int argc, char **argv){

@@ -64,43 +64,50 @@ static void lud_omp49_hclib_async(void *arg, const int ___iter) {
     chunk_idx = ___iter;
     do {
 {
-    int i, j, k, i_global, j_global, i_here, j_here;
-    float sum;
-    float temp[256] __attribute__((aligned(64)));
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j++) {
-            temp[i * 16 + j] = a[size * (i + offset) + offset + j];
-        }
-    }
-    i_global = offset;
-    j_global = offset;
-    j_global += 16 * (chunk_idx + 1);
-    for (j = 0; j < 16; j++) {
-        for (i = 0; i < 16; i++) {
-            sum = 0.F;
-            for (k = 0; k < i; k++) {
-                sum += temp[16 * i + k] * a[(i_global + k) * size + (j_global + j)];
+            int i, j, k, i_global, j_global, i_here, j_here;
+            float sum;           
+            float temp[BS*BS] __attribute__ ((aligned (64)));
+
+            for (i = 0; i < BS; i++) {
+                for (j =0; j < BS; j++){
+                    temp[i*BS + j] = a[size*(i + offset) + offset + j ];
+                }
             }
-            i_here = i_global + i;
-            j_here = j_global + j;
-            a[i_here * size + j_here] = a[i_here * size + j_here] - sum;
-        }
-    }
-    j_global = offset;
-    i_global += 16 * (chunk_idx + 1);
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j++) {
-            sum = 0.F;
-            for (k = 0; k < j; k++) {
-                sum += a[(i_global + i) * size + (j_global + k)] * temp[16 * k + j];
+            i_global = offset;
+            j_global = offset;
+            
+            // processing top perimeter
+            //
+            j_global += BS * (chunk_idx+1);
+            for (j = 0; j < BS; j++) {
+                for (i = 0; i < BS; i++) {
+                    sum = 0.f;
+                    for (k=0; k < i; k++) {
+                        sum += temp[BS*i +k] * BB((i_global+k),(j_global+j));
+                    }
+                    i_here = i_global + i;
+                    j_here = j_global + j;
+                    BB(i_here, j_here) = BB(i_here,j_here) - sum;
+                }
             }
-            i_here = i_global + i;
-            j_here = j_global + j;
-            a[size * i_here + j_here] = (a[size * i_here + j_here] - sum) / a[size * (offset + j) + offset + j];
-        }
-    }
-}
-    } while (0);
+
+            // processing left perimeter
+            //
+            j_global = offset;
+            i_global += BS * (chunk_idx + 1);
+            for (i = 0; i < BS; i++) {
+                for (j = 0; j < BS; j++) {
+                    sum = 0.f;
+                    for (k=0; k < j; k++) {
+                        sum += BB((i_global+i),(j_global+k)) * temp[BS*k + j];
+                    }
+                    i_here = i_global + i;
+                    j_here = j_global + j;
+                    a[size*i_here + j_here] = ( a[size*i_here+j_here] - sum ) / a[size*(offset+j) + offset+j];
+                }
+            }
+
+        }    } while (0);
 }
 
 static void lud_omp103_hclib_async(void *arg, const int ___iter) {
@@ -115,31 +122,34 @@ static void lud_omp103_hclib_async(void *arg, const int ___iter) {
     chunk_idx = ___iter;
     do {
 {
-    int i, j, k, i_global, j_global;
-    float temp_top[256] __attribute__((aligned(64)));
-    float temp_left[256] __attribute__((aligned(64)));
-    float sum[16] = { 0.F } __attribute__((aligned(64)));
-    i_global = offset + 16 * (1 + chunk_idx / chunks_in_inter_row);
-    j_global = offset + 16 * (1 + chunk_idx % chunks_in_inter_row);
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j++) {
-            temp_top[i * 16 + j] = a[size * (i + offset) + j + j_global];
-            temp_left[i * 16 + j] = a[size * (i + i_global) + offset + j];
-        }
-    }
-    for (i = 0; i < 16; i++) {
-        for (k = 0; k < 16; k++) {
-            for (j = 0; j < 16; j++) {
-                sum[j] += temp_left[16 * i + k] * temp_top[16 * k + j];
+            int i, j, k, i_global, j_global;
+            float temp_top[BS*BS] __attribute__ ((aligned (64)));
+            float temp_left[BS*BS] __attribute__ ((aligned (64)));
+            float sum[BS] __attribute__ ((aligned (64))) = {0.f};
+            
+            i_global = offset + BS * (1 +  chunk_idx/chunks_in_inter_row);
+            j_global = offset + BS * (1 + chunk_idx%chunks_in_inter_row);
+
+            for (i = 0; i < BS; i++) {
+                for (j =0; j < BS; j++){
+                    temp_top[i*BS + j]  = a[size*(i + offset) + j + j_global ];
+                    temp_left[i*BS + j] = a[size*(i + i_global) + offset + j];
+                }
             }
-        }
-        for (j = 0; j < 16; j++) {
-            a[(i + i_global) * size + (j + j_global)] -= sum[j];
-            sum[j] = 0.F;
-        }
-    }
-}
-    } while (0);
+
+            for (i = 0; i < BS; i++)
+            {
+                for (k=0; k < BS; k++) {
+                    for (j = 0; j < BS; j++) {
+                        sum[j] += temp_left[BS*i + k] * temp_top[BS*k + j];
+                    }
+                }
+                for (j = 0; j < BS; j++) {
+                    BB((i+i_global),(j+j_global)) -= sum[j];
+                    sum[j] = 0.f;
+                }
+            }
+        }    } while (0);
 }
 
 void lud_omp(float *a, int size)

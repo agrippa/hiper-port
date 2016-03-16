@@ -56,59 +56,85 @@ static void ellipsetrack83_hclib_async(void *arg, const int ___iter) {
     cell_num = ___iter;
     do {
 {
-    double xci = xc[cell_num][frame_num];
-    double yci = yc[cell_num][frame_num];
-    double *ri = (double *)malloc(sizeof(double) * Np);
-    for (j = 0; j < Np; j++) {
-        ri[j] = r[cell_num][j][frame_num];
-    }
-    double ycavg = 0.;
-    for (i = (frame_num > 10 ? frame_num - 10 : 0); i < frame_num; i++) {
-        ycavg += yc[cell_num][i];
-    }
-    ycavg = ycavg / (double)(frame_num > 10 ? 10 : frame_num);
-    int u1 = ((xci - 4. * R + 0.5) > (0) ? (xci - 4. * R + 0.5) : (0));
-    int u2 = ((xci + 4. * R + 0.5) > (Iw - 1) ? (Iw - 1) : (xci + 4. * R + 0.5));
-    int v1 = ((yci - 2. * R + 1.5) > (0) ? (yci - 2. * R + 1.5) : (0));
-    int v2 = ((yci + 2. * R + 1.5) > (Ih - 1) ? (Ih - 1) : (yci + 2. * R + 1.5));
-    MAT *Isub = m_get(v2 - v1 + 1, u2 - u1 + 1);
-    for (i = v1; i <= v2; i++) {
-        for (j = u1; j <= u2; j++) {
-            ((Isub)->me[(i - v1)][(j - u1)] = (((I)->me[(i)][(j)])));
-        }
-    }
-    MAT *Ix = gradient_x(Isub);
-    MAT *Iy = gradient_y(Isub);
-    MAT *IE = m_get(Isub->m, Isub->n);
-    for (i = 0; i < Isub->m; i++) {
-        for (j = 0; j < Isub->n; j++) {
-            double temp_x = ((Ix)->me[(i)][(j)]);
-            double temp_y = ((Iy)->me[(i)][(j)]);
-            ((IE)->me[(i)][(j)] = (sqrt((temp_x * temp_x) + (temp_y * temp_y))));
-        }
-    }
-    long long MGVF_start_time = get_time();
-    MAT *IMGVF = MGVF(IE, 1, 1);
-    MGVF_time += get_time() - MGVF_start_time;
-    xci = xci - (double)u1;
-    yci = yci - (double)(v1 - 1);
-    ycavg = ycavg - (double)(v1 - 1);
-    long long snake_start_time = get_time();
-    ellipseevolve(IMGVF, &xci, &yci, ri, t, Np, (double)R, ycavg);
-    snake_time += get_time() - snake_start_time;
-    xci = xci + u1;
-    yci = yci + (v1 - 1);
-    xc[cell_num][frame_num] = xci;
-    yc[cell_num][frame_num] = yci;
-    for (j = 0; j < Np; j++) {
-        r[cell_num][j][frame_num] = ri[j];
-        x[cell_num][j][frame_num] = xc[cell_num][frame_num] + (ri[j] * cos(t[j]));
-        y[cell_num][j][frame_num] = yc[cell_num][frame_num] + (ri[j] * sin(t[j]));
-    }
-    m_free(IMGVF);
-    free(ri);
-}
-    } while (0);
+			// Make copies of the current cell's location
+			double xci = xc[cell_num][frame_num];
+			double yci = yc[cell_num][frame_num];
+			double *ri = (double *) malloc(sizeof(double) * Np);
+			for (j = 0; j < Np; j++) {
+				ri[j] = r[cell_num][j][frame_num];
+			}
+			
+			// Add up the last ten y-values for this cell
+			//  (or fewer if there are not yet ten previous frames)
+			double ycavg = 0.0;
+			for (i = (frame_num > 10 ? frame_num - 10 : 0); i < frame_num; i++) {
+				ycavg += yc[cell_num][i];
+			}
+			// Compute the average of the last ten y-values
+			//  (this represents the expected y-location of the cell)
+			ycavg = ycavg / (double) (frame_num > 10 ? 10 : frame_num);
+			
+			// Determine the range of the subimage surrounding the current position
+			int u1 = max(xci - 4.0 * R + 0.5, 0 );
+			int u2 = min(xci + 4.0 * R + 0.5, Iw - 1);
+			int v1 = max(yci - 2.0 * R + 1.5, 0 );    
+			int v2 = min(yci + 2.0 * R + 1.5, Ih - 1);
+			
+			// Extract the subimage
+			MAT *Isub = m_get(v2 - v1 + 1, u2 - u1 + 1);
+			for (i = v1; i <= v2; i++) {
+				for (j = u1; j <= u2; j++) {
+					m_set_val(Isub, i - v1, j - u1, m_get_val(I, i, j));
+				}
+			}
+			
+	        // Compute the subimage gradient magnitude			
+			MAT *Ix = gradient_x(Isub);
+			MAT *Iy = gradient_y(Isub);
+			MAT *IE = m_get(Isub->m, Isub->n);
+			for (i = 0; i < Isub->m; i++) {
+				for (j = 0; j < Isub->n; j++) {
+					double temp_x = m_get_val(Ix, i, j);
+					double temp_y = m_get_val(Iy, i, j);
+					m_set_val(IE, i, j, sqrt((temp_x * temp_x) + (temp_y * temp_y)));
+				}
+			}
+			
+			// Compute the motion gradient vector flow (MGVF) edgemaps
+			long long MGVF_start_time = get_time();
+			MAT *IMGVF = MGVF(IE, 1, 1);
+			MGVF_time += get_time() - MGVF_start_time;
+			
+			// Determine the position of the cell in the subimage			
+			xci = xci - (double) u1;
+			yci = yci - (double) (v1 - 1);
+			ycavg = ycavg - (double) (v1 - 1);
+			
+			// Evolve the snake
+			long long snake_start_time = get_time();
+			ellipseevolve(IMGVF, &xci, &yci, ri, t, Np, (double) R, ycavg);
+			snake_time += get_time() - snake_start_time;
+			
+			// Compute the cell's new position in the full image
+			xci = xci + u1;
+			yci = yci + (v1 - 1);
+			
+			// Store the new location of the cell and the snake
+			xc[cell_num][frame_num] = xci;
+			yc[cell_num][frame_num] = yci;
+			for (j = 0; j < Np; j++) {
+				r[cell_num][j][frame_num] = ri[j];
+				x[cell_num][j][frame_num] = xc[cell_num][frame_num] + (ri[j] * cos(t[j]));
+				y[cell_num][j][frame_num] = yc[cell_num][frame_num] + (ri[j] * sin(t[j]));
+			}
+			
+			// Output the updated center of each cell
+			//printf("%d,%f,%f\n", cell_num, xci[cell_num], yci[cell_num]);
+			
+			// Free temporary memory
+			m_free(IMGVF);
+			free(ri);
+	    }    } while (0);
 }
 
 void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {

@@ -80,11 +80,12 @@ const clang::Stmt *OMPToHClib::getParent(const clang::Stmt *s) {
 }
 
 std::string OMPToHClib::stmtToString(const clang::Stmt* stmt) {
-    std::string s;
-    llvm::raw_string_ostream stream(s);
-    stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
-    stream.flush();
-    return s;
+    // std::string s;
+    // llvm::raw_string_ostream stream(s);
+    // stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
+    // stream.flush();
+    // return s;
+    return rewriter->getRewrittenText(stmt->getSourceRange());
 }
 
 void OMPToHClib::visitChildren(const clang::Stmt *s, bool firstTraversal) {

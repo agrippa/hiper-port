@@ -118,34 +118,46 @@ static void ellipsematching112_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    double Grad[150];
-    int j, k, n, x, y;
-    for (j = MaxR; j < height - MaxR; j++) {
-        double max_GICOV = 0;
-        for (k = 0; k < 7; k++) {
-            for (n = 0; n < 150; n++) {
-                y = j + tY[k][n];
-                x = i + tX[k][n];
-                Grad[n] = ((grad_x)->me[(y)][(x)]) * cos_angle[n] + ((grad_y)->me[(y)][(x)]) * sin_angle[n];
-            }
-            double sum = 0.;
-            for (n = 0; n < 150; n++) 
-                sum += Grad[n];
-            double mean = sum / (double)150;
-            double var = 0.;
-            for (n = 0; n < 150; n++) {
-                sum = Grad[n] - mean;
-                var += sum * sum;
-            }
-            var = var / (double)(150 - 1);
-            if (mean * mean / var > max_GICOV) {
-                ((gicov)->me[(j)][(i)] = (mean / sqrt(var)));
-                max_GICOV = mean * mean / var;
-            }
-        }
-    }
-}
-    } while (0);
+		double Grad[NPOINTS];
+		int j, k, n, x, y;
+		
+		for (j = MaxR; j < height - MaxR; j++) {
+			// Initialize the maximal GICOV score to 0
+			double max_GICOV = 0;	
+			
+			// Iterate across each stencil
+			for (k = 0; k < NCIRCLES; k++) {
+				// Iterate across each sample point in the current stencil
+				for (n = 0; n < NPOINTS; n++)	{
+					// Determine the x- and y-coordinates of the current sample point
+					y = j + tY[k][n];
+					x = i + tX[k][n];
+					
+					// Compute the combined gradient value at the current sample point
+					Grad[n] = m_get_val(grad_x, y, x) * cos_angle[n] + m_get_val(grad_y, y, x) * sin_angle[n];
+				}
+				
+				// Compute the mean gradient value across all sample points
+				double sum = 0.0;
+				for (n = 0; n < NPOINTS; n++) sum += Grad[n];
+				double mean = sum / (double)NPOINTS;
+				
+				// Compute the variance of the gradient values
+				double var = 0.0;				
+				for (n = 0; n < NPOINTS; n++)	{
+					sum = Grad[n] - mean;
+					var += sum * sum;
+				}				
+				var = var / (double) (NPOINTS - 1);
+				
+				// Keep track of the maximal GICOV value seen so far
+				if (mean * mean / var > max_GICOV) {
+					m_set_val(gicov, j, i, mean / sqrt(var));
+					max_GICOV = mean * mean / var;
+				}
+			}
+		}
+	}    } while (0);
 }
 
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
@@ -247,24 +259,26 @@ static void dilate_f187_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    int j, el_i, el_j, x, y;
-    for (j = 0; j < img_in->n; j++) {
-        double max = 0., temp;
-        for (el_i = 0; el_i < strel->m; el_i++) {
-            for (el_j = 0; el_j < strel->n; el_j++) {
-                y = i - el_center_i + el_i;
-                x = j - el_center_j + el_j;
-                if (y >= 0 && x >= 0 && y < img_in->m && x < img_in->n && ((strel)->me[(el_i)][(el_j)]) != 0) {
-                    temp = ((img_in)->me[(y)][(x)]);
-                    if (temp > max)
-                        max = temp;
-                }
-            }
-        }
-        ((dilated)->me[(i)][(j)] = (max));
-    }
-}
-    } while (0);
+		int j, el_i, el_j, x, y;
+		for (j = 0; j < img_in->n; j++) {
+			double max = 0.0, temp;
+			// Iterate across the structuring element
+			for (el_i = 0; el_i < strel->m; el_i++) {
+				for (el_j = 0; el_j < strel->n; el_j++) {
+					y = i - el_center_i + el_i;
+					x = j - el_center_j + el_j;
+					// Make sure we have not gone off the edge of the matrix
+					if (y >=0 && x >= 0 && y < img_in->m && x < img_in->n && m_get_val(strel, el_i, el_j) != 0) {
+						// Determine if this is maximal value seen so far
+						temp = m_get_val(img_in, y, x);
+						if (temp > max)	max = temp;
+					}
+				}
+			}
+			// Store the maximum value found
+			m_set_val(dilated, i, j, max);
+		}
+	}    } while (0);
 }
 
 MAT * dilate_f(MAT * img_in, MAT * strel) {

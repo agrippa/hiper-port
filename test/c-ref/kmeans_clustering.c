@@ -162,16 +162,24 @@ static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
     i = ___iter;
     do {
 {
-    int tid = hclib_get_current_worker();
-    index = find_nearest_point(feature[i], nfeatures, clusters, nclusters);
-    if (membership[i] != index)
-        delta += 1.;
-    membership[i] = index;
-    partial_new_centers_len[tid][index]++;
-    for (j = 0; j < nfeatures; j++) 
-        partial_new_centers[tid][index][j] += feature[i][j];
-}
-    } while (0);
+	        /* find the index of nestest cluster centers */					
+            int tid = hclib_get_current_worker();				
+	        index = find_nearest_point(feature[i],
+		             nfeatures,
+		             clusters,
+		             nclusters);				
+	        /* if membership changes, increase delta by 1 */
+	        if (membership[i] != index) delta += 1.0;
+
+	        /* assign the membership to object i */
+	        membership[i] = index;
+				
+	        /* update new cluster centers : sum of all objects located
+		       within */
+	        partial_new_centers_len[tid][index]++;				
+	        for (j=0; j<nfeatures; j++)
+		       partial_new_centers[tid][index][j] += feature[i][j];
+            }    } while (0);
 }
 
 float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */

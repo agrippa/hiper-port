@@ -102,7 +102,7 @@ public:
         std::string contextSetup = transform->getContextSetup(
                 "main_entrypoint_ctx", transform->getLaunchCaptures());
         std::string launchStr = contextSetup +
-            "hclib_launch(NULL, NULL, main_entrypoint, ctx);\n" +
+            "hclib_launch(main_entrypoint, ctx);\n" +
             "free(ctx);\n";
 
         rewriter.InsertText(transform->getFunctionContainingLaunch()->getLocStart(),

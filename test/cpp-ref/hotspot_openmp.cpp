@@ -90,42 +90,81 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     chunk = ___iter;
     do {
 {
-    int r_start = 16 * (chunk / chunks_in_col);
-    int c_start = 16 * (chunk % chunks_in_row);
-    int r_end = r_start + 16 > row ? row : r_start + 16;
-    int c_end = c_start + 16 > col ? col : c_start + 16;
-    if (r_start == 0 || c_start == 0 || r_end == row || c_end == col) {
-        for (r = r_start; r < r_start + 16; ++r) {
-            for (c = c_start; c < c_start + 16; ++c) {
-                if ((r == 0) && (c == 0)) {
-                    delta = (Cap_1) * (power[0] + (temp[1] - temp[0]) * Rx_1 + (temp[col] - temp[0]) * Ry_1 + (amb_temp - temp[0]) * Rz_1);
-                } else if ((r == 0) && (c == col - 1)) {
-                    delta = (Cap_1) * (power[c] + (temp[c - 1] - temp[c]) * Rx_1 + (temp[c + col] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
-                } else if ((r == row - 1) && (c == col - 1)) {
-                    delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                } else if ((r == row - 1) && (c == 0)) {
-                    delta = (Cap_1) * (power[r * col] + (temp[r * col + 1] - temp[r * col]) * Rx_1 + (temp[(r - 1) * col] - temp[r * col]) * Ry_1 + (amb_temp - temp[r * col]) * Rz_1);
-                } else if (r == 0) {
-                    delta = (Cap_1) * (power[c] + (temp[c + 1] + temp[c - 1] - 2. * temp[c]) * Rx_1 + (temp[col + c] - temp[c]) * Ry_1 + (amb_temp - temp[c]) * Rz_1);
-                } else if (c == col - 1) {
-                    delta = (Cap_1) * (power[r * col + c] + (temp[(r + 1) * col + c] + temp[(r - 1) * col + c] - 2. * temp[r * col + c]) * Ry_1 + (temp[r * col + c - 1] - temp[r * col + c]) * Rx_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                } else if (r == row - 1) {
-                    delta = (Cap_1) * (power[r * col + c] + (temp[r * col + c + 1] + temp[r * col + c - 1] - 2. * temp[r * col + c]) * Rx_1 + (temp[(r - 1) * col + c] - temp[r * col + c]) * Ry_1 + (amb_temp - temp[r * col + c]) * Rz_1);
-                } else if (c == 0) {
-                    delta = (Cap_1) * (power[r * col] + (temp[(r + 1) * col] + temp[(r - 1) * col] - 2. * temp[r * col]) * Ry_1 + (temp[r * col + 1] - temp[r * col]) * Rx_1 + (amb_temp - temp[r * col]) * Rz_1);
+        int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
+        int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 
+        int r_end = r_start + BLOCK_SIZE_R > row ? row : r_start + BLOCK_SIZE_R;
+        int c_end = c_start + BLOCK_SIZE_C > col ? col : c_start + BLOCK_SIZE_C;
+       
+        if ( r_start == 0 || c_start == 0 || r_end == row || c_end == col )
+        {
+            for ( r = r_start; r < r_start + BLOCK_SIZE_R; ++r ) {
+                for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
+                    /* Corner 1 */
+                    if ( (r == 0) && (c == 0) ) {
+                        delta = (Cap_1) * (power[0] +
+                            (temp[1] - temp[0]) * Rx_1 +
+                            (temp[col] - temp[0]) * Ry_1 +
+                            (amb_temp - temp[0]) * Rz_1);
+                    }	/* Corner 2 */
+                    else if ((r == 0) && (c == col-1)) {
+                        delta = (Cap_1) * (power[c] +
+                            (temp[c-1] - temp[c]) * Rx_1 +
+                            (temp[c+col] - temp[c]) * Ry_1 +
+                        (   amb_temp - temp[c]) * Rz_1);
+                    }	/* Corner 3 */
+                    else if ((r == row-1) && (c == col-1)) {
+                        delta = (Cap_1) * (power[r*col+c] + 
+                            (temp[r*col+c-1] - temp[r*col+c]) * Rx_1 + 
+                            (temp[(r-1)*col+c] - temp[r*col+c]) * Ry_1 + 
+                        (   amb_temp - temp[r*col+c]) * Rz_1);					
+                    }	/* Corner 4	*/
+                    else if ((r == row-1) && (c == 0)) {
+                        delta = (Cap_1) * (power[r*col] + 
+                            (temp[r*col+1] - temp[r*col]) * Rx_1 + 
+                            (temp[(r-1)*col] - temp[r*col]) * Ry_1 + 
+                            (amb_temp - temp[r*col]) * Rz_1);
+                    }	/* Edge 1 */
+                    else if (r == 0) {
+                        delta = (Cap_1) * (power[c] + 
+                            (temp[c+1] + temp[c-1] - 2.0*temp[c]) * Rx_1 + 
+                            (temp[col+c] - temp[c]) * Ry_1 + 
+                            (amb_temp - temp[c]) * Rz_1);
+                    }	/* Edge 2 */
+                    else if (c == col-1) {
+                        delta = (Cap_1) * (power[r*col+c] + 
+                            (temp[(r+1)*col+c] + temp[(r-1)*col+c] - 2.0*temp[r*col+c]) * Ry_1 + 
+                            (temp[r*col+c-1] - temp[r*col+c]) * Rx_1 + 
+                            (amb_temp - temp[r*col+c]) * Rz_1);
+                    }	/* Edge 3 */
+                    else if (r == row-1) {
+                        delta = (Cap_1) * (power[r*col+c] + 
+                            (temp[r*col+c+1] + temp[r*col+c-1] - 2.0*temp[r*col+c]) * Rx_1 + 
+                            (temp[(r-1)*col+c] - temp[r*col+c]) * Ry_1 + 
+                            (amb_temp - temp[r*col+c]) * Rz_1);
+                    }	/* Edge 4 */
+                    else if (c == 0) {
+                        delta = (Cap_1) * (power[r*col] + 
+                            (temp[(r+1)*col] + temp[(r-1)*col] - 2.0*temp[r*col]) * Ry_1 + 
+                            (temp[r*col+1] - temp[r*col]) * Rx_1 + 
+                            (amb_temp - temp[r*col]) * Rz_1);
+                    }
+                    result[r*col+c] =temp[r*col+c]+ delta;
                 }
-                result[r * col + c] = temp[r * col + c] + delta;
+            }
+            continue;
+        }
+
+        for ( r = r_start; r < r_start + BLOCK_SIZE_R; ++r ) {
+            for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
+            /* Update Temperatures */
+                result[r*col+c] =temp[r*col+c]+ 
+                     ( Cap_1 * (power[r*col+c] + 
+                    (temp[(r+1)*col+c] + temp[(r-1)*col+c] - 2.f*temp[r*col+c]) * Ry_1 + 
+                    (temp[r*col+c+1] + temp[r*col+c-1] - 2.f*temp[r*col+c]) * Rx_1 + 
+                    (amb_temp - temp[r*col+c]) * Rz_1));
             }
         }
-        continue;
-    }
-    for (r = r_start; r < r_start + 16; ++r) {
-        for (c = c_start; c < c_start + 16; ++c) {
-            result[r * col + c] = temp[r * col + c] + (Cap_1 * (power[r * col + c] + (temp[(r + 1) * col + c] + temp[(r - 1) * col + c] - 2.F * temp[r * col + c]) * Ry_1 + (temp[r * col + c + 1] + temp[r * col + c - 1] - 2.F * temp[r * col + c]) * Rx_1 + (amb_temp - temp[r * col + c]) * Rz_1));
-        }
-    }
-}
-    } while (0);
+    }    } while (0);
 }
 
 void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,

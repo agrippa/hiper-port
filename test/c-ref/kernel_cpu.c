@@ -110,39 +110,85 @@ static void kernel_cpu110_hclib_async(void *arg, const int ___iter) {
     l = ___iter;
     do {
 {
-    first_i = box[l].offset;
-    rA = &rv[first_i];
-    fA = &fv[first_i];
-    for (k = 0; k < (1 + box[l].nn); k++) {
-        if (k == 0) {
-            pointer = l;
-        } else {
-            pointer = box[l].nei[k - 1].number;
-        }
-        first_j = box[pointer].offset;
-        rB = &rv[first_j];
-        qB = &qv[first_j];
-        for (i = 0; i < 100; i = i + 1) {
-            for (j = 0; j < 100; j = j + 1) {
-                r2 = rA[i].v + rB[j].v - ((rA[i].x) * (rB[j].x) + (rA[i].y) * (rB[j].y) + (rA[i].z) * (rB[j].z));
-                u2 = a2 * r2;
-                vij = exp(-u2);
-                fs = 2. * vij;
-                d.x = rA[i].x - rB[j].x;
-                d.y = rA[i].y - rB[j].y;
-                d.z = rA[i].z - rB[j].z;
-                fxij = fs * d.x;
-                fyij = fs * d.y;
-                fzij = fs * d.z;
-                fA[i].v += qB[j] * vij;
-                fA[i].x += qB[j] * fxij;
-                fA[i].y += qB[j] * fyij;
-                fA[i].z += qB[j] * fzij;
-            }
-        }
-    }
-}
-    } while (0);
+
+		//------------------------------------------------------------------------------------------100
+		//	home box - box parameters
+		//------------------------------------------------------------------------------------------100
+
+		first_i = box[l].offset;												// offset to common arrays
+
+		//------------------------------------------------------------------------------------------100
+		//	home box - distance, force, charge and type parameters from common arrays
+		//------------------------------------------------------------------------------------------100
+
+		rA = &rv[first_i];
+		fA = &fv[first_i];
+
+		//------------------------------------------------------------------------------------------100
+		//	Do for the # of (home+neighbor) boxes
+		//------------------------------------------------------------------------------------------100
+
+		for (k=0; k<(1+box[l].nn); k++) 
+		{
+
+			//----------------------------------------50
+			//	neighbor box - get pointer to the right box
+			//----------------------------------------50
+
+			if(k==0){
+				pointer = l;													// set first box to be processed to home box
+			}
+			else{
+				pointer = box[l].nei[k-1].number;							// remaining boxes are neighbor boxes
+			}
+
+			//----------------------------------------50
+			//	neighbor box - box parameters
+			//----------------------------------------50
+
+			first_j = box[pointer].offset; 
+
+			//----------------------------------------50
+			//	neighbor box - distance, force, charge and type parameters
+			//----------------------------------------50
+
+			rB = &rv[first_j];
+			qB = &qv[first_j];
+
+			//----------------------------------------50
+			//	Do for the # of particles in home box
+			//----------------------------------------50
+
+			for (i=0; i<NUMBER_PAR_PER_BOX; i=i+1){
+
+				// do for the # of particles in current (home or neighbor) box
+				for (j=0; j<NUMBER_PAR_PER_BOX; j=j+1){
+
+					// // coefficients
+					r2 = rA[i].v + rB[j].v - DOT(rA[i],rB[j]); 
+					u2 = a2*r2;
+					vij= exp(-u2);
+					fs = 2.*vij;
+					d.x = rA[i].x  - rB[j].x; 
+					d.y = rA[i].y  - rB[j].y; 
+					d.z = rA[i].z  - rB[j].z; 
+					fxij=fs*d.x;
+					fyij=fs*d.y;
+					fzij=fs*d.z;
+
+					// forces
+					fA[i].v +=  qB[j]*vij;
+					fA[i].x +=  qB[j]*fxij;
+					fA[i].y +=  qB[j]*fyij;
+					fA[i].z +=  qB[j]*fzij;
+
+				} // for j
+
+			} // for i
+
+		} // for k
+
+	}    } while (0);
 }
 
 void  kernel_cpu(	par_str par, 
