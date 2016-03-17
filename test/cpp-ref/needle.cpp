@@ -267,7 +267,7 @@ ctx->penalty = penalty;
 ctx->blk = blk;
 hclib_loop_domain_t domain;
 domain.low = blk - 1;
-domain.high = ;
+domain.high = (max_cols - 1) / 16;
 domain.stride = 1;
 domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)nw_optimized155_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);

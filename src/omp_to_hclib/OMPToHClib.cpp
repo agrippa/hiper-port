@@ -88,6 +88,14 @@ std::string OMPToHClib::stmtToString(const clang::Stmt* stmt) {
     return rewriter->getRewrittenText(stmt->getSourceRange());
 }
 
+std::string OMPToHClib::stringForAST(const clang::Stmt *stmt) {
+    std::string s;
+    llvm::raw_string_ostream stream(s);
+    stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
+    stream.flush();
+    return s;
+}
+
 void OMPToHClib::visitChildren(const clang::Stmt *s, bool firstTraversal) {
     for (clang::Stmt::const_child_iterator i = s->child_begin(),
             e = s->child_end(); i != e; i++) {
@@ -288,7 +296,7 @@ std::string OMPToHClib::getUpperBoundFromCond(const clang::Stmt *cond,
             assert(declref);
             const clang::ValueDecl *decl = declref->getDecl();
             assert(condVar == decl);
-            return stmtToString(bin->getRHS());
+            return stringForAST(bin->getRHS());
         } else {
             std::cerr << "Unsupported binary operator" << std::endl;
             exit(1);
