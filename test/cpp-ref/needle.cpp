@@ -291,6 +291,7 @@ typedef struct _main_entrypoint_ctx {
     int *output_itemsets;
     int *referrence;
     int omp_num_threads;
+    long long start_time;
  } main_entrypoint_ctx;
 
 static void main_entrypoint(void *arg) {
@@ -304,8 +305,9 @@ static void main_entrypoint(void *arg) {
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
     int *referrence; referrence = ctx->referrence;
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
-long long start_time = get_time();; nw_optimized( input_itemsets, output_itemsets, referrence,
-        max_rows, max_cols, penalty ); long long end_time = get_time();; }
+    long long start_time; start_time = ctx->start_time;
+nw_optimized( input_itemsets, output_itemsets, referrence,
+        max_rows, max_cols, penalty ); }
 
 void
 runTest( int argc, char** argv) 
@@ -373,7 +375,9 @@ runTest( int argc, char** argv)
     printf("Num of threads: %d\n", omp_num_threads);
     printf("Processing top-left matrix\n");
    
+    long long start_time = get_time();
 #pragma omp_to_hclib body_start
+
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
@@ -384,10 +388,13 @@ ctx->input_itemsets = input_itemsets;
 ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
 ctx->omp_num_threads = omp_num_threads;
+ctx->start_time = start_time;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
+;
 
 #pragma omp_to_hclib body_end
+    long long end_time = get_time();
 
     printf("Total time: %.3f seconds\n", ((float) (end_time - start_time)) / (1000*1000));
 
