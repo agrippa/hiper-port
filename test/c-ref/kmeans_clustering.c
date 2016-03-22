@@ -159,8 +159,8 @@ static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
     int nthreads; nthreads = ctx->nthreads;
     int **partial_new_centers_len; partial_new_centers_len = ctx->partial_new_centers_len;
     float ***partial_new_centers; partial_new_centers = ctx->partial_new_centers;
-    i = ___iter;
     do {
+    i = ___iter;
 {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				

@@ -174,8 +174,8 @@ static void main125_hclib_async(void *arg, const int ___iter) {
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nthreads; nthreads = ctx->nthreads;
-    int i;     i = ___iter;
     do {
+    int i;     i = ___iter;
 {
             for (int j = 0; j < cols; j++) { 
 		
@@ -257,8 +257,8 @@ static void main158_hclib_async(void *arg, const int ___iter) {
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nthreads; nthreads = ctx->nthreads;
-    int i;     i = ___iter;
     do {
+    int i;     i = ___iter;
 {
             for (int j = 0; j < cols; j++) {        
 

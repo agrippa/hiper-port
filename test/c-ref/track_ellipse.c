@@ -53,8 +53,8 @@ static void ellipsetrack83_hclib_async(void *arg, const int ___iter) {
     MAT *I; I = ctx->I;
     int Ih; Ih = ctx->Ih;
     int Iw; Iw = ctx->Iw;
-    cell_num = ___iter;
     do {
+    cell_num = ___iter;
 {
 			// Make copies of the current cell's location
 			double xci = xc[cell_num][frame_num];

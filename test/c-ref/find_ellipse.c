@@ -115,8 +115,8 @@ static void ellipsematching112_hclib_async(void *arg, const int ___iter) {
     int height; height = ctx->height;
     int width; width = ctx->width;
     MAT *gicov; gicov = ctx->gicov;
-    i = ___iter;
     do {
+    i = ___iter;
 {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
@@ -256,8 +256,8 @@ static void dilate_f187_hclib_async(void *arg, const int ___iter) {
     int el_center_i; el_center_i = ctx->el_center_i;
     int el_center_j; el_center_j = ctx->el_center_j;
     int i; i = ctx->i;
-    i = ___iter;
     do {
+    i = ___iter;
 {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {

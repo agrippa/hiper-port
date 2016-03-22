@@ -100,8 +100,8 @@ static void run99_hclib_async(void *arg, const int ___iter) {
     int *temp; temp = ctx->temp;
     int min; min = ctx->min;
     int t; t = ctx->t;
-    int n;     n = ___iter;
     do {
+    int n;     n = ___iter;
 {
           min = src[n];
           if (n > 0)

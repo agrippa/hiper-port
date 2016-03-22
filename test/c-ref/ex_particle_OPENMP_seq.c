@@ -736,8 +736,8 @@ static void particleFilter371_hclib_async(void *arg, const int ___iter) {
     double *objxy; objxy = ctx->objxy;
     long long get_neighbors; get_neighbors = ctx->get_neighbors;
     double *weights; weights = ctx->weights;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 		weights[x] = 1/((double)(Nparticles));
 	}    } while (0);
@@ -773,8 +773,8 @@ static void particleFilter386_hclib_async(void *arg, const int ___iter) {
     double *CDF; CDF = ctx->CDF;
     double *u; u = ctx->u;
     int *ind; ind = ctx->ind;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 		arrayX[x] = xe;
 		arrayY[x] = ye;
@@ -815,8 +815,8 @@ static void particleFilter400_hclib_async(void *arg, const int ___iter) {
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
     long long set_arrays; set_arrays = ctx->set_arrays;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			arrayX[x] += 1 + 5*randn(seed, x);
 			arrayY[x] += -2 + 2*randn(seed, x);
@@ -858,8 +858,8 @@ static void particleFilter408_hclib_async(void *arg, const int ___iter) {
     int indY; indY = ctx->indY;
     long long set_arrays; set_arrays = ctx->set_arrays;
     long long error; error = ctx->error;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			//compute the likelihood: remember our assumption is that you know
 			// foreground and the background image intensity distribution.
@@ -916,8 +916,8 @@ static void particleFilter431_hclib_async(void *arg, const int ___iter) {
     long long set_arrays; set_arrays = ctx->set_arrays;
     long long error; error = ctx->error;
     long long likelihood_time; likelihood_time = ctx->likelihood_time;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			weights[x] = weights[x] * exp(likelihood[x]);
 		}    } while (0);
@@ -961,8 +961,8 @@ static void particleFilter438_hclib_async(void *arg, const int ___iter) {
     long long likelihood_time; likelihood_time = ctx->likelihood_time;
     long long exponential; exponential = ctx->exponential;
     double sumWeights; sumWeights = ctx->sumWeights;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			sumWeights += weights[x];
 		}    } while (0);
@@ -1007,8 +1007,8 @@ static void particleFilter444_hclib_async(void *arg, const int ___iter) {
     long long exponential; exponential = ctx->exponential;
     double sumWeights; sumWeights = ctx->sumWeights;
     long long sum_time; sum_time = ctx->sum_time;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			weights[x] = weights[x]/sumWeights;
 		}    } while (0);
@@ -1054,8 +1054,8 @@ static void particleFilter453_hclib_async(void *arg, const int ___iter) {
     double sumWeights; sumWeights = ctx->sumWeights;
     long long sum_time; sum_time = ctx->sum_time;
     long long normalize; normalize = ctx->normalize;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			xe += arrayX[x] * weights[x];
 			ye += arrayY[x] * weights[x];
@@ -1106,8 +1106,8 @@ static void particleFilter478_hclib_async(void *arg, const int ___iter) {
     double distance; distance = ctx->distance;
     long long cum_sum; cum_sum = ctx->cum_sum;
     double u1; u1 = ctx->u1;
-    x = ___iter;
     do {
+    x = ___iter;
 {
 			u[x] = u1 + x/((double)(Nparticles));
 		}    } while (0);
@@ -1160,8 +1160,8 @@ static void particleFilter486_hclib_async(void *arg, const int ___iter) {
     long long u_time; u_time = ctx->u_time;
     int j; j = ctx->j;
     int i; i = ctx->i;
-    j = ___iter;
     do {
+    j = ___iter;
 {
 			i = findIndex(CDF, Nparticles, u[j]);
 			if(i == -1)

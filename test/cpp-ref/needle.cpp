@@ -122,8 +122,8 @@ static void nw_optimized100_hclib_async(void *arg, const int ___iter) {
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
     int blk; blk = ctx->blk;
-    int b_index_x;     b_index_x = ___iter;
     do {
+    int b_index_x;     b_index_x = ___iter;
 {
             int b_index_y = blk - 1 - b_index_x;
             int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
@@ -179,8 +179,8 @@ static void nw_optimized155_hclib_async(void *arg, const int ___iter) {
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
     int blk; blk = ctx->blk;
-    int b_index_x;     b_index_x = ___iter;
     do {
+    int b_index_x;     b_index_x = ___iter;
 {
             int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
 

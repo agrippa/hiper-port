@@ -185,8 +185,8 @@ static void computeTempOMP157_hclib_async(void *arg, const int ___iter) {
     float *tIn_t; tIn_t = ctx->tIn_t;
     float *tOut_t; tOut_t = ctx->tOut_t;
     int z; z = ctx->z;
-    z = ___iter;
     do {
+    z = ___iter;
 {
                 int y;
                 for (y = 0; y < ny; y++) {

@@ -60,8 +60,8 @@ static void main67_hclib_async(void *arg, const int ___iter) {
     FILE *fl; fl = ctx->fl;
     FILE *fu; fu = ctx->fu;
     FILE *fa; fa = ctx->fa;
-    i = ___iter;
     do {
+    i = ___iter;
 {
         for (j=0; j < MatrixDim; j++){
             if ( i == j) {
@@ -93,8 +93,8 @@ static void main86_hclib_async(void *arg, const int ___iter) {
     FILE *fl; fl = ctx->fl;
     FILE *fu; fu = ctx->fu;
     FILE *fa; fa = ctx->fa;
-    i = ___iter;
     do {
+    i = ___iter;
 {
         for (j=0; j < MatrixDim; j++){
             sum = 0;

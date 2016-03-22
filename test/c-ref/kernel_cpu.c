@@ -107,8 +107,8 @@ static void kernel_cpu110_hclib_async(void *arg, const int ___iter) {
     double fyij; fyij = ctx->fyij;
     double fzij; fzij = ctx->fzij;
     THREE_VECTOR d; d = ctx->d;
-    l = ___iter;
     do {
+    l = ___iter;
 {
 
 		//------------------------------------------------------------------------------------------100

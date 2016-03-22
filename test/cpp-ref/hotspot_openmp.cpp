@@ -87,8 +87,8 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     int num_chunk; num_chunk = ctx->num_chunk;
     int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
     int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
-    chunk = ___iter;
     do {
+    chunk = ___iter;
 {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 

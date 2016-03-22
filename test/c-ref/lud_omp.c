@@ -61,8 +61,8 @@ static void lud_omp49_hclib_async(void *arg, const int ___iter) {
     int size_inter; size_inter = ctx->size_inter;
     int chunks_in_inter_row; chunks_in_inter_row = ctx->chunks_in_inter_row;
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
-    chunk_idx = ___iter;
     do {
+    chunk_idx = ___iter;
 {
             int i, j, k, i_global, j_global, i_here, j_here;
             float sum;           
@@ -119,8 +119,8 @@ static void lud_omp103_hclib_async(void *arg, const int ___iter) {
     int size_inter; size_inter = ctx->size_inter;
     int chunks_in_inter_row; chunks_in_inter_row = ctx->chunks_in_inter_row;
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
-    chunk_idx = ___iter;
     do {
+    chunk_idx = ___iter;
 {
             int i, j, k, i_global, j_global;
             float temp_top[BS*BS] __attribute__ ((aligned (64)));
