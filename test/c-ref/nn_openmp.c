@@ -76,8 +76,8 @@ static void main116_hclib_async(void *arg, const int ___iter) {
     char filename_buf[1024]; memcpy(filename_buf, ctx->filename_buf, 1024 * (sizeof(char))); 
     char *rodinia_data_dir; rodinia_data_dir = ctx->rodinia_data_dir;
     float *z; z = ctx->z;
-    i = ___iter;
     do {
+    i = ___iter;
 {
 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
             float tmp_lat = atof(rec_iter);

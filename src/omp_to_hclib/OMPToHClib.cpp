@@ -400,21 +400,22 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
 
     if (isForasyncClosure) {
         /*
+         * Insert a one iteration do-loop around the original body so that
+         * continues have the same semantics and in case the condition variable
+         * declared below has the same name as a captured variable.
+         */
+        ss << "    do {\n";
+
+        /*
          * In the case of C++ style loops with the iterator variable declared inside
          * the initialization clause, make sure the condition variable still gets
-         * added into the struct definition.
+         * added into the body of the kernel.
          */
         if (std::find(captured->begin(), captured->end(), condVar) == captured->end()) {
             ss << "    " << getDeclarationTypeStr(condVar->getType(),
                     condVar->getNameAsString(), "", "") << "; ";
         }
         ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
-        /*
-         * Insert a one iteration do-loop around the
-         * original body so that continues have the same
-         * semantics.
-         */
-        ss << "    do {\n";
     }
 
     ss << bodyStr;
