@@ -383,7 +383,8 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 
 std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, const clang::ValueDecl *condVar) {
+        std::string bodyStr, std::vector<OMPReductionVar> *reductions,
+        const clang::ValueDecl *condVar) {
     std::stringstream ss;
     ss << "static void " << closureName << "(void *arg";
     if (isForasyncClosure) {
@@ -421,21 +422,53 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
     ss << bodyStr;
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
+        for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
+                e = reductions->end(); i != e; i++) {
+            OMPReductionVar red = *i;
+            std::string varname = red.getVar();
+
+            // Find the associated declaration for its type information
+            clang::ValueDecl *decl = NULL;
+            for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
+                    ee = captured->end(); ii != ee; ii++) {
+                if ((*ii)->getNameAsString() == varname) {
+                    decl = *ii;
+                    break;
+                }
+            }
+            assert(decl);
+
+            ss << "    " << red.getReductionFunc() << "(&ctx->" << red.getVar() << ", " << red.getVar() << ");\n";
+            //TODO do actual reduction on ctx->varname
+        }
     }
     ss << "}\n\n";
     return ss.str();
 }
 
 std::string OMPToHClib::getContextSetup(std::string structName,
-        std::vector<clang::ValueDecl *> *captured) {
+        std::vector<clang::ValueDecl *> *captured,
+        std::vector<OMPReductionVar> *reductions) {
     std::stringstream ss;
     ss << structName << " *ctx = (" << structName << " *)malloc(sizeof(" <<
         structName << "));\n";
+
     for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
             ee = captured->end(); ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         ss << getCaptureStr(curr) << "\n";
     }
+
+    if (reductions) {
+        for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
+                e = reductions->end(); i != e; i++) {
+            OMPReductionVar red = *i;
+            // Initialize the reduction target based on the reduction op
+            ss << "ctx->" << red.getVar() << " = " << red.getInitialValue() <<
+                ";\n";
+        }
+    }
+
     return ss.str();
 }
 
@@ -530,7 +563,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             accumulatedKernelDefs += getClosureDef(
                                     node->getLbl() + ASYNC_SUFFIX, true,
                                     node->getLbl(),
-                                    captures[node->getPragmaLine()], bodyStr, condVar);
+                                    captures[node->getPragmaLine()], bodyStr,
+                                    node->getPragma()->getReductions(), condVar);
 
                             const std::string structDef = getStructDef(
                                     node->getLbl(),
@@ -539,7 +573,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                             std::string contextCreation = "\n" +
                                 getContextSetup(node->getLbl(),
-                                        captures[node->getPragmaLine()]);
+                                        captures[node->getPragmaLine()],
+                                        node->getPragma()->getReductions());
 
                             contextCreation += "hclib_loop_domain_t domain;\n";
                             contextCreation += "domain.low = " + lowStr + ";\n";

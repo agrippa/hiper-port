@@ -100,7 +100,7 @@ public:
                 "main_entrypoint", false, "main_entrypoint_ctx",
                 transform->getLaunchCaptures(), launchBody);
         std::string contextSetup = transform->getContextSetup(
-                "main_entrypoint_ctx", transform->getLaunchCaptures());
+                "main_entrypoint_ctx", transform->getLaunchCaptures(), NULL);
         std::string launchStr = contextSetup +
             "hclib_launch(main_entrypoint, ctx);\n" +
             "free(ctx);\n";

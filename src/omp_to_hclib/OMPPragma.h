@@ -4,13 +4,22 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <iostream>
+
+#include "OMPReductionVar.h"
 
 class OMPPragma {
     public:
         OMPPragma(int setLine, int setLastLine,
                 std::string setPragma, std::string setPragmaName) :
                 line(setLine), lastLine(setLastLine), pragma(setPragma),
-                pragmaName(setPragmaName) { }
+                pragmaName(setPragmaName) {
+            if (setPragma != "parallel" && setPragma != "simd") {
+                std::cerr << "Unsupported pragma detected: \"" << setPragma <<
+                    "\"" << std::endl;
+                exit(1);
+            }
+        }
 
         void addClause(std::string clauseName,
                 std::vector<std::string> clauseArguments);
@@ -24,6 +33,9 @@ class OMPPragma {
         std::map<std::string, std::vector<std::string> > getClauses() {
             return clauses;
         }
+        std::vector<OMPReductionVar> *getReductions() {
+            return &reductions;
+        }
 
     private:
         int line;
@@ -32,6 +44,7 @@ class OMPPragma {
 
         std::string pragmaName;
         std::map<std::string, std::vector<std::string> > clauses;
+        std::vector<OMPReductionVar> reductions;
 };
 
 #endif // OMP_PRAGMA_H
