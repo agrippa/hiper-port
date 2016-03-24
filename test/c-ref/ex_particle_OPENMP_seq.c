@@ -539,6 +539,7 @@ typedef struct _particleFilter438 {
     long long likelihood_time;
     long long exponential;
     double sumWeights;
+    pthread_mutex_t reduction_mutex;
  } particleFilter438;
 
 typedef struct _particleFilter444 {
@@ -620,6 +621,7 @@ typedef struct _particleFilter453 {
     double sumWeights;
     long long sum_time;
     long long normalize;
+    pthread_mutex_t reduction_mutex;
  } particleFilter453;
 
 typedef struct _particleFilter478 {
@@ -966,7 +968,11 @@ static void particleFilter438_hclib_async(void *arg, const int ___iter) {
 {
 			sumWeights += weights[x];
 		}    } while (0);
-    __sync_fetch_and_add(&ctx->sumWeights, sumWeights);
+    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
+    assert(lock_err == 0);
+    ctx->sumWeights += sumWeights;
+    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
+    assert(unlock_err == 0);
 }
 
 static void particleFilter444_hclib_async(void *arg, const int ___iter) {
@@ -1061,8 +1067,12 @@ static void particleFilter453_hclib_async(void *arg, const int ___iter) {
 			xe += arrayX[x] * weights[x];
 			ye += arrayY[x] * weights[x];
 		}    } while (0);
-    __sync_fetch_and_add(&ctx->xe, xe);
-    __sync_fetch_and_add(&ctx->ye, ye);
+    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
+    assert(lock_err == 0);
+    ctx->xe += xe;
+    ctx->ye += ye;
+    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
+    assert(unlock_err == 0);
 }
 
 static void particleFilter478_hclib_async(void *arg, const int ___iter) {
@@ -1473,6 +1483,7 @@ ctx->likelihood_time = likelihood_time;
 ctx->exponential = exponential;
 ctx->sumWeights = sumWeights;
 ctx->sumWeights = 0;
+ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = Nparticles;
@@ -1580,6 +1591,7 @@ ctx->sum_time = sum_time;
 ctx->normalize = normalize;
 ctx->xe = 0;
 ctx->ye = 0;
+ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = Nparticles;

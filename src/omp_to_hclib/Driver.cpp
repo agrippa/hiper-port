@@ -95,7 +95,7 @@ public:
     if (transform->hasLaunchBody()) {
         std::string launchBody = transform->getLaunchBody();
         std::string launchStruct = transform->getStructDef(
-                "main_entrypoint_ctx", transform->getLaunchCaptures());
+                "main_entrypoint_ctx", transform->getLaunchCaptures(), false);
         std::string closureFunction = transform->getClosureDef(
                 "main_entrypoint", false, "main_entrypoint_ctx",
                 transform->getLaunchCaptures(), launchBody);

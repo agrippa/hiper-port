@@ -224,14 +224,20 @@ std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
 }
 
 std::string OMPToHClib::getStructDef(std::string structName,
-        std::vector<clang::ValueDecl *> *captured) {
+        std::vector<clang::ValueDecl *> *captured, bool hasReductions) {
     std::string struct_def = "typedef struct _" + structName + " {\n";
+
     for (std::vector<clang::ValueDecl *>::iterator ii =
             captured->begin(), ee = captured->end();
             ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         struct_def += "    " + getDeclarationStr(curr) + "\n";
     }
+
+    if (hasReductions) {
+        struct_def += "    pthread_mutex_t reduction_mutex;\n";
+    }
+
     struct_def += " } " + structName + ";\n\n";
 
     return struct_def;
@@ -422,24 +428,21 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
     ss << bodyStr;
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
-        for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
-                e = reductions->end(); i != e; i++) {
-            OMPReductionVar red = *i;
-            std::string varname = red.getVar();
+        if (!reductions->empty()) {
+            ss << "    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);\n";
+            ss << "    assert(lock_err == 0);\n";
 
-            // Find the associated declaration for its type information
-            clang::ValueDecl *decl = NULL;
-            for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
-                    ee = captured->end(); ii != ee; ii++) {
-                if ((*ii)->getNameAsString() == varname) {
-                    decl = *ii;
-                    break;
-                }
+            for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
+                    e = reductions->end(); i != e; i++) {
+                OMPReductionVar red = *i;
+                std::string varname = red.getVar();
+
+                ss << "    ctx->" << varname << " " << red.getOp() << "= " <<
+                    varname << ";\n";
             }
-            assert(decl);
 
-            ss << "    " << red.getReductionFunc() << "(&ctx->" << red.getVar() << ", " << red.getVar() << ");\n";
-            //TODO do actual reduction on ctx->varname
+            ss << "    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);\n";
+            ss << "    assert(unlock_err == 0);\n";
         }
     }
     ss << "}\n\n";
@@ -459,7 +462,7 @@ std::string OMPToHClib::getContextSetup(std::string structName,
         ss << getCaptureStr(curr) << "\n";
     }
 
-    if (reductions) {
+    if (reductions && !reductions->empty()) {
         for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
                 e = reductions->end(); i != e; i++) {
             OMPReductionVar red = *i;
@@ -467,6 +470,7 @@ std::string OMPToHClib::getContextSetup(std::string structName,
             ss << "ctx->" << red.getVar() << " = " << red.getInitialValue() <<
                 ";\n";
         }
+        ss << "ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;\n";
     }
 
     return ss.str();
@@ -568,7 +572,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                             const std::string structDef = getStructDef(
                                     node->getLbl(),
-                                    captures[node->getPragmaLine()]);
+                                    captures[node->getPragmaLine()],
+                                    !node->getPragma()->getReductions()->empty());
                             accumulatedStructDefs = accumulatedStructDefs + structDef;
 
                             std::vector<OMPReductionVar> *reductions =

@@ -135,6 +135,7 @@ typedef struct _kmeans_clustering183 {
     int nthreads;
     int **partial_new_centers_len;
     float ***partial_new_centers;
+    pthread_mutex_t reduction_mutex;
  } kmeans_clustering183;
 
 static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
@@ -180,7 +181,11 @@ static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
 	        for (j=0; j<nfeatures; j++)
 		       partial_new_centers[tid][index][j] += feature[i][j];
             }    } while (0);
-    __sync_fetch_and_add(&ctx->delta, delta);
+    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
+    assert(lock_err == 0);
+    ctx->delta += delta;
+    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
+    assert(unlock_err == 0);
 }
 
 float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
@@ -273,6 +278,7 @@ ctx->nthreads = nthreads;
 ctx->partial_new_centers_len = partial_new_centers_len;
 ctx->partial_new_centers = partial_new_centers;
 ctx->delta = 0;
+ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = npoints;

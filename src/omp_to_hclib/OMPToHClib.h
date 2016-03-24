@@ -56,7 +56,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::vector<OMPReductionVar> *reductions = NULL,
                 const clang::ValueDecl *condVar = NULL);
         std::string getStructDef(std::string structName,
-                std::vector<clang::ValueDecl *> *captured);
+                std::vector<clang::ValueDecl *> *captured, bool hasReductions);
         std::string getContextSetup(std::string structName,
                 std::vector<clang::ValueDecl *> *captured,
                 std::vector<OMPReductionVar> *reductions);
@@ -95,8 +95,6 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 const clang::ValueDecl *condVar);
         std::string getStrideFromIncr(const clang::Stmt *inc,
                 const clang::ValueDecl *condVar);
-
-        std::string getStructDef(OMPNode *node);
 
         clang::Expr *unwrapCasts(clang::Expr *expr);
 

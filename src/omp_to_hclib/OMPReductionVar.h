@@ -16,7 +16,6 @@ class OMPReductionVar {
         std::string getVar();
 
         std::string getInitialValue();
-        std::string getReductionFunc();
 };
 
 #endif

@@ -373,6 +373,7 @@ typedef struct _pgain451 {
     double t1;
     double *lower;
     double *gl_lower;
+    pthread_mutex_t reduction_mutex;
  } pgain451;
 
 typedef struct _pgain539 {
@@ -454,7 +455,11 @@ static void pgain451_hclib_async(void *arg, const int ___iter) {
       lower[center_table[assign]] += current_cost - x_cost;			
     }
   }    } while (0);
-    __sync_fetch_and_add(&ctx->cost_of_opening_x, cost_of_opening_x);
+    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
+    assert(lock_err == 0);
+    ctx->cost_of_opening_x += cost_of_opening_x;
+    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
+    assert(unlock_err == 0);
 }
 
 static void pgain539_hclib_async(void *arg, const int ___iter) {
@@ -623,6 +628,7 @@ ctx->t1 = t1;
 ctx->lower = lower;
 ctx->gl_lower = gl_lower;
 ctx->cost_of_opening_x = 0;
+ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;
 hclib_loop_domain_t domain;
 domain.low = k1;
 domain.high = k2;

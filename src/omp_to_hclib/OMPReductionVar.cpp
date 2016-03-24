@@ -18,12 +18,3 @@ std::string OMPReductionVar::getInitialValue() {
         exit(1);
     }
 }
-
-std::string OMPReductionVar::getReductionFunc() {
-    if (op == "+") {
-        return std::string("__sync_fetch_and_add");
-    } else {
-        std::cerr << "Unsupported reduction op \"" << op << "\"" << std::endl;
-        exit(1);
-    }
-}
