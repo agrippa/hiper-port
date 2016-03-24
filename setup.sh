@@ -12,11 +12,6 @@ if [[ -z "$LLVM_HOME" ]]; then
     exit 1
 fi
 
-if [[ -z "$CHIMES_HOME" ]]; then
-    echo CHIMES_HOME must be set
-    exit 1
-fi
-
 rm -rf $LLVM_INSTALL
 rm -rf $LLVM_HOME
 
