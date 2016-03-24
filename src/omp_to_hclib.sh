@@ -4,11 +4,8 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-BRACE_INSERT=$SCRIPT_DIR/brace_insert/brace_insert
-INSERT_LINE_NO=$SCRIPT_DIR/insert_line_numbers.py
 OPENMP_FINDER=$SCRIPT_DIR/openmp_finder.py
 OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
-INSERT_STRUCTS=$SCRIPT_DIR/insert_structs.py
 REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER=$SCRIPT_DIR/remove_omp_pragmas_and_insert_header.py 
 OMP_TO_HCLIB_PRAGMA_FINDER=$SCRIPT_DIR/omp_to_hclib_pragma_finder.py
 
@@ -89,11 +86,6 @@ WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
 
 OMP_INFO=$DIRNAME/$NAME.omp.info
 OMP_TO_HCLIB_INFO=$DIRNAME/$NAME.omp_to_hclib.info
-
-# Insert braces to simplify future transformatsion, i.e. to ensure block
-# membership does not change because of inserted code
-# [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting braces'
-# $BRACE_INSERT -o $WITH_BRACES $INPUT_PATH -- $INCLUDE $USER_INCLUDES
 
 # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
