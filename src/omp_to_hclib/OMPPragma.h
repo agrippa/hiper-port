@@ -14,7 +14,7 @@ class OMPPragma {
                 std::string setPragma, std::string setPragmaName) :
                 line(setLine), lastLine(setLastLine), pragma(setPragma),
                 pragmaName(setPragmaName) {
-            if (setPragma != "parallel" && setPragma != "simd") {
+            if (setPragmaName != "parallel" && setPragmaName != "simd") {
                 std::cerr << "Unsupported pragma detected: \"" << setPragma <<
                     "\"" << std::endl;
                 exit(1);

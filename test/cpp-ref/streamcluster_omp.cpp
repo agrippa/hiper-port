@@ -454,6 +454,7 @@ static void pgain451_hclib_async(void *arg, const int ___iter) {
       lower[center_table[assign]] += current_cost - x_cost;			
     }
   }    } while (0);
+    __sync_fetch_and_add(&ctx->cost_of_opening_x, cost_of_opening_x);
 }
 
 static void pgain539_hclib_async(void *arg, const int ___iter) {
@@ -621,6 +622,7 @@ ctx->count = count;
 ctx->t1 = t1;
 ctx->lower = lower;
 ctx->gl_lower = gl_lower;
+ctx->cost_of_opening_x = 0;
 hclib_loop_domain_t domain;
 domain.low = k1;
 domain.high = k2;
@@ -629,6 +631,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)pgain451_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
+cost_of_opening_x = ctx->cost_of_opening_x;
  } 
 
 #ifdef ENABLE_THREADS

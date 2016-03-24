@@ -23,28 +23,39 @@ void OMPPragma::addClause(std::string clauseName,
         } else if (clauseName == "schedule") {
             // Ignore for now
             supportedClause = true;
+        } else if (clauseName == "default") {
+            // Ignore for now
+            supportedClause = true;
+        } else if (clauseName == "num_threads") {
+            // Ignore for now
+            supportedClause = true;
         } else if (clauseName == "for") {
             // Ignore, already know we're in a parallel for
             supportedClause = true;
         } else if (clauseName == "reduction") {
-            assert(clauseArguments.size() == 1);
-            std::string arg = clauseArguments[0];
-            assert(arg.find(":") != std::string::npos);
+            assert(clauseArguments.size() >= 1);
+            std::string firstArg = clauseArguments[0];
+            assert(firstArg.find(":") != std::string::npos);
 
             int start_index = 0;
-            while (std::isspace(arg[start_index])) start_index++;
-            int op_end_index = arg.find(":") - 1;
-            while (std::isspace(arg[op_end_index])) op_end_index--;
-            int vars_start_index = arg.find(":") + 1;
-            while (std::isspace(arg[vars_start_index])) vars_start_index++;
-            int vars_end_index = arg.size() - 1;
-            while (std::isspace(arg[vars_end_index])) vars_end_index--;
+            while (std::isspace(firstArg[start_index])) start_index++;
+            int op_end_index = firstArg.find(":") - 1;
+            while (std::isspace(firstArg[op_end_index])) op_end_index--;
+            int vars_start_index = firstArg.find(":") + 1;
+            while (std::isspace(firstArg[vars_start_index])) vars_start_index++;
+            int vars_end_index = firstArg.size() - 1;
+            while (std::isspace(firstArg[vars_end_index])) vars_end_index--;
 
-            std::string op_str = arg.substr(start_index, op_end_index - start_index + 1);
-            std::string vars_str = arg.substr(vars_start_index, vars_end_index - vars_start_index + 1);
-            assert(vars_str.find(",") == std::string::npos); // for now only support single variable lists
+            std::string opStr = firstArg.substr(start_index,
+                    op_end_index - start_index + 1);
+            std::string firstVarStr = firstArg.substr(vars_start_index,
+                    vars_end_index - vars_start_index + 1);
 
-            reductions.push_back(OMPReductionVar(op_str, vars_str));
+            reductions.push_back(OMPReductionVar(opStr, firstVarStr));
+            for (int i = 1; i < clauseArguments.size(); i++) {
+                reductions.push_back(OMPReductionVar(opStr,
+                            clauseArguments[i]));
+            }
 
             supportedClause = true;
         }

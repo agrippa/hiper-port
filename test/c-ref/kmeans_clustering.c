@@ -180,6 +180,7 @@ static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
 	        for (j=0; j<nfeatures; j++)
 		       partial_new_centers[tid][index][j] += feature[i][j];
             }    } while (0);
+    __sync_fetch_and_add(&ctx->delta, delta);
 }
 
 float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
@@ -271,6 +272,7 @@ ctx->timing = timing;
 ctx->nthreads = nthreads;
 ctx->partial_new_centers_len = partial_new_centers_len;
 ctx->partial_new_centers = partial_new_centers;
+ctx->delta = 0;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = npoints;
@@ -279,6 +281,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)kmeans_clustering183_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
+delta = ctx->delta;
  } 
         } /* end of #pragma omp parallel */
 

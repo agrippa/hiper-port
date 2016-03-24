@@ -966,6 +966,7 @@ static void particleFilter438_hclib_async(void *arg, const int ___iter) {
 {
 			sumWeights += weights[x];
 		}    } while (0);
+    __sync_fetch_and_add(&ctx->sumWeights, sumWeights);
 }
 
 static void particleFilter444_hclib_async(void *arg, const int ___iter) {
@@ -1060,6 +1061,8 @@ static void particleFilter453_hclib_async(void *arg, const int ___iter) {
 			xe += arrayX[x] * weights[x];
 			ye += arrayY[x] * weights[x];
 		}    } while (0);
+    __sync_fetch_and_add(&ctx->xe, xe);
+    __sync_fetch_and_add(&ctx->ye, ye);
 }
 
 static void particleFilter478_hclib_async(void *arg, const int ___iter) {
@@ -1469,6 +1472,7 @@ ctx->error = error;
 ctx->likelihood_time = likelihood_time;
 ctx->exponential = exponential;
 ctx->sumWeights = sumWeights;
+ctx->sumWeights = 0;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = Nparticles;
@@ -1477,6 +1481,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)particleFilter438_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
+sumWeights = ctx->sumWeights;
  } 
 		long long sum_time = get_time();
 		printf("TIME TO SUM WEIGHTS TOOK: %f\n", elapsed_time(exponential, sum_time));
@@ -1573,6 +1578,8 @@ ctx->exponential = exponential;
 ctx->sumWeights = sumWeights;
 ctx->sum_time = sum_time;
 ctx->normalize = normalize;
+ctx->xe = 0;
+ctx->ye = 0;
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = Nparticles;
@@ -1581,6 +1588,8 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)particleFilter453_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
+xe = ctx->xe;
+ye = ctx->ye;
  } 
 		long long move_time = get_time();
 		printf("TIME TO MOVE OBJECT TOOK: %f\n", elapsed_time(normalize, move_time));

@@ -571,23 +571,36 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     captures[node->getPragmaLine()]);
                             accumulatedStructDefs = accumulatedStructDefs + structDef;
 
-                            std::string contextCreation = "\n" +
+                            std::vector<OMPReductionVar> *reductions =
+                                node->getPragma()->getReductions();
+                            std::stringstream contextCreation;
+                            contextCreation << "\n" <<
                                 getContextSetup(node->getLbl(),
                                         captures[node->getPragmaLine()],
-                                        node->getPragma()->getReductions());
+                                        reductions);
 
-                            contextCreation += "hclib_loop_domain_t domain;\n";
-                            contextCreation += "domain.low = " + lowStr + ";\n";
-                            contextCreation += "domain.high = " + highStr + ";\n";
-                            contextCreation += "domain.stride = " + strideStr + ";\n";
-                            contextCreation += "domain.tile = 1;\n";
-                            contextCreation += "hclib_future_t *fut = hclib_forasync_future((void *)" +
-                                node->getLbl() + ASYNC_SUFFIX + ", ctx, NULL, 1, " +
+                            contextCreation << "hclib_loop_domain_t domain;\n";
+                            contextCreation << "domain.low = " << lowStr << ";\n";
+                            contextCreation << "domain.high = " << highStr << ";\n";
+                            contextCreation << "domain.stride = " << strideStr << ";\n";
+                            contextCreation << "domain.tile = 1;\n";
+                            contextCreation << "hclib_future_t *fut = hclib_forasync_future((void *)" <<
+                                node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, 1, " <<
                                 "&domain, FORASYNC_MODE_RECURSIVE);\n";
-                            contextCreation += "hclib_future_wait(fut);\n";
-                            contextCreation += "free(ctx);\n";
+                            contextCreation << "hclib_future_wait(fut);\n";
+                            contextCreation << "free(ctx);\n";
+
+                            for (std::vector<OMPReductionVar>::iterator i =
+                                    reductions->begin(), e = reductions->end();
+                                    i != e; i++) {
+                                OMPReductionVar var = *i;
+                                contextCreation << var.getVar() << " = " <<
+                                    "ctx->" << var.getVar() << ";\n";
+                            }
+
                             // Add braces to ensure we don't change control flow
-                            rewriter->ReplaceText(succ->getSourceRange(), " { " + contextCreation + " } ");
+                            rewriter->ReplaceText(succ->getSourceRange(),
+                                    " { " + contextCreation.str() + " } ");
                         } else {
                             std::cerr << "Parallel pragma without a for at line " <<
                                 node->getPragmaLine() << std::endl;
