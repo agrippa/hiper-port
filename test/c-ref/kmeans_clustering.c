@@ -135,6 +135,7 @@ typedef struct _kmeans_clustering183 {
     int nthreads;
     int **partial_new_centers_len;
     float ***partial_new_centers;
+    pthread_mutex_t reduction_mutex;
  } kmeans_clustering183;
 
 static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
@@ -180,6 +181,11 @@ static void kmeans_clustering183_hclib_async(void *arg, const int ___iter) {
 	        for (j=0; j<nfeatures; j++)
 		       partial_new_centers[tid][index][j] += feature[i][j];
             }    } while (0);
+    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
+    assert(lock_err == 0);
+    ctx->delta += delta;
+    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
+    assert(unlock_err == 0);
 }
 
 float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
@@ -271,6 +277,9 @@ ctx->timing = timing;
 ctx->nthreads = nthreads;
 ctx->partial_new_centers_len = partial_new_centers_len;
 ctx->partial_new_centers = partial_new_centers;
+ctx->delta = 0;
+const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
+assert(init_err == 0);
 hclib_loop_domain_t domain;
 domain.low = 0;
 domain.high = npoints;
@@ -279,6 +288,7 @@ domain.tile = 1;
 hclib_future_t *fut = hclib_forasync_future((void *)kmeans_clustering183_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
+delta = ctx->delta;
  } 
         } /* end of #pragma omp parallel */
 

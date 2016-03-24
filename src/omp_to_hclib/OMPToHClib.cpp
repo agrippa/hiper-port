@@ -224,14 +224,20 @@ std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
 }
 
 std::string OMPToHClib::getStructDef(std::string structName,
-        std::vector<clang::ValueDecl *> *captured) {
+        std::vector<clang::ValueDecl *> *captured, bool hasReductions) {
     std::string struct_def = "typedef struct _" + structName + " {\n";
+
     for (std::vector<clang::ValueDecl *>::iterator ii =
             captured->begin(), ee = captured->end();
             ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         struct_def += "    " + getDeclarationStr(curr) + "\n";
     }
+
+    if (hasReductions) {
+        struct_def += "    pthread_mutex_t reduction_mutex;\n";
+    }
+
     struct_def += " } " + structName + ";\n\n";
 
     return struct_def;
@@ -383,7 +389,8 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 
 std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, const clang::ValueDecl *condVar) {
+        std::string bodyStr, std::vector<OMPReductionVar> *reductions,
+        const clang::ValueDecl *condVar) {
     std::stringstream ss;
     ss << "static void " << closureName << "(void *arg";
     if (isForasyncClosure) {
@@ -421,21 +428,52 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
     ss << bodyStr;
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
+        if (!reductions->empty()) {
+            ss << "    const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);\n";
+            ss << "    assert(lock_err == 0);\n";
+
+            for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
+                    e = reductions->end(); i != e; i++) {
+                OMPReductionVar red = *i;
+                std::string varname = red.getVar();
+
+                ss << "    ctx->" << varname << " " << red.getOp() << "= " <<
+                    varname << ";\n";
+            }
+
+            ss << "    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);\n";
+            ss << "    assert(unlock_err == 0);\n";
+        }
     }
     ss << "}\n\n";
     return ss.str();
 }
 
 std::string OMPToHClib::getContextSetup(std::string structName,
-        std::vector<clang::ValueDecl *> *captured) {
+        std::vector<clang::ValueDecl *> *captured,
+        std::vector<OMPReductionVar> *reductions) {
     std::stringstream ss;
     ss << structName << " *ctx = (" << structName << " *)malloc(sizeof(" <<
         structName << "));\n";
+
     for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
             ee = captured->end(); ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         ss << getCaptureStr(curr) << "\n";
     }
+
+    if (reductions && !reductions->empty()) {
+        for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
+                e = reductions->end(); i != e; i++) {
+            OMPReductionVar red = *i;
+            // Initialize the reduction target based on the reduction op
+            ss << "ctx->" << red.getVar() << " = " << red.getInitialValue() <<
+                ";\n";
+        }
+        ss << "const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);\n";
+        ss << "assert(init_err == 0);\n";
+    }
+
     return ss.str();
 }
 
@@ -530,29 +568,45 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             accumulatedKernelDefs += getClosureDef(
                                     node->getLbl() + ASYNC_SUFFIX, true,
                                     node->getLbl(),
-                                    captures[node->getPragmaLine()], bodyStr, condVar);
+                                    captures[node->getPragmaLine()], bodyStr,
+                                    node->getPragma()->getReductions(), condVar);
 
                             const std::string structDef = getStructDef(
                                     node->getLbl(),
-                                    captures[node->getPragmaLine()]);
+                                    captures[node->getPragmaLine()],
+                                    !node->getPragma()->getReductions()->empty());
                             accumulatedStructDefs = accumulatedStructDefs + structDef;
 
-                            std::string contextCreation = "\n" +
+                            std::vector<OMPReductionVar> *reductions =
+                                node->getPragma()->getReductions();
+                            std::stringstream contextCreation;
+                            contextCreation << "\n" <<
                                 getContextSetup(node->getLbl(),
-                                        captures[node->getPragmaLine()]);
+                                        captures[node->getPragmaLine()],
+                                        reductions);
 
-                            contextCreation += "hclib_loop_domain_t domain;\n";
-                            contextCreation += "domain.low = " + lowStr + ";\n";
-                            contextCreation += "domain.high = " + highStr + ";\n";
-                            contextCreation += "domain.stride = " + strideStr + ";\n";
-                            contextCreation += "domain.tile = 1;\n";
-                            contextCreation += "hclib_future_t *fut = hclib_forasync_future((void *)" +
-                                node->getLbl() + ASYNC_SUFFIX + ", ctx, NULL, 1, " +
+                            contextCreation << "hclib_loop_domain_t domain;\n";
+                            contextCreation << "domain.low = " << lowStr << ";\n";
+                            contextCreation << "domain.high = " << highStr << ";\n";
+                            contextCreation << "domain.stride = " << strideStr << ";\n";
+                            contextCreation << "domain.tile = 1;\n";
+                            contextCreation << "hclib_future_t *fut = hclib_forasync_future((void *)" <<
+                                node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, 1, " <<
                                 "&domain, FORASYNC_MODE_RECURSIVE);\n";
-                            contextCreation += "hclib_future_wait(fut);\n";
-                            contextCreation += "free(ctx);\n";
+                            contextCreation << "hclib_future_wait(fut);\n";
+                            contextCreation << "free(ctx);\n";
+
+                            for (std::vector<OMPReductionVar>::iterator i =
+                                    reductions->begin(), e = reductions->end();
+                                    i != e; i++) {
+                                OMPReductionVar var = *i;
+                                contextCreation << var.getVar() << " = " <<
+                                    "ctx->" << var.getVar() << ";\n";
+                            }
+
                             // Add braces to ensure we don't change control flow
-                            rewriter->ReplaceText(succ->getSourceRange(), " { " + contextCreation + " } ");
+                            rewriter->ReplaceText(succ->getSourceRange(),
+                                    " { " + contextCreation.str() + " } ");
                         } else {
                             std::cerr << "Parallel pragma without a for at line " <<
                                 node->getPragmaLine() << std::endl;

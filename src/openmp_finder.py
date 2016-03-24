@@ -39,6 +39,7 @@ if __name__ == '__main__':
                     acc += ' ' + line
 
                 acc = acc.replace('\t', ' ')
+                acc = ' '.join(acc.split('\\s+'))
                 sys.stdout.write(str(starting_line_no) + ' ' + str(curr_line_no) + ' ' + acc + '\n')
 
         line = input_fp.readline()

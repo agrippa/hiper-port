@@ -95,12 +95,12 @@ public:
     if (transform->hasLaunchBody()) {
         std::string launchBody = transform->getLaunchBody();
         std::string launchStruct = transform->getStructDef(
-                "main_entrypoint_ctx", transform->getLaunchCaptures());
+                "main_entrypoint_ctx", transform->getLaunchCaptures(), false);
         std::string closureFunction = transform->getClosureDef(
                 "main_entrypoint", false, "main_entrypoint_ctx",
                 transform->getLaunchCaptures(), launchBody);
         std::string contextSetup = transform->getContextSetup(
-                "main_entrypoint_ctx", transform->getLaunchCaptures());
+                "main_entrypoint_ctx", transform->getLaunchCaptures(), NULL);
         std::string launchStr = contextSetup +
             "hclib_launch(main_entrypoint, ctx);\n" +
             "free(ctx);\n";
