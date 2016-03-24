@@ -470,7 +470,8 @@ std::string OMPToHClib::getContextSetup(std::string structName,
             ss << "ctx->" << red.getVar() << " = " << red.getInitialValue() <<
                 ";\n";
         }
-        ss << "ctx->reduction_mutex = PTHREAD_MUTEX_INITIALIZER;\n";
+        ss << "const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);\n";
+        ss << "assert(init_err == 0);\n";
     }
 
     return ss.str();
