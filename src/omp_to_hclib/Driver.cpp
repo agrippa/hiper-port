@@ -83,10 +83,15 @@ private:
 template <class c> class NumDebugFrontendAction : public ASTFrontendAction {
 public:
   NumDebugFrontendAction() {
+#ifdef OLD_LLVM
       std::string code;
+      out = new llvm::raw_fd_ostream(outputFile.c_str(), code,
+              llvm::sys::fs::OpenFlags::F_None);
+#else
       std::error_code EC;
       out = new llvm::raw_fd_ostream(outputFile.c_str(), EC,
               llvm::sys::fs::OpenFlags::F_None);
+#endif
   }
 
   void EndSourceFileAction() override {
@@ -114,11 +119,20 @@ public:
     out->close();
   }
 
-  std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef file) override {
+#ifdef OLD_LLVM
+  clang::ASTConsumer *CreateASTConsumer(
+#else
+  std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+#endif
+      CompilerInstance &CI, StringRef file) override {
     rewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-    return std::unique_ptr<clang::ASTConsumer>(
-            new TransformASTConsumer(rewriter, CI.getASTContext()));
+    clang::ASTConsumer *result = new TransformASTConsumer(rewriter,
+        CI.getASTContext());
+#ifdef OLD_LLVM
+    return result;
+#else
+    return std::unique_ptr<clang::ASTConsumer>(result);
+#endif
   }
 
 private:

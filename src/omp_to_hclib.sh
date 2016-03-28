@@ -91,6 +91,13 @@ if [[ $IS_CPP -eq 1 && -d /usr/include/c++ ]]; then
     done
 fi
 
+# We add -D_FORTIFY_SOURCE here for Mac OS where not setting it to zero causes
+# many utility functions (e.g. memcpy, strcpy) to be replaced with intrinsics
+# from /usr/include/secure/_string.h. While this is fine at compile time, it
+# breaks tests that assert the generated code is identical to the reference
+# output.
+DEFINES=-D_FORTIFY_SOURCE=0
+
 WITH_BRACES=$DIRNAME/____omp_to_hclib.$NAME.braces.$EXTENSION
 WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
 WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
@@ -107,14 +114,9 @@ python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 cat $INPUT_PATH | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
 
 # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
-# We add -D_FORTIFY_SOURCE here for Mac OS where not setting it to zero causes
-# many utility functions (e.g. memcpy, strcpy) to be replaced with intrinsics
-# from /usr/include/secure/_string.h. While this is fine at compile time, it
-# breaks tests that assert the generated code is identical to the reference
-# output.
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
 $OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $INPUT_PATH -- \
-    $INCLUDE $USER_INCLUDES -D_FORTIFY_SOURCE=0 $FLAGS
+    $INCLUDE $USER_INCLUDES $DEFINES
 
 # Remove any OMP pragmas
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'

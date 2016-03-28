@@ -13,6 +13,10 @@ INCLUDES=-I${LLVM_HOME}/tools/clang/include -I${LLVM_INSTALL}/tools/clang/includ
 ARCH=$(shell uname -s)
 GXX ?= g++
 
+ifeq ($(OMP_TO_HCLIB_LLVM_VERSION),3.5.1)
+GXX_FLAGS+=-DOLD_LLVM
+endif
+
 ifeq ($(ARCH),Darwin)
 LIBS=-lclangAST -lclangAnalysis -lclangBasic -lclangDriver -lclangEdit \
 	 -lclangFrontend -lclangFrontendTool -lclangLex -lclangParse -lclangSema \
