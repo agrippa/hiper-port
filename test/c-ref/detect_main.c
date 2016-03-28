@@ -108,7 +108,7 @@ long long GICOV_start_time = get_time();; MAT *gicov = ellipsematching(grad_x, g
 			m_set_val(cellx, i, j, x_result[i] + radius * cos(t[j]));
 			m_set_val(celly, i, j, y_result[i] + radius * sin(t[j]));
 		}
-	}; A = TMatrix(9,4); V = (double *) malloc(sizeof(double) * pair_counter); QAX_CENTERS = (double * )malloc(sizeof(double) * pair_counter); QAY_CENTERS = (double *) malloc(sizeof(double) * pair_counter); memset(V, 0, sizeof(double) * pair_counter); memset(QAX_CENTERS, 0, sizeof(double) * pair_counter); memset(QAY_CENTERS, 0, sizeof(double) * pair_counter); k_count = 0; for (n = 0; n < x_result_len; n++) {
+	}; A = TMatrix(9,4); V = (double *) calloc(pair_counter, sizeof(double)); QAX_CENTERS = (double * )calloc(pair_counter, sizeof(double)); QAY_CENTERS = (double *) calloc(pair_counter, sizeof(double)); k_count = 0; for (n = 0; n < x_result_len; n++) {
 		if ((G[n] < -1 * threshold) || G[n] > threshold) {
 			MAT * x, *y;
 			VEC * x_row, * y_row;

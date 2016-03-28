@@ -39,7 +39,7 @@ for FILE in $FILES; do
     set -e
 
     LINES=$(cat $SCRIPT_DIR/delta | wc -l)
-    if [[ $LINES != 0 ]]; then
+    if [[ $LINES -ne 0 ]]; then
         echo
         echo Non-empty delta for $FILE
         echo Delta is placed in $SCRIPT_DIR/delta

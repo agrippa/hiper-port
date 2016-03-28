@@ -74,11 +74,22 @@ FILENAME=$(basename $INPUT_PATH)
 EXTENSION="${FILENAME##*.}"
 NAME="${FILENAME%.*}"
 
+IS_CPP=0
+if [[ $EXTENSION == 'cpp' ]]; then
+    IS_CPP=1
+fi
+
 INCLUDE=""
 
 for DIR in $(cpp -v < /dev/null 2>&1 | awk 'BEGIN { doPrint = 0; } /#include <...> search starts here:/ { doPrint = 1; } /End of search list/ { doPrint = 0; } { if (doPrint) print $0; }' | tail -n +2); do
     INCLUDE="$INCLUDE -I$DIR"
 done
+
+if [[ $IS_CPP -eq 1 && -d /usr/include/c++ ]]; then
+    for DIR in $(ls /usr/include/c++); do
+        INCLUDE="$INCLUDE -I/usr/include/c++/$DIR"
+    done
+fi
 
 WITH_BRACES=$DIRNAME/____omp_to_hclib.$NAME.braces.$EXTENSION
 WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
@@ -95,9 +106,15 @@ python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
 cat $INPUT_PATH | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
 
-# Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs
+# Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
+# We add -D_FORTIFY_SOURCE here for Mac OS where not setting it to zero causes
+# many utility functions (e.g. memcpy, strcpy) to be replaced with intrinsics
+# from /usr/include/secure/_string.h. While this is fine at compile time, it
+# breaks tests that assert the generated code is identical to the reference
+# output.
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $INPUT_PATH -- $INCLUDE $USER_INCLUDES
+$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $INPUT_PATH -- \
+    $INCLUDE $USER_INCLUDES -D_FORTIFY_SOURCE=0 $FLAGS
 
 # Remove any OMP pragmas
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'

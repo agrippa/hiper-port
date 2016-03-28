@@ -115,32 +115,48 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
     assert(type);
 
     if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
-        if (const clang::ConstantArrayType *constantArrayType = clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
-            std::string sizeStr = constantArrayType->getSize().toString(10, true);
+        if (const clang::ConstantArrayType *constantArrayType =
+                clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
+            std::string sizeStr = constantArrayType->getSize().toString(10,
+                    true);
             return getDeclarationTypeStr(constantArrayType->getElementType(),
                     name, soFarBefore, soFarAfter + "[" + sizeStr + "]");
         } else {
-            std::cerr << "Unsupported array size modifier " << arrayType->getSizeModifier() << std::endl;
+            std::cerr << "Unsupported array size modifier " <<
+                arrayType->getSizeModifier() << std::endl;
             exit(1);
         }
-    } else if (const clang::PointerType *pointerType = type->getAs<clang::PointerType>()) {
-        return getDeclarationTypeStr(pointerType->getPointeeType(), name, soFarBefore + "*", soFarAfter);
-    } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
+    } else if (const clang::PointerType *pointerType =
+            type->getAs<clang::PointerType>()) {
+        return getDeclarationTypeStr(pointerType->getPointeeType(), name,
+                soFarBefore + "*", soFarAfter);
+    } else if (const clang::BuiltinType *builtinType =
+            type->getAs<clang::BuiltinType>()) {
         return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
-    } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
-        return typedefType->getDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
-    } else if (const clang::ElaboratedType *elaboratedType = type->getAs<clang::ElaboratedType>()) {
-        return elaboratedType->getNamedType().getAsString() + " " + soFarBefore + name + soFarAfter;
+    } else if (const clang::TypedefType *typedefType =
+            type->getAs<clang::TypedefType>()) {
+        return typedefType->getDecl()->getNameAsString() + " " + soFarBefore +
+            name + soFarAfter;
+    } else if (const clang::ElaboratedType *elaboratedType =
+            type->getAs<clang::ElaboratedType>()) {
+        return elaboratedType->getNamedType().getAsString() + " " +
+            soFarBefore + name + soFarAfter;
     } else if (const clang::TagType *tagType = type->getAs<clang::TagType>()) {
+        clang::TagDecl *decl = tagType->getDecl();
+
+        std::string tagName;
         if (tagType->getDecl()->getTypedefNameForAnonDecl()) {
-            return tagType->getDecl()->getTypedefNameForAnonDecl()->getNameAsString() + " " + soFarBefore + name + soFarAfter;
+            tagName = decl->getTypedefNameForAnonDecl()->getNameAsString();
         } else if (tagType->getDecl()->getDeclName()) {
-            return tagType->getDecl()->getDeclName().getAsString() + " " + soFarBefore + name + soFarAfter;
+            tagName = decl->getDeclName().getAsString() ;
         } else {
             assert(false);
         }
+
+        return tagName + " " + soFarBefore + name + soFarAfter;
     } else {
-        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        std::cerr << "Unsupported type " <<
+            std::string(type->getTypeClassName()) << std::endl;
         exit(1);
     }
 }
@@ -426,6 +442,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
     }
 
     ss << bodyStr;
+
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
         if (!reductions->empty()) {
@@ -740,9 +757,22 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
             if (call->getDirectCallee()) {
                 const clang::FunctionDecl *callee = call->getDirectCallee();
                 std::string calleeName = callee->getNameAsString();
+                bool abort = false;
                 if (calleeName.find("omp_") == 0) {
-                    std::cerr << "Found OMP function call to \"" <<  calleeName << "\" on line " << presumedStart.getLine() << std::endl;
-                    std::cerr << "Please replace or delete, then retry to the translation" << std::endl;
+                    std::cerr << "Found OMP function call to \"" <<
+                        calleeName << "\" on line " <<
+                        presumedStart.getLine() << std::endl;
+                    abort = true;
+                } else if (calleeName.find("pthread_") == 0) {
+                    std::cerr << "Found pthread function call to \"" <<
+                        calleeName << "\" on line " <<
+                        presumedStart.getLine() << std::endl;
+                    abort = true;
+                }
+
+                if (abort) {
+                    std::cerr << "Please replace or delete, then retry the " <<
+                        "translation" << std::endl;
                     exit(1);
                 }
             }

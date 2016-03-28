@@ -21,17 +21,21 @@ fi
 
 LLVM_HOME_DIR=$(dirname $LLVM_HOME)
 
-LLVM_TAR=llvm-3.5.1.src
-CLANG_TAR=cfe-3.5.1.src
-COMPILER_RT_TAR=compiler-rt-3.5.1.src
+LLVM_VERSION=3.8.0
+CLANG_VERSION=3.8.0
+COMPILER_RT_VERSION=3.8.0
+
+LLVM_TAR=llvm-${LLVM_VERSION}.src
+CLANG_TAR=cfe-${CLANG_VERSION}.src
+COMPILER_RT_TAR=compiler-rt-${COMPILER_RT_VERSION}.src
 
 # Download source
 cd $LLVM_HOME_DIR && rm -f $LLVM_TAR.tar.xz && \
-       wget http://llvm.org/releases/3.5.1/$LLVM_TAR.tar.xz
+       wget http://llvm.org/releases/${LLVM_VERSION}/$LLVM_TAR.tar.xz
 cd $LLVM_HOME_DIR && rm -f $CLANG_TAR.tar.xz && \
-       wget http://llvm.org/releases/3.5.1/$CLANG_TAR.tar.xz
+       wget http://llvm.org/releases/${CLANG_VERSION}/$CLANG_TAR.tar.xz
 cd $LLVM_HOME_DIR && rm -f $COMPILER_RT_TAR.tar.xz && \
-       wget http://llvm.org/releases/3.5.1/$COMPILER_RT_TAR.tar.xz
+       wget http://llvm.org/releases/${COMPILER_RT_VERSION}/$COMPILER_RT_TAR.tar.xz
 
 # Build directory structure for llvm, clang, compiler-rt
 cd $LLVM_HOME_DIR && tar xf $LLVM_TAR.tar.xz && mv $LLVM_TAR $LLVM_HOME

@@ -21,12 +21,9 @@ using namespace clang::driver;
 using namespace clang::tooling;
 
 static llvm::cl::OptionCategory ToolingSampleCategory("omp-to-hclib options");
-static llvm::cl::opt<std::string> outputFile("o",
-        llvm::cl::desc("Output file"), llvm::cl::value_desc("outputFile"));
-static llvm::cl::opt<std::string> ompPragmaFile("m",
-        llvm::cl::desc("OpenMP file"), llvm::cl::value_desc("ompInfo"));
-static llvm::cl::opt<std::string> ompToHclibPragmaFile("s",
-        llvm::cl::desc("OMP-to-hclib file"), llvm::cl::value_desc("ompToHclibInfo"));
+static llvm::cl::opt<std::string> outputFile("o");
+static llvm::cl::opt<std::string> ompPragmaFile("m");
+static llvm::cl::opt<std::string> ompToHclibPragmaFile("s");
 
 static OMPToHClib *transform = NULL;
 FunctionDecl *curr_func_decl = NULL;
@@ -87,7 +84,8 @@ template <class c> class NumDebugFrontendAction : public ASTFrontendAction {
 public:
   NumDebugFrontendAction() {
       std::string code;
-      out = new llvm::raw_fd_ostream(outputFile.c_str(), code,
+      std::error_code EC;
+      out = new llvm::raw_fd_ostream(outputFile.c_str(), EC,
               llvm::sys::fs::OpenFlags::F_None);
   }
 
@@ -116,10 +114,11 @@ public:
     out->close();
   }
 
-  clang::ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
+  std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
                                                  StringRef file) override {
     rewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-    return new TransformASTConsumer(rewriter, CI.getASTContext());
+    return std::unique_ptr<clang::ASTConsumer>(
+            new TransformASTConsumer(rewriter, CI.getASTContext()));
   }
 
 private:
@@ -127,7 +126,7 @@ private:
   Rewriter rewriter;
 };
 
-static void check_opt(llvm::cl::opt<std::string> s, const char *msg) {
+static void check_opt(llvm::cl::opt<std::string> &s, const char *msg) {
     if (s.size() == 0) {
         llvm::errs() << std::string(msg) << " is required\n";
         exit(1);

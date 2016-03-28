@@ -119,12 +119,9 @@ int main(int argc, char ** argv) {
 	A = TMatrix(9,4);
 
 	
-	V = (double *) malloc(sizeof(double) * pair_counter);
-	QAX_CENTERS = (double * )malloc(sizeof(double) * pair_counter);
-	QAY_CENTERS = (double *) malloc(sizeof(double) * pair_counter);
-	memset(V, 0, sizeof(double) * pair_counter);
-	memset(QAX_CENTERS, 0, sizeof(double) * pair_counter);
-	memset(QAY_CENTERS, 0, sizeof(double) * pair_counter);
+	V = (double *) calloc(pair_counter, sizeof(double));
+	QAX_CENTERS = (double * )calloc(pair_counter, sizeof(double));
+	QAY_CENTERS = (double *) calloc(pair_counter, sizeof(double));
 
 	// For all possible results, find the ones that are feasibly leukocytes and store their centers
 	k_count = 0;
