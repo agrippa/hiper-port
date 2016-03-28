@@ -27,7 +27,6 @@ struct neighbor {
 * REC_WINDOW has been arbitrarily assigned; A larger value would allow more work for the threads
 */
 int main(int argc, char* argv[]) {
-#pragma omp_to_hclib body_start
 	long long time0 = clock();
     FILE   *flist,*fp;
 	int    i=0,j=0, k=0, rec_count=0, done=0;
@@ -83,6 +82,7 @@ int main(int argc, char* argv[]) {
 	float *z;
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
+#pragma omp_to_hclib body_start
 	while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
@@ -140,6 +140,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}//End while loop
+#pragma omp_to_hclib body_end
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {
@@ -152,7 +153,6 @@ int main(int argc, char* argv[]) {
 
     long long time1 = clock();
     printf("total time : %15.12f s\n", (float) (time1 - time0) / 1000000);
-#pragma omp_to_hclib body_end
     return 0;
 }
 
