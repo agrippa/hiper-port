@@ -65,6 +65,20 @@ void OMPPragma::addClause(std::string clauseName,
         if (clauseName == "nowait") {
             supportedClause = true;
         }
+    } else if (pragmaName == "task") {
+        if (clauseName == "untied") {
+            //TODO can't remember what this is
+            supportedClause = true;
+        } else if (clauseName == "private") {
+            // Ignore for now
+            supportedClause = true;
+        } else if (clauseName == "firstprivate") {
+            // Ignore for now
+            supportedClause = true;
+        } else if (clauseName == "shared") {
+            // Ignore for now
+            supportedClause = true;
+        }
     } else {
         std::cerr << "Unsupported pragma \"" << pragmaName << "\"" << std::endl;
         exit(1);

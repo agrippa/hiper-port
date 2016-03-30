@@ -18,12 +18,14 @@ if [[ $# == 1 ]]; then
 fi
 
 for FILE in $FILES; do
-    echo Processing $FILE
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
+    TESTNAME=$(basename $(dirname $FILE))
+
+    echo Running $TESTNAME \($FILE\)
 
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
-    REFERENCE=$(dirname $DIRNAME)-ref/$FILENAME
+    REFERENCE=$(dirname $DIRNAME)-ref/$TESTNAME/$FILENAME
 
     $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME $* &> transform.log
 
@@ -31,6 +33,7 @@ for FILE in $FILES; do
         echo
         echo Missing reference output at $REFERENCE for $FILE, exiting early
         echo Generated output is in $TEST_OUTPUT
+        echo Reference goes at $REFERENCE
         exit 1
     fi
 
@@ -44,7 +47,7 @@ for FILE in $FILES; do
         echo Non-empty delta for $FILE
         echo Delta is placed in $SCRIPT_DIR/delta
         echo Generated output is in $TEST_OUTPUT
-        echo Reference output is in $REFERENCE
+        echo Reference goes at $REFERENCE
         exit 1
     fi
 

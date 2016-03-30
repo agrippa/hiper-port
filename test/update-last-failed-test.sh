@@ -17,9 +17,10 @@ if [[ $PASSED -eq 1 ]]; then
 fi
 
 NEW_OUTPUT=$(cat tmp | tail -n 2 | head -n 1 | awk '{ print $5 }')
-REF_LOCATION=$(cat tmp | tail -n 1 | awk '{ print $5 }')
+REF_LOCATION=$(cat tmp | tail -n 1 | awk '{ print $4 }')
 rm -f tmp
 
 echo Updating $REF_LOCATION
+mkdir -p $(dirname $REF_LOCATION)
 
 mv $NEW_OUTPUT $REF_LOCATION
