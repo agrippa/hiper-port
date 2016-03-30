@@ -64,6 +64,9 @@ void OMPPragma::addClause(std::string clauseName,
     } else if (pragmaName == "single") {
         if (clauseName == "nowait") {
             supportedClause = true;
+        } else if (clauseName == "private") {
+            // Ignore for now
+            supportedClause = true;
         }
     } else if (pragmaName == "task") {
         if (clauseName == "untied") {
@@ -101,3 +104,7 @@ void OMPPragma::addClause(std::string clauseName,
     }
 }
 
+
+bool OMPPragma::expectsSuccessorBlock() {
+    return pragmaName != "taskwait" && pragmaName != "barrier";
+}

@@ -19,7 +19,7 @@
 
 class OMPNode {
     private:
-        std::vector<OMPNode> children;
+        std::vector<OMPNode *> children;
         OMPNode *parent;
         const clang::Stmt *body;
         int startLine;
@@ -48,7 +48,7 @@ class OMPNode {
         std::vector<OMPNode *> *getLeaves();
         std::string getLbl();
         OMPNode *getParent();
-        std::vector<OMPNode> *getChildren();
+        std::vector<OMPNode *> *getChildren();
         const clang::Stmt *getBody();
 };
 

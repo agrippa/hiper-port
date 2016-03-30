@@ -520,10 +520,18 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 predecessors.begin(), e = predecessors.end(); i != e; i++) {
             const int line = i->first;
             const clang::Stmt *pred = i->second;
-            assert(successors.find(line) != successors.end());
-            assert(captures.find(line) != captures.end());
-            const clang::Stmt *succ = successors[line];
             OMPPragma *pragma = getOMPPragmaFor(line);
+
+            const clang::Stmt *succ = NULL;
+            if (pragma->expectsSuccessorBlock()) {
+                if (successors.find(line) == successors.end()) {
+                    std::cerr << "Missing successor block for pragma at " <<
+                        "line " << line << std::endl;
+                    exit(1);
+                }
+                succ = successors.at(line);
+                assert(captures.find(line) != captures.end());
+            }
 
             if (supportedPragmas.find(pragma->getPragmaName()) ==
                     supportedPragmas.end()) {
@@ -538,7 +546,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     pragma->getPragmaName() == "task") {
                 std::string lbl = fname + std::to_string(line);
                 rootNode.addChild(succ, line, pragma, lbl, SM);
-            } else if (pragma->getPragmaName() == "simd") {
+            } else if (pragma->getPragmaName() == "simd" ||
+                    pragma->getPragmaName() == "taskwait") {
                 // ignore and don't add to pragma tree
             } else {
                 std::cerr << "Unhandled supported pragma \"" <<
@@ -640,9 +649,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             rewriter->ReplaceText(succ->getSourceRange(),
                                     " { " + contextCreation.str() + " } ");
                         } else if (node->nchildren() == 1 &&
-                                node->getChildren()->at(0).getPragma()->getPragmaName() == "single" &&
+                                node->getChildren()->at(0)->getPragma()->getPragmaName() == "single" &&
                                 removeCompoundWrappers(node->getBody()) ==
-                                removeCompoundWrappers(node->getChildren()->at(0).getBody())) {
+                                removeCompoundWrappers(node->getChildren()->at(0)->getBody())) {
                             /*
                              * A parallel followed immediately by a single that
                              * includes its entire body, ignore because we do
@@ -679,7 +688,19 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         rewriter->ReplaceText(succ->getSourceRange(),
                                 " { " + contextCreation.str() + " } ");
                     } else if (node->getPragma()->getPragmaName() == "single") {
-                        assert(node->getParent()->getPragma()->getPragmaName() == "parallel");
+                        if (node->getParent()->getPragma()->getPragmaName() !=
+                                "parallel") {
+                            std::cerr << "It appears the \"single\" pragma " <<
+                                "on line " << node->getPragmaLine() <<
+                                " does not have a \"parallel\" pragma as " <<
+                                "its parent. Instead has \"" <<
+                                node->getParent()->getPragma()->getPragmaName() <<
+                                "\" at line " <<
+                                node->getParent()->getPragmaLine() << "." <<
+                                std::endl;
+                            node->getParent()->print();
+                            exit(1);
+                        }
                         assert(removeCompoundWrappers(node->getBody()) ==
                                 removeCompoundWrappers(node->getParent()->getBody()));
                         /*
@@ -1127,6 +1148,7 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFi
     supportedPragmas.insert("simd"); // ignore
     supportedPragmas.insert("single");
     supportedPragmas.insert("task");
+    supportedPragmas.insert("taskwait");
 
     launchStartLine = -1;
     launchEndLine = -1;
