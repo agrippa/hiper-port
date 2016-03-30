@@ -403,10 +403,13 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
     }
 }
 
-std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncClosure,
+std::string OMPToHClib::getClosureDef(std::string closureName,
+        bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
         std::string bodyStr, std::vector<OMPReductionVar> *reductions,
         const clang::ValueDecl *condVar) {
+    assert(!(isForasyncClosure && isAsyncClosure));
+
     std::stringstream ss;
     ss << "static void " << closureName << "(void *arg";
     if (isForasyncClosure) {
@@ -439,6 +442,15 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
                     condVar->getNameAsString(), "", "") << "; ";
         }
         ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
+    } else if (isAsyncClosure) {
+        /*
+         * In OMP's task model you can use taskwait to wait on all previously
+         * created child tasks of the currently executing task. To model this in
+         * HClib, we wrap the body of each async in a finish scope and on
+         * encountering a taskwait call hclib_end_finish followed by
+         * hclib_start_finish.
+         */
+        ss << "    hclib_start_finish();\n";
     }
 
     ss << bodyStr;
@@ -461,6 +473,8 @@ std::string OMPToHClib::getClosureDef(std::string closureName, bool isForasyncCl
             ss << "    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);\n";
             ss << "    assert(unlock_err == 0);\n";
         }
+    } else if (isAsyncClosure) {
+        ss << "    hclib_end_finish();\n";
     }
     ss << "}\n\n";
     return ss.str();
@@ -543,11 +557,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
             if (pragma->getPragmaName() == "parallel" ||
                     pragma->getPragmaName() == "single" ||
-                    pragma->getPragmaName() == "task") {
+                    pragma->getPragmaName() == "task" ||
+                    pragma->getPragmaName() == "taskwait") {
                 std::string lbl = fname + std::to_string(line);
                 rootNode.addChild(succ, line, pragma, lbl, SM);
-            } else if (pragma->getPragmaName() == "simd" ||
-                    pragma->getPragmaName() == "taskwait") {
+            } else if (pragma->getPragmaName() == "simd") {
                 // ignore and don't add to pragma tree
             } else {
                 std::cerr << "Unhandled supported pragma \"" <<
@@ -569,8 +583,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 for (std::vector<OMPNode *>::iterator i = processing->begin(),
                         e = processing->end(); i != e; i++) {
                     OMPNode *node = *i;
-                    const clang::Stmt *succ = successors[node->getPragmaLine()];
-                    const clang::Stmt *pred = predecessors[node->getPragmaLine()];
+                    const clang::Stmt *succ = successors.at(node->getPragmaLine());
+                    const clang::Stmt *pred = predecessors.at(node->getPragmaLine());
 
                     assert(supportedPragmas.find(node->getPragma()->getPragmaName()) != supportedPragmas.end());
 
@@ -687,6 +701,10 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         // Add braces to ensure we don't change control flow
                         rewriter->ReplaceText(succ->getSourceRange(),
                                 " { " + contextCreation.str() + " } ");
+                    } else if (node->getPragma()->getPragmaName() == "taskwait") {
+                        rewriter->InsertText(succ->getLocStart(),
+                                "hclib_end_finish(); hclib_start_finish(); ",
+                                true, true);
                     } else if (node->getPragma()->getPragmaName() == "single") {
                         if (node->getParent()->getPragma()->getPragmaName() !=
                                 "parallel") {

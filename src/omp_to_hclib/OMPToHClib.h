@@ -50,7 +50,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         clang::SourceLocation getLaunchBodyBeginLoc();
         clang::SourceLocation getLaunchBodyEndLoc();
 
-        std::string getClosureDef(std::string closureName, bool isForasyncClosure,
+        std::string getClosureDef(std::string closureName,
+                bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName, std::vector<clang::ValueDecl *> *captured,
                 std::string bodyStr,
                 std::vector<OMPReductionVar> *reductions = NULL,

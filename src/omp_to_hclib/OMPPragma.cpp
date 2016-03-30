@@ -70,7 +70,14 @@ void OMPPragma::addClause(std::string clauseName,
         }
     } else if (pragmaName == "task") {
         if (clauseName == "untied") {
-            //TODO can't remember what this is
+            /*
+             * An untied task is one who, on suspend, can be resumed by any
+             * thread not just the thread it suspended on. For now we ignore
+             * this case, but in the future this could cause problems (e.g. if
+             * the task uses thread-local variables and we work steal it onto
+             * another thread after a blocking condition is satisfied). This
+             * could be implemented by executing the task at a locale.
+             */
             supportedClause = true;
         } else if (clauseName == "private") {
             // Ignore for now
