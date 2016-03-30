@@ -61,6 +61,10 @@ void OMPPragma::addClause(std::string clauseName,
         }
     } else if (pragmaName == "simd") {
         // Nothing at the moment
+    } else if (pragmaName == "single") {
+        if (clauseName == "nowait") {
+            supportedClause = true;
+        }
     } else {
         std::cerr << "Unsupported pragma \"" << pragmaName << "\"" << std::endl;
         exit(1);

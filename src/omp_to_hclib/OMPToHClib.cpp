@@ -494,19 +494,30 @@ std::string OMPToHClib::getContextSetup(std::string structName,
     return ss.str();
 }
 
+static const clang::Stmt *removeCompoundWrappers(const clang::Stmt *curr) {
+    if (const clang::CompoundStmt *compound = clang::dyn_cast<clang::CompoundStmt>(curr)) {
+        if (compound->size() == 1) {
+            return removeCompoundWrappers(compound->body_front());
+        }
+    }
+    return curr;
+}
+
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
     assert(getCurrentLexicalDepth() == 1);
     popScope();
 
     if (func) {
         std::string fname = func->getNameAsString();
-        clang::PresumedLoc presumedStart = SM->getPresumedLoc(func->getLocStart());
+        clang::PresumedLoc presumedStart = SM->getPresumedLoc(
+                func->getLocStart());
         const int functionStartLine = presumedStart.getLine();
 
-        OMPNode rootNode(NULL, functionStartLine, NULL, NULL, std::string("root"), SM);
+        OMPNode rootNode(NULL, functionStartLine, NULL, NULL,
+                std::string("root"), SM);
 
-        for (std::map<int, const clang::Stmt *>::iterator i = predecessors.begin(),
-                e = predecessors.end(); i != e; i++) {
+        for (std::map<int, const clang::Stmt *>::iterator i =
+                predecessors.begin(), e = predecessors.end(); i != e; i++) {
             const int line = i->first;
             const clang::Stmt *pred = i->second;
             assert(successors.find(line) != successors.end());
@@ -514,13 +525,17 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
             const clang::Stmt *succ = successors[line];
             OMPPragma *pragma = getOMPPragmaFor(line);
 
-            if (supportedPragmas.find(pragma->getPragmaName()) == supportedPragmas.end()) {
+            if (supportedPragmas.find(pragma->getPragmaName()) ==
+                    supportedPragmas.end()) {
                 std::cerr << "Encountered an unknown pragma \"" <<
-                    pragma->getPragmaName() << "\" at line " << line << std::endl;
+                    pragma->getPragmaName() << "\" at line " << line <<
+                    std::endl;
                 exit(1);
             }
 
-            if (pragma->getPragmaName() == "parallel") {
+            if (pragma->getPragmaName() == "parallel" ||
+                    pragma->getPragmaName() == "single" ||
+                    pragma->getPragmaName() == "task") {
                 std::string lbl = fname + std::to_string(line);
                 rootNode.addChild(succ, line, pragma, lbl, SM);
             } else if (pragma->getPragmaName() == "simd") {
@@ -592,7 +607,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     node->getLbl(),
                                     captures[node->getPragmaLine()],
                                     !node->getPragma()->getReductions()->empty());
-                            accumulatedStructDefs = accumulatedStructDefs + structDef;
+                            accumulatedStructDefs += structDef;
 
                             std::vector<OMPReductionVar> *reductions =
                                 node->getPragma()->getReductions();
@@ -624,18 +639,72 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             // Add braces to ensure we don't change control flow
                             rewriter->ReplaceText(succ->getSourceRange(),
                                     " { " + contextCreation.str() + " } ");
+                        } else if (node->nchildren() == 1 &&
+                                node->getChildren()->at(0).getPragma()->getPragmaName() == "single" &&
+                                removeCompoundWrappers(node->getBody()) ==
+                                removeCompoundWrappers(node->getChildren()->at(0).getBody())) {
+                            /*
+                             * A parallel followed immediately by a single that
+                             * includes its entire body, ignore because we do
+                             * the start_finish/end_finish insert below when we
+                             * encounter the single.
+                             */
                         } else {
                             std::cerr << "Parallel pragma without a for at line " <<
                                 node->getPragmaLine() << std::endl;
                             exit(1);
                         }
+                    } else if (node->getPragma()->getPragmaName() == "task") {
+                        const clang::Stmt *body = node->getBody();
+                        std::string bodyStr = stmtToString(body);
+                        accumulatedKernelDefs += getClosureDef(
+                                node->getLbl() + ASYNC_SUFFIX, false,
+                                node->getLbl(), captures[node->getPragmaLine()],
+                                bodyStr, NULL, NULL);
+
+                        const std::string structDef = getStructDef(
+                                node->getLbl(),
+                                captures[node->getPragmaLine()], false);
+                        accumulatedStructDefs += structDef;
+
+                        std::stringstream contextCreation;
+                        contextCreation << "\n" <<
+                            getContextSetup(node->getLbl(),
+                                    captures[node->getPragmaLine()], NULL);
+                        contextCreation << "hclib_async(" << node->getLbl() <<
+                            ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
+                            "ANY_PLACE);\n";
+
+                        // Add braces to ensure we don't change control flow
+                        rewriter->ReplaceText(succ->getSourceRange(),
+                                " { " + contextCreation.str() + " } ");
+                    } else if (node->getPragma()->getPragmaName() == "single") {
+                        assert(node->getParent()->getPragma()->getPragmaName() == "parallel");
+                        assert(removeCompoundWrappers(node->getBody()) ==
+                                removeCompoundWrappers(node->getParent()->getBody()));
+                        /*
+                         * Verify that at least one of these pragmas does not
+                         * have the nowait clause.
+                         */
+                        assert(!node->getPragma()->hasClause("nowait") ||
+                                !node->getParent()->getPragma()->hasClause("nowait"));
+
+                        // Insert finish
+                        const clang::Stmt *body = node->getBody();
+
+                        rewriter->InsertText(body->getLocStart(),
+                                "hclib_start_finish(); ", true, true);
+                        rewriter->InsertText(body->getLocEnd(),
+                                "hclib_end_finish(); ", true, true);
                     } else {
                         std::cerr << "Unhandled supported pragma \"" <<
                             node->getPragma()->getPragmaName() << "\"" << std::endl;
                         exit(1);
                     }
 
-                    if (std::find(todo->begin(), todo->end(), node->getParent()) == todo->end() && node->getParent()->getLbl() != "root") {
+                    if (std::find(todo->begin(), todo->end(),
+                                node->getParent()) == todo->end() &&
+                            node->getParent()->getLbl() != "root") {
                         todo->push_back(node->getParent());
                     }
                 }
@@ -1056,6 +1125,8 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFi
 
     supportedPragmas.insert("parallel");
     supportedPragmas.insert("simd"); // ignore
+    supportedPragmas.insert("single");
+    supportedPragmas.insert("task");
 
     launchStartLine = -1;
     launchEndLine = -1;

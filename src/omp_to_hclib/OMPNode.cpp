@@ -51,6 +51,10 @@ OMPNode *OMPNode::getParent() {
     return parent;
 }
 
+std::vector<OMPNode> *OMPNode::getChildren() {
+    return &children;
+}
+
 void OMPNode::addChild(const clang::Stmt *stmt, int pragmaLine,
         OMPPragma *pragma, std::string lbl, clang::SourceManager *SM) {
     clang::PresumedLoc presumedStart = SM->getPresumedLoc(stmt->getLocStart());
@@ -99,8 +103,9 @@ void OMPNode::printHelper(int depth) {
     for (int i = 0; i < depth * 2; i++) {
         std::cerr << "=";
     }
-    std::cerr << "pragma @ line " << pragmaLine << ", " << children.size() <<
-        " children, lbl = " << lbl << std::endl;
+    std::cerr << (pragma ? pragma->getPragmaName() : "root") << " @ line " <<
+        pragmaLine << ", " << children.size() << " children, lbl = " << lbl <<
+        std::endl;
     for (int i = 0; i < children.size(); i++) {
         children[i].printHelper(depth + 1);
     }

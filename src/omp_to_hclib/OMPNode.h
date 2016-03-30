@@ -48,6 +48,7 @@ class OMPNode {
         std::vector<OMPNode *> *getLeaves();
         std::string getLbl();
         OMPNode *getParent();
+        std::vector<OMPNode> *getChildren();
         const clang::Stmt *getBody();
 };
 

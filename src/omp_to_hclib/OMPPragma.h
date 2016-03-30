@@ -14,11 +14,6 @@ class OMPPragma {
                 std::string setPragma, std::string setPragmaName) :
                 line(setLine), lastLine(setLastLine), pragma(setPragma),
                 pragmaName(setPragmaName) {
-            if (setPragmaName != "parallel" && setPragmaName != "simd") {
-                std::cerr << "Unsupported pragma detected: \"" << setPragma <<
-                    "\"" << std::endl;
-                exit(1);
-            }
         }
 
         void addClause(std::string clauseName,
@@ -35,6 +30,9 @@ class OMPPragma {
         }
         std::vector<OMPReductionVar> *getReductions() {
             return &reductions;
+        }
+        bool hasClause(std::string clauseName) {
+            return clauses.find(clauseName) != clauses.end();
         }
 
     private:
