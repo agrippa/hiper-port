@@ -154,9 +154,11 @@ static void par_sort144_hclib_async(void *arg) {
     int right; right = ctx->right;
     int index; index = ctx->index;
     sort_data_t *buf; buf = ctx->buf;
+    hclib_start_finish();
 {
               par_sort(buf);
-          }}
+          }    hclib_end_finish();
+}
 
 static void par_sort154_hclib_async(void *arg) {
     par_sort154 *ctx = (par_sort154 *)arg;
@@ -167,9 +169,11 @@ static void par_sort154_hclib_async(void *arg) {
     int right; right = ctx->right;
     int index; index = ctx->index;
     sort_data_t *buf; buf = ctx->buf;
+    hclib_start_finish();
 {
               par_sort(buf);
-          }}
+          }    hclib_end_finish();
+}
 
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;

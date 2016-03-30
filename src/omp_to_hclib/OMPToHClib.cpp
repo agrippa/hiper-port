@@ -583,10 +583,14 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 for (std::vector<OMPNode *>::iterator i = processing->begin(),
                         e = processing->end(); i != e; i++) {
                     OMPNode *node = *i;
-                    const clang::Stmt *succ = successors.at(node->getPragmaLine());
-                    const clang::Stmt *pred = predecessors.at(node->getPragmaLine());
+                    const clang::Stmt *succ = NULL;
+                    if (successors.find(node->getPragmaLine()) != successors.end()) {
+                        succ = successors.at(node->getPragmaLine());
+                    }
 
-                    assert(supportedPragmas.find(node->getPragma()->getPragmaName()) != supportedPragmas.end());
+                    assert(supportedPragmas.find(
+                                node->getPragma()->getPragmaName()) !=
+                            supportedPragmas.end());
 
                     if (node->getPragma()->getPragmaName() == "parallel") {
                         std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
@@ -621,7 +625,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     condVar);
 
                             accumulatedKernelDefs += getClosureDef(
-                                    node->getLbl() + ASYNC_SUFFIX, true,
+                                    node->getLbl() + ASYNC_SUFFIX, true, false,
                                     node->getLbl(),
                                     captures[node->getPragmaLine()], bodyStr,
                                     node->getPragma()->getReductions(), condVar);
@@ -681,7 +685,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         const clang::Stmt *body = node->getBody();
                         std::string bodyStr = stmtToString(body);
                         accumulatedKernelDefs += getClosureDef(
-                                node->getLbl() + ASYNC_SUFFIX, false,
+                                node->getLbl() + ASYNC_SUFFIX, false, true,
                                 node->getLbl(), captures[node->getPragmaLine()],
                                 bodyStr, NULL, NULL);
 
@@ -702,7 +706,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         rewriter->ReplaceText(succ->getSourceRange(),
                                 " { " + contextCreation.str() + " } ");
                     } else if (node->getPragma()->getPragmaName() == "taskwait") {
-                        rewriter->InsertText(succ->getLocStart(),
+                        const clang::Stmt *pred = predecessors.at(
+                                node->getPragmaLine());
+                        rewriter->InsertText(pred->getLocEnd(),
                                 "hclib_end_finish(); hclib_start_finish(); ",
                                 true, true);
                     } else if (node->getPragma()->getPragmaName() == "single") {

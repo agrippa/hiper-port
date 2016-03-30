@@ -100,7 +100,7 @@ public:
         std::string launchStruct = transform->getStructDef(
                 "main_entrypoint_ctx", transform->getLaunchCaptures(), false);
         std::string closureFunction = transform->getClosureDef(
-                "main_entrypoint", false, "main_entrypoint_ctx",
+                "main_entrypoint", false, false, "main_entrypoint_ctx",
                 transform->getLaunchCaptures(), launchBody);
         std::string contextSetup = transform->getContextSetup(
                 "main_entrypoint_ctx", transform->getLaunchCaptures(), NULL);

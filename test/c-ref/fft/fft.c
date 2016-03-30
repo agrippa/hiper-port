@@ -74,7 +74,9 @@ static void compute_w_coefficients58_hclib_async(void *arg) {
     REAL s; s = ctx->s;
     REAL c; c = ctx->c;
     int ab; ab = ctx->ab;
-compute_w_coefficients(n, a, ab, W)}
+    hclib_start_finish();
+compute_w_coefficients(n, a, ab, W)    hclib_end_finish();
+}
 
 static void compute_w_coefficients60_hclib_async(void *arg) {
     compute_w_coefficients60 *ctx = (compute_w_coefficients60 *)arg;
@@ -87,7 +89,9 @@ static void compute_w_coefficients60_hclib_async(void *arg) {
     REAL s; s = ctx->s;
     REAL c; c = ctx->c;
     int ab; ab = ctx->ab;
-compute_w_coefficients(n, ab + 1, b, W)}
+    hclib_start_finish();
+compute_w_coefficients(n, ab + 1, b, W)    hclib_end_finish();
+}
 
 void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
 {
@@ -131,7 +135,7 @@ ctx->s = s;
 ctx->c = c;
 ctx->ab = ab;
 hclib_async(compute_w_coefficients60_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void compute_w_coefficients_seq(int n, int a, int b, COMPLEX * W)
@@ -221,7 +225,9 @@ static void unshuffle135_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-unshuffle(a, ab, in, out, r, m)}
+    hclib_start_finish();
+unshuffle(a, ab, in, out, r, m)    hclib_end_finish();
+}
 
 static void unshuffle137_hclib_async(void *arg) {
     unshuffle137 *ctx = (unshuffle137 *)arg;
@@ -237,7 +243,9 @@ static void unshuffle137_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-unshuffle(ab, b, in, out, r, m)}
+    hclib_start_finish();
+unshuffle(ab, b, in, out, r, m)    hclib_end_finish();
+}
 
 void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
@@ -297,7 +305,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(unshuffle137_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
@@ -409,8 +417,10 @@ static void fft_twiddle_gen205_hclib_async(void *arg) {
     int nWdn; nWdn = ctx->nWdn;
     int r; r = ctx->r;
     int m; m = ctx->m;
+    hclib_start_finish();
 fft_twiddle_gen1(in + i, out + i, W,
-				 r, m, nW, nWdn * i, nWdn * m)}
+				 r, m, nW, nWdn * i, nWdn * m)    hclib_end_finish();
+}
 
 static void fft_twiddle_gen210_hclib_async(void *arg) {
     fft_twiddle_gen210 *ctx = (fft_twiddle_gen210 *)arg;
@@ -424,8 +434,10 @@ static void fft_twiddle_gen210_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int i2; i2 = ctx->i2;
+    hclib_start_finish();
 fft_twiddle_gen(i, i2, in, out, W, nW,
-				nWdn, r, m)}
+				nWdn, r, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_gen213_hclib_async(void *arg) {
     fft_twiddle_gen213 *ctx = (fft_twiddle_gen213 *)arg;
@@ -439,8 +451,10 @@ static void fft_twiddle_gen213_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int i2; i2 = ctx->i2;
+    hclib_start_finish();
 fft_twiddle_gen(i2, i1, in, out, W, nW,
-				nWdn, r, m)}
+				nWdn, r, m)    hclib_end_finish();
+}
 
 void fft_twiddle_gen(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int r, int m)
 {
@@ -488,7 +502,7 @@ ctx->m = m;
 ctx->i2 = i2;
 hclib_async(fft_twiddle_gen213_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } ;
-     }
+     hclib_end_finish(); hclib_start_finish(); }
 }
 void fft_twiddle_gen_seq(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W,
                          int nW, int nWdn, int r, int m)
@@ -577,7 +591,9 @@ static void fft_twiddle_2275_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_2277_hclib_async(void *arg) {
     fft_twiddle_2277 *ctx = (fft_twiddle_2277 *)arg;
@@ -598,7 +614,9 @@ static void fft_twiddle_2277_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -669,7 +687,7 @@ ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
 hclib_async(fft_twiddle_2277_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -739,7 +757,9 @@ static void fft_unshuffle_2329_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_2(a, ab, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_2(a, ab, in, out, m)    hclib_end_finish();
+}
 
 static void fft_unshuffle_2331_hclib_async(void *arg) {
     fft_unshuffle_2331 *ctx = (fft_unshuffle_2331 *)arg;
@@ -752,7 +772,9 @@ static void fft_unshuffle_2331_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_2(ab, b, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_2(ab, b, in, out, m)    hclib_end_finish();
+}
 
 void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -794,7 +816,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(fft_unshuffle_2331_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -914,7 +936,9 @@ static void fft_twiddle_4456_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_4458_hclib_async(void *arg) {
     fft_twiddle_4458 *ctx = (fft_twiddle_4458 *)arg;
@@ -935,7 +959,9 @@ static void fft_twiddle_4458_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -1040,7 +1066,7 @@ ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
 hclib_async(fft_twiddle_4458_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -1144,7 +1170,9 @@ static void fft_unshuffle_4548_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_4(a, ab, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_4(a, ab, in, out, m)    hclib_end_finish();
+}
 
 static void fft_unshuffle_4550_hclib_async(void *arg) {
     fft_unshuffle_4550 *ctx = (fft_unshuffle_4550 *)arg;
@@ -1157,7 +1185,9 @@ static void fft_unshuffle_4550_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_4(ab, b, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_4(ab, b, in, out, m)    hclib_end_finish();
+}
 
 void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -1203,7 +1233,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(fft_unshuffle_4550_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -1398,7 +1428,9 @@ static void fft_twiddle_8834_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_8836_hclib_async(void *arg) {
     fft_twiddle_8836 *ctx = (fft_twiddle_8836 *)arg;
@@ -1419,7 +1451,9 @@ static void fft_twiddle_8836_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -1608,7 +1642,7 @@ ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
 hclib_async(fft_twiddle_8836_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -1796,7 +1830,9 @@ static void fft_unshuffle_81018_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_8(a, ab, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_8(a, ab, in, out, m)    hclib_end_finish();
+}
 
 static void fft_unshuffle_81020_hclib_async(void *arg) {
     fft_unshuffle_81020 *ctx = (fft_unshuffle_81020 *)arg;
@@ -1809,7 +1845,9 @@ static void fft_unshuffle_81020_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_8(ab, b, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_8(ab, b, in, out, m)    hclib_end_finish();
+}
 
 void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -1863,7 +1901,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(fft_unshuffle_81020_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -2234,7 +2272,9 @@ static void fft_twiddle_161680_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_161682_hclib_async(void *arg) {
     fft_twiddle_161682 *ctx = (fft_twiddle_161682 *)arg;
@@ -2255,7 +2295,9 @@ static void fft_twiddle_161682_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -2644,7 +2686,7 @@ ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
 hclib_async(fft_twiddle_161682_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -3032,7 +3074,9 @@ static void fft_unshuffle_162080_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_16(a, ab, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_16(a, ab, in, out, m)    hclib_end_finish();
+}
 
 static void fft_unshuffle_162082_hclib_async(void *arg) {
     fft_unshuffle_162082 *ctx = (fft_unshuffle_162082 *)arg;
@@ -3045,7 +3089,9 @@ static void fft_unshuffle_162082_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_16(ab, b, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_16(ab, b, in, out, m)    hclib_end_finish();
+}
 
 void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -3115,7 +3161,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(fft_unshuffle_162082_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -3902,7 +3948,9 @@ static void fft_twiddle_323622_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 static void fft_twiddle_323624_hclib_async(void *arg) {
     fft_twiddle_323624 *ctx = (fft_twiddle_323624 *)arg;
@@ -3923,7 +3971,9 @@ static void fft_twiddle_323624_hclib_async(void *arg) {
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
     int ab; ab = ctx->ab;
-fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m)}
+    hclib_start_finish();
+fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m)    hclib_end_finish();
+}
 
 void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -4776,7 +4826,7 @@ ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
 hclib_async(fft_twiddle_323624_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -5628,7 +5678,9 @@ static void fft_unshuffle_324518_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_32(a, ab, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_32(a, ab, in, out, m)    hclib_end_finish();
+}
 
 static void fft_unshuffle_324520_hclib_async(void *arg) {
     fft_unshuffle_324520 *ctx = (fft_unshuffle_324520 *)arg;
@@ -5641,7 +5693,9 @@ static void fft_unshuffle_324520_hclib_async(void *arg) {
     COMPLEX *ip; ip = ctx->ip;
     COMPLEX *jp; jp = ctx->jp;
     int ab; ab = ctx->ab;
-fft_unshuffle_32(ab, b, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_32(ab, b, in, out, m)    hclib_end_finish();
+}
 
 void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -5743,7 +5797,7 @@ ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
 hclib_async(fft_unshuffle_324520_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } ;
+ }hclib_end_finish(); hclib_start_finish();  ;
      }
 }
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -5997,7 +6051,9 @@ static void fft_aux4660_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_unshuffle_32(0, m, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_32(0, m, in, out, m)    hclib_end_finish();
+}
 
 static void fft_aux4663_hclib_async(void *arg) {
     fft_aux4663 *ctx = (fft_aux4663 *)arg;
@@ -6010,7 +6066,9 @@ static void fft_aux4663_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_unshuffle_16(0, m, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_16(0, m, in, out, m)    hclib_end_finish();
+}
 
 static void fft_aux4666_hclib_async(void *arg) {
     fft_aux4666 *ctx = (fft_aux4666 *)arg;
@@ -6023,7 +6081,9 @@ static void fft_aux4666_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_unshuffle_8(0, m, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_8(0, m, in, out, m)    hclib_end_finish();
+}
 
 static void fft_aux4669_hclib_async(void *arg) {
     fft_aux4669 *ctx = (fft_aux4669 *)arg;
@@ -6036,7 +6096,9 @@ static void fft_aux4669_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_unshuffle_4(0, m, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_4(0, m, in, out, m)    hclib_end_finish();
+}
 
 static void fft_aux4672_hclib_async(void *arg) {
     fft_aux4672 *ctx = (fft_aux4672 *)arg;
@@ -6049,7 +6111,9 @@ static void fft_aux4672_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_unshuffle_2(0, m, in, out, m)}
+    hclib_start_finish();
+fft_unshuffle_2(0, m, in, out, m)    hclib_end_finish();
+}
 
 static void fft_aux4680_hclib_async(void *arg) {
     fft_aux4680 *ctx = (fft_aux4680 *)arg;
@@ -6062,7 +6126,9 @@ static void fft_aux4680_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_aux(m, out + k, in + k, factors + 1, W, nW)}
+    hclib_start_finish();
+fft_aux(m, out + k, in + k, factors + 1, W, nW)    hclib_end_finish();
+}
 
 static void fft_aux4690_hclib_async(void *arg) {
     fft_aux4690 *ctx = (fft_aux4690 *)arg;
@@ -6075,7 +6141,9 @@ static void fft_aux4690_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_2(0, m, in, out, W, nW, nW / n, m)}
+    hclib_start_finish();
+fft_twiddle_2(0, m, in, out, W, nW, nW / n, m)    hclib_end_finish();
+}
 
 static void fft_aux4693_hclib_async(void *arg) {
     fft_aux4693 *ctx = (fft_aux4693 *)arg;
@@ -6088,7 +6156,9 @@ static void fft_aux4693_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_4(0, m, in, out, W, nW, nW / n, m)}
+    hclib_start_finish();
+fft_twiddle_4(0, m, in, out, W, nW, nW / n, m)    hclib_end_finish();
+}
 
 static void fft_aux4696_hclib_async(void *arg) {
     fft_aux4696 *ctx = (fft_aux4696 *)arg;
@@ -6101,7 +6171,9 @@ static void fft_aux4696_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_8(0, m, in, out, W, nW, nW / n, m)}
+    hclib_start_finish();
+fft_twiddle_8(0, m, in, out, W, nW, nW / n, m)    hclib_end_finish();
+}
 
 static void fft_aux4699_hclib_async(void *arg) {
     fft_aux4699 *ctx = (fft_aux4699 *)arg;
@@ -6114,7 +6186,9 @@ static void fft_aux4699_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_16(0, m, in, out, W, nW, nW / n, m)}
+    hclib_start_finish();
+fft_twiddle_16(0, m, in, out, W, nW, nW / n, m)    hclib_end_finish();
+}
 
 static void fft_aux4702_hclib_async(void *arg) {
     fft_aux4702 *ctx = (fft_aux4702 *)arg;
@@ -6127,7 +6201,9 @@ static void fft_aux4702_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_32(0, m, in, out, W, nW, nW / n, m)}
+    hclib_start_finish();
+fft_twiddle_32(0, m, in, out, W, nW, nW / n, m)    hclib_end_finish();
+}
 
 static void fft_aux4705_hclib_async(void *arg) {
     fft_aux4705 *ctx = (fft_aux4705 *)arg;
@@ -6140,7 +6216,9 @@ static void fft_aux4705_hclib_async(void *arg) {
     int r; r = ctx->r;
     int m; m = ctx->m;
     int k; k = ctx->k;
-fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m)}
+    hclib_start_finish();
+fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m)    hclib_end_finish();
+}
 
 void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int nW)
 {
@@ -6251,7 +6329,7 @@ ctx->k = k;
 hclib_async(fft_aux4672_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } ;
 	  } else
-	       unshuffle(0, m, in, out, r, m);
+	       unshuffle(0, m, in, out, r, mhclib_end_finish(); hclib_start_finish(); );
 
 
 	  for (k = 0; k < n; k += m) {
@@ -6268,7 +6346,7 @@ ctx->m = m;
 ctx->k = k;
 hclib_async(fft_aux4680_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } ;
-	  }
+	  hclib_end_finish(); hclib_start_finish(); }
      }
      /* 
       * now multiply by the twiddle factors, and perform m FFTs
@@ -6358,7 +6436,7 @@ ctx->m = m;
 ctx->k = k;
 hclib_async(fft_aux4705_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } ;
-     }
+     hclib_end_finish(); hclib_start_finish(); }
 
 
      return;
@@ -6461,9 +6539,11 @@ static void fft4793_hclib_async(void *arg) {
     int l; l = ctx->l;
     int r; r = ctx->r;
     COMPLEX *W; W = ctx->W;
+    hclib_start_finish();
 {
                  compute_w_coefficients(n, 0, n / 2, W);
-             }}
+             }    hclib_end_finish();
+}
 
 static void fft4816_hclib_async(void *arg) {
     fft4816 *ctx = (fft4816 *)arg;
@@ -6475,9 +6555,11 @@ static void fft4816_hclib_async(void *arg) {
     int l; l = ctx->l;
     int r; r = ctx->r;
     COMPLEX *W; W = ctx->W;
+    hclib_start_finish();
 {
                  fft_aux(n, in, out, factors, W, n);
-             }}
+             }    hclib_end_finish();
+}
 
 void fft(int n, COMPLEX * in, COMPLEX * out)
 {

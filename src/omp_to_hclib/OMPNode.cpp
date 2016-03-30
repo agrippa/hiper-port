@@ -59,10 +59,17 @@ std::vector<OMPNode *> *OMPNode::getChildren() {
 
 void OMPNode::addChild(const clang::Stmt *stmt, int newPragmaLine,
         OMPPragma *newPragma, std::string newLbl, clang::SourceManager *SM) {
-    clang::PresumedLoc presumedStart = SM->getPresumedLoc(stmt->getLocStart());
-    clang::PresumedLoc presumedEnd = SM->getPresumedLoc(stmt->getLocEnd());
-    const int childStartLine = presumedStart.getLine();
-    const int childEndLine = presumedEnd.getLine();
+    int childStartLine, childEndLine;
+    if (stmt) {
+        clang::PresumedLoc presumedStart = SM->getPresumedLoc(
+                stmt->getLocStart());
+        clang::PresumedLoc presumedEnd = SM->getPresumedLoc(stmt->getLocEnd());
+        childStartLine = presumedStart.getLine();
+        childEndLine = presumedEnd.getLine();
+    } else {
+        childStartLine = newPragmaLine;
+        childEndLine = newPragmaLine;
+    }
 
     for (int i = 0; i < children.size(); i++) {
         OMPNode *existingChild = children.at(i);

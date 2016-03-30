@@ -469,6 +469,7 @@ static void pairalign454_hclib_async(void *arg) {
     double mm_score; mm_score = ctx->mm_score;
     int *mat_xref; mat_xref = ctx->mat_xref;
     int *matptr; matptr = ctx->matptr;
+    hclib_start_finish();
 {
               int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
               int displ[2*MAX_ALN_LENGTH+1];
@@ -504,7 +505,8 @@ static void pairalign454_hclib_async(void *arg) {
               else                        mm_score /= (double) MIN(len1,len2);
 
               bench_output[si*nseqs+sj] = (int) mm_score;
-           }}
+           }    hclib_end_finish();
+}
 
 static void pairalign441_hclib_async(void *arg, const int ___iter) {
     pairalign441 *ctx = (pairalign441 *)arg;
