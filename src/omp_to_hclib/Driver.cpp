@@ -24,6 +24,8 @@ static llvm::cl::OptionCategory ToolingSampleCategory("omp-to-hclib options");
 static llvm::cl::opt<std::string> outputFile("o");
 static llvm::cl::opt<std::string> ompPragmaFile("m");
 static llvm::cl::opt<std::string> ompToHclibPragmaFile("s");
+static llvm::cl::opt<std::string> handledPragmas("d");
+static llvm::cl::opt<std::string> checkForPthread("n");
 
 static OMPToHClib *transform = NULL;
 FunctionDecl *curr_func_decl = NULL;
@@ -96,22 +98,33 @@ public:
 
   void EndSourceFileAction() override {
     if (transform->hasLaunchBody()) {
-        std::string launchBody = transform->getLaunchBody();
-        std::string launchStruct = transform->getStructDef(
-                "main_entrypoint_ctx", transform->getLaunchCaptures(), false);
-        std::string closureFunction = transform->getClosureDef(
-                "main_entrypoint", false, false, "main_entrypoint_ctx",
-                transform->getLaunchCaptures(), launchBody);
-        std::string contextSetup = transform->getContextSetup(
-                "main_entrypoint_ctx", transform->getLaunchCaptures(), NULL);
-        std::string launchStr = contextSetup +
-            "hclib_launch(main_entrypoint, ctx);\n" +
-            "free(ctx);\n";
+        // std::string launchBody = transform->getLaunchBody();
+        // std::string launchStruct = transform->getStructDef(
+        //         "main_entrypoint_ctx", transform->getLaunchCaptures(), false);
+        // std::string closureFunction = transform->getClosureDef(
+        //         "main_entrypoint", false, false, "main_entrypoint_ctx",
+        //         transform->getLaunchCaptures(), launchBody);
+        // std::string contextSetup = transform->getContextSetup(
+        //         "main_entrypoint_ctx", transform->getLaunchCaptures(), NULL);
+        // std::string launchStr = contextSetup +
+        //     "hclib_launch(main_entrypoint, ctx);\n" +
+        //     "free(ctx);\n";
 
-        rewriter.InsertText(transform->getFunctionContainingLaunch()->getLocStart(),
-                launchStruct + closureFunction, true, true);
-        rewriter.ReplaceText(SourceRange(transform->getLaunchBodyBeginLoc(),
-                    transform->getLaunchBodyEndLoc()), launchStr);
+        // /*
+        //  * If we fail here, we assume it is a result of some other pragma having
+        //  * inserted overlapping text. If that is the case, we assume that
+        //  * another iteration of this transformation will be called and
+        //  * eventually this replacement will succeed. This isn't verified at the
+        //  * moment in the code (only in the tests) and should be in the future.
+        //  * TODO.
+        //  */
+        // bool failed = rewriter.ReplaceText(SourceRange(transform->getLaunchBodyBeginLoc(),
+        //             transform->getLaunchBodyEndLoc()), launchStr);
+        // if (!failed) {
+        //     failed = rewriter.InsertText(transform->getFunctionContainingLaunch()->getLocStart(),
+        //             launchStruct + closureFunction, true, true);
+        //     assert(!failed);
+        // }
     }
 
     SourceManager &SM = rewriter.getSourceMgr();
@@ -153,6 +166,8 @@ int main(int argc, const char **argv) {
   check_opt(outputFile, "Output file");
   check_opt(ompPragmaFile, "OpenMP pragma file");
   check_opt(ompToHclibPragmaFile, "OMP-to-HClib pragma file");
+  check_opt(handledPragmas, "Handled pragmas output file");
+  check_opt(checkForPthread, "Check for pthread calls");
 
   assert(op.getSourcePathList().size() == 1);
 
@@ -160,7 +175,9 @@ int main(int argc, const char **argv) {
       NumDebugFrontendAction<TransformASTConsumer>>();
   FrontendActionFactory *factory = factory_ptr.get();
 
-  transform = new OMPToHClib(ompPragmaFile.c_str(), ompToHclibPragmaFile.c_str());
+  transform = new OMPToHClib(ompPragmaFile.c_str(),
+          ompToHclibPragmaFile.c_str(), handledPragmas.c_str(),
+          checkForPthread.c_str());
 
   ClangTool *Tool = new ClangTool(op.getCompilations(), op.getSourcePathList());
   int err = Tool->run(factory);

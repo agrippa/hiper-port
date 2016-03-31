@@ -238,8 +238,12 @@ int main (int argc, char *argv[]) {
   }
   shmem_barrier_all();
 
+#pragma omp_to_hclib body_start
+
   /**** Sorting Locally ****/
   sorting(InputData, NoofElements_Bloc);
+
+#pragma omp_to_hclib body_end
 
   /**** Choosing Local Splitters ****/
   Splitter = (TYPE *) shmem_malloc (sizeof (TYPE) * (Numprocs-1));

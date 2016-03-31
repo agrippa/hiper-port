@@ -2,7 +2,7 @@
 #include "track_ellipse.h"
 
 
-typedef struct _ellipsetrack83 {
+typedef struct _ellipsetrack84 {
     avi_t *video;
     double *xc0;
     double *yc0;
@@ -26,10 +26,158 @@ typedef struct _ellipsetrack83 {
     MAT *I;
     int Ih;
     int Iw;
- } ellipsetrack83;
+ } ellipsetrack84;
 
-static void ellipsetrack83_hclib_async(void *arg, const int ___iter) {
-    ellipsetrack83 *ctx = (ellipsetrack83 *)arg;
+static void ellipsetrack84_hclib_async(void *____arg, const int ___iter);void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
+	/*
+	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
+	%  locations 'xc0'/'yc0' with radii R using an ellipse with Np discrete
+	%  points, starting at frame number one and stopping at frame number 'Nf'.
+	%
+	% INPUTS:
+	%   video.......pointer to avi video object
+	%   xc0,yc0.....initial center location (Nc entries)
+	%   Nc..........number of cells
+	%   R...........initial radius
+	%   Np..........nbr of snaxels points per snake
+	%   Nf..........nbr of frames in which to track
+	%
+	% Matlab code written by: DREW GILLIAM (based on code by GANG DONG /
+	%                                                        NILANJAN RAY)
+	% Ported to C by: MICHAEL BOYER
+	*/
+	
+	int i, j;
+	
+	// Compute angle parameter
+	double *t = (double *) malloc(sizeof(double) * Np);
+	double increment = (2.0 * PI) / (double) Np;
+	for (i = 0; i < Np; i++) {
+		t[i] =  increment * (double) i ;
+	}
+
+	// Allocate space for a snake for each cell in each frame
+	double **xc = alloc_2d_double(Nc, Nf + 1);
+	double **yc = alloc_2d_double(Nc, Nf + 1);
+	double ***r = alloc_3d_double(Nc, Np, Nf + 1);
+	double ***x = alloc_3d_double(Nc, Np, Nf + 1);
+	double ***y = alloc_3d_double(Nc, Np, Nf + 1);
+	
+	// Save the first snake for each cell
+	for (i = 0; i < Nc; i++) {
+		xc[i][0] = xc0[i];
+		yc[i][0] = yc0[i];
+		for (j = 0; j < Np; j++) {
+			r[i][j][0] = (double) R;
+		}
+	}
+	
+	// Generate ellipse points for each cell
+	for (i = 0; i < Nc; i++) {
+		for (j = 0; j < Np; j++) {
+			x[i][j][0] = xc[i][0] + (r[i][j][0] * cos(t[j]));
+			y[i][j][0] = yc[i][0] + (r[i][j][0] * sin(t[j]));
+		}
+	}
+	
+	// Keep track of the total time spent on computing
+	//  the MGVF matrix and evolving the snakes
+	long long  MGVF_time = 0;
+	long long snake_time = 0;
+	
+	
+	// Process each frame
+	int frame_num, cell_num;
+	for (frame_num = 1; frame_num <= Nf; frame_num++) {	 
+		printf("\rProcessing frame %d / %d", frame_num, Nf);
+		fflush(stdout);
+		
+		// Get the current video frame and its dimensions
+		MAT *I = get_frame(video, frame_num, 0, 1);
+		int Ih = I->m;
+		int Iw = I->n;
+	    
+	    // Set the current positions equal to the previous positions		
+		for (i = 0; i < Nc; i++) {
+			xc[i][frame_num] = xc[i][frame_num - 1];
+			yc[i][frame_num] = yc[i][frame_num - 1];
+			for (j = 0; j < Np; j++) {
+				r[i][j][frame_num] = r[i][j][frame_num - 1];
+			}
+		}
+		
+		// Split the work among multiple threads, if OPEN is defined
+		// Track each cell
+		 { 
+ellipsetrack84 *ctx = (ellipsetrack84 *)malloc(sizeof(ellipsetrack84));
+ctx->video = video;
+ctx->xc0 = xc0;
+ctx->yc0 = yc0;
+ctx->Nc = Nc;
+ctx->R = R;
+ctx->Np = Np;
+ctx->Nf = Nf;
+ctx->i = i;
+ctx->j = j;
+ctx->t = t;
+ctx->increment = increment;
+ctx->xc = xc;
+ctx->yc = yc;
+ctx->r = r;
+ctx->x = x;
+ctx->y = y;
+ctx->MGVF_time = MGVF_time;
+ctx->snake_time = snake_time;
+ctx->frame_num = frame_num;
+ctx->cell_num = cell_num;
+ctx->I = I;
+ctx->Ih = Ih;
+ctx->Iw = Iw;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = Nc;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)ellipsetrack84_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+
+#ifdef OUTPUT
+		if (frame_num == Nf)
+		  {
+		    FILE * pFile;
+		    pFile = fopen ("result.txt","w+");
+	
+		    for (cell_num = 0; cell_num < Nc; cell_num++) {
+		      fprintf(pFile,"\n%d,%f,%f", cell_num, xc[cell_num][Nf], yc[cell_num][Nf]);
+            }
+
+		    fclose (pFile);
+		  }
+		
+#endif
+	
+	
+		// Output a new line to visually distinguish the output from different frames
+		//printf("\n");
+	}
+	
+	// Free temporary memory
+	free(t);
+	free_2d_double(xc);
+	free_2d_double(yc);
+	free_3d_double(r);
+	free_3d_double(x);
+	free_3d_double(y);
+	
+	// Report average processing time per frame
+	printf("\n\nTracking runtime (average per frame):\n");
+	printf("------------------------------------\n");
+	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
+	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
+} static void ellipsetrack84_hclib_async(void *____arg, const int ___iter) {
+    ellipsetrack84 *ctx = (ellipsetrack84 *)____arg;
     avi_t *video; video = ctx->video;
     double *xc0; xc0 = ctx->xc0;
     double *yc0; yc0 = ctx->yc0;
@@ -53,6 +201,7 @@ static void ellipsetrack83_hclib_async(void *arg, const int ___iter) {
     MAT *I; I = ctx->I;
     int Ih; Ih = ctx->Ih;
     int Iw; Iw = ctx->Iw;
+    hclib_start_finish();
     do {
     cell_num = ___iter;
 {
@@ -135,157 +284,10 @@ static void ellipsetrack83_hclib_async(void *arg, const int ___iter) {
 			m_free(IMGVF);
 			free(ri);
 	    }    } while (0);
+    ; hclib_end_finish();
 }
 
-void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
-	/*
-	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
-	%  locations 'xc0'/'yc0' with radii R using an ellipse with Np discrete
-	%  points, starting at frame number one and stopping at frame number 'Nf'.
-	%
-	% INPUTS:
-	%   video.......pointer to avi video object
-	%   xc0,yc0.....initial center location (Nc entries)
-	%   Nc..........number of cells
-	%   R...........initial radius
-	%   Np..........nbr of snaxels points per snake
-	%   Nf..........nbr of frames in which to track
-	%
-	% Matlab code written by: DREW GILLIAM (based on code by GANG DONG /
-	%                                                        NILANJAN RAY)
-	% Ported to C by: MICHAEL BOYER
-	*/
-	
-	int i, j;
-	
-	// Compute angle parameter
-	double *t = (double *) malloc(sizeof(double) * Np);
-	double increment = (2.0 * PI) / (double) Np;
-	for (i = 0; i < Np; i++) {
-		t[i] =  increment * (double) i ;
-	}
 
-	// Allocate space for a snake for each cell in each frame
-	double **xc = alloc_2d_double(Nc, Nf + 1);
-	double **yc = alloc_2d_double(Nc, Nf + 1);
-	double ***r = alloc_3d_double(Nc, Np, Nf + 1);
-	double ***x = alloc_3d_double(Nc, Np, Nf + 1);
-	double ***y = alloc_3d_double(Nc, Np, Nf + 1);
-	
-	// Save the first snake for each cell
-	for (i = 0; i < Nc; i++) {
-		xc[i][0] = xc0[i];
-		yc[i][0] = yc0[i];
-		for (j = 0; j < Np; j++) {
-			r[i][j][0] = (double) R;
-		}
-	}
-	
-	// Generate ellipse points for each cell
-	for (i = 0; i < Nc; i++) {
-		for (j = 0; j < Np; j++) {
-			x[i][j][0] = xc[i][0] + (r[i][j][0] * cos(t[j]));
-			y[i][j][0] = yc[i][0] + (r[i][j][0] * sin(t[j]));
-		}
-	}
-	
-	// Keep track of the total time spent on computing
-	//  the MGVF matrix and evolving the snakes
-	long long  MGVF_time = 0;
-	long long snake_time = 0;
-	
-	
-	// Process each frame
-	int frame_num, cell_num;
-	for (frame_num = 1; frame_num <= Nf; frame_num++) {	 
-		printf("\rProcessing frame %d / %d", frame_num, Nf);
-		fflush(stdout);
-		
-		// Get the current video frame and its dimensions
-		MAT *I = get_frame(video, frame_num, 0, 1);
-		int Ih = I->m;
-		int Iw = I->n;
-	    
-	    // Set the current positions equal to the previous positions		
-		for (i = 0; i < Nc; i++) {
-			xc[i][frame_num] = xc[i][frame_num - 1];
-			yc[i][frame_num] = yc[i][frame_num - 1];
-			for (j = 0; j < Np; j++) {
-				r[i][j][frame_num] = r[i][j][frame_num - 1];
-			}
-		}
-		
-		// Split the work among multiple threads, if OPEN is defined
-		// Track each cell
-		 { 
-ellipsetrack83 *ctx = (ellipsetrack83 *)malloc(sizeof(ellipsetrack83));
-ctx->video = video;
-ctx->xc0 = xc0;
-ctx->yc0 = yc0;
-ctx->Nc = Nc;
-ctx->R = R;
-ctx->Np = Np;
-ctx->Nf = Nf;
-ctx->i = i;
-ctx->j = j;
-ctx->t = t;
-ctx->increment = increment;
-ctx->xc = xc;
-ctx->yc = yc;
-ctx->r = r;
-ctx->x = x;
-ctx->y = y;
-ctx->MGVF_time = MGVF_time;
-ctx->snake_time = snake_time;
-ctx->frame_num = frame_num;
-ctx->cell_num = cell_num;
-ctx->I = I;
-ctx->Ih = Ih;
-ctx->Iw = Iw;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = Nc;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)ellipsetrack83_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
-hclib_future_wait(fut);
-free(ctx);
- } 
-
-#ifdef OUTPUT
-		if (frame_num == Nf)
-		  {
-		    FILE * pFile;
-		    pFile = fopen ("result.txt","w+");
-	
-		    for (cell_num = 0; cell_num < Nc; cell_num++) {
-		      fprintf(pFile,"\n%d,%f,%f", cell_num, xc[cell_num][Nf], yc[cell_num][Nf]);
-            }
-
-		    fclose (pFile);
-		  }
-		
-#endif
-	
-	
-		// Output a new line to visually distinguish the output from different frames
-		//printf("\n");
-	}
-	
-	// Free temporary memory
-	free(t);
-	free_2d_double(xc);
-	free_2d_double(yc);
-	free_3d_double(r);
-	free_3d_double(x);
-	free_3d_double(y);
-	
-	// Report average processing time per frame
-	printf("\n\nTracking runtime (average per frame):\n");
-	printf("------------------------------------\n");
-	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
-	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
-}
 
 
 MAT *MGVF(MAT *I, double vx, double vy) {

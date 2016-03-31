@@ -426,7 +426,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int s
 }
 
 
-typedef struct _pairalign457 {
+typedef struct _pairalign458 {
     int i;
     int n;
     int m;
@@ -439,10 +439,103 @@ typedef struct _pairalign457 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign457;
+ } pairalign458;
 
-static void pairalign457_hclib_async(void *arg) {
-    pairalign457 *ctx = (pairalign457 *)arg;
+static void pairalign458_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+    int i;
+    int n;
+    int m;
+    int si;
+    int sj;
+    int len1;
+    int len2;
+    int maxres;
+    double gg;
+    double mm_score;
+    int *mat_xref;
+    int *matptr;
+ } main_entrypoint_ctx;
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    int i; i = ctx->i;
+    int n; n = ctx->n;
+    int m; m = ctx->m;
+    int si; si = ctx->si;
+    int sj; sj = ctx->sj;
+    int len1; len1 = ctx->len1;
+    int len2; len2 = ctx->len2;
+    int maxres; maxres = ctx->maxres;
+    double gg; gg = ctx->gg;
+    double mm_score; mm_score = ctx->mm_score;
+    int *mat_xref; mat_xref = ctx->mat_xref;
+    int *matptr; matptr = ctx->matptr;
+{
+      hclib_start_finish(); for (si = 0; si < nseqs; si++) {
+         n = seqlen_array[si+1];
+         for (i = 1, len1 = 0; i <= n; i++) {
+            char c = seq_array[si+1][i];
+            if ((c != gap_pos1) && (c != gap_pos2)) len1++;
+         }
+         for (sj = si + 1; sj < nseqs; sj++)
+         {
+            m = seqlen_array[sj+1];
+            if ( n == 0 || m == 0 ) {
+               bench_output[si*nseqs+sj] = (int) 1.0;
+            } else {
+                { 
+pairalign458 *ctx = (pairalign458 *)malloc(sizeof(pairalign458));
+ctx->i = i;
+ctx->n = n;
+ctx->m = m;
+ctx->si = si;
+ctx->sj = sj;
+ctx->len1 = len1;
+ctx->len2 = len2;
+ctx->maxres = maxres;
+ctx->gg = gg;
+ctx->mm_score = mm_score;
+ctx->mat_xref = mat_xref;
+ctx->matptr = matptr;
+hclib_async(pairalign458_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+ }  // end task
+            } // end if (n == 0 || m == 0)
+         } // for (j)
+      } hclib_end_finish();  // end parallel for (i)
+   }; }
+
+int pairalign()
+{
+   int i, n, m, si, sj;
+   int len1, len2, maxres;
+   double gg, mm_score;
+   int    *mat_xref, *matptr;
+
+   matptr   = gon250mt;
+   mat_xref = def_aa_xref;
+   maxres = get_matrix(matptr, mat_xref, 10);
+   if (maxres == 0) return(-1);
+
+
+   main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->i = i;
+ctx->n = n;
+ctx->m = m;
+ctx->si = si;
+ctx->sj = sj;
+ctx->len1 = len1;
+ctx->len2 = len2;
+ctx->maxres = maxres;
+ctx->gg = gg;
+ctx->mm_score = mm_score;
+ctx->mat_xref = mat_xref;
+ctx->matptr = matptr;
+hclib_launch(main_entrypoint, ctx);
+free(ctx);
+ // end parallel
+   return 0;
+} static void pairalign458_hclib_async(void *____arg) {
+    pairalign458 *ctx = (pairalign458 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
@@ -490,59 +583,10 @@ static void pairalign457_hclib_async(void *arg) {
                   else                        mm_score /= (double) MIN(len1,len2);
 
                   bench_output[si*nseqs+sj] = (int) mm_score;
-               }    hclib_end_finish();
+               }    ; hclib_end_finish();
 }
 
-int pairalign()
-{
-   int i, n, m, si, sj;
-   int len1, len2, maxres;
-   double gg, mm_score;
-   int    *mat_xref, *matptr;
 
-   matptr   = gon250mt;
-   mat_xref = def_aa_xref;
-   maxres = get_matrix(matptr, mat_xref, 10);
-   if (maxres == 0) return(-1);
-
-   bots_message("Start aligning ");
-
-   {
-      hclib_start_finish(); for (si = 0; si < nseqs; si++) {
-         n = seqlen_array[si+1];
-         for (i = 1, len1 = 0; i <= n; i++) {
-            char c = seq_array[si+1][i];
-            if ((c != gap_pos1) && (c != gap_pos2)) len1++;
-         }
-         for (sj = si + 1; sj < nseqs; sj++)
-         {
-            m = seqlen_array[sj+1];
-            if ( n == 0 || m == 0 ) {
-               bench_output[si*nseqs+sj] = (int) 1.0;
-            } else {
-                { 
-pairalign457 *ctx = (pairalign457 *)malloc(sizeof(pairalign457));
-ctx->i = i;
-ctx->n = n;
-ctx->m = m;
-ctx->si = si;
-ctx->sj = sj;
-ctx->len1 = len1;
-ctx->len2 = len2;
-ctx->maxres = maxres;
-ctx->gg = gg;
-ctx->mm_score = mm_score;
-ctx->mat_xref = mat_xref;
-ctx->matptr = matptr;
-hclib_async(pairalign457_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- }  // end task
-            } // end if (n == 0 || m == 0)
-         } // for (j)
-      hclib_end_finish(); } // end parallel for (i)
-   } // end parallel
-   bots_message(" completed!\n");
-   return 0;
-}
 
 int pairalign_seq()
 {

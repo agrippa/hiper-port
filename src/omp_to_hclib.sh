@@ -4,10 +4,13 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+FILE_PREFIX=____omp_to_hclib
+
 OPENMP_FINDER=$SCRIPT_DIR/openmp_finder.py
 OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
-REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER=$SCRIPT_DIR/remove_omp_pragmas_and_insert_header.py 
+REMOVE_OMP_PRAGMAS=$SCRIPT_DIR/remove_omp_pragmas.py
 OMP_TO_HCLIB_PRAGMA_FINDER=$SCRIPT_DIR/omp_to_hclib_pragma_finder.py
+ADD_PRAGMA_LINE_LABELS=$SCRIPT_DIR/add_pragma_line_labels.py
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
@@ -98,34 +101,60 @@ fi
 # output.
 DEFINES=-D_FORTIFY_SOURCE=0
 
-WITH_BRACES=$DIRNAME/____omp_to_hclib.$NAME.braces.$EXTENSION
-WITH_HCLIB=$DIRNAME/____omp_to_hclib.$NAME.hclib.$EXTENSION
-WITHOUT_PRAGMAS=$DIRNAME/____omp_to_hclib.$NAME.no_pragmas.$EXTENSION
+WITH_HEADER=$DIRNAME/$FILE_PREFIX.$NAME.header.$EXTENSION
 
-OMP_INFO=$DIRNAME/$NAME.omp.info
-OMP_TO_HCLIB_INFO=$DIRNAME/$NAME.omp_to_hclib.info
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
+echo '#include "hclib.h"' > $WITH_HEADER
+cat $INPUT_PATH >> $WITH_HEADER
 
-# Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
-python $OPENMP_FINDER $INPUT_PATH > $OMP_INFO
+COUNT=1
+CHANGED=1
+PREV=$WITH_HEADER
+CHECK_FOR_PTHREAD=true
+until [[ $CHANGED -eq 0 ]]; do
+    OMP_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp.$COUNT.info
+    OMP_TO_HCLIB_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp_to_hclib.$COUNT.info
+    WITH_LINE_LABELS=$DIRNAME/$FILE_PREFIX.$NAME.line_labels.$COUNT.$EXTENSION
+    TMP_OUTPUT=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$COUNT.$EXTENSION
+    WITHOUT_PRAGMAS=$DIRNAME/$FILE_PREFIX.$NAME.no_pragmas.$COUNT.$EXTENSION
+    HANDLED_PRAGMAS_INFO=$DIRNAME/$FILE_PREFIX.pragmas.$COUNT.info
 
-# Search for pragmas specific to this framework
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
-cat $INPUT_PATH | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
+    # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
+    python $OPENMP_FINDER $PREV > $OMP_INFO
 
-# Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-$OMP_TO_HCLIB -o $WITH_HCLIB -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $INPUT_PATH -- \
-    $INCLUDE $USER_INCLUDES $DEFINES
+    # Search for pragmas specific to this framework
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
+    cat $PREV | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
 
-# Remove any OMP pragmas
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
-cat $WITH_HCLIB | python $REMOVE_OMP_PRAGMAS_AND_INSERT_HEADER > $WITHOUT_PRAGMAS
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Adding line labels to pragmas'
+    cat $PREV | python $ADD_PRAGMA_LINE_LABELS > $WITH_LINE_LABELS
+
+    # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
+    $OMP_TO_HCLIB -o $TMP_OUTPUT -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $WITH_LINE_LABELS \
+        -d $HANDLED_PRAGMAS_INFO -n $CHECK_FOR_PTHREAD -- $INCLUDE $USER_INCLUDES $DEFINES \
+        -I$HCLIB_ROOT/include
+
+    # Remove any OMP pragmas that this iteration handled
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
+    cat $TMP_OUTPUT | python $REMOVE_OMP_PRAGMAS $HANDLED_PRAGMAS_INFO > $WITHOUT_PRAGMAS
+
+    # Check to see if there were any changes to the code during this iteration. If not, exit.
+    set +e
+    diff $WITH_LINE_LABELS $TMP_OUTPUT > /dev/null
+    CHANGED=$?
+    set -e
+
+    COUNT=$(($COUNT + 1))
+    PREV=$WITHOUT_PRAGMAS
+    CHECK_FOR_PTHREAD=false
+done
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Producing final output file'
 cp $WITHOUT_PRAGMAS $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'
-    rm -f $WITH_BRACES $OMP_INFO $WITH_HCLIB $WITHOUT_PRAGMAS $OMP_TO_HCLIB_INFO
+    rm -f $DIRNAME/$FILE_PREFIX.*
 fi

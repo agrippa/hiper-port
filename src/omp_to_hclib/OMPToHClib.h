@@ -21,7 +21,8 @@
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
-        OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile);
+        OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile,
+                const char *handledPragmaFile, const char *checkForPthread);
         ~OMPToHClib();
 
         void setRewriter(clang::Rewriter &R) {
@@ -50,6 +51,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         clang::SourceLocation getLaunchBodyBeginLoc();
         clang::SourceLocation getLaunchBodyEndLoc();
 
+        std::string getClosureDecl(std::string closureName,
+                bool isForasyncClosure);
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName, std::vector<clang::ValueDecl *> *captured,
@@ -120,6 +123,11 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         const clang::Stmt *lastInsideLaunch;
         std::vector<clang::ValueDecl *> *launchCaptures;
         const clang::FunctionDecl *functionContainingLaunch;
+
+        std::ofstream handledPragmasFp;
+        void outputHandledPragma(int line, std::string pragmaName);
+
+        bool checkForPthread;
 };
 
 #endif

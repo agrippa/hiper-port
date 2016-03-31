@@ -4,6 +4,18 @@
 
 // #define VERBOSE
 
+OMPNode::OMPNode(int setStartLine, int setEndLine, int setPragmaLine,
+        OMPNode *setParent, std::string setLbl, clang::SourceManager *SM) {
+    body = NULL;
+    pragmaLine = setPragmaLine;
+    pragma = NULL;
+    parent = setParent;
+    lbl = setLbl;
+
+    startLine = setStartLine;
+    endLine = setEndLine;
+}
+
 OMPNode::OMPNode(const clang::Stmt *setBody, int setPragmaLine,
         OMPPragma *setPragma, OMPNode *setParent, std::string setLbl,
         clang::SourceManager *SM) {
@@ -19,9 +31,9 @@ OMPNode::OMPNode(const clang::Stmt *setBody, int setPragmaLine,
         startLine = presumedStart.getLine();
         endLine = presumedEnd.getLine();
     } else {
-        // body is NULL on root node of function
-        startLine = -1;
-        endLine = -1;
+        // body can be null for OMP pragmas lacking bodies, such as barrier or taskwait
+        startLine = setPragmaLine;
+        endLine = setPragmaLine;
     }
 }
 
@@ -124,7 +136,7 @@ void OMPNode::printHelper(int depth) {
     for (int i = 0; i < depth * 2; i++) {
         std::cerr << "=";
     }
-    std::cerr << (pragma ? pragma->getPragmaName() : "root") << " @ line " <<
+    std::cerr << (pragma ? pragma->getPragmaName() : lbl) << " @ line " <<
         pragmaLine << ", body = (" << startLine << "->" << endLine << "), " <<
         children.size() << " children, lbl = " << lbl << ", parent = " <<
         parent << ", this = " << this << std::endl;
@@ -151,4 +163,8 @@ std::vector<OMPNode *> *OMPNode::getLeaves() {
     std::vector<OMPNode *> *accum = new std::vector<OMPNode *>();
     getLeavesHelper(accum);
     return accum;
+}
+
+void OMPNode::manuallyAddChild(OMPNode *node) {
+    children.push_back(node);
 }

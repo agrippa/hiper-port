@@ -34,6 +34,8 @@ class OMPNode {
         OMPNode(const clang::Stmt *setBody, int setPragmaLine,
                 OMPPragma *setPragma, OMPNode *setParent, std::string setLbl,
                 clang::SourceManager *SM);
+        OMPNode(int setStartLine, int setEndLine, int setPragmaLine,
+                OMPNode *setParent, std::string setLbl, clang::SourceManager *SM);
 
         void addChild(const clang::Stmt *stmt, int pragmaLine,
                 OMPPragma *pragma, std::string lbl, clang::SourceManager *SM);
@@ -41,6 +43,7 @@ class OMPNode {
         int getStartLine();
         int getEndLine();
         int getPragmaLine();
+
         OMPPragma *getPragma();
         void print();
         void printHelper(int depth);
@@ -50,6 +53,8 @@ class OMPNode {
         OMPNode *getParent();
         std::vector<OMPNode *> *getChildren();
         const clang::Stmt *getBody();
+
+        void manuallyAddChild(OMPNode *node);
 };
 
 #endif

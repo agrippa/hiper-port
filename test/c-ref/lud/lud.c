@@ -52,8 +52,8 @@ typedef struct _main_entrypoint_ctx {
     stopwatch sw;
  } main_entrypoint_ctx;
 
-static void main_entrypoint(void *arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)arg;
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int matrix_dim; matrix_dim = ctx->matrix_dim;
@@ -146,7 +146,6 @@ main ( int argc, char *argv[] )
 
 
   stopwatch_start(&sw);
-#pragma omp_to_hclib body_start
   main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
@@ -161,7 +160,6 @@ ctx->sw = sw;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;
-#pragma omp_to_hclib body_end
   stopwatch_stop(&sw);
   printf("Time consumed(ms): %lf\n", 1000*get_interval_by_sec(&sw));
 

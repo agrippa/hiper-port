@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-typedef struct _run99 {
+typedef struct _run100 {
     int argc;
     char **argv;
     unsigned long long cycles;
@@ -88,31 +88,9 @@ typedef struct _run99 {
     int *temp;
     int min;
     int t;
- } run99;
+ } run100;
 
-static void run99_hclib_async(void *arg, const int ___iter) {
-    run99 *ctx = (run99 *)arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
-    unsigned long long cycles; cycles = ctx->cycles;
-    int *src; src = ctx->src;
-    int *dst; dst = ctx->dst;
-    int *temp; temp = ctx->temp;
-    int min; min = ctx->min;
-    int t; t = ctx->t;
-    do {
-    int n;     n = ___iter;
-{
-          min = src[n];
-          if (n > 0)
-            min = MIN(min, src[n-1]);
-          if (n < cols-1)
-            min = MIN(min, src[n+1]);
-          dst[n] = wall[t+1][n]+min;
-        }    } while (0);
-}
-
-typedef struct _main_entrypoint_ctx {
+static void run100_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     unsigned long long cycles;
@@ -122,8 +100,8 @@ typedef struct _main_entrypoint_ctx {
     int min;
  } main_entrypoint_ctx;
 
-static void main_entrypoint(void *arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)arg;
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     unsigned long long cycles; cycles = ctx->cycles;
@@ -136,7 +114,7 @@ for (int t = 0; t < rows-1; t++) {
         src = dst;
         dst = temp;
          { 
-run99 *ctx = (run99 *)malloc(sizeof(run99));
+run100 *ctx = (run100 *)malloc(sizeof(run100));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->cycles = cycles;
@@ -150,7 +128,7 @@ domain.low = 0;
 domain.high = cols;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)run99_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)run100_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -169,7 +147,6 @@ void run(int argc, char** argv)
     src = new int[cols];
 
     pin_stats_reset();
-#pragma omp_to_hclib body_start
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
@@ -181,7 +158,6 @@ ctx->min = min;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-#pragma omp_to_hclib body_end
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);
@@ -199,5 +175,29 @@ free(ctx);
     delete [] wall;
     delete [] dst;
     delete [] src;
+} static void run100_hclib_async(void *____arg, const int ___iter) {
+    run100 *ctx = (run100 *)____arg;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
+    unsigned long long cycles; cycles = ctx->cycles;
+    int *src; src = ctx->src;
+    int *dst; dst = ctx->dst;
+    int *temp; temp = ctx->temp;
+    int min; min = ctx->min;
+    int t; t = ctx->t;
+    hclib_start_finish();
+    do {
+    int n;     n = ___iter;
+{
+          min = src[n];
+          if (n > 0)
+            min = MIN(min, src[n-1]);
+          if (n < cols-1)
+            min = MIN(min, src[n+1]);
+          dst[n] = wall[t+1][n]+min;
+        }    } while (0);
+    ; hclib_end_finish();
 }
+
+
 

@@ -42,8 +42,8 @@ typedef struct _main_entrypoint_ctx {
     MAT *grad_y;
  } main_entrypoint_ctx;
 
-static void main_entrypoint(void *arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)arg;
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     long long program_start_time; program_start_time = ctx->program_start_time;
@@ -251,7 +251,6 @@ int main(int argc, char ** argv) {
 	MAT *grad_y = gradient_y(image_chopped);
 	
 	m_free(image_chopped);
-#pragma omp_to_hclib body_start
 	// Get GICOV matrix corresponding to image gradients
 	main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
@@ -292,7 +291,6 @@ ctx->grad_y = grad_y;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;
-#pragma omp_to_hclib body_end
 	
 	// Report total program execution time
     printf("\nTotal application run time: %.5f seconds\n", ((float) (get_time() - program_start_time)) / (1000*1000));

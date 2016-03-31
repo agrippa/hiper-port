@@ -48,7 +48,7 @@ int num_omp_threads;
  * advances the solution of the discretized difference equations 
  * by one time step
  */
-typedef struct _single_iteration62 {
+typedef struct _single_iteration63 {
     FLOAT *result;
     FLOAT *temp;
     FLOAT *power;
@@ -66,10 +66,50 @@ typedef struct _single_iteration62 {
     int num_chunk;
     int chunks_in_row;
     int chunks_in_col;
- } single_iteration62;
+ } single_iteration63;
 
-static void single_iteration62_hclib_async(void *arg, const int ___iter) {
-    single_iteration62 *ctx = (single_iteration62 *)arg;
+static void single_iteration63_hclib_async(void *____arg, const int ___iter);void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
+					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
+					  FLOAT step)
+{
+    FLOAT delta;
+    int r, c;
+    int chunk;
+    int num_chunk = row*col / (BLOCK_SIZE_R * BLOCK_SIZE_C);
+    int chunks_in_row = col/BLOCK_SIZE_C;
+    int chunks_in_col = row/BLOCK_SIZE_R;
+
+	// omp_set_num_threads(num_omp_threads);
+     { 
+single_iteration63 *ctx = (single_iteration63 *)malloc(sizeof(single_iteration63));
+ctx->result = result;
+ctx->temp = temp;
+ctx->power = power;
+ctx->row = row;
+ctx->col = col;
+ctx->Cap_1 = Cap_1;
+ctx->Rx_1 = Rx_1;
+ctx->Ry_1 = Ry_1;
+ctx->Rz_1 = Rz_1;
+ctx->step = step;
+ctx->delta = delta;
+ctx->r = r;
+ctx->c = c;
+ctx->chunk = chunk;
+ctx->num_chunk = num_chunk;
+ctx->chunks_in_row = chunks_in_row;
+ctx->chunks_in_col = chunks_in_col;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = num_chunk;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)single_iteration63_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void single_iteration63_hclib_async(void *____arg, const int ___iter) {
+    single_iteration63 *ctx = (single_iteration63 *)____arg;
     FLOAT *result; result = ctx->result;
     FLOAT *temp; temp = ctx->temp;
     FLOAT *power; power = ctx->power;
@@ -87,6 +127,7 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
     int num_chunk; num_chunk = ctx->num_chunk;
     int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
     int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
+    hclib_start_finish();
     do {
     chunk = ___iter;
 {
@@ -155,6 +196,7 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
         }
 
         for ( r = r_start; r < r_start + BLOCK_SIZE_R; ++r ) {
+#pragma omp simd        
             for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
             /* Update Temperatures */
                 result[r*col+c] =temp[r*col+c]+ 
@@ -165,49 +207,10 @@ static void single_iteration62_hclib_async(void *arg, const int ___iter) {
             }
         }
     }    } while (0);
+    ; hclib_end_finish();
 }
 
-void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
-					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
-					  FLOAT step)
-{
-    FLOAT delta;
-    int r, c;
-    int chunk;
-    int num_chunk = row*col / (BLOCK_SIZE_R * BLOCK_SIZE_C);
-    int chunks_in_row = col/BLOCK_SIZE_C;
-    int chunks_in_col = row/BLOCK_SIZE_R;
 
-	// omp_set_num_threads(num_omp_threads);
-     { 
-single_iteration62 *ctx = (single_iteration62 *)malloc(sizeof(single_iteration62));
-ctx->result = result;
-ctx->temp = temp;
-ctx->power = power;
-ctx->row = row;
-ctx->col = col;
-ctx->Cap_1 = Cap_1;
-ctx->Rx_1 = Rx_1;
-ctx->Ry_1 = Ry_1;
-ctx->Rz_1 = Rz_1;
-ctx->step = step;
-ctx->delta = delta;
-ctx->r = r;
-ctx->c = c;
-ctx->chunk = chunk;
-ctx->num_chunk = num_chunk;
-ctx->chunks_in_row = chunks_in_row;
-ctx->chunks_in_col = chunks_in_col;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = num_chunk;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)single_iteration62_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
-hclib_future_wait(fut);
-free(ctx);
- } 
-}
 
 /* Transient solver driver routine: simply converts the heat 
  * transfer differential equations to difference equations 

@@ -437,7 +437,7 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-   bots_message("Start aligning ");
+#pragma omp_to_hclib body_start
 
    #pragma omp parallel
    {
@@ -496,7 +496,7 @@ int pairalign()
          } // for (j)
       } // end parallel for (i)
    } // end parallel
-   bots_message(" completed!\n");
+#pragma omp_to_hclib body_end
    return 0;
 }
 

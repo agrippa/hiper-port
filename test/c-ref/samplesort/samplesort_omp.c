@@ -125,7 +125,7 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _par_sort144 {
+typedef struct _par_sort145 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -133,9 +133,9 @@ typedef struct _par_sort144 {
     int right;
     int index;
     sort_data_t *buf;
- } par_sort144;
+ } par_sort145;
 
-typedef struct _par_sort154 {
+typedef struct _par_sort155 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -143,39 +143,9 @@ typedef struct _par_sort154 {
     int right;
     int index;
     sort_data_t *buf;
- } par_sort154;
+ } par_sort155;
 
-static void par_sort144_hclib_async(void *arg) {
-    par_sort144 *ctx = (par_sort144 *)arg;
-    void *arg; arg = ctx->arg;
-    sort_data_t *in; in = ctx->in;
-    uint64_t *data; data = ctx->data;
-    int left; left = ctx->left;
-    int right; right = ctx->right;
-    int index; index = ctx->index;
-    sort_data_t *buf; buf = ctx->buf;
-    hclib_start_finish();
-{
-              par_sort(buf);
-          }    hclib_end_finish();
-}
-
-static void par_sort154_hclib_async(void *arg) {
-    par_sort154 *ctx = (par_sort154 *)arg;
-    void *arg; arg = ctx->arg;
-    sort_data_t *in; in = ctx->in;
-    uint64_t *data; data = ctx->data;
-    int left; left = ctx->left;
-    int right; right = ctx->right;
-    int index; index = ctx->index;
-    sort_data_t *buf; buf = ctx->buf;
-    hclib_start_finish();
-{
-              par_sort(buf);
-          }    hclib_end_finish();
-}
-
-void par_sort(void* arg) {
+static void par_sort145_hclib_async(void *____arg);static void par_sort155_hclib_async(void *____arg);void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
   int left = in->left; 
@@ -191,7 +161,7 @@ void par_sort(void* arg) {
           buf->left = left;
           buf->right = index - 1; 
            { 
-par_sort144 *ctx = (par_sort144 *)malloc(sizeof(par_sort144));
+par_sort145 *ctx = (par_sort145 *)malloc(sizeof(par_sort145));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -199,7 +169,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(par_sort144_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(par_sort145_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -208,7 +178,7 @@ hclib_async(par_sort144_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
           buf->left = index;
           buf->right = right; 
            { 
-par_sort154 *ctx = (par_sort154 *)malloc(sizeof(par_sort154));
+par_sort155 *ctx = (par_sort155 *)malloc(sizeof(par_sort155));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -216,10 +186,10 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(par_sort154_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(par_sort155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
         }
-        hclib_end_finish(); }
+        } hclib_end_finish(); 
     }
   }
   else {
@@ -227,7 +197,37 @@ hclib_async(par_sort154_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
     qsort(data+left, right - left + 1, sizeof(TYPE), compare);
   }
   free(arg);
+} static void par_sort145_hclib_async(void *____arg) {
+    par_sort145 *ctx = (par_sort145 *)____arg;
+    void *arg; arg = ctx->arg;
+    sort_data_t *in; in = ctx->in;
+    uint64_t *data; data = ctx->data;
+    int left; left = ctx->left;
+    int right; right = ctx->right;
+    int index; index = ctx->index;
+    sort_data_t *buf; buf = ctx->buf;
+    hclib_start_finish();
+{
+              par_sort(buf);
+          }    ; hclib_end_finish();
 }
+
+static void par_sort155_hclib_async(void *____arg) {
+    par_sort155 *ctx = (par_sort155 *)____arg;
+    void *arg; arg = ctx->arg;
+    sort_data_t *in; in = ctx->in;
+    uint64_t *data; data = ctx->data;
+    int left; left = ctx->left;
+    int right; right = ctx->right;
+    int index; index = ctx->index;
+    sort_data_t *buf; buf = ctx->buf;
+    hclib_start_finish();
+{
+              par_sort(buf);
+          }    ; hclib_end_finish();
+}
+
+
 
 void sorting(TYPE* buffer, int size) {
   sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
@@ -241,6 +241,57 @@ void sorting(TYPE* buffer, int size) {
   qsort(buffer, size, sizeof(TYPE), compare);
 }
 #endif
+
+typedef struct _main_entrypoint_ctx {
+    int argc;
+    char **argv;
+    int Numprocs;
+    int MyRank;
+    int Root;
+    int i;
+    int j;
+    int k;
+    int NoofElements;
+    int NoofElements_Bloc;
+    int NoElementsToSort;
+    int count;
+    int temp;
+    uint64_t *Input;
+    uint64_t *InputData;
+    uint64_t *Splitter;
+    uint64_t *AllSplitter;
+    uint64_t *Buckets;
+    uint64_t *BucketBuffer;
+    uint64_t *LocalBucket;
+    uint64_t *OutputBuffer;
+    uint64_t *Output;
+ } main_entrypoint_ctx;
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
+    int Numprocs; Numprocs = ctx->Numprocs;
+    int MyRank; MyRank = ctx->MyRank;
+    int Root; Root = ctx->Root;
+    int i; i = ctx->i;
+    int j; j = ctx->j;
+    int k; k = ctx->k;
+    int NoofElements; NoofElements = ctx->NoofElements;
+    int NoofElements_Bloc; NoofElements_Bloc = ctx->NoofElements_Bloc;
+    int NoElementsToSort; NoElementsToSort = ctx->NoElementsToSort;
+    int count; count = ctx->count;
+    int temp; temp = ctx->temp;
+    uint64_t *Input; Input = ctx->Input;
+    uint64_t *InputData; InputData = ctx->InputData;
+    uint64_t *Splitter; Splitter = ctx->Splitter;
+    uint64_t *AllSplitter; AllSplitter = ctx->AllSplitter;
+    uint64_t *Buckets; Buckets = ctx->Buckets;
+    uint64_t *BucketBuffer; BucketBuffer = ctx->BucketBuffer;
+    uint64_t *LocalBucket; LocalBucket = ctx->LocalBucket;
+    uint64_t *OutputBuffer; OutputBuffer = ctx->OutputBuffer;
+    uint64_t *Output; Output = ctx->Output;
+sorting(InputData, NoofElements_Bloc); }
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
@@ -301,8 +352,35 @@ int main (int argc, char *argv[]) {
   }
   shmem_barrier_all();
 
+
   /**** Sorting Locally ****/
-  sorting(InputData, NoofElements_Bloc);
+  main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->argc = argc;
+ctx->argv = argv;
+ctx->Numprocs = Numprocs;
+ctx->MyRank = MyRank;
+ctx->Root = Root;
+ctx->i = i;
+ctx->j = j;
+ctx->k = k;
+ctx->NoofElements = NoofElements;
+ctx->NoofElements_Bloc = NoofElements_Bloc;
+ctx->NoElementsToSort = NoElementsToSort;
+ctx->count = count;
+ctx->temp = temp;
+ctx->Input = Input;
+ctx->InputData = InputData;
+ctx->Splitter = Splitter;
+ctx->AllSplitter = AllSplitter;
+ctx->Buckets = Buckets;
+ctx->BucketBuffer = BucketBuffer;
+ctx->LocalBucket = LocalBucket;
+ctx->OutputBuffer = OutputBuffer;
+ctx->Output = Output;
+hclib_launch(main_entrypoint, ctx);
+free(ctx);
+;
+
 
   /**** Choosing Local Splitters ****/
   Splitter = (TYPE *) shmem_malloc (sizeof (TYPE) * (Numprocs-1));

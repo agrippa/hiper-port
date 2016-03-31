@@ -132,7 +132,7 @@ float accuracy(float *arr1, float *arr2, int len)
 
 
 }
-typedef struct _computeTempOMP157 {
+typedef struct _computeTempOMP158 {
     float *pIn;
     float *tIn;
     float *tOut;
@@ -157,57 +157,9 @@ typedef struct _computeTempOMP157 {
     float *tIn_t;
     float *tOut_t;
     int z;
- } computeTempOMP157;
+ } computeTempOMP158;
 
-static void computeTempOMP157_hclib_async(void *arg, const int ___iter) {
-    computeTempOMP157 *ctx = (computeTempOMP157 *)arg;
-    float *pIn; pIn = ctx->pIn;
-    float *tIn; tIn = ctx->tIn;
-    float *tOut; tOut = ctx->tOut;
-    int nx; nx = ctx->nx;
-    int ny; ny = ctx->ny;
-    int nz; nz = ctx->nz;
-    float Cap; Cap = ctx->Cap;
-    float Rx; Rx = ctx->Rx;
-    float Ry; Ry = ctx->Ry;
-    float Rz; Rz = ctx->Rz;
-    float dt; dt = ctx->dt;
-    int numiter; numiter = ctx->numiter;
-    float ce; ce = ctx->ce;
-    float cw; cw = ctx->cw;
-    float cn; cn = ctx->cn;
-    float cs; cs = ctx->cs;
-    float ct; ct = ctx->ct;
-    float cb; cb = ctx->cb;
-    float cc; cc = ctx->cc;
-    float stepDivCap; stepDivCap = ctx->stepDivCap;
-    int count; count = ctx->count;
-    float *tIn_t; tIn_t = ctx->tIn_t;
-    float *tOut_t; tOut_t = ctx->tOut_t;
-    int z; z = ctx->z;
-    do {
-    z = ___iter;
-{
-                int y;
-                for (y = 0; y < ny; y++) {
-                    int x;
-                    for (x = 0; x < nx; x++) {
-                        int c, w, e, n, s, b, t;
-                        c =  x + y * nx + z * nx * ny;
-                        w = (x == 0)    ? c : c - 1;
-                        e = (x == nx-1) ? c : c + 1;
-                        n = (y == 0)    ? c : c - nx;
-                        s = (y == ny-1) ? c : c + nx;
-                        b = (z == 0)    ? c : c - nx * ny;
-                        t = (z == nz-1) ? c : c + nx * ny;
-                        tOut_t[c] = cc * tIn_t[c] + cw * tIn_t[w] + ce * tIn_t[e]
-                            + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
-                    }
-                }
-            }    } while (0);
-}
-
-void computeTempOMP(float *pIn, float* tIn, float *tOut, 
+static void computeTempOMP158_hclib_async(void *____arg, const int ___iter);void computeTempOMP(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 
         float dt, int numiter) 
@@ -231,7 +183,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
         do {
             int z; 
              { 
-computeTempOMP157 *ctx = (computeTempOMP157 *)malloc(sizeof(computeTempOMP157));
+computeTempOMP158 *ctx = (computeTempOMP158 *)malloc(sizeof(computeTempOMP158));
 ctx->pIn = pIn;
 ctx->tIn = tIn;
 ctx->tOut = tOut;
@@ -261,7 +213,7 @@ domain.low = 0;
 domain.high = nz;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)computeTempOMP157_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)computeTempOMP158_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -272,7 +224,57 @@ free(ctx);
         } while (count < numiter);
     } 
     return; 
-} 
+} static void computeTempOMP158_hclib_async(void *____arg, const int ___iter) {
+    computeTempOMP158 *ctx = (computeTempOMP158 *)____arg;
+    float *pIn; pIn = ctx->pIn;
+    float *tIn; tIn = ctx->tIn;
+    float *tOut; tOut = ctx->tOut;
+    int nx; nx = ctx->nx;
+    int ny; ny = ctx->ny;
+    int nz; nz = ctx->nz;
+    float Cap; Cap = ctx->Cap;
+    float Rx; Rx = ctx->Rx;
+    float Ry; Ry = ctx->Ry;
+    float Rz; Rz = ctx->Rz;
+    float dt; dt = ctx->dt;
+    int numiter; numiter = ctx->numiter;
+    float ce; ce = ctx->ce;
+    float cw; cw = ctx->cw;
+    float cn; cn = ctx->cn;
+    float cs; cs = ctx->cs;
+    float ct; ct = ctx->ct;
+    float cb; cb = ctx->cb;
+    float cc; cc = ctx->cc;
+    float stepDivCap; stepDivCap = ctx->stepDivCap;
+    int count; count = ctx->count;
+    float *tIn_t; tIn_t = ctx->tIn_t;
+    float *tOut_t; tOut_t = ctx->tOut_t;
+    int z; z = ctx->z;
+    hclib_start_finish();
+    do {
+    z = ___iter;
+{
+                int y;
+                for (y = 0; y < ny; y++) {
+                    int x;
+                    for (x = 0; x < nx; x++) {
+                        int c, w, e, n, s, b, t;
+                        c =  x + y * nx + z * nx * ny;
+                        w = (x == 0)    ? c : c - 1;
+                        e = (x == nx-1) ? c : c + 1;
+                        n = (y == 0)    ? c : c - nx;
+                        s = (y == ny-1) ? c : c + nx;
+                        b = (z == 0)    ? c : c - nx * ny;
+                        t = (z == nz-1) ? c : c + nx * ny;
+                        tOut_t[c] = cc * tIn_t[c] + cw * tIn_t[w] + ce * tIn_t[e]
+                            + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
+                    }
+                }
+            }    } while (0);
+    ; hclib_end_finish();
+}
+
+ 
 
 void usage(int argc, char **argv)
 {

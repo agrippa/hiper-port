@@ -38,7 +38,7 @@ extern "C" {
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _kernel_cpu110 {
+typedef struct _kernel_cpu111 {
     par_str par;
     dim_str dim;
     box_str *box;
@@ -71,10 +71,140 @@ typedef struct _kernel_cpu110 {
     double fyij;
     double fzij;
     THREE_VECTOR d;
- } kernel_cpu110;
+ } kernel_cpu111;
 
-static void kernel_cpu110_hclib_async(void *arg, const int ___iter) {
-    kernel_cpu110 *ctx = (kernel_cpu110 *)arg;
+static void kernel_cpu111_hclib_async(void *____arg, const int ___iter);void  kernel_cpu(	par_str par, 
+					dim_str dim,
+					box_str* box,
+					FOUR_VECTOR* rv,
+					fp* qv,
+					FOUR_VECTOR* fv)
+{
+
+	//======================================================================================================================================================150
+	//	Variables
+	//======================================================================================================================================================150
+
+	// timer
+	long long time0;
+
+	time0 = get_time();
+
+	// timer
+	long long time1;
+	long long time2;
+	long long time3;
+	long long time4;
+
+	// parameters
+	fp alpha;
+	fp a2;
+
+	// counters
+	int i, j, k, l;
+
+	// home box
+	long first_i;
+	FOUR_VECTOR* rA;
+	FOUR_VECTOR* fA;
+
+	// neighbor box
+	int pointer;
+	long first_j; 
+	FOUR_VECTOR* rB;
+	fp* qB;
+
+	// common
+	fp r2; 
+	fp u2;
+	fp fs;
+	fp vij;
+	fp fxij,fyij,fzij;
+	THREE_VECTOR d;
+
+	time1 = get_time();
+
+	//======================================================================================================================================================150
+	//	MCPU SETUP
+	//======================================================================================================================================================150
+
+	time2 = get_time();
+
+	//======================================================================================================================================================150
+	//	INPUTS
+	//======================================================================================================================================================150
+
+	alpha = par.alpha;
+	a2 = 2.0*alpha*alpha;
+
+	time3 = get_time();
+
+	//======================================================================================================================================================150
+	//	PROCESS INTERACTIONS
+	//======================================================================================================================================================150
+
+	 { 
+kernel_cpu111 *ctx = (kernel_cpu111 *)malloc(sizeof(kernel_cpu111));
+ctx->par = par;
+ctx->dim = dim;
+ctx->box = box;
+ctx->rv = rv;
+ctx->qv = qv;
+ctx->fv = fv;
+ctx->time0 = time0;
+ctx->time1 = time1;
+ctx->time2 = time2;
+ctx->time3 = time3;
+ctx->time4 = time4;
+ctx->alpha = alpha;
+ctx->a2 = a2;
+ctx->i = i;
+ctx->j = j;
+ctx->k = k;
+ctx->l = l;
+ctx->first_i = first_i;
+ctx->rA = rA;
+ctx->fA = fA;
+ctx->pointer = pointer;
+ctx->first_j = first_j;
+ctx->rB = rB;
+ctx->qB = qB;
+ctx->r2 = r2;
+ctx->u2 = u2;
+ctx->fs = fs;
+ctx->vij = vij;
+ctx->fxij = fxij;
+ctx->fyij = fyij;
+ctx->fzij = fzij;
+ctx->d = d;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = dim.number_boxes;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)kernel_cpu111_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ }  // for l
+
+	time4 = get_time();
+
+	//======================================================================================================================================================150
+	//	DISPLAY TIMING
+	//======================================================================================================================================================150
+
+	printf("Time spent in different stages of CPU/MCPU KERNEL:\n");
+
+	printf("%15.12f s, %15.12f % : CPU/MCPU: VARIABLES\n",				(float) (time1-time0) / 1000000, (float) (time1-time0) / (float) (time4-time0) * 100);
+	printf("%15.12f s, %15.12f % : MCPU: SET DEVICE\n",					(float) (time2-time1) / 1000000, (float) (time2-time1) / (float) (time4-time0) * 100);
+	printf("%15.12f s, %15.12f % : CPU/MCPU: INPUTS\n", 				(float) (time3-time2) / 1000000, (float) (time3-time2) / (float) (time4-time0) * 100);
+	printf("%15.12f s, %15.12f % : CPU/MCPU: KERNEL\n",					(float) (time4-time3) / 1000000, (float) (time4-time3) / (float) (time4-time0) * 100);
+
+	printf("Total time:\n");
+	printf("%.12f s\n", 												(float) (time4-time0) / 1000000);
+
+} static void kernel_cpu111_hclib_async(void *____arg, const int ___iter) {
+    kernel_cpu111 *ctx = (kernel_cpu111 *)____arg;
     par_str par; par = ctx->par;
     dim_str dim; dim = ctx->dim;
     box_str *box; box = ctx->box;
@@ -107,6 +237,7 @@ static void kernel_cpu110_hclib_async(void *arg, const int ___iter) {
     double fyij; fyij = ctx->fyij;
     double fzij; fzij = ctx->fzij;
     THREE_VECTOR d; d = ctx->d;
+    hclib_start_finish();
     do {
     l = ___iter;
 {
@@ -189,139 +320,10 @@ static void kernel_cpu110_hclib_async(void *arg, const int ___iter) {
 		} // for k
 
 	}    } while (0);
+    ; hclib_end_finish();
 }
 
-void  kernel_cpu(	par_str par, 
-					dim_str dim,
-					box_str* box,
-					FOUR_VECTOR* rv,
-					fp* qv,
-					FOUR_VECTOR* fv)
-{
-
-	//======================================================================================================================================================150
-	//	Variables
-	//======================================================================================================================================================150
-
-	// timer
-	long long time0;
-
-	time0 = get_time();
-
-	// timer
-	long long time1;
-	long long time2;
-	long long time3;
-	long long time4;
-
-	// parameters
-	fp alpha;
-	fp a2;
-
-	// counters
-	int i, j, k, l;
-
-	// home box
-	long first_i;
-	FOUR_VECTOR* rA;
-	FOUR_VECTOR* fA;
-
-	// neighbor box
-	int pointer;
-	long first_j; 
-	FOUR_VECTOR* rB;
-	fp* qB;
-
-	// common
-	fp r2; 
-	fp u2;
-	fp fs;
-	fp vij;
-	fp fxij,fyij,fzij;
-	THREE_VECTOR d;
-
-	time1 = get_time();
-
-	//======================================================================================================================================================150
-	//	MCPU SETUP
-	//======================================================================================================================================================150
-
-	time2 = get_time();
-
-	//======================================================================================================================================================150
-	//	INPUTS
-	//======================================================================================================================================================150
-
-	alpha = par.alpha;
-	a2 = 2.0*alpha*alpha;
-
-	time3 = get_time();
-
-	//======================================================================================================================================================150
-	//	PROCESS INTERACTIONS
-	//======================================================================================================================================================150
-
-	 { 
-kernel_cpu110 *ctx = (kernel_cpu110 *)malloc(sizeof(kernel_cpu110));
-ctx->par = par;
-ctx->dim = dim;
-ctx->box = box;
-ctx->rv = rv;
-ctx->qv = qv;
-ctx->fv = fv;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->time3 = time3;
-ctx->time4 = time4;
-ctx->alpha = alpha;
-ctx->a2 = a2;
-ctx->i = i;
-ctx->j = j;
-ctx->k = k;
-ctx->l = l;
-ctx->first_i = first_i;
-ctx->rA = rA;
-ctx->fA = fA;
-ctx->pointer = pointer;
-ctx->first_j = first_j;
-ctx->rB = rB;
-ctx->qB = qB;
-ctx->r2 = r2;
-ctx->u2 = u2;
-ctx->fs = fs;
-ctx->vij = vij;
-ctx->fxij = fxij;
-ctx->fyij = fyij;
-ctx->fzij = fzij;
-ctx->d = d;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = dim.number_boxes;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)kernel_cpu110_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
-hclib_future_wait(fut);
-free(ctx);
- }  // for l
-
-	time4 = get_time();
-
-	//======================================================================================================================================================150
-	//	DISPLAY TIMING
-	//======================================================================================================================================================150
-
-	printf("Time spent in different stages of CPU/MCPU KERNEL:\n");
-
-	printf("%15.12f s, %15.12f % : CPU/MCPU: VARIABLES\n",				(float) (time1-time0) / 1000000, (float) (time1-time0) / (float) (time4-time0) * 100);
-	printf("%15.12f s, %15.12f % : MCPU: SET DEVICE\n",					(float) (time2-time1) / 1000000, (float) (time2-time1) / (float) (time4-time0) * 100);
-	printf("%15.12f s, %15.12f % : CPU/MCPU: INPUTS\n", 				(float) (time3-time2) / 1000000, (float) (time3-time2) / (float) (time4-time0) * 100);
-	printf("%15.12f s, %15.12f % : CPU/MCPU: KERNEL\n",					(float) (time4-time3) / 1000000, (float) (time4-time3) / (float) (time4-time0) * 100);
-
-	printf("Total time:\n");
-	printf("%.12f s\n", 												(float) (time4-time0) / 1000000);
-
-} // main
+ // main
 
 #ifdef __cplusplus
 }

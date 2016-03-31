@@ -27,6 +27,8 @@
  * single line of code to a multi-line block of code does not change the control
  * flow of the application. This should be kept in mind anywhere that an
  * InsertText, ReplaceText, etc API is called.
+ *
+ * NOTE: In general, each rewriter use is followed by an assertion that it should not fail. Rewrites can fail if the target location is invalid, e.g. the target location is in a macro. So if you start getting these assert failures, it's usually simpler to change the application code than figure out 
  */
 
 extern clang::FunctionDecl *curr_func_decl;
@@ -403,6 +405,17 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
     }
 }
 
+std::string OMPToHClib::getClosureDecl(std::string closureName,
+        bool isForasyncClosure) {
+    std::stringstream ss;
+    ss << "static void " << closureName << "(void *____arg";
+    if (isForasyncClosure) {
+        ss << ", const int ___iter";
+    }
+    ss << ");";
+    return ss.str();
+}
+
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
@@ -411,17 +424,28 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     assert(!(isForasyncClosure && isAsyncClosure));
 
     std::stringstream ss;
-    ss << "static void " << closureName << "(void *arg";
+    ss << "static void " << closureName << "(void *____arg";
     if (isForasyncClosure) {
         ss << ", const int ___iter";
     }
     ss << ") {\n";
 
-    ss << "    " << contextName << " *ctx = (" << contextName << " *)arg;\n";
+    ss << "    " << contextName << " *ctx = (" << contextName << " *)____arg;\n";
     for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
             ee = captured->end(); ii != ee; ii++) {
         clang::ValueDecl *curr = *ii;
         ss << "    " << getUnpackStr(curr) << "\n";
+    }
+
+    if (isAsyncClosure || isForasyncClosure) {
+        /*
+         * In OMP's task model you can use taskwait to wait on all previously
+         * created child tasks of the currently executing task. To model this in
+         * HClib, we wrap the body of each async in a finish scope and on
+         * encountering a taskwait call hclib_end_finish followed by
+         * hclib_start_finish.
+         */
+        ss << "    hclib_start_finish();\n";
     }
 
     if (isForasyncClosure) {
@@ -442,15 +466,6 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
                     condVar->getNameAsString(), "", "") << "; ";
         }
         ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
-    } else if (isAsyncClosure) {
-        /*
-         * In OMP's task model you can use taskwait to wait on all previously
-         * created child tasks of the currently executing task. To model this in
-         * HClib, we wrap the body of each async in a finish scope and on
-         * encountering a taskwait call hclib_end_finish followed by
-         * hclib_start_finish.
-         */
-        ss << "    hclib_start_finish();\n";
     }
 
     ss << bodyStr;
@@ -473,8 +488,9 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
             ss << "    const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);\n";
             ss << "    assert(unlock_err == 0);\n";
         }
-    } else if (isAsyncClosure) {
-        ss << "    hclib_end_finish();\n";
+    }
+    if (isAsyncClosure || isForasyncClosure) {
+        ss << "    ; hclib_end_finish();\n";
     }
     ss << "}\n\n";
     return ss.str();
@@ -509,12 +525,17 @@ std::string OMPToHClib::getContextSetup(std::string structName,
 }
 
 static const clang::Stmt *removeCompoundWrappers(const clang::Stmt *curr) {
-    if (const clang::CompoundStmt *compound = clang::dyn_cast<clang::CompoundStmt>(curr)) {
+    if (const clang::CompoundStmt *compound =
+            clang::dyn_cast<clang::CompoundStmt>(curr)) {
         if (compound->size() == 1) {
-            return removeCompoundWrappers(compound->body_front());
+            return removeCompoundWrappers(*compound->body_begin());
         }
     }
     return curr;
+}
+
+void OMPToHClib::outputHandledPragma(int line, std::string pragmaName) {
+    handledPragmasFp << line << " " << pragmaName << std::endl;
 }
 
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
@@ -527,8 +548,14 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 func->getLocStart());
         const int functionStartLine = presumedStart.getLine();
 
-        OMPNode rootNode(NULL, functionStartLine, NULL, NULL,
+        OMPNode rootNode(-1, -1, functionStartLine, NULL,
                 std::string("root"), SM);
+
+        if (launchStartLine > 0 && functionContainingLaunch == func) {
+            rootNode.manuallyAddChild(new OMPNode(launchStartLine,
+                        launchEndLine, launchStartLine,
+                        &rootNode, std::string("launch"), SM));
+        }
 
         for (std::map<int, const clang::Stmt *>::iterator i =
                 predecessors.begin(), e = predecessors.end(); i != e; i++) {
@@ -573,196 +600,233 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
         rootNode.print();
 
         std::string accumulatedStructDefs = "";
+        std::string accumulatedKernelDecls = "";
         std::string accumulatedKernelDefs = "";
 
         if (rootNode.nchildren() > 0) {
-            std::vector<OMPNode *> *todo = new std::vector<OMPNode *>();
-            std::vector<OMPNode *> *processing = rootNode.getLeaves();
+            std::vector<OMPNode *> *leaves = rootNode.getLeaves();
 
-            while (processing->size() != 0) {
-                for (std::vector<OMPNode *>::iterator i = processing->begin(),
-                        e = processing->end(); i != e; i++) {
-                    OMPNode *node = *i;
-                    const clang::Stmt *succ = NULL;
-                    if (successors.find(node->getPragmaLine()) != successors.end()) {
-                        succ = successors.at(node->getPragmaLine());
-                    }
+            for (std::vector<OMPNode *>::iterator i = leaves->begin(),
+                    e = leaves->end(); i != e; i++) {
+                OMPNode *node = *i;
+                const clang::Stmt *succ = NULL;
+                if (successors.find(node->getPragmaLine()) != successors.end()) {
+                    succ = successors.at(node->getPragmaLine());
+                }
 
-                    assert(supportedPragmas.find(
-                                node->getPragma()->getPragmaName()) !=
-                            supportedPragmas.end());
+                assert(node->getLbl() == "launch" || supportedPragmas.find(
+                            node->getPragma()->getPragmaName()) !=
+                        supportedPragmas.end());
 
-                    if (node->getPragma()->getPragmaName() == "parallel") {
-                        std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
-                        if (clauses.find("for") != clauses.end()) {
+                if (node->getLbl() == "launch") {
+                    std::string launchBody = getLaunchBody();
+                    std::string launchStruct = getStructDef(
+                            "main_entrypoint_ctx", getLaunchCaptures(), false);
+                    std::string closureFunction = getClosureDef(
+                            "main_entrypoint", false, false, "main_entrypoint_ctx",
+                            getLaunchCaptures(), launchBody);
+                    std::string contextSetup = getContextSetup(
+                            "main_entrypoint_ctx", getLaunchCaptures(), NULL);
+                    std::string launchStr = contextSetup +
+                        "hclib_launch(main_entrypoint, ctx);\n" +
+                        "free(ctx);\n";
+                    bool failed = rewriter->ReplaceText(clang::SourceRange(getLaunchBodyBeginLoc(),
+                                getLaunchBodyEndLoc()), launchStr);
+                    assert(!failed);
+                    failed = rewriter->InsertText(getFunctionContainingLaunch()->getLocStart(),
+                            launchStruct + closureFunction, true, true);
+                    assert(!failed);
 
-                            const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
-                            if (!forLoop) {
-                                std::cerr << "Expected to find for loop " <<
-                                    "inside omp parallel for at line " <<
-                                    node->getPragmaLine() << " but found a " <<
-                                    node->getBody()->getStmtClassName() <<
-                                    " instead." << std::endl;
-                                std::cerr << stmtToString(node->getBody()) << std::endl;
-                                exit(1);
-                            }
-                            const clang::Stmt *init = forLoop->getInit();
-                            const clang::Stmt *cond = forLoop->getCond();
-                            const clang::Expr *inc = forLoop->getInc();
+                    outputHandledPragma(node->getStartLine(), "launch");
+                    outputHandledPragma(node->getEndLine(), "launch");
+                } else if (node->getPragma()->getPragmaName() == "parallel") {
+                    std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
+                    if (clauses.find("for") != clauses.end()) {
 
-                            std::string bodyStr = stmtToString(forLoop->getBody());
-
-                            const clang::ValueDecl *condVar = NULL;
-                            std::string lowStr =
-                                getCondVarAndLowerBoundFromInit(init,
-                                        &condVar);
-                            assert(condVar);
-
-                            std::string highStr = getUpperBoundFromCond(
-                                    cond, condVar);
-
-                            std::string strideStr = getStrideFromIncr(inc,
-                                    condVar);
-
-                            accumulatedKernelDefs += getClosureDef(
-                                    node->getLbl() + ASYNC_SUFFIX, true, false,
-                                    node->getLbl(),
-                                    captures[node->getPragmaLine()], bodyStr,
-                                    node->getPragma()->getReductions(), condVar);
-
-                            const std::string structDef = getStructDef(
-                                    node->getLbl(),
-                                    captures[node->getPragmaLine()],
-                                    !node->getPragma()->getReductions()->empty());
-                            accumulatedStructDefs += structDef;
-
-                            std::vector<OMPReductionVar> *reductions =
-                                node->getPragma()->getReductions();
-                            std::stringstream contextCreation;
-                            contextCreation << "\n" <<
-                                getContextSetup(node->getLbl(),
-                                        captures[node->getPragmaLine()],
-                                        reductions);
-
-                            contextCreation << "hclib_loop_domain_t domain;\n";
-                            contextCreation << "domain.low = " << lowStr << ";\n";
-                            contextCreation << "domain.high = " << highStr << ";\n";
-                            contextCreation << "domain.stride = " << strideStr << ";\n";
-                            contextCreation << "domain.tile = 1;\n";
-                            contextCreation << "hclib_future_t *fut = hclib_forasync_future((void *)" <<
-                                node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, 1, " <<
-                                "&domain, FORASYNC_MODE_RECURSIVE);\n";
-                            contextCreation << "hclib_future_wait(fut);\n";
-                            contextCreation << "free(ctx);\n";
-
-                            for (std::vector<OMPReductionVar>::iterator i =
-                                    reductions->begin(), e = reductions->end();
-                                    i != e; i++) {
-                                OMPReductionVar var = *i;
-                                contextCreation << var.getVar() << " = " <<
-                                    "ctx->" << var.getVar() << ";\n";
-                            }
-
-                            // Add braces to ensure we don't change control flow
-                            rewriter->ReplaceText(succ->getSourceRange(),
-                                    " { " + contextCreation.str() + " } ");
-                        } else if (node->nchildren() == 1 &&
-                                node->getChildren()->at(0)->getPragma()->getPragmaName() == "single" &&
-                                removeCompoundWrappers(node->getBody()) ==
-                                removeCompoundWrappers(node->getChildren()->at(0)->getBody())) {
-                            /*
-                             * A parallel followed immediately by a single that
-                             * includes its entire body, ignore because we do
-                             * the start_finish/end_finish insert below when we
-                             * encounter the single.
-                             */
-                        } else {
-                            std::cerr << "Parallel pragma without a for at line " <<
-                                node->getPragmaLine() << std::endl;
+                        const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
+                        if (!forLoop) {
+                            std::cerr << "Expected to find for loop " <<
+                                "inside omp parallel for at line " <<
+                                node->getPragmaLine() << " but found a " <<
+                                node->getBody()->getStmtClassName() <<
+                                " instead." << std::endl;
+                            std::cerr << stmtToString(node->getBody()) << std::endl;
                             exit(1);
                         }
-                    } else if (node->getPragma()->getPragmaName() == "task") {
-                        const clang::Stmt *body = node->getBody();
-                        std::string bodyStr = stmtToString(body);
+                        const clang::Stmt *init = forLoop->getInit();
+                        const clang::Stmt *cond = forLoop->getCond();
+                        const clang::Expr *inc = forLoop->getInc();
+
+                        std::string bodyStr = stmtToString(forLoop->getBody());
+
+                        const clang::ValueDecl *condVar = NULL;
+                        std::string lowStr =
+                            getCondVarAndLowerBoundFromInit(init,
+                                    &condVar);
+                        assert(condVar);
+
+                        std::string highStr = getUpperBoundFromCond(
+                                cond, condVar);
+
+                        std::string strideStr = getStrideFromIncr(inc,
+                                condVar);
+
+                        accumulatedKernelDecls += getClosureDecl(
+                                node->getLbl() + ASYNC_SUFFIX, true);
+
                         accumulatedKernelDefs += getClosureDef(
-                                node->getLbl() + ASYNC_SUFFIX, false, true,
-                                node->getLbl(), captures[node->getPragmaLine()],
-                                bodyStr, NULL, NULL);
+                                node->getLbl() + ASYNC_SUFFIX, true, false,
+                                node->getLbl(),
+                                captures[node->getPragmaLine()], bodyStr,
+                                node->getPragma()->getReductions(), condVar);
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(),
-                                captures[node->getPragmaLine()], false);
+                                captures[node->getPragmaLine()],
+                                !node->getPragma()->getReductions()->empty());
                         accumulatedStructDefs += structDef;
 
+                        std::vector<OMPReductionVar> *reductions =
+                            node->getPragma()->getReductions();
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<
                             getContextSetup(node->getLbl(),
-                                    captures[node->getPragmaLine()], NULL);
-                        contextCreation << "hclib_async(" << node->getLbl() <<
-                            ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
-                            "ANY_PLACE);\n";
+                                    captures[node->getPragmaLine()],
+                                    reductions);
+
+                        contextCreation << "hclib_loop_domain_t domain;\n";
+                        contextCreation << "domain.low = " << lowStr << ";\n";
+                        contextCreation << "domain.high = " << highStr << ";\n";
+                        contextCreation << "domain.stride = " << strideStr << ";\n";
+                        contextCreation << "domain.tile = 1;\n";
+                        contextCreation << "hclib_future_t *fut = hclib_forasync_future((void *)" <<
+                            node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, 1, " <<
+                            "&domain, FORASYNC_MODE_RECURSIVE);\n";
+                        contextCreation << "hclib_future_wait(fut);\n";
+                        contextCreation << "free(ctx);\n";
+
+                        for (std::vector<OMPReductionVar>::iterator i =
+                                reductions->begin(), e = reductions->end();
+                                i != e; i++) {
+                            OMPReductionVar var = *i;
+                            contextCreation << var.getVar() << " = " <<
+                                "ctx->" << var.getVar() << ";\n";
+                        }
 
                         // Add braces to ensure we don't change control flow
-                        rewriter->ReplaceText(succ->getSourceRange(),
+                        const bool failed = rewriter->ReplaceText(succ->getSourceRange(),
                                 " { " + contextCreation.str() + " } ");
-                    } else if (node->getPragma()->getPragmaName() == "taskwait") {
-                        const clang::Stmt *pred = predecessors.at(
-                                node->getPragmaLine());
-                        rewriter->InsertText(pred->getLocEnd(),
-                                "hclib_end_finish(); hclib_start_finish(); ",
-                                true, true);
-                    } else if (node->getPragma()->getPragmaName() == "single") {
-                        if (node->getParent()->getPragma()->getPragmaName() !=
-                                "parallel") {
-                            std::cerr << "It appears the \"single\" pragma " <<
-                                "on line " << node->getPragmaLine() <<
-                                " does not have a \"parallel\" pragma as " <<
-                                "its parent. Instead has \"" <<
-                                node->getParent()->getPragma()->getPragmaName() <<
-                                "\" at line " <<
-                                node->getParent()->getPragmaLine() << "." <<
-                                std::endl;
-                            node->getParent()->print();
-                            exit(1);
-                        }
-                        assert(removeCompoundWrappers(node->getBody()) ==
-                                removeCompoundWrappers(node->getParent()->getBody()));
+                        assert(!failed);
+                    } else if (node->nchildren() == 1 &&
+                            node->getChildren()->at(0)->getPragma()->getPragmaName() == "single" &&
+                            removeCompoundWrappers(node->getBody()) ==
+                            removeCompoundWrappers(node->getChildren()->at(0)->getBody())) {
                         /*
-                         * Verify that at least one of these pragmas does not
-                         * have the nowait clause.
+                         * A parallel followed immediately by a single that
+                         * includes its entire body, ignore because we do
+                         * the start_finish/end_finish insert below when we
+                         * encounter the single.
                          */
-                        assert(!node->getPragma()->hasClause("nowait") ||
-                                !node->getParent()->getPragma()->hasClause("nowait"));
-
-                        // Insert finish
-                        const clang::Stmt *body = node->getBody();
-
-                        rewriter->InsertText(body->getLocStart(),
-                                "hclib_start_finish(); ", true, true);
-                        rewriter->InsertText(body->getLocEnd(),
-                                "hclib_end_finish(); ", true, true);
                     } else {
-                        std::cerr << "Unhandled supported pragma \"" <<
-                            node->getPragma()->getPragmaName() << "\"" << std::endl;
+                        std::cerr << "Parallel pragma without a for at line " <<
+                            node->getPragmaLine() << std::endl;
                         exit(1);
                     }
+                    outputHandledPragma(node->getPragma()->getLine(), "parallel");
+                } else if (node->getPragma()->getPragmaName() == "task") {
+                    const clang::Stmt *body = node->getBody();
+                    std::string bodyStr = stmtToString(body);
 
-                    if (std::find(todo->begin(), todo->end(),
-                                node->getParent()) == todo->end() &&
-                            node->getParent()->getLbl() != "root") {
-                        todo->push_back(node->getParent());
+                    accumulatedKernelDecls += getClosureDecl(
+                            node->getLbl() + ASYNC_SUFFIX, false);
+
+                    accumulatedKernelDefs += getClosureDef(
+                            node->getLbl() + ASYNC_SUFFIX, false, true,
+                            node->getLbl(), captures[node->getPragmaLine()],
+                            bodyStr, NULL, NULL);
+
+                    const std::string structDef = getStructDef(
+                            node->getLbl(),
+                            captures[node->getPragmaLine()], false);
+                    accumulatedStructDefs += structDef;
+
+                    std::stringstream contextCreation;
+                    contextCreation << "\n" <<
+                        getContextSetup(node->getLbl(),
+                                captures[node->getPragmaLine()], NULL);
+                    contextCreation << "hclib_async(" << node->getLbl() <<
+                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
+                        "ANY_PLACE);\n";
+
+                    // Add braces to ensure we don't change control flow
+                    const bool failed = rewriter->ReplaceText(succ->getSourceRange(),
+                            " { " + contextCreation.str() + " } ");
+                    assert(!failed);
+                    outputHandledPragma(node->getPragma()->getLine(), "task");
+                } else if (node->getPragma()->getPragmaName() == "taskwait") {
+                    /*
+                     * taskwait is handled by a standalone script that inserts
+                     * 'hclib_end_finish(); hclib_start_finish();' for each
+                     * taskwait.
+                     */
+                    /*
+                    const clang::Stmt *pred = predecessors.at(
+                            node->getPragmaLine());
+                    const bool failed = rewriter->InsertText(pred->getLocEnd(),
+                            "hclib_end_finish(); hclib_start_finish(); ",
+                            true, true);
+                    assert(!failed);
+                    */
+                    outputHandledPragma(node->getPragma()->getLine(), "taskwait");
+                } else if (node->getPragma()->getPragmaName() == "single") {
+                    if (node->getParent()->getPragma()->getPragmaName() !=
+                            "parallel") {
+                        std::cerr << "It appears the \"single\" pragma " <<
+                            "on line " << node->getPragmaLine() <<
+                            " does not have a \"parallel\" pragma as " <<
+                            "its parent. Instead has \"" <<
+                            node->getParent()->getPragma()->getPragmaName() <<
+                            "\" at line " <<
+                            node->getParent()->getPragmaLine() << "." <<
+                            std::endl;
+                        node->getParent()->print();
+                        exit(1);
                     }
-                }
+                    assert(removeCompoundWrappers(node->getBody()) ==
+                            removeCompoundWrappers(node->getParent()->getBody()));
+                    /*
+                     * Verify that at least one of these pragmas does not
+                     * have the nowait clause.
+                     */
+                    assert(!node->getPragma()->hasClause("nowait") ||
+                            !node->getParent()->getPragma()->hasClause("nowait"));
 
-                processing = todo;
-                todo = new std::vector<OMPNode *>();
+                    // Insert finish
+                    const clang::Stmt *body = node->getBody();
+
+                    const bool failed = rewriter->ReplaceText(
+                            body->getSourceRange(), "hclib_start_finish(); " +
+                            stmtToString(body) + " hclib_end_finish(); ");
+                    assert(!failed);
+
+                    outputHandledPragma(node->getPragma()->getLine(), "single");
+                    outputHandledPragma(node->getParent()->getPragma()->getLine(), "parallel");
+                } else {
+                    std::cerr << "Unhandled supported pragma \"" <<
+                        node->getPragma()->getPragmaName() << "\"" << std::endl;
+                    exit(1);
+                }
             }
         }
 
         if (accumulatedStructDefs.length() > 0 ||
                 accumulatedKernelDefs.length() > 0) {
-            rewriter->InsertText(func->getLocStart(),
-                    accumulatedStructDefs + accumulatedKernelDefs, true, true);
+            bool failed = rewriter->InsertText(func->getLocStart(),
+                    accumulatedStructDefs + accumulatedKernelDecls, true, true);
+            assert(!failed);
+            failed = rewriter->ReplaceText(func->getLocEnd(), 1,
+                    "} " + accumulatedKernelDefs);
+            assert(!failed);
         }
 
         successors.clear();
@@ -877,7 +941,7 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                         calleeName << "\" on line " <<
                         presumedStart.getLine() << std::endl;
                     abort = true;
-                } else if (calleeName.find("pthread_") == 0) {
+                } else if (checkForPthread && calleeName.find("pthread_") == 0) {
                     std::cerr << "Found pthread function call to \"" <<
                         calleeName << "\" on line " <<
                         presumedStart.getLine() << std::endl;
@@ -1165,8 +1229,20 @@ std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
     return pragmas;
 }
 
-OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile) {
+OMPToHClib::OMPToHClib(const char *ompPragmaFile,
+        const char *ompToHclibPragmaFile, const char *handledPragmasFile,
+        const char *checkForPthreadStr) {
     pragmas = parseOMPPragmas(ompPragmaFile);
+
+    if (strcmp(checkForPthreadStr, "true") == 0) {
+        checkForPthread = true;
+    } else if (strcmp(checkForPthreadStr, "false") == 0) {
+        checkForPthread = false;
+    } else {
+        std::cerr << "Invalid value \"" << std::string(checkForPthreadStr) <<
+            "\" provided for -n" << std::endl;
+        exit(1);
+    }
 
     supportedPragmas.insert("parallel");
     supportedPragmas.insert("simd"); // ignore
@@ -1181,7 +1257,11 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFi
     launchCaptures = NULL;
     functionContainingLaunch = NULL;
     parseHClibPragmas(ompToHclibPragmaFile);
+
+    handledPragmasFp.open(std::string(handledPragmasFile));
+    assert(handledPragmasFp.is_open());
 }
 
 OMPToHClib::~OMPToHClib() {
+    handledPragmasFp.close();
 }
