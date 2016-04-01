@@ -273,10 +273,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
 {
    int i, j, f, e, s, t, hh;
    int midi, midj, midh, type;
-   int HH[MAX_ALN_LENGTH];
-        int DD[MAX_ALN_LENGTH];
-   int RR[MAX_ALN_LENGTH];
-   int SS[MAX_ALN_LENGTH];
+
+   int *HH = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *DD = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *RR = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *SS = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
 
    if (N <= 0) {if (M > 0) del(M, print_ptr, last_print, displ); return( - (int) tbgap(M)); }
 
@@ -387,6 +388,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
       del(2, print_ptr, last_print, displ);
       diff(A+midi+1, B+midj, M-midi-1, N-midj, 0.0, te, print_ptr, last_print, displ, seq1, seq2, g, gh);
    }
+
+   free(HH);
+   free(DD);
+   free(RR);
+   free(SS);
 
    return midh;
 }

@@ -6523,7 +6523,7 @@ void fft_aux_seq(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, 
 /*
  * user interface for fft_aux
  */
-typedef struct _fft4794 {
+typedef struct _fft4796 {
     int n;
     COMPLEX *in;
     COMPLEX *out;
@@ -6532,9 +6532,9 @@ typedef struct _fft4794 {
     int l;
     int r;
     COMPLEX *W;
- } fft4794;
+ } fft4796;
 
-typedef struct _fft4817 {
+typedef struct _fft4819 {
     int n;
     COMPLEX *in;
     COMPLEX *out;
@@ -6543,9 +6543,66 @@ typedef struct _fft4817 {
     int l;
     int r;
     COMPLEX *W;
- } fft4817;
+ } fft4819;
 
-static void fft4794_hclib_async(void *____arg);static void fft4817_hclib_async(void *____arg);void fft(int n, COMPLEX * in, COMPLEX * out)
+static void fft4796_hclib_async(void *____arg);static void fft4819_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+    int n;
+    COMPLEX *in;
+    COMPLEX *out;
+    int factors[40];
+    int *p;
+    int l;
+    int r;
+    COMPLEX *W;
+ } main_entrypoint_ctx;
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    int n; n = ctx->n;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    int factors[40]; memcpy(factors, ctx->factors, 40 * (sizeof(int))); 
+    int *p; p = ctx->p;
+    int l; l = ctx->l;
+    int r; r = ctx->r;
+    COMPLEX *W; W = ctx->W;
+W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX)); {
+         hclib_start_finish(); {
+              { 
+fft4796 *ctx = (fft4796 *)malloc(sizeof(fft4796));
+ctx->n = n;
+ctx->in = in;
+ctx->out = out;
+memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
+ctx->p = p;
+ctx->l = l;
+ctx->r = r;
+ctx->W = W;
+hclib_async(fft4796_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+ } 
+         } hclib_end_finish(); 
+     }; ; ;; do {
+	  r = factor(l);
+	  *p++ = r;
+	  l /= r;
+     } while (l > 1); ; ;; {
+         hclib_start_finish(); {
+              { 
+fft4819 *ctx = (fft4819 *)malloc(sizeof(fft4819));
+ctx->n = n;
+ctx->in = in;
+ctx->out = out;
+memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
+ctx->p = p;
+ctx->l = l;
+ctx->r = r;
+ctx->W = W;
+hclib_async(fft4819_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+ } 
+         } hclib_end_finish(); 
+     }; }
+
+void fft(int n, COMPLEX * in, COMPLEX * out)
 {
      int factors[40];		/* allows FFTs up to at least 3^40 */
      int *p = factors;
@@ -6553,12 +6610,9 @@ static void fft4794_hclib_async(void *____arg);static void fft4817_hclib_async(v
      int r;
      COMPLEX *W;
 
+
      bots_message("Computing coefficients ");
-     W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
-     {
-         hclib_start_finish(); {
-              { 
-fft4794 *ctx = (fft4794 *)malloc(sizeof(fft4794));
+     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
@@ -6567,46 +6621,16 @@ ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
-hclib_async(fft4794_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } 
-         } hclib_end_finish(); 
-     }
-     bots_message(" completed!\n");
+hclib_launch(main_entrypoint, ctx);
+free(ctx);
 
-     /* 
-      * find factors of n, first 8, then 4 and then primes in ascending
-      * order 
-      */
-     do {
-	  r = factor(l);
-	  *p++ = r;
-	  l /= r;
-     } while (l > 1);
-
-     bots_message("Computing FFT ");
-     {
-         hclib_start_finish(); {
-              { 
-fft4817 *ctx = (fft4817 *)malloc(sizeof(fft4817));
-ctx->n = n;
-ctx->in = in;
-ctx->out = out;
-memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
-ctx->p = p;
-ctx->l = l;
-ctx->r = r;
-ctx->W = W;
-hclib_async(fft4817_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
- } 
-         } hclib_end_finish(); 
-     }
 
      bots_message(" completed!\n");
 
      free(W);
      return;
-} static void fft4794_hclib_async(void *____arg) {
-    fft4794 *ctx = (fft4794 *)____arg;
+} static void fft4796_hclib_async(void *____arg) {
+    fft4796 *ctx = (fft4796 *)____arg;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
@@ -6621,8 +6645,8 @@ hclib_async(fft4817_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
              }    ; hclib_end_finish();
 }
 
-static void fft4817_hclib_async(void *____arg) {
-    fft4817 *ctx = (fft4817 *)____arg;
+static void fft4819_hclib_async(void *____arg) {
+    fft4819 *ctx = (fft4819 *)____arg;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;

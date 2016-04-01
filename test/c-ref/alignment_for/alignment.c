@@ -274,10 +274,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
 {
    int i, j, f, e, s, t, hh;
    int midi, midj, midh, type;
-   int HH[MAX_ALN_LENGTH];
-        int DD[MAX_ALN_LENGTH];
-   int RR[MAX_ALN_LENGTH];
-   int SS[MAX_ALN_LENGTH];
+
+   int *HH = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *DD = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *RR = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *SS = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
 
    if (N <= 0) {if (M > 0) del(M, print_ptr, last_print, displ); return( - (int) tbgap(M)); }
 
@@ -389,6 +390,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
       diff(A+midi+1, B+midj, M-midi-1, N-midj, 0.0, te, print_ptr, last_print, displ, seq1, seq2, g, gh);
    }
 
+   free(HH);
+   free(DD);
+   free(RR);
+   free(SS);
+
    return midh;
 }
 
@@ -425,7 +431,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int s
 }
 
 
-typedef struct _pairalign456 {
+typedef struct _pairalign462 {
     int i;
     int n;
     int m;
@@ -438,9 +444,9 @@ typedef struct _pairalign456 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign456;
+ } pairalign462;
 
-static void pairalign456_hclib_async(void *____arg);typedef struct _pairalign458 {
+static void pairalign462_hclib_async(void *____arg);typedef struct _pairalign464 {
     int i;
     int n;
     int m;
@@ -453,9 +459,9 @@ static void pairalign456_hclib_async(void *____arg);typedef struct _pairalign458
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign458;
+ } pairalign464;
 
-static void pairalign458_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pairalign464_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;
@@ -485,7 +491,7 @@ static void main_entrypoint(void *____arg) {
     int *mat_xref; mat_xref = ctx->mat_xref;
     int *matptr; matptr = ctx->matptr;
 { 
-pairalign458 *ctx = (pairalign458 *)malloc(sizeof(pairalign458));
+pairalign464 *ctx = (pairalign464 *)malloc(sizeof(pairalign464));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -503,7 +509,7 @@ domain.low = 0;
 domain.high = nseqs;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pairalign458_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pairalign464_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  }; }
@@ -539,8 +545,8 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
   // end parallel for (i)
    return 0;
-} static void pairalign458_hclib_async(void *____arg, const int ___iter) {
-    pairalign458 *ctx = (pairalign458 *)____arg;
+} static void pairalign464_hclib_async(void *____arg, const int ___iter) {
+    pairalign464 *ctx = (pairalign464 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
@@ -569,7 +575,7 @@ free(ctx);
            bench_output[si*nseqs+sj] = (int) 1.0;
         } else {
             { 
-pairalign456 *ctx = (pairalign456 *)malloc(sizeof(pairalign456));
+pairalign462 *ctx = (pairalign462 *)malloc(sizeof(pairalign462));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -582,7 +588,7 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_async(pairalign456_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pairalign462_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  }  // end task
         } // end if (n == 0 || m == 0)
      } // for (j)
@@ -590,8 +596,8 @@ hclib_async(pairalign456_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
     ; hclib_end_finish();
 }
 
- static void pairalign456_hclib_async(void *____arg) {
-    pairalign456 *ctx = (pairalign456 *)____arg;
+ static void pairalign462_hclib_async(void *____arg) {
+    pairalign462 *ctx = (pairalign462 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;

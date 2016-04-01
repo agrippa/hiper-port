@@ -275,10 +275,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
 {
    int i, j, f, e, s, t, hh;
    int midi, midj, midh, type;
-   int HH[MAX_ALN_LENGTH];
-        int DD[MAX_ALN_LENGTH];
-   int RR[MAX_ALN_LENGTH];
-   int SS[MAX_ALN_LENGTH];
+
+   int *HH = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *DD = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *RR = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
+   int *SS = (int *)malloc(MAX_ALN_LENGTH * sizeof(int));
 
    if (N <= 0) {if (M > 0) del(M, print_ptr, last_print, displ); return( - (int) tbgap(M)); }
 
@@ -390,6 +391,11 @@ int diff (int A, int B, int M, int N, int tb, int te, int *print_ptr, int *last_
       diff(A+midi+1, B+midj, M-midi-1, N-midj, 0.0, te, print_ptr, last_print, displ, seq1, seq2, g, gh);
    }
 
+   free(HH);
+   free(DD);
+   free(RR);
+   free(SS);
+
    return midh;
 }
 
@@ -426,7 +432,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int s
 }
 
 
-typedef struct _pairalign458 {
+typedef struct _pairalign464 {
     int i;
     int n;
     int m;
@@ -439,9 +445,9 @@ typedef struct _pairalign458 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign458;
+ } pairalign464;
 
-static void pairalign458_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pairalign464_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;
@@ -484,7 +490,7 @@ static void main_entrypoint(void *____arg) {
                bench_output[si*nseqs+sj] = (int) 1.0;
             } else {
                 { 
-pairalign458 *ctx = (pairalign458 *)malloc(sizeof(pairalign458));
+pairalign464 *ctx = (pairalign464 *)malloc(sizeof(pairalign464));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -497,7 +503,7 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_async(pairalign458_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pairalign464_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  }  // end task
             } // end if (n == 0 || m == 0)
          } // for (j)
@@ -534,8 +540,8 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
  // end parallel
    return 0;
-} static void pairalign458_hclib_async(void *____arg) {
-    pairalign458 *ctx = (pairalign458 *)____arg;
+} static void pairalign464_hclib_async(void *____arg) {
+    pairalign464 *ctx = (pairalign464 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
