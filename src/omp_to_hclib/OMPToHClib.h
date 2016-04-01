@@ -75,7 +75,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     private:
         std::vector<OMPPragma> *parseOMPPragmas(const char *ompPragmaFile);
         void parseHClibPragmas(const char *filename);
-        std::vector<OMPPragma> *getOMPPragmasFor(
+        std::vector<OMPPragma *> *getOMPPragmasFor(
                 clang::FunctionDecl *decl, clang::SourceManager &SM);
         OMPPragma *getOMPPragmaFor(int lineNo);
 

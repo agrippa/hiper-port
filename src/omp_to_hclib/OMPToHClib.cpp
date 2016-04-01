@@ -35,9 +35,9 @@ extern clang::FunctionDecl *curr_func_decl;
 
 #define ASYNC_SUFFIX "_hclib_async"
 
-std::vector<OMPPragma> *OMPToHClib::getOMPPragmasFor(
+std::vector<OMPPragma *> *OMPToHClib::getOMPPragmasFor(
         clang::FunctionDecl *decl, clang::SourceManager &SM) {
-    std::vector<OMPPragma> *result = new std::vector<OMPPragma>();
+    std::vector<OMPPragma *> *result = new std::vector<OMPPragma *>();
     if (!decl->hasBody()) return result;
 
     clang::SourceLocation start = decl->getBody()->getLocStart();
@@ -48,10 +48,10 @@ std::vector<OMPPragma> *OMPToHClib::getOMPPragmasFor(
 
     for (std::vector<OMPPragma>::iterator i = pragmas->begin(),
             e = pragmas->end(); i != e; i++) {
-        OMPPragma curr = *i;
+        OMPPragma *curr = &*i;
 
-        bool before = (curr.getLine() < startLoc.getLine());
-        bool after = (curr.getLine() > endLoc.getLine());
+        bool before = (curr->getLine() < startLoc.getLine());
+        bool after = (curr->getLine() > endLoc.getLine());
 
         if (!before && !after) {
             result->push_back(curr);
@@ -557,11 +557,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         &rootNode, std::string("launch"), SM));
         }
 
-        for (std::map<int, const clang::Stmt *>::iterator i =
-                predecessors.begin(), e = predecessors.end(); i != e; i++) {
-            const int line = i->first;
-            const clang::Stmt *pred = i->second;
-            OMPPragma *pragma = getOMPPragmaFor(line);
+        std::vector<OMPPragma *> *omp_pragmas = getOMPPragmasFor(func, *SM);
+        for (std::vector<OMPPragma *>::iterator i = omp_pragmas->begin(),
+                e = omp_pragmas->end(); i != e; i++) {
+            OMPPragma *pragma = *i;
+            const int line = pragma->getLine();
 
             const clang::Stmt *succ = NULL;
             if (pragma->expectsSuccessorBlock()) {
@@ -754,9 +754,20 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     contextCreation << "\n" <<
                         getContextSetup(node->getLbl(),
                                 captures[node->getPragmaLine()], NULL);
+                    if (node->getPragma()->hasClause("if")) {
+                        // We have already asserted there is only one if arg
+                        std::vector<std::string> ifArgs = node->getPragma()->getArgsForClause("if");
+                        // If the if condition is false, just call the task body sequentially
+                        contextCreation << "if (!(" << ifArgs[0] << ")) {\n";
+                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(ctx);\n";
+                        contextCreation << "} else {\n";
+                    }
                     contextCreation << "hclib_async(" << node->getLbl() <<
                         ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
                         "ANY_PLACE);\n";
+                    if (node->getPragma()->hasClause("if")) {
+                        contextCreation << "}\n";
+                    }
 
                     // Add braces to ensure we don't change control flow
                     const bool failed = rewriter->ReplaceText(succ->getSourceRange(),
@@ -769,16 +780,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                      * 'hclib_end_finish(); hclib_start_finish();' for each
                      * taskwait.
                      */
-                    /*
-                    const clang::Stmt *pred = predecessors.at(
-                            node->getPragmaLine());
-                    const bool failed = rewriter->InsertText(pred->getLocEnd(),
-                            "hclib_end_finish(); hclib_start_finish(); ",
-                            true, true);
-                    assert(!failed);
-                    */
                     outputHandledPragma(node->getPragma()->getLine(), "taskwait");
                 } else if (node->getPragma()->getPragmaName() == "single") {
+                    assert(node->getParent()); // should not be root
+                    assert(node->getParent()->getPragma());
+
                     if (node->getParent()->getPragma()->getPragmaName() !=
                             "parallel") {
                         std::cerr << "It appears the \"single\" pragma " <<
@@ -961,41 +967,41 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
          * first before (predecessors) or after (successors) the line that an
          * OMP pragma is on.
          */
-        std::vector<OMPPragma> *omp_pragmas =
+        std::vector<OMPPragma *> *omp_pragmas =
             getOMPPragmasFor(curr_func_decl, *SM);
-        for (std::vector<OMPPragma>::iterator i = omp_pragmas->begin(),
+        for (std::vector<OMPPragma *>::iterator i = omp_pragmas->begin(),
                 e = omp_pragmas->end(); i != e; i++) {
-            OMPPragma pragma = *i;
+            OMPPragma *pragma = *i;
 
-            if (presumedEnd.getLine() < pragma.getLine()) {
-                if (predecessors.find(pragma.getLine()) ==
+            if (presumedEnd.getLine() < pragma->getLine()) {
+                if (predecessors.find(pragma->getLine()) ==
                         predecessors.end()) {
-                    predecessors[pragma.getLine()] = s;
+                    predecessors[pragma->getLine()] = s;
                 } else {
-                    const clang::Stmt *curr = predecessors[pragma.getLine()];
+                    const clang::Stmt *curr = predecessors[pragma->getLine()];
                     clang::PresumedLoc curr_loc = SM->getPresumedLoc(
                             curr->getLocEnd());
                     if (presumedEnd.getLine() > curr_loc.getLine() ||
                             (presumedEnd.getLine() == curr_loc.getLine() &&
                              presumedEnd.getColumn() > curr_loc.getColumn())) {
-                        predecessors[pragma.getLine()] = s;
+                        predecessors[pragma->getLine()] = s;
                     }
                 }
             }
 
-            if (presumedStart.getLine() >= pragma.getLine()) {
-                if (successors.find(pragma.getLine()) == successors.end()) {
-                    successors[pragma.getLine()] = s;
-                    captures[pragma.getLine()] = visibleDecls();
+            if (presumedStart.getLine() >= pragma->getLine()) {
+                if (successors.find(pragma->getLine()) == successors.end()) {
+                    successors[pragma->getLine()] = s;
+                    captures[pragma->getLine()] = visibleDecls();
                 } else {
-                    const clang::Stmt *curr = successors[pragma.getLine()];
+                    const clang::Stmt *curr = successors[pragma->getLine()];
                     clang::PresumedLoc curr_loc =
                         SM->getPresumedLoc(curr->getLocStart());
                     if (presumedStart.getLine() < curr_loc.getLine() ||
                             (presumedStart.getLine() == curr_loc.getLine() &&
                              presumedStart.getColumn() < curr_loc.getColumn())) {
-                        successors[pragma.getLine()] = s;
-                        captures[pragma.getLine()] = visibleDecls();
+                        successors[pragma->getLine()] = s;
+                        captures[pragma->getLine()] = visibleDecls();
                     }
                 }
             }

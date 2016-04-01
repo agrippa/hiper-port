@@ -117,7 +117,7 @@ until [[ $CHANGED -eq 0 ]]; do
     WITH_LINE_LABELS=$DIRNAME/$FILE_PREFIX.$NAME.line_labels.$COUNT.$EXTENSION
     TMP_OUTPUT=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$COUNT.$EXTENSION
     WITHOUT_PRAGMAS=$DIRNAME/$FILE_PREFIX.$NAME.no_pragmas.$COUNT.$EXTENSION
-    HANDLED_PRAGMAS_INFO=$DIRNAME/$FILE_PREFIX.pragmas.$COUNT.info
+    HANDLED_PRAGMAS_INFO=$DIRNAME/$FILE_PREFIX.handled_pragmas.$COUNT.info
 
     # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'

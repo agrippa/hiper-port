@@ -88,6 +88,26 @@ void OMPPragma::addClause(std::string clauseName,
         } else if (clauseName == "shared") {
             // Ignore for now
             supportedClause = true;
+        } else if (clauseName == "if") {
+            // Handled in the actual code generation step in OMPToHClib
+            assert(clauseArguments.size() == 1); // only one argument to the if clause
+            assert(clauses.find("if") == clauses.end()); // only one if per task
+            supportedClause = true;
+        } else if (clauseName == "final") {
+            /*
+             * If the expression passed to final evaluates to true, then the
+             * task created is "final" and any of its transitively spawned child
+             * tasks are also "final". This essentially turns the spawned task
+             * into a sequential block of code regardless of any parallel/task
+             * pragmas. We don't really have an equivalent for this in HClib at
+             * the moment so for now we ignore this. In the future if we wanted
+             * to better support this we could add a flag to hclib_async that
+             * turns all spawn calls beneath it into sequential recursive calls.
+             */
+            supportedClause = true;
+        } else if (clauseName == "mergeable") {
+            // Ignore for now
+            supportedClause = true;
         }
     } else {
         std::cerr << "Unsupported pragma \"" << pragmaName << "\"" << std::endl;

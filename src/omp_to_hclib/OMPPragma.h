@@ -34,6 +34,9 @@ class OMPPragma {
         bool hasClause(std::string clauseName) {
             return clauses.find(clauseName) != clauses.end();
         }
+        std::vector<std::string> &getArgsForClause(std::string clauseName) {
+            return clauses.at(clauseName);
+        }
         bool expectsSuccessorBlock();
 
     private:

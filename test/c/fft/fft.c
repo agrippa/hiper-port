@@ -4778,7 +4778,8 @@ void fft_aux_seq(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, 
  */
 void fft(int n, COMPLEX * in, COMPLEX * out)
 {
-     int factors[40];		/* allows FFTs up to at least 3^40 */
+    int *factors = (int *)malloc(40 * sizeof(int));
+     // int factors[40];		/* allows FFTs up to at least 3^40 */
      int *p = factors;
      int l = n;
      int r;
@@ -4822,10 +4823,10 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
          }
      }
 
+     free(W);
 #pragma omp_to_hclib body_end
      bots_message(" completed!\n");
 
-     free(W);
      return;
 }
 void fft_seq(int n, COMPLEX * in, COMPLEX * out)

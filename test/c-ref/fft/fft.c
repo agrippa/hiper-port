@@ -6523,33 +6523,33 @@ void fft_aux_seq(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, 
 /*
  * user interface for fft_aux
  */
-typedef struct _fft4796 {
+typedef struct _fft4797 {
     int n;
     COMPLEX *in;
     COMPLEX *out;
-    int factors[40];
+    int *factors;
     int *p;
     int l;
     int r;
     COMPLEX *W;
- } fft4796;
+ } fft4797;
 
-typedef struct _fft4819 {
+typedef struct _fft4820 {
     int n;
     COMPLEX *in;
     COMPLEX *out;
-    int factors[40];
+    int *factors;
     int *p;
     int l;
     int r;
     COMPLEX *W;
- } fft4819;
+ } fft4820;
 
-static void fft4796_hclib_async(void *____arg);static void fft4819_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void fft4797_hclib_async(void *____arg);static void fft4820_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
     int n;
     COMPLEX *in;
     COMPLEX *out;
-    int factors[40];
+    int *factors;
     int *p;
     int l;
     int r;
@@ -6561,7 +6561,7 @@ static void main_entrypoint(void *____arg) {
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
-    int factors[40]; memcpy(factors, ctx->factors, 40 * (sizeof(int))); 
+    int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
@@ -6569,16 +6569,16 @@ static void main_entrypoint(void *____arg) {
 W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX)); {
          hclib_start_finish(); {
               { 
-fft4796 *ctx = (fft4796 *)malloc(sizeof(fft4796));
+fft4797 *ctx = (fft4797 *)malloc(sizeof(fft4797));
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
-memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
+ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
-hclib_async(fft4796_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(fft4797_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
          } hclib_end_finish(); 
      }; ; ;; do {
@@ -6588,23 +6588,24 @@ hclib_async(fft4796_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
      } while (l > 1); ; ;; {
          hclib_start_finish(); {
               { 
-fft4819 *ctx = (fft4819 *)malloc(sizeof(fft4819));
+fft4820 *ctx = (fft4820 *)malloc(sizeof(fft4820));
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
-memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
+ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
-hclib_async(fft4819_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(fft4820_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
          } hclib_end_finish(); 
-     }; }
+     }; free(W); }
 
 void fft(int n, COMPLEX * in, COMPLEX * out)
 {
-     int factors[40];		/* allows FFTs up to at least 3^40 */
+    int *factors = (int *)malloc(40 * sizeof(int));
+     // int factors[40];		/* allows FFTs up to at least 3^40 */
      int *p = factors;
      int l = n;
      int r;
@@ -6616,25 +6617,23 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
-memcpy(ctx->factors, factors, 40 * (sizeof(int))); 
+ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
-
-
+;
      bots_message(" completed!\n");
 
-     free(W);
      return;
-} static void fft4796_hclib_async(void *____arg) {
-    fft4796 *ctx = (fft4796 *)____arg;
+} static void fft4797_hclib_async(void *____arg) {
+    fft4797 *ctx = (fft4797 *)____arg;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
-    int factors[40]; memcpy(factors, ctx->factors, 40 * (sizeof(int))); 
+    int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
@@ -6645,12 +6644,12 @@ free(ctx);
              }    ; hclib_end_finish();
 }
 
-static void fft4819_hclib_async(void *____arg) {
-    fft4819 *ctx = (fft4819 *)____arg;
+static void fft4820_hclib_async(void *____arg) {
+    fft4820 *ctx = (fft4820 *)____arg;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
-    int factors[40]; memcpy(factors, ctx->factors, 40 * (sizeof(int))); 
+    int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
