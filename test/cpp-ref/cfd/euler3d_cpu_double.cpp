@@ -1,3 +1,4 @@
+#include "hclib.h"
 // Copyright 2009, Andrew Corrigan, acorriga@gmu.edu
 // This code is from the AIAA-2009-4001 paper
 
@@ -48,14 +49,43 @@ void dealloc(T* array)
 	delete[] array;
 }
 
-template <typename T> void copy(T* dst, T* src, int N)
+typedef struct _pragma54 {
+    double *dst;
+    double *src;
+    int N;
+ } pragma54;
+
+static void pragma54_hclib_async(void *____arg, const int ___iter);template <typename T> void copy(T* dst, T* src, int N)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < N; i++)
-	{
+ { 
+pragma54 *ctx = (pragma54 *)malloc(sizeof(pragma54));
+ctx->dst = dst;
+ctx->src = src;
+ctx->N = N;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = N;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma54_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void pragma54_hclib_async(void *____arg, const int ___iter) {
+    pragma54 *ctx = (pragma54 *)____arg;
+    double *dst; dst = ctx->dst;
+    double *src; src = ctx->src;
+    int N; N = ctx->N;
+    hclib_start_finish();
+    do {
+    int i;     i = ___iter;
+{
 		dst[i] = src[i];
-	}
+	} ;     } while (0);
+    ; hclib_end_finish();
 }
+
+
 
 
 void dump(double* variables, int nel, int nelr)
@@ -97,14 +127,40 @@ double3 ff_flux_contribution_momentum_z;
 double3 ff_flux_contribution_density_energy;
 
 
-void initialize_variables(int nelr, double* variables)
+typedef struct _pragma103 {
+    int nelr;
+    double *variables;
+ } pragma103;
+
+static void pragma103_hclib_async(void *____arg, const int ___iter);void initialize_variables(int nelr, double* variables)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
-	{
+ { 
+pragma103 *ctx = (pragma103 *)malloc(sizeof(pragma103));
+ctx->nelr = nelr;
+ctx->variables = variables;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = nelr;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma103_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void pragma103_hclib_async(void *____arg, const int ___iter) {
+    pragma103 *ctx = (pragma103 *)____arg;
+    int nelr; nelr = ctx->nelr;
+    double *variables; variables = ctx->variables;
+    hclib_start_finish();
+    do {
+    int i;     i = ___iter;
+{
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
-	}
+	} ;     } while (0);
+    ; hclib_end_finish();
 }
+
+
 
 inline void compute_flux_contribution(double& density, double3& momentum, double& density_energy, double& pressure, double3& velocity, double3& fc_momentum_x, double3& fc_momentum_y, double3& fc_momentum_z, double3& fc_density_energy)
 {
@@ -150,11 +206,40 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 
 
-void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
+typedef struct _pragma156 {
+    int nelr;
+    double *variables;
+    double *areas;
+    double *step_factors;
+ } pragma156;
+
+static void pragma156_hclib_async(void *____arg, const int ___iter);void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
-	{
+ { 
+pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
+ctx->nelr = nelr;
+ctx->variables = variables;
+ctx->areas = areas;
+ctx->step_factors = step_factors;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = nelr;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma156_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void pragma156_hclib_async(void *____arg, const int ___iter) {
+    pragma156 *ctx = (pragma156 *)____arg;
+    int nelr; nelr = ctx->nelr;
+    double *variables; variables = ctx->variables;
+    double *areas; areas = ctx->areas;
+    double *step_factors; step_factors = ctx->step_factors;
+    hclib_start_finish();
+    do {
+    int i;     i = ___iter;
+{
 		double density = variables[NVAR*i + VAR_DENSITY];
 
 		double3 momentum;
@@ -170,8 +255,11 @@ void compute_step_factor(int nelr, double* variables, double* areas, double* ste
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
 		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
-	}
+	} ;     } while (0);
+    ; hclib_end_finish();
 }
+
+
 
 
 /*
@@ -179,13 +267,48 @@ void compute_step_factor(int nelr, double* variables, double* areas, double* ste
  *
 */
 
-void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
+typedef struct _pragma187 {
+    int nelr;
+    int *elements_surrounding_elements;
+    double *normals;
+    double *variables;
+    double *fluxes;
+    double smoothing_coefficient;
+ } pragma187;
+
+static void pragma187_hclib_async(void *____arg, const int ___iter);void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
 {
 	double smoothing_coefficient = double(0.2f);
 
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
-	{
+ { 
+pragma187 *ctx = (pragma187 *)malloc(sizeof(pragma187));
+ctx->nelr = nelr;
+ctx->elements_surrounding_elements = elements_surrounding_elements;
+ctx->normals = normals;
+ctx->variables = variables;
+ctx->fluxes = fluxes;
+ctx->smoothing_coefficient = smoothing_coefficient;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = nelr;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma187_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void pragma187_hclib_async(void *____arg, const int ___iter) {
+    pragma187 *ctx = (pragma187 *)____arg;
+    int nelr; nelr = ctx->nelr;
+    int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
+    double *normals; normals = ctx->normals;
+    double *variables; variables = ctx->variables;
+    double *fluxes; fluxes = ctx->fluxes;
+    double smoothing_coefficient; smoothing_coefficient = ctx->smoothing_coefficient;
+    hclib_start_finish();
+    do {
+    int i;     i = ___iter;
+{
 		int j, nb;
 		double3 normal; double normal_len;
 		double factor;
@@ -309,14 +432,52 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
 		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
 		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
-	}
+	} ;     } while (0);
+    ; hclib_end_finish();
 }
 
-void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
+
+
+typedef struct _pragma318 {
+    int j;
+    int nelr;
+    double *old_variables;
+    double *variables;
+    double *step_factors;
+    double *fluxes;
+ } pragma318;
+
+static void pragma318_hclib_async(void *____arg, const int ___iter);void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
-	#pragma omp parallel for  default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
-	{
+ { 
+pragma318 *ctx = (pragma318 *)malloc(sizeof(pragma318));
+ctx->j = j;
+ctx->nelr = nelr;
+ctx->old_variables = old_variables;
+ctx->variables = variables;
+ctx->step_factors = step_factors;
+ctx->fluxes = fluxes;
+hclib_loop_domain_t domain;
+domain.low = 0;
+domain.high = nelr;
+domain.stride = 1;
+domain.tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma318_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(ctx);
+ } 
+} static void pragma318_hclib_async(void *____arg, const int ___iter) {
+    pragma318 *ctx = (pragma318 *)____arg;
+    int j; j = ctx->j;
+    int nelr; nelr = ctx->nelr;
+    double *old_variables; old_variables = ctx->old_variables;
+    double *variables; variables = ctx->variables;
+    double *step_factors; step_factors = ctx->step_factors;
+    double *fluxes; fluxes = ctx->fluxes;
+    hclib_start_finish();
+    do {
+    int i;     i = ___iter;
+{
 		double factor = step_factors[i]/double(RK+1-j);
 
 		variables[NVAR*i + VAR_DENSITY] = old_variables[NVAR*i + VAR_DENSITY] + factor*fluxes[NVAR*i + VAR_DENSITY];
@@ -324,11 +485,57 @@ void time_step(int j, int nelr, double* old_variables, double* variables, double
 		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
 		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
 		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
-	}
+	} ;     } while (0);
+    ; hclib_end_finish();
 }
+
+
 /*
  * Main function
  */
+typedef struct _main_entrypoint_ctx {
+    int argc;
+    char **argv;
+    const char *data_file_name;
+    int nel;
+    int nelr;
+    double *areas;
+    int *elements_surrounding_elements;
+    double *normals;
+    double *variables;
+    double *old_variables;
+    double *fluxes;
+    double *step_factors;
+ } main_entrypoint_ctx;
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
+    const char *data_file_name; data_file_name = ctx->data_file_name;
+    int nel; nel = ctx->nel;
+    int nelr; nelr = ctx->nelr;
+    double *areas; areas = ctx->areas;
+    int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
+    double *normals; normals = ctx->normals;
+    double *variables; variables = ctx->variables;
+    double *old_variables; old_variables = ctx->old_variables;
+    double *fluxes; fluxes = ctx->fluxes;
+    double *step_factors; step_factors = ctx->step_factors;
+for(int i = 0; i < iterations; i++)
+	{
+		copy<double>(old_variables, variables, nelr*NVAR);
+
+		// for the first iteration we compute the time step
+		compute_step_factor(nelr, variables, areas, step_factors);
+
+		for(int j = 0; j < RK; j++)
+		{
+			compute_flux(nelr, elements_surrounding_elements, normals, variables, fluxes);
+			time_step(j, nelr, old_variables, variables, step_factors, fluxes);
+		}
+	} ; }
+
 int main(int argc, char** argv)
 {
 	if (argc < 2)
@@ -425,21 +632,22 @@ int main(int argc, char** argv)
 	// these need to be computed the first time in order to compute time step
 	std::cout << "Starting..." << std::endl;
 
-#pragma omp_to_hclib
-	// Begin iterations
-	for(int i = 0; i < iterations; i++)
-	{
-		copy<double>(old_variables, variables, nelr*NVAR);
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->argc = argc;
+ctx->argv = argv;
+ctx->data_file_name = data_file_name;
+ctx->nel = nel;
+ctx->nelr = nelr;
+ctx->areas = areas;
+ctx->elements_surrounding_elements = elements_surrounding_elements;
+ctx->normals = normals;
+ctx->variables = variables;
+ctx->old_variables = old_variables;
+ctx->fluxes = fluxes;
+ctx->step_factors = step_factors;
+hclib_launch(main_entrypoint, ctx);
+free(ctx);
 
-		// for the first iteration we compute the time step
-		compute_step_factor(nelr, variables, areas, step_factors);
-
-		for(int j = 0; j < RK; j++)
-		{
-			compute_flux(nelr, elements_surrounding_elements, normals, variables, fluxes);
-			time_step(j, nelr, old_variables, variables, step_factors, fluxes);
-		}
-	}
 
 	std::cout << "Saving solution..." << std::endl;
 	dump(variables, nel, nelr);
@@ -459,4 +667,4 @@ int main(int argc, char** argv)
 	std::cout << "Done..." << std::endl;
 
 	return 0;
-}
+} 
