@@ -783,7 +783,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
         if (accumulatedStructDefs.length() > 0 ||
                 accumulatedKernelDefs.length() > 0) {
-            std::cerr << "Function " << func->getNameAsString() << " " << clang::isa<clang::CXXMethodDecl>(func) << std::endl;
 
             bool failed = rewriter->InsertText(func->getLocStart(),
                     accumulatedStructDefs + accumulatedKernelDecls, true, true);
