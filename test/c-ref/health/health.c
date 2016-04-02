@@ -515,7 +515,7 @@ void sim_village_par(struct Village *village)
 pragma508 *ctx = (pragma508 *)malloc(sizeof(pragma508));
 ctx->village = village;
 ctx->vlist = vlist;
-hclib_async(pragma508_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma508_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
       vlist = vlist->next;
    }
@@ -672,7 +672,7 @@ hclib_start_finish(); {
 pragma645 *ctx = (pragma645 *)malloc(sizeof(pragma645));
 ctx->top = top;
 ctx->i = i;
-hclib_async(pragma645_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma645_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
     } ; }

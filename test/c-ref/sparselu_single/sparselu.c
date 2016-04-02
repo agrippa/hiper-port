@@ -266,7 +266,7 @@ ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
-hclib_async(pragma252_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma252_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
 
            } ; hclib_end_finish(); 
@@ -306,7 +306,7 @@ ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
-hclib_async(pragma235_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma235_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
                    for (ii=kk+1; ii<bots_arg_size; ii++) 
@@ -318,7 +318,7 @@ ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
-hclib_async(pragma243_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma243_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
 
@@ -335,7 +335,7 @@ ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
-hclib_async(pragma256_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma256_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                                }
 

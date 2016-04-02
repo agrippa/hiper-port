@@ -372,7 +372,7 @@ final(level >= bots_cutoff_value) mergeable
           if ( omp_in_final() && level > bots_cutoff_value ) {
             cells = CELLS;
           } else {
-            cells = alloca(sizeof(struct cell)*(N+1));
+            cells = (struct cell *)alloca(sizeof(struct cell)*(N+1));
 	    memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
           }
 
@@ -451,7 +451,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,bots_verbose_mo
 {
 	  struct cell *cells;
           
-          cells = alloca(sizeof(struct cell)*(N+1));
+          cells = (struct cell *)alloca(sizeof(struct cell)*(N+1));
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 
 /* extent of shape */
@@ -512,7 +512,7 @@ return nnc+nnl;
 
 #else
 
-static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int dummy_level) {
   int  i, j, nn, area, nnc,nnl;
 
   ibrd board;
@@ -570,7 +570,7 @@ shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbos
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
  	    #pragma omp atomic
- 	      nnc += add_cell(cells[id].next, footprint, board,cells);
+ 	      nnc += add_cell(cells[id].next, footprint, board,cells, 0);
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -625,7 +625,7 @@ void compute_floorplan (void)
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
             bots_number_of_tasks = add_cell(1, footprint, board, gcells,0);
 #else
-            bots_number_of_tasks = add_cell(1, footprint, board, gcells);
+            bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
 #endif
         }
         bots_message(" completed!\n");

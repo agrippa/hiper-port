@@ -93,7 +93,7 @@ ctx->k = k;
 ctx->s = s;
 ctx->c = c;
 ctx->ab = ab;
-hclib_async(pragma59_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma59_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma61 *ctx = (pragma61 *)malloc(sizeof(pragma61));
@@ -106,7 +106,7 @@ ctx->k = k;
 ctx->s = s;
 ctx->c = c;
 ctx->ab = ab;
-hclib_async(pragma61_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma61_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -220,7 +220,7 @@ void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
      int i, j;
      int r4 = r & (~0x3);
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
 
      if (b - a < 16) {
@@ -257,7 +257,7 @@ ctx->r4 = r4;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma136_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma136_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma138 *ctx = (pragma138 *)malloc(sizeof(pragma138));
@@ -273,7 +273,7 @@ ctx->r4 = r4;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma138_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma138_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -318,7 +318,7 @@ void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
      int i, j;
      int r4 = r & (~0x3);
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
 
      if (b - a < 16) {
@@ -429,7 +429,7 @@ ctx->nW = nW;
 ctx->nWdn = nWdn;
 ctx->r = r;
 ctx->m = m;
-hclib_async(pragma206_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma206_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else {
 	  int i2 = (i + i1) / 2;
@@ -445,7 +445,7 @@ ctx->nWdn = nWdn;
 ctx->r = r;
 ctx->m = m;
 ctx->i2 = i2;
-hclib_async(pragma211_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma211_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma214 *ctx = (pragma214 *)malloc(sizeof(pragma214));
@@ -459,7 +459,7 @@ ctx->nWdn = nWdn;
 ctx->r = r;
 ctx->m = m;
 ctx->i2 = i2;
-hclib_async(pragma214_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma214_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      }
  hclib_end_finish(); hclib_start_finish(); ;
@@ -631,7 +631,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma276_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma276_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma278 *ctx = (pragma278 *)malloc(sizeof(pragma278));
@@ -652,7 +652,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma278_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma278_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -764,7 +764,7 @@ static void pragma332_hclib_async(void *____arg);
 void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 2;
@@ -787,7 +787,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma330_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma330_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma332 *ctx = (pragma332 *)malloc(sizeof(pragma332));
@@ -800,7 +800,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma332_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma332_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -838,7 +838,7 @@ fft_unshuffle_2(ab, b, in, out, m) ;     ; hclib_end_finish();
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 2;
@@ -1016,7 +1016,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma457_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma457_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma459 *ctx = (pragma459 *)malloc(sizeof(pragma459));
@@ -1037,7 +1037,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma459_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma459_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -1183,7 +1183,7 @@ static void pragma551_hclib_async(void *____arg);
 void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 4;
@@ -1210,7 +1210,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma549_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma549_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma551 *ctx = (pragma551 *)malloc(sizeof(pragma551));
@@ -1223,7 +1223,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma551_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma551_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -1261,7 +1261,7 @@ fft_unshuffle_4(ab, b, in, out, m) ;     ; hclib_end_finish();
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 4;
@@ -1598,7 +1598,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma835_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma835_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma837 *ctx = (pragma837 *)malloc(sizeof(pragma837));
@@ -1619,7 +1619,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma837_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma837_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -1849,7 +1849,7 @@ static void pragma1021_hclib_async(void *____arg);
 void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 8;
@@ -1884,7 +1884,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma1019_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1019_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma1021 *ctx = (pragma1021 *)malloc(sizeof(pragma1021));
@@ -1897,7 +1897,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma1021_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1021_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -1935,7 +1935,7 @@ fft_unshuffle_8(ab, b, in, out, m) ;     ; hclib_end_finish();
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 8;
@@ -2648,7 +2648,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma1681_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1681_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma1683 *ctx = (pragma1683 *)malloc(sizeof(pragma1683));
@@ -2669,7 +2669,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma1683_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1683_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -3099,7 +3099,7 @@ static void pragma2083_hclib_async(void *____arg);
 void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 16;
@@ -3150,7 +3150,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma2081_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma2081_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma2083 *ctx = (pragma2083 *)malloc(sizeof(pragma2083));
@@ -3163,7 +3163,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma2083_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma2083_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -3201,7 +3201,7 @@ fft_unshuffle_16(ab, b, in, out, m) ;     ; hclib_end_finish();
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 16;
@@ -4794,7 +4794,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma3623_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma3623_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma3625 *ctx = (pragma3625 *)malloc(sizeof(pragma3625));
@@ -4815,7 +4815,7 @@ ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
 ctx->ab = ab;
-hclib_async(pragma3625_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma3625_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -5709,7 +5709,7 @@ static void pragma4521_hclib_async(void *____arg);
 void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 32;
@@ -5792,7 +5792,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma4519_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4519_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma4521 *ctx = (pragma4521 *)malloc(sizeof(pragma4521));
@@ -5805,7 +5805,7 @@ ctx->i = i;
 ctx->ip = ip;
 ctx->jp = jp;
 ctx->ab = ab;
-hclib_async(pragma4521_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4521_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
@@ -5843,7 +5843,7 @@ fft_unshuffle_32(ab, b, in, out, m) ;     ; hclib_end_finish();
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 32;
@@ -6142,7 +6142,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4661_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4661_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 16) {
  { 
@@ -6156,7 +6156,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4664_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4664_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 8) {
  { 
@@ -6170,7 +6170,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4667_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4667_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 4) {
  { 
@@ -6184,7 +6184,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4670_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4670_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 2) {
  { 
@@ -6198,7 +6198,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4673_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4673_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else
 	       unshuffle(0, m, in, out, r, m);
@@ -6217,7 +6217,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4681_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4681_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  }
  hclib_end_finish(); hclib_start_finish(); ;
@@ -6238,7 +6238,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4691_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4691_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 4) {
  { 
@@ -6252,7 +6252,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4694_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4694_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 8) {
  { 
@@ -6266,7 +6266,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4697_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4697_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 16) {
  { 
@@ -6280,7 +6280,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4700_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4700_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 32) {
  { 
@@ -6294,7 +6294,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4703_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4703_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else {
  { 
@@ -6308,7 +6308,7 @@ ctx->nW = nW;
 ctx->r = r;
 ctx->m = m;
 ctx->k = k;
-hclib_async(pragma4706_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4706_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      }
 
@@ -6620,7 +6620,7 @@ ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
-hclib_async(pragma4798_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4798_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          } ; hclib_end_finish(); 
      bots_message(" completed!\n");
@@ -6647,7 +6647,7 @@ ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
-hclib_async(pragma4821_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma4821_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          } ; hclib_end_finish(); 
 

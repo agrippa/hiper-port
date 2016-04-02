@@ -369,7 +369,7 @@ hclib_pragma_marker("omp", "task untied private(footprint,area) firstprivate(NWS
           if ( omp_in_final() && level > bots_cutoff_value ) {
             cells = CELLS;
           } else {
-            cells = alloca(sizeof(struct cell)*(N+1));
+            cells = (struct cell *)alloca(sizeof(struct cell)*(N+1));
 	    memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
           }
 
@@ -446,7 +446,7 @@ hclib_pragma_marker("omp", "task untied private(board, footprint,area) firstpriv
 {
 	  struct cell *cells;
           
-          cells = alloca(sizeof(struct cell)*(N+1));
+          cells = (struct cell *)alloca(sizeof(struct cell)*(N+1));
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
 
 /* extent of shape */
@@ -512,6 +512,7 @@ typedef struct _pragma525 {
     int *FOOTPRINT;
     char *BOARD;
     struct cell *CELLS;
+    int dummy_level;
     int i;
     int j;
     int nn;
@@ -524,7 +525,7 @@ typedef struct _pragma525 {
  } pragma525;
 
 static void pragma525_hclib_async(void *____arg);
-static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int dummy_level) {
   int  i, j, nn, area, nnc,nnl;
 
   ibrd board;
@@ -545,6 +546,7 @@ ctx->id = id;
 ctx->FOOTPRINT = FOOTPRINT;
 ctx->BOARD = BOARD;
 ctx->CELLS = CELLS;
+ctx->dummy_level = dummy_level;
 ctx->i = i;
 ctx->j = j;
 ctx->nn = nn;
@@ -554,7 +556,7 @@ ctx->nnl = nnl;
 memcpy(ctx->board, board, 4096 * (sizeof(char))); 
 memcpy(ctx->footprint, footprint, 2 * (sizeof(int))); 
 memcpy(ctx->NWS, NWS, 64 * (2 * (sizeof(int)))); 
-hclib_async(pragma525_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma525_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
       }
 }
@@ -566,6 +568,7 @@ return nnc+nnl;
     int *FOOTPRINT; FOOTPRINT = ctx->FOOTPRINT;
     char *BOARD; BOARD = ctx->BOARD;
     struct cell *CELLS; CELLS = ctx->CELLS;
+    int dummy_level; dummy_level = ctx->dummy_level;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nn; nn = ctx->nn;
@@ -614,7 +617,7 @@ return nnc+nnl;
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
- { const int ____lock_1_err = pthread_mutex_lock(&critical_1_lock); assert(____lock_1_err == 0); nnc += add_cell(cells[id].next, footprint, board,cells); const int ____unlock_1_err = pthread_mutex_unlock(&critical_1_lock); assert(____unlock_1_err); } ;
+ { const int ____lock_1_err = pthread_mutex_lock(&critical_1_lock); assert(____lock_1_err == 0); nnc += add_cell(cells[id].next, footprint, board,cells, 0); const int ____unlock_1_err = pthread_mutex_unlock(&critical_1_lock); assert(____unlock_1_err); } ;
 /* if area is greater than or equal to best area, prune search */
           } else {
 
@@ -663,7 +666,7 @@ static void main_entrypoint(void *____arg) {
         footprint[0] = 0;
         footprint[1] = 0;
         bots_message("Computing floorplan ");
-hclib_start_finish(); bots_number_of_tasks = add_cell(1, footprint, board, gcells) ; hclib_end_finish(); 
+hclib_start_finish(); bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0) ; hclib_end_finish(); 
         bots_message(" completed!\n");
     } ; }
 

@@ -119,14 +119,14 @@ pragma103 *ctx = (pragma103 *)malloc(sizeof(pragma103));
 ctx->n = n;
 ctx->x = x;
 ctx->y = y;
-hclib_async(pragma103_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma103_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma105 *ctx = (pragma105 *)malloc(sizeof(pragma105));
 ctx->n = n;
 ctx->x = x;
 ctx->y = y;
-hclib_async(pragma105_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma105_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;

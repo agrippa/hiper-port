@@ -591,7 +591,7 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_async(pragma462_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma462_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  }  // end task
         } // end if (n == 0 || m == 0)
      } // for (j)

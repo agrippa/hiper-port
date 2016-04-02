@@ -170,7 +170,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(pragma145_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma145_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -187,7 +187,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         } ; hclib_end_finish(); 

@@ -424,7 +424,7 @@ void OptimizedStrassenMultiply_seq(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -623,7 +623,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -833,7 +833,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -1372,7 +1372,7 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   C22 = C21 + QuadrantSize;
 
   /* Allocate Heap Space Here */
-  StartHeap = Heap = malloc(QuadrantSizeInBytes * NumberOfVariables);
+  StartHeap = Heap = (char *)malloc(QuadrantSizeInBytes * NumberOfVariables);
   /* ensure that heap is on cache boundary */
   if ( ((PTR) Heap) & 31)
      Heap = (char*) ( ((PTR) Heap) + 32 - ( ((PTR) Heap) & 31) );
@@ -1478,7 +1478,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1131_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1131_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* M5 = S1 * S5 */
@@ -1524,7 +1524,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1135_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1135_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of T1 = S2 x S6 + M2 */
@@ -1570,7 +1570,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1139_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1139_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of T2 = T1 + S3 x S7 */
@@ -1616,7 +1616,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1143_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1143_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of C11 = M2 + A12 * B21 */
@@ -1662,7 +1662,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1147_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1147_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
   
   /* Step 1 of C12 = S4 x B22 + T1 + M5 */
@@ -1708,7 +1708,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1151_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1151_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of C21 = T2 - A22 * S8 */
@@ -1754,7 +1754,7 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
-hclib_async(pragma1155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1155_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /**********************************************
@@ -2186,7 +2186,7 @@ int compare_matrix(int n, REAL *A, int an, REAL *B, int bn)
  */
 REAL *alloc_matrix(int n) 
 {
-     return malloc(n * n * sizeof(REAL));
+     return (REAL *)malloc(n * n * sizeof(REAL));
 }
 
 typedef struct _pragma1277 {
@@ -2218,7 +2218,7 @@ ctx->A = A;
 ctx->B = B;
 ctx->C = C;
 ctx->n = n;
-hclib_async(pragma1277_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma1277_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
             } ; hclib_end_finish(); 
 	bots_message(" completed!\n");

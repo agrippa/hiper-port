@@ -669,8 +669,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         contextCreation << "} else {\n";
                     }
                     contextCreation << "hclib_async(" << node->getLbl() <<
-                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
-                        "ANY_PLACE);\n";
+                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, ANY_PLACE);\n";
                     if (clauses->hasClause("if")) {
                         contextCreation << "}\n";
                     }

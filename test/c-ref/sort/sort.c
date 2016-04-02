@@ -380,7 +380,7 @@ ctx->lowdest = lowdest;
 ctx->split1 = split1;
 ctx->split2 = split2;
 ctx->lowsize = lowsize;
-hclib_async(pragma349_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma349_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma351 *ctx = (pragma351 *)malloc(sizeof(pragma351));
@@ -392,7 +392,7 @@ ctx->lowdest = lowdest;
 ctx->split1 = split1;
 ctx->split2 = split2;
 ctx->lowsize = lowsize;
-hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
@@ -564,7 +564,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma385_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma385_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma387 *ctx = (pragma387 *)malloc(sizeof(pragma387));
@@ -580,7 +580,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma387_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma387_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma389 *ctx = (pragma389 *)malloc(sizeof(pragma389));
@@ -596,7 +596,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma389_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma389_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma391 *ctx = (pragma391 *)malloc(sizeof(pragma391));
@@ -612,7 +612,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma391_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma391_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
@@ -630,7 +630,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma395_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma395_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma397 *ctx = (pragma397 *)malloc(sizeof(pragma397));
@@ -646,7 +646,7 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma397_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma397_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
@@ -838,7 +838,7 @@ static void main_entrypoint(void *____arg) {
 hclib_start_finish(); {
  { 
 pragma477 *ctx = (pragma477 *)malloc(sizeof(pragma477));
-hclib_async(pragma477_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma477_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
     } ; }

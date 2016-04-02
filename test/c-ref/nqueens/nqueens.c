@@ -152,7 +152,7 @@ void nqueens(int n, int j, char *a, int depth)
 
 #ifndef FORCE_TIED_TASKS
 	*solutions = 0;
-	csols = alloca(n*sizeof(int));
+	csols = (int *)alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
 
@@ -161,7 +161,7 @@ void nqueens(int n, int j, char *a, int depth)
 hclib_pragma_marker("omp", "task untied if(depth < bots_cutoff_value)");
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca(n * sizeof(char));
+	  		char * b = (char *)alloca(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
@@ -208,7 +208,7 @@ void nqueens(int n, int j, char *a, int depth)
         char final = omp_in_final();
         if ( !final ) {
 	  *solutions = 0;
-	  csols = alloca(n*sizeof(int));
+	  csols = (int *)alloca(n*sizeof(int));
 	  memset(csols,0,n*sizeof(int));
         }
 #endif
@@ -226,7 +226,7 @@ hclib_pragma_marker("omp", "task untied final(depth+1 >= bots_cutoff_value) merg
 #endif
                         } else {
 	  		/* allocate a temporary array and copy <a> into it */
-	  		   b = alloca(n * sizeof(char));
+	  		   b = (char *)alloca(n * sizeof(char));
 	  		   memcpy(b, a, j * sizeof(char));
 #ifndef FORCE_TIED_TASKS
                            sol = &csols[i];
@@ -277,7 +277,7 @@ void nqueens(int n, int j, char *a, int depth)
 
 #ifndef FORCE_TIED_TASKS
 	*solutions = 0;
-	csols = alloca(n*sizeof(int));
+	csols = (int *)alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
 
@@ -287,7 +287,7 @@ void nqueens(int n, int j, char *a, int depth)
 hclib_pragma_marker("omp", "task untied");
 			{
 	  			/* allocate a temporary array and copy <a> into it */
-	  			char * b = alloca(n * sizeof(char));
+	  			char * b = (char *)alloca(n * sizeof(char));
 	  			memcpy(b, a, j * sizeof(char));
 	  			b[j] = (char) i;
 	  			if (ok(j + 1, b))
@@ -353,7 +353,7 @@ void nqueens(int n, int j, char *a, int depth)
 
 #ifndef FORCE_TIED_TASKS
 	*solutions = 0;
-	csols = alloca(n*sizeof(int));
+	csols = (int *)alloca(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 #endif
 
@@ -368,7 +368,7 @@ ctx->solutions = solutions;
 ctx->depth = depth;
 ctx->csols = csols;
 ctx->i = i;
-hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
 	}
 
@@ -388,7 +388,7 @@ hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
     hclib_start_finish();
 {
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = alloca(n * sizeof(char));
+	  		char * b = (char *)alloca(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
@@ -418,7 +418,7 @@ static void main_entrypoint(void *____arg) {
 hclib_start_finish(); {
 			char *a;
 
-			a = alloca(size * sizeof(char));
+			a = (char *)alloca(size * sizeof(char));
 #ifndef FORCE_TIED_TASKS
 			nqueens(size, 0, a, &total_count,0);
 #else

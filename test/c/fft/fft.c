@@ -109,7 +109,7 @@ void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
      int i, j;
      int r4 = r & (~0x3);
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
 
      if (b - a < 16) {
@@ -143,7 +143,7 @@ void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
      int i, j;
      int r4 = r & (~0x3);
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
 
      if (b - a < 16) {
@@ -314,7 +314,7 @@ void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
 void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 2;
@@ -336,7 +336,7 @@ void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 2;
@@ -529,7 +529,7 @@ void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
 void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 4;
@@ -555,7 +555,7 @@ void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 4;
@@ -991,7 +991,7 @@ void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
 void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 8;
@@ -1025,7 +1025,7 @@ void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 8;
@@ -2037,7 +2037,7 @@ void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, 
 void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 16;
@@ -2087,7 +2087,7 @@ void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 16;
@@ -4443,7 +4443,7 @@ void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, 
 void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 32;
@@ -4525,7 +4525,7 @@ void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
-     const COMPLEX *ip;
+     COMPLEX *ip;
      COMPLEX *jp;
      if ((b - a) < 128) {
 	  ip = in + a * 32;

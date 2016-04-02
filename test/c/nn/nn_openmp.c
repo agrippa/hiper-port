@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	target_lat = atof(argv[3]);
 	target_long = atof(argv[4]);
 
-	neighbors = malloc(k*sizeof(struct neighbor));
+	neighbors = (struct neighbor *)malloc(k*sizeof(struct neighbor));
 
     if(neighbors == NULL) {
         fprintf(stderr, "no room for neighbors\n");

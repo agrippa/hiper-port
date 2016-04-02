@@ -192,7 +192,7 @@ hclib_start_finish(); {
 pragma187 *ctx = (pragma187 *)malloc(sizeof(pragma187));
 ctx->root = root;
 ctx->num_nodes = num_nodes;
-hclib_async(pragma187_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma187_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
            } ; hclib_end_finish(); 
    } ; }
@@ -269,7 +269,7 @@ ctx->i = i;
 ctx->j = j;
 ctx->subtreesize = subtreesize;
 ctx->partialCount = partialCount;
-hclib_async(pragma219_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma219_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
   }
 
