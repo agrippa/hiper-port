@@ -60,7 +60,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::vector<clang::ValueDecl *> *captured,
                 std::vector<OMPReductionVar> *reductions);
 
-        const clang::Stmt *getBodyFrom(const clang::CallExpr *call);
+        const clang::Stmt *getBodyFrom(const clang::CallExpr *call, std::string lbl);
         const clang::Stmt *getBodyForMarker(const clang::CallExpr *call);
         std::string getPragmaNameForMarker(const clang::CallExpr *call);
         std::string getPragmaArgumentsForMarker(const clang::CallExpr *call);
@@ -116,6 +116,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         int criticalSectionId;
 
         bool foundOmpToHclibLaunch = false;
+
+        std::vector<std::string> compatiblePthreadAPIs;
 };
 
 #endif

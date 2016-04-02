@@ -91,8 +91,9 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
             return getDeclarationTypeStr(constantArrayType->getElementType(),
                     name, soFarBefore, soFarAfter + "[" + sizeStr + "]");
         } else {
-            std::cerr << "Unsupported array size modifier " <<
-                arrayType->getSizeModifier() << std::endl;
+            std::cerr << "Unsupported array type " <<
+                std::string(type->getTypeClassName()) << " while building " <<
+                "declaration for " << name << std::endl;
             exit(1);
         }
     } else if (const clang::PointerType *pointerType =
@@ -139,13 +140,15 @@ std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
     assert(type);
 
     if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
+        std::string sizeStr;
         if (const clang::ConstantArrayType *constantArrayType = clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
-            std::string sizeStr = constantArrayType->getSize().toString(10, true);
-            return sizeStr + " * (" + getArraySizeExpr(constantArrayType->getElementType()) + ")";
+            sizeStr = constantArrayType->getSize().toString(10, true);
         } else {
-            std::cerr << "Unsupported array size modifier " << arrayType->getSizeModifier() << std::endl;
+            std::cerr << "Unsupported array type " <<
+                std::string(type->getTypeClassName()) << std::endl;
             exit(1);
         }
+        return sizeStr + " * (" + getArraySizeExpr(arrayType->getElementType()) + ")";
     } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
         return "sizeof(" + qualType.getAsString() + ")";
     } else if (const clang::DecayedType *decayedType = type->getAs<clang::DecayedType>()) {
@@ -848,7 +851,8 @@ std::string OMPToHClib::getPragmaArgumentsForMarker(const clang::CallExpr *call)
     return literal->getString().str();
 }
 
-const clang::Stmt *OMPToHClib::getBodyFrom(const clang::CallExpr *call) {
+const clang::Stmt *OMPToHClib::getBodyFrom(const clang::CallExpr *call,
+        std::string lbl) {
     const clang::Stmt *parent = getParent(call);
     const clang::Stmt *body = NULL;
 
@@ -867,7 +871,7 @@ const clang::Stmt *OMPToHClib::getBodyFrom(const clang::CallExpr *call) {
         }
     } else {
         std::cerr << "Unhandled parent while looking for body: " <<
-            parent->getStmtClassName() << std::endl;
+            parent->getStmtClassName() << " of " << lbl << std::endl;
         exit(1);
     }
 
@@ -895,13 +899,13 @@ const clang::Stmt *OMPToHClib::getBodyForMarker(const clang::CallExpr *call) {
         } else if (ompPragma == "task" || ompPragma == "critical" ||
                 ompPragma == "atomic" || ompPragma == "parallel" ||
                 ompPragma == "single" || ompPragma == "simd") {
-            return getBodyFrom(call);
+            return getBodyFrom(call, ompPragma);
         } else {
             std::cerr << "Unhandled OMP pragma \"" << ompPragma << "\"" << std::endl;
             exit(1);
         }
     } else if (pragmaName == "omp_to_hclib") {
-        return getBodyFrom(call);
+        return getBodyFrom(call, "omp_to_hclib");
     } else {
         std::cerr << "Unhandled pragma name \"" << pragmaName << "\"" <<
             std::endl;
@@ -990,7 +994,10 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                         calleeName << "\" on line " <<
                         presumedStart.getLine() << std::endl;
                     abort = true;
-                } else if (checkForPthread && calleeName.find("pthread_") == 0) {
+                } else if (checkForPthread && calleeName.find("pthread_") == 0 &&
+                        std::find(compatiblePthreadAPIs.begin(),
+                            compatiblePthreadAPIs.end(), calleeName) ==
+                        compatiblePthreadAPIs.end()) {
                     std::cerr << "Found pthread function call to \"" <<
                         calleeName << "\" on line " <<
                         presumedStart.getLine() << std::endl;
@@ -1060,6 +1067,10 @@ OMPToHClib::OMPToHClib(const char *checkForPthreadStr,
     }
 
     criticalSectionId = atoi(startCriticalSectionId);
+
+    compatiblePthreadAPIs.push_back("pthread_mutex_init");
+    compatiblePthreadAPIs.push_back("pthread_mutex_lock");
+    compatiblePthreadAPIs.push_back("pthread_mutex_unlock");
 }
 
 OMPToHClib::~OMPToHClib() {
