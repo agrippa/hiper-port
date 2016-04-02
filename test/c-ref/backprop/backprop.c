@@ -233,7 +233,7 @@ int n_in, n_hidden, n_out;
 }
 
 
-typedef struct _pragma245 {
+typedef struct _pragma246 {
     float *l1;
     float *l2;
     float **conn;
@@ -243,9 +243,9 @@ typedef struct _pragma245 {
     int j;
     int k;
     pthread_mutex_t reduction_mutex;
- } pragma245;
+ } pragma246;
 
-static void pragma245_hclib_async(void *____arg, const int ___iter0);
+static void pragma246_hclib_async(void *____arg, const int ___iter0);
 void bpnn_layerforward(l1, l2, conn, n1, n2)
 float *l1, *l2, **conn;
 int n1, n2;
@@ -256,7 +256,7 @@ int n1, n2;
   /*** Set up thresholding unit ***/
   l1[0] = 1.0;
  { 
-pragma245 *ctx = (pragma245 *)malloc(sizeof(pragma245));
+pragma246 *ctx = (pragma246 *)malloc(sizeof(pragma246));
 ctx->l1 = l1;
 ctx->l2 = l2;
 ctx->conn = conn;
@@ -273,13 +273,13 @@ domain[0].low = 1;
 domain[0].high = (n2) + 1;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma245_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma246_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 sum = ctx->sum;
  } 
-} static void pragma245_hclib_async(void *____arg, const int ___iter0) {
-    pragma245 *ctx = (pragma245 *)____arg;
+} static void pragma246_hclib_async(void *____arg, const int ___iter0) {
+    pragma246 *ctx = (pragma246 *)____arg;
     float *l1; l1 = ctx->l1;
     float *l2; l2 = ctx->l2;
     float **conn; conn = ctx->conn;
@@ -355,7 +355,7 @@ int nh, no;
 }
 
 
-typedef struct _pragma312 {
+typedef struct _pragma313 {
     float *delta;
     int ndelta;
     float *ly;
@@ -365,9 +365,9 @@ typedef struct _pragma312 {
     float new_dw;
     int k;
     int j;
- } pragma312;
+ } pragma313;
 
-static void pragma312_hclib_async(void *____arg, const int ___iter0);
+static void pragma313_hclib_async(void *____arg, const int ___iter0);
 void bpnn_adjust_weights(delta, ndelta, ly, nly, w, oldw)
 float *delta, *ly, **w, **oldw;
 {
@@ -378,7 +378,7 @@ float *delta, *ly, **w, **oldw;
   //momentum = 0.3;
 
  { 
-pragma312 *ctx = (pragma312 *)malloc(sizeof(pragma312));
+pragma313 *ctx = (pragma313 *)malloc(sizeof(pragma313));
 ctx->delta = delta;
 ctx->ndelta = ndelta;
 ctx->ly = ly;
@@ -393,12 +393,12 @@ domain[0].low = 1;
 domain[0].high = (ndelta) + 1;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma312_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma313_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma312_hclib_async(void *____arg, const int ___iter0) {
-    pragma312 *ctx = (pragma312 *)____arg;
+} static void pragma313_hclib_async(void *____arg, const int ___iter0) {
+    pragma313 *ctx = (pragma313 *)____arg;
     float *delta; delta = ctx->delta;
     int ndelta; ndelta = ctx->ndelta;
     float *ly; ly = ctx->ly;

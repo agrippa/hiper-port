@@ -492,12 +492,12 @@ hclib_pragma_marker("omp", "taskwait");
    check_patients_population(village);
 }
 #else
-typedef struct _pragma508 {
+typedef struct _pragma509 {
     struct Village *village;
     struct Village *vlist;
- } pragma508;
+ } pragma509;
 
-static void pragma508_hclib_async(void *____arg);
+static void pragma509_hclib_async(void *____arg);
 void sim_village_par(struct Village *village)
 {
    struct Village *vlist;
@@ -512,10 +512,10 @@ void sim_village_par(struct Village *village)
    while(vlist)
    {
  { 
-pragma508 *ctx = (pragma508 *)malloc(sizeof(pragma508));
+pragma509 *ctx = (pragma509 *)malloc(sizeof(pragma509));
 ctx->village = village;
 ctx->vlist = vlist;
-hclib_async(pragma508_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma509_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
       vlist = vlist->next;
    }
@@ -536,8 +536,8 @@ hclib_async(pragma508_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 
    /* Uses list v->population, v->hosp->asses and v->h->waiting */
    check_patients_population(village);
-} static void pragma508_hclib_async(void *____arg) {
-    pragma508 *ctx = (pragma508 *)____arg;
+} static void pragma509_hclib_async(void *____arg) {
+    pragma509 *ctx = (pragma509 *)____arg;
     struct Village *village; village = ctx->village;
     struct Village *vlist; vlist = ctx->vlist;
     hclib_start_finish();
@@ -651,12 +651,12 @@ int check_village(struct Village *top)
    return answer;
 }
 /**********************************************************************/
-typedef struct _pragma645 {
+typedef struct _pragma646 {
     struct Village *top;
     long i;
- } pragma645;
+ } pragma646;
 
-static void pragma645_hclib_async(void *____arg);
+static void pragma646_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
     struct Village *top;
     long i;
@@ -669,10 +669,10 @@ static void main_entrypoint(void *____arg) {
 {
 hclib_start_finish(); {
  { 
-pragma645 *ctx = (pragma645 *)malloc(sizeof(pragma645));
+pragma646 *ctx = (pragma646 *)malloc(sizeof(pragma646));
 ctx->top = top;
 ctx->i = i;
-hclib_async(pragma645_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma646_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
     } ; }
@@ -686,8 +686,8 @@ ctx->i = i;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma645_hclib_async(void *____arg) {
-    pragma645 *ctx = (pragma645 *)____arg;
+}  static void pragma646_hclib_async(void *____arg) {
+    pragma646 *ctx = (pragma646 *)____arg;
     struct Village *top; top = ctx->top;
     long i; i = ctx->i;
     hclib_start_finish();

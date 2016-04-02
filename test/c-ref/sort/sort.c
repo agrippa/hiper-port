@@ -294,7 +294,7 @@ ELM *binsplit(ELM val, ELM *low, ELM *high)
 }
 
 
-typedef struct _pragma349 {
+typedef struct _pragma350 {
     ELM *low1;
     ELM *high1;
     ELM *low2;
@@ -303,9 +303,9 @@ typedef struct _pragma349 {
     ELM *split1;
     ELM *split2;
     long lowsize;
- } pragma349;
+ } pragma350;
 
-typedef struct _pragma351 {
+typedef struct _pragma352 {
     ELM *low1;
     ELM *high1;
     ELM *low2;
@@ -314,10 +314,10 @@ typedef struct _pragma351 {
     ELM *split1;
     ELM *split2;
     long lowsize;
- } pragma351;
+ } pragma352;
 
-static void pragma349_hclib_async(void *____arg);
-static void pragma351_hclib_async(void *____arg);
+static void pragma350_hclib_async(void *____arg);
+static void pragma352_hclib_async(void *____arg);
 void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 {
      /*
@@ -371,7 +371,7 @@ void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
       */
      *(lowdest + lowsize + 1) = *split1;
  { 
-pragma349 *ctx = (pragma349 *)malloc(sizeof(pragma349));
+pragma350 *ctx = (pragma350 *)malloc(sizeof(pragma350));
 ctx->low1 = low1;
 ctx->high1 = high1;
 ctx->low2 = low2;
@@ -380,10 +380,10 @@ ctx->lowdest = lowdest;
 ctx->split1 = split1;
 ctx->split2 = split2;
 ctx->lowsize = lowsize;
-hclib_async(pragma349_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma350_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma351 *ctx = (pragma351 *)malloc(sizeof(pragma351));
+pragma352 *ctx = (pragma352 *)malloc(sizeof(pragma352));
 ctx->low1 = low1;
 ctx->high1 = high1;
 ctx->low2 = low2;
@@ -392,13 +392,13 @@ ctx->lowdest = lowdest;
 ctx->split1 = split1;
 ctx->split2 = split2;
 ctx->lowsize = lowsize;
-hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma352_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
      return;
-} static void pragma349_hclib_async(void *____arg) {
-    pragma349 *ctx = (pragma349 *)____arg;
+} static void pragma350_hclib_async(void *____arg) {
+    pragma350 *ctx = (pragma350 *)____arg;
     ELM *low1; low1 = ctx->low1;
     ELM *high1; high1 = ctx->high1;
     ELM *low2; low2 = ctx->low2;
@@ -411,8 +411,8 @@ hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 cilkmerge_par(low1, split1 - 1, low2, split2, lowdest) ;     ; hclib_end_finish();
 }
 
-static void pragma351_hclib_async(void *____arg) {
-    pragma351 *ctx = (pragma351 *)____arg;
+static void pragma352_hclib_async(void *____arg) {
+    pragma352 *ctx = (pragma352 *)____arg;
     ELM *low1; low1 = ctx->low1;
     ELM *high1; high1 = ctx->high1;
     ELM *low2; low2 = ctx->low2;
@@ -428,7 +428,7 @@ cilkmerge_par(split1 + 1, high1, split2 + 1, high2,
 
 
 
-typedef struct _pragma385 {
+typedef struct _pragma386 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -441,9 +441,9 @@ typedef struct _pragma385 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma385;
+ } pragma386;
 
-typedef struct _pragma387 {
+typedef struct _pragma388 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -456,9 +456,9 @@ typedef struct _pragma387 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma387;
+ } pragma388;
 
-typedef struct _pragma389 {
+typedef struct _pragma390 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -471,9 +471,9 @@ typedef struct _pragma389 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma389;
+ } pragma390;
 
-typedef struct _pragma391 {
+typedef struct _pragma392 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -486,9 +486,9 @@ typedef struct _pragma391 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma391;
+ } pragma392;
 
-typedef struct _pragma395 {
+typedef struct _pragma396 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -501,9 +501,9 @@ typedef struct _pragma395 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma395;
+ } pragma396;
 
-typedef struct _pragma397 {
+typedef struct _pragma398 {
     ELM *low;
     ELM *tmp;
     long size;
@@ -516,14 +516,14 @@ typedef struct _pragma397 {
     ELM *tmpB;
     ELM *tmpC;
     ELM *tmpD;
- } pragma397;
+ } pragma398;
 
-static void pragma385_hclib_async(void *____arg);
-static void pragma387_hclib_async(void *____arg);
-static void pragma389_hclib_async(void *____arg);
-static void pragma391_hclib_async(void *____arg);
-static void pragma395_hclib_async(void *____arg);
-static void pragma397_hclib_async(void *____arg);
+static void pragma386_hclib_async(void *____arg);
+static void pragma388_hclib_async(void *____arg);
+static void pragma390_hclib_async(void *____arg);
+static void pragma392_hclib_async(void *____arg);
+static void pragma396_hclib_async(void *____arg);
+static void pragma398_hclib_async(void *____arg);
 void cilksort_par(ELM *low, ELM *tmp, long size)
 {
      /*
@@ -551,7 +551,7 @@ void cilksort_par(ELM *low, ELM *tmp, long size)
      tmpD = tmpC + quarter;
 
  { 
-pragma385 *ctx = (pragma385 *)malloc(sizeof(pragma385));
+pragma386 *ctx = (pragma386 *)malloc(sizeof(pragma386));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -564,10 +564,10 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma385_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma386_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma387 *ctx = (pragma387 *)malloc(sizeof(pragma387));
+pragma388 *ctx = (pragma388 *)malloc(sizeof(pragma388));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -580,10 +580,10 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma387_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma388_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma389 *ctx = (pragma389 *)malloc(sizeof(pragma389));
+pragma390 *ctx = (pragma390 *)malloc(sizeof(pragma390));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -596,10 +596,10 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma389_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma390_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma391 *ctx = (pragma391 *)malloc(sizeof(pragma391));
+pragma392 *ctx = (pragma392 *)malloc(sizeof(pragma392));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -612,12 +612,12 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma391_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma392_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
  { 
-pragma395 *ctx = (pragma395 *)malloc(sizeof(pragma395));
+pragma396 *ctx = (pragma396 *)malloc(sizeof(pragma396));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -630,10 +630,10 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma395_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma396_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma397 *ctx = (pragma397 *)malloc(sizeof(pragma397));
+pragma398 *ctx = (pragma398 *)malloc(sizeof(pragma398));
 ctx->low = low;
 ctx->tmp = tmp;
 ctx->size = size;
@@ -646,13 +646,13 @@ ctx->tmpA = tmpA;
 ctx->tmpB = tmpB;
 ctx->tmpC = tmpC;
 ctx->tmpD = tmpD;
-hclib_async(pragma397_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma398_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
 
      cilkmerge_par(tmpA, tmpC - 1, tmpC, tmpA + size - 1, A);
-} static void pragma385_hclib_async(void *____arg) {
-    pragma385 *ctx = (pragma385 *)____arg;
+} static void pragma386_hclib_async(void *____arg) {
+    pragma386 *ctx = (pragma386 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -669,8 +669,8 @@ hclib_async(pragma397_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 cilksort_par(A, tmpA, quarter) ;     ; hclib_end_finish();
 }
 
-static void pragma387_hclib_async(void *____arg) {
-    pragma387 *ctx = (pragma387 *)____arg;
+static void pragma388_hclib_async(void *____arg) {
+    pragma388 *ctx = (pragma388 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -687,8 +687,8 @@ static void pragma387_hclib_async(void *____arg) {
 cilksort_par(B, tmpB, quarter) ;     ; hclib_end_finish();
 }
 
-static void pragma389_hclib_async(void *____arg) {
-    pragma389 *ctx = (pragma389 *)____arg;
+static void pragma390_hclib_async(void *____arg) {
+    pragma390 *ctx = (pragma390 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -705,8 +705,8 @@ static void pragma389_hclib_async(void *____arg) {
 cilksort_par(C, tmpC, quarter) ;     ; hclib_end_finish();
 }
 
-static void pragma391_hclib_async(void *____arg) {
-    pragma391 *ctx = (pragma391 *)____arg;
+static void pragma392_hclib_async(void *____arg) {
+    pragma392 *ctx = (pragma392 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -723,8 +723,8 @@ static void pragma391_hclib_async(void *____arg) {
 cilksort_par(D, tmpD, size - 3 * quarter) ;     ; hclib_end_finish();
 }
 
-static void pragma395_hclib_async(void *____arg) {
-    pragma395 *ctx = (pragma395 *)____arg;
+static void pragma396_hclib_async(void *____arg) {
+    pragma396 *ctx = (pragma396 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -741,8 +741,8 @@ static void pragma395_hclib_async(void *____arg) {
 cilkmerge_par(A, A + quarter - 1, B, B + quarter - 1, tmpA) ;     ; hclib_end_finish();
 }
 
-static void pragma397_hclib_async(void *____arg) {
-    pragma397 *ctx = (pragma397 *)____arg;
+static void pragma398_hclib_async(void *____arg) {
+    pragma398 *ctx = (pragma398 *)____arg;
     ELM *low; low = ctx->low;
     ELM *tmp; tmp = ctx->tmp;
     long size; size = ctx->size;
@@ -825,10 +825,10 @@ void sort_init ( void )
      scramble_array(array);
 }
 
-typedef struct _pragma477 {
- } pragma477;
+typedef struct _pragma478 {
+ } pragma478;
 
-static void pragma477_hclib_async(void *____arg);
+static void pragma478_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
@@ -837,8 +837,8 @@ static void main_entrypoint(void *____arg) {
 {
 hclib_start_finish(); {
  { 
-pragma477 *ctx = (pragma477 *)malloc(sizeof(pragma477));
-hclib_async(pragma477_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma478 *ctx = (pragma478 *)malloc(sizeof(pragma478));
+hclib_async(pragma478_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
     } ; }
@@ -851,8 +851,8 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
 	bots_message(" completed!\n");
-}  static void pragma477_hclib_async(void *____arg) {
-    pragma477 *ctx = (pragma477 *)____arg;
+}  static void pragma478_hclib_async(void *____arg) {
+    pragma478 *ctx = (pragma478 *)____arg;
     hclib_start_finish();
 {
                     cilksort_par(array, tmp, bots_arg_size);

@@ -114,7 +114,7 @@ float euclid_dist_2(float *pt1,
 
 
 /*----< kmeans_clustering() >---------------------------------------------*/
-typedef struct _pragma185 {
+typedef struct _pragma186 {
     float **feature;
     int nfeatures;
     int npoints;
@@ -136,9 +136,9 @@ typedef struct _pragma185 {
     int **partial_new_centers_len;
     float ***partial_new_centers;
     pthread_mutex_t reduction_mutex;
- } pragma185;
+ } pragma186;
 
-static void pragma185_hclib_async(void *____arg, const int ___iter0);
+static void pragma186_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     float **feature;
     int nfeatures;
@@ -188,7 +188,7 @@ do {
         delta = 0.0;
         {
  { 
-pragma185 *ctx = (pragma185 *)malloc(sizeof(pragma185));
+pragma186 *ctx = (pragma186 *)malloc(sizeof(pragma186));
 ctx->feature = feature;
 ctx->nfeatures = nfeatures;
 ctx->npoints = npoints;
@@ -217,7 +217,7 @@ domain[0].low = 0;
 domain[0].high = npoints;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma185_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma186_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 delta = ctx->delta;
@@ -343,8 +343,8 @@ free(ctx);
     free(new_centers_len);
 
     return clusters;
-}  static void pragma185_hclib_async(void *____arg, const int ___iter0) {
-    pragma185 *ctx = (pragma185 *)____arg;
+}  static void pragma186_hclib_async(void *____arg, const int ___iter0) {
+    pragma186 *ctx = (pragma186 *)____arg;
     float **feature; feature = ctx->feature;
     int nfeatures; nfeatures = ctx->nfeatures;
     int npoints; npoints = ctx->npoints;

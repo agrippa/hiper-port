@@ -13,6 +13,10 @@ line = sys.stdin.readline()
 assert line.strip() == '#include "hclib.h"'
 sys.stdout.write(line)
 
+line = sys.stdin.readline()
+assert line.strip() == 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);'
+sys.stdout.write(line)
+
 index = start
 while index < stop:
     sys.stdout.write('pthread_mutex_t critical_' + str(index) +

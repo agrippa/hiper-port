@@ -48,7 +48,7 @@ int num_omp_threads;
  * advances the solution of the discretized difference equations 
  * by one time step
  */
-typedef struct _pragma63 {
+typedef struct _pragma64 {
     FLOAT *result;
     FLOAT *temp;
     FLOAT *power;
@@ -66,9 +66,9 @@ typedef struct _pragma63 {
     int num_chunk;
     int chunks_in_row;
     int chunks_in_col;
- } pragma63;
+ } pragma64;
 
-static void pragma63_hclib_async(void *____arg, const int ___iter0);
+static void pragma64_hclib_async(void *____arg, const int ___iter0);
 void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
 					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
 					  FLOAT step)
@@ -82,7 +82,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
 
 	// omp_set_num_threads(num_omp_threads);
  { 
-pragma63 *ctx = (pragma63 *)malloc(sizeof(pragma63));
+pragma64 *ctx = (pragma64 *)malloc(sizeof(pragma64));
 ctx->result = result;
 ctx->temp = temp;
 ctx->power = power;
@@ -105,12 +105,12 @@ domain[0].low = 0;
 domain[0].high = num_chunk;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma63_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma64_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma63_hclib_async(void *____arg, const int ___iter0) {
-    pragma63 *ctx = (pragma63 *)____arg;
+} static void pragma64_hclib_async(void *____arg, const int ___iter0) {
+    pragma64 *ctx = (pragma64 *)____arg;
     FLOAT *result; result = ctx->result;
     FLOAT *temp; temp = ctx->temp;
     FLOAT *power; power = ctx->power;

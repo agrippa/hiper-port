@@ -62,7 +62,7 @@ John Burkardt
 
 /******************************************************************************/
 
-typedef struct _pragma120 {
+typedef struct _pragma121 {
     struct user_parameters *params;
     int matrix_size;
     int block_size;
@@ -79,9 +79,9 @@ typedef struct _pragma120 {
     double *f;
     double *u;
     double *unew;
- } pragma120;
+ } pragma121;
 
-static void pragma120_hclib_async(void *____arg);
+static void pragma121_hclib_async(void *____arg);
 double run(struct user_parameters* params)
 {
     int matrix_size = params->matrix_size;
@@ -134,7 +134,7 @@ double run(struct user_parameters* params)
 hclib_start_finish(); for (j = 0; j < ny; j+= block_size) {
             for (i = 0; i < nx; i+= block_size) {
  { 
-pragma120 *ctx = (pragma120 *)malloc(sizeof(pragma120));
+pragma121 *ctx = (pragma121 *)malloc(sizeof(pragma121));
 ctx->params = params;
 ctx->matrix_size = matrix_size;
 ctx->block_size = block_size;
@@ -151,7 +151,7 @@ ctx->ny = ny;
 ctx->f = f;
 ctx->u = u;
 ctx->unew = unew;
-hclib_async(pragma120_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma121_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             }
         } ; hclib_end_finish(); 
@@ -212,8 +212,8 @@ hclib_async(pragma120_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     free(u);
     free(unew);
     return TIMER;
-} static void pragma120_hclib_async(void *____arg) {
-    pragma120 *ctx = (pragma120 *)____arg;
+} static void pragma121_hclib_async(void *____arg) {
+    pragma121 *ctx = (pragma121 *)____arg;
     struct user_parameters *params; params = ctx->params;
     int matrix_size; matrix_size = ctx->matrix_size;
     int block_size; block_size = ctx->block_size;
@@ -265,7 +265,7 @@ double r8mat_rms(int nx, int ny, double *a_) {
 }
 
 /* RHS initializes the right hand side "vector". */
-typedef struct _pragma229 {
+typedef struct _pragma230 {
     int nx;
     int ny;
     double *f;
@@ -276,9 +276,9 @@ typedef struct _pragma229 {
     int jj;
     double x;
     double y;
- } pragma229;
+ } pragma230;
 
-static void pragma229_hclib_async(void *____arg);
+static void pragma230_hclib_async(void *____arg);
 void rhs(int nx, int ny, double *f, int block_size)
 {
     int i,ii;
@@ -292,7 +292,7 @@ void rhs(int nx, int ny, double *f, int block_size)
 hclib_start_finish(); for (j = 0; j < ny; j+=block_size) {
         for (i = 0; i < nx; i+=block_size) {
  { 
-pragma229 *ctx = (pragma229 *)malloc(sizeof(pragma229));
+pragma230 *ctx = (pragma230 *)malloc(sizeof(pragma230));
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->f = f;
@@ -303,12 +303,12 @@ ctx->j = j;
 ctx->jj = jj;
 ctx->x = x;
 ctx->y = y;
-hclib_async(pragma229_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma230_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
     } ; hclib_end_finish(); 
-} static void pragma229_hclib_async(void *____arg) {
-    pragma229 *ctx = (pragma229 *)____arg;
+} static void pragma230_hclib_async(void *____arg) {
+    pragma230 *ctx = (pragma230 *)____arg;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double *f; f = ctx->f;

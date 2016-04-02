@@ -95,7 +95,7 @@ void write_data(	char* filename,
 //===============================================================================================================================================================================================================
 //===============================================================================================================================================================================================================
 
-typedef struct _pragma548 {
+typedef struct _pragma549 {
     int argc;
     char **argv;
     int i;
@@ -105,9 +105,9 @@ typedef struct _pragma548 {
     char *video_file_name;
     avi_t *d_frames;
     int omp_num_threads;
- } pragma548;
+ } pragma549;
 
-static void pragma548_hclib_async(void *____arg, const int ___iter0);
+static void pragma549_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -149,7 +149,7 @@ for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 	//====================================================================================================
 
  { 
-pragma548 *ctx = (pragma548 *)malloc(sizeof(pragma548));
+pragma549 *ctx = (pragma549 *)malloc(sizeof(pragma549));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->i = i;
@@ -164,7 +164,7 @@ domain[0].low = 0;
 domain[0].high = public.allPoints;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma548_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma549_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -704,8 +704,8 @@ free(ctx);
 		free(private[i].d_mask_conv);
 	}
 
-}  static void pragma548_hclib_async(void *____arg, const int ___iter0) {
-    pragma548 *ctx = (pragma548 *)____arg;
+}  static void pragma549_hclib_async(void *____arg, const int ___iter0) {
+    pragma549 *ctx = (pragma549 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int i; i = ctx->i;

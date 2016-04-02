@@ -31,7 +31,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _pragma126 {
+typedef struct _pragma127 {
     int argc;
     char **argv;
     int rows;
@@ -77,9 +77,9 @@ typedef struct _pragma126 {
     int i;
     int j;
     int nthreads;
- } pragma126;
+ } pragma127;
 
-typedef struct _pragma159 {
+typedef struct _pragma160 {
     int argc;
     char **argv;
     int rows;
@@ -125,10 +125,10 @@ typedef struct _pragma159 {
     int i;
     int j;
     int nthreads;
- } pragma159;
+ } pragma160;
 
-static void pragma126_hclib_async(void *____arg, const int ___iter0);
-static void pragma159_hclib_async(void *____arg, const int ___iter0);
+static void pragma127_hclib_async(void *____arg, const int ___iter0);
+static void pragma160_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -239,7 +239,7 @@ for (iter=0; iter< niter; iter++){
 		
 
  { 
-pragma126 *ctx = (pragma126 *)malloc(sizeof(pragma126));
+pragma127 *ctx = (pragma127 *)malloc(sizeof(pragma127));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->rows = rows;
@@ -290,12 +290,12 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma126_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma127_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
  { 
-pragma159 *ctx = (pragma159 *)malloc(sizeof(pragma159));
+pragma160 *ctx = (pragma160 *)malloc(sizeof(pragma160));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->rows = rows;
@@ -346,7 +346,7 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma160_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -501,8 +501,8 @@ free(ctx);
 
 	free(c);
 	return 0;
-}  static void pragma126_hclib_async(void *____arg, const int ___iter0) {
-    pragma126 *ctx = (pragma126 *)____arg;
+}  static void pragma127_hclib_async(void *____arg, const int ___iter0) {
+    pragma127 *ctx = (pragma127 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
@@ -586,8 +586,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma159_hclib_async(void *____arg, const int ___iter0) {
-    pragma159 *ctx = (pragma159 *)____arg;
+static void pragma160_hclib_async(void *____arg, const int ___iter0) {
+    pragma160 *ctx = (pragma160 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;

@@ -302,7 +302,7 @@ float pspeedy(Points *points, float z, long *kcenter, int pid)
 /* z is the facility cost, x is the number of this point in the array 
    points */
 
-typedef struct _pragma390 {
+typedef struct _pragma391 {
     long x;
     Points *points;
     double z;
@@ -326,9 +326,9 @@ typedef struct _pragma390 {
     double *lower;
     double *gl_lower;
     pthread_mutex_t reduction_mutex;
- } pragma390;
+ } pragma391;
 
-typedef struct _pragma466 {
+typedef struct _pragma467 {
     long x;
     Points *points;
     double z;
@@ -352,10 +352,10 @@ typedef struct _pragma466 {
     double *lower;
     double *gl_lower;
     double t2;
- } pragma466;
+ } pragma467;
 
-static void pragma390_hclib_async(void *____arg, const int ___iter0);
-static void pragma466_hclib_async(void *____arg, const int ___iter0);
+static void pragma391_hclib_async(void *____arg, const int ___iter0);
+static void pragma467_hclib_async(void *____arg, const int ___iter0);
 double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
@@ -442,7 +442,7 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	// OpenMP parallelization
 //	#pragma omp parallel for 
  { 
-pragma390 *ctx = (pragma390 *)malloc(sizeof(pragma390));
+pragma391 *ctx = (pragma391 *)malloc(sizeof(pragma391));
 ctx->x = x;
 ctx->points = points;
 ctx->z = z;
@@ -473,7 +473,7 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma390_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma391_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 cost_of_opening_x = ctx->cost_of_opening_x;
@@ -529,7 +529,7 @@ cost_of_opening_x = ctx->cost_of_opening_x;
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
  { 
-pragma466 *ctx = (pragma466 *)malloc(sizeof(pragma466));
+pragma467 *ctx = (pragma467 *)malloc(sizeof(pragma467));
 ctx->x = x;
 ctx->points = points;
 ctx->z = z;
@@ -558,7 +558,7 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma466_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma467_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -595,8 +595,8 @@ free(ctx);
 #endif
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
-} static void pragma390_hclib_async(void *____arg, const int ___iter0) {
-    pragma390 *ctx = (pragma390 *)____arg;
+} static void pragma391_hclib_async(void *____arg, const int ___iter0) {
+    pragma391 *ctx = (pragma391 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
     double z; z = ctx->z;
@@ -655,8 +655,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma466_hclib_async(void *____arg, const int ___iter0) {
-    pragma466 *ctx = (pragma466 *)____arg;
+static void pragma467_hclib_async(void *____arg, const int ___iter0) {
+    pragma467 *ctx = (pragma467 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
     double z; z = ctx->z;

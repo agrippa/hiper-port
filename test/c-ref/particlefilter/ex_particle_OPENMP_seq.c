@@ -341,7 +341,7 @@ int findIndexBin(double * CDF, int beginIndex, int endIndex, double value){
 * @param seed The seed array used for random number generation
 * @param Nparticles The number of particles to be used
 */
-typedef struct _pragma372 {
+typedef struct _pragma373 {
     int *I;
     int IszX;
     int IszY;
@@ -361,9 +361,9 @@ typedef struct _pragma372 {
     double *objxy;
     long long get_neighbors;
     double *weights;
- } pragma372;
+ } pragma373;
 
-typedef struct _pragma387 {
+typedef struct _pragma388 {
     int *I;
     int IszX;
     int IszY;
@@ -392,9 +392,9 @@ typedef struct _pragma387 {
     double *CDF;
     double *u;
     int *ind;
- } pragma387;
+ } pragma388;
 
-typedef struct _pragma401 {
+typedef struct _pragma402 {
     int *I;
     int IszX;
     int IszY;
@@ -427,9 +427,9 @@ typedef struct _pragma401 {
     int indX;
     int indY;
     long long set_arrays;
- } pragma401;
+ } pragma402;
 
-typedef struct _pragma409 {
+typedef struct _pragma410 {
     int *I;
     int IszX;
     int IszY;
@@ -463,9 +463,9 @@ typedef struct _pragma409 {
     int indY;
     long long set_arrays;
     long long error;
- } pragma409;
+ } pragma410;
 
-typedef struct _pragma432 {
+typedef struct _pragma433 {
     int *I;
     int IszX;
     int IszY;
@@ -500,9 +500,9 @@ typedef struct _pragma432 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
- } pragma432;
+ } pragma433;
 
-typedef struct _pragma439 {
+typedef struct _pragma440 {
     int *I;
     int IszX;
     int IszY;
@@ -540,9 +540,9 @@ typedef struct _pragma439 {
     long long exponential;
     double sumWeights;
     pthread_mutex_t reduction_mutex;
- } pragma439;
+ } pragma440;
 
-typedef struct _pragma445 {
+typedef struct _pragma446 {
     int *I;
     int IszX;
     int IszY;
@@ -580,9 +580,9 @@ typedef struct _pragma445 {
     long long exponential;
     double sumWeights;
     long long sum_time;
- } pragma445;
+ } pragma446;
 
-typedef struct _pragma454 {
+typedef struct _pragma455 {
     int *I;
     int IszX;
     int IszY;
@@ -622,9 +622,9 @@ typedef struct _pragma454 {
     long long sum_time;
     long long normalize;
     pthread_mutex_t reduction_mutex;
- } pragma454;
+ } pragma455;
 
-typedef struct _pragma479 {
+typedef struct _pragma480 {
     int *I;
     int IszX;
     int IszY;
@@ -667,9 +667,9 @@ typedef struct _pragma479 {
     double distance;
     long long cum_sum;
     double u1;
- } pragma479;
+ } pragma480;
 
-typedef struct _pragma487 {
+typedef struct _pragma488 {
     int *I;
     int IszX;
     int IszY;
@@ -715,18 +715,18 @@ typedef struct _pragma487 {
     long long u_time;
     int j;
     int i;
- } pragma487;
+ } pragma488;
 
-static void pragma372_hclib_async(void *____arg, const int ___iter0);
-static void pragma387_hclib_async(void *____arg, const int ___iter0);
-static void pragma401_hclib_async(void *____arg, const int ___iter0);
-static void pragma409_hclib_async(void *____arg, const int ___iter0);
-static void pragma432_hclib_async(void *____arg, const int ___iter0);
-static void pragma439_hclib_async(void *____arg, const int ___iter0);
-static void pragma445_hclib_async(void *____arg, const int ___iter0);
-static void pragma454_hclib_async(void *____arg, const int ___iter0);
-static void pragma479_hclib_async(void *____arg, const int ___iter0);
-static void pragma487_hclib_async(void *____arg, const int ___iter0);
+static void pragma373_hclib_async(void *____arg, const int ___iter0);
+static void pragma388_hclib_async(void *____arg, const int ___iter0);
+static void pragma402_hclib_async(void *____arg, const int ___iter0);
+static void pragma410_hclib_async(void *____arg, const int ___iter0);
+static void pragma433_hclib_async(void *____arg, const int ___iter0);
+static void pragma440_hclib_async(void *____arg, const int ___iter0);
+static void pragma446_hclib_async(void *____arg, const int ___iter0);
+static void pragma455_hclib_async(void *____arg, const int ___iter0);
+static void pragma480_hclib_async(void *____arg, const int ___iter0);
+static void pragma488_hclib_async(void *____arg, const int ___iter0);
 void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
 	
 	int max_size = IszX*IszY*Nfr;
@@ -756,7 +756,7 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 	//initial weights are all equal (1/Nparticles)
 	double * weights = (double *)malloc(sizeof(double)*Nparticles);
  { 
-pragma372 *ctx = (pragma372 *)malloc(sizeof(pragma372));
+pragma373 *ctx = (pragma373 *)malloc(sizeof(pragma373));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -781,7 +781,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma372_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma373_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -797,7 +797,7 @@ free(ctx);
 	double * u = (double *)malloc(sizeof(double)*Nparticles);
 	int * ind = (int*)malloc(sizeof(int)*countOnes*Nparticles);
  { 
-pragma387 *ctx = (pragma387 *)malloc(sizeof(pragma387));
+pragma388 *ctx = (pragma388 *)malloc(sizeof(pragma388));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -831,7 +831,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma387_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma388_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -845,7 +845,7 @@ free(ctx);
 		//draws sample from motion model (random walk). The only prior information
 		//is that the object moves 2x as fast as in the y direction
  { 
-pragma401 *ctx = (pragma401 *)malloc(sizeof(pragma401));
+pragma402 *ctx = (pragma402 *)malloc(sizeof(pragma402));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -883,7 +883,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma401_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma402_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -891,7 +891,7 @@ free(ctx);
 		printf("TIME TO SET ERROR TOOK: %f\n", elapsed_time(set_arrays, error));
 		//particle filter likelihood
  { 
-pragma409 *ctx = (pragma409 *)malloc(sizeof(pragma409));
+pragma410 *ctx = (pragma410 *)malloc(sizeof(pragma410));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -930,7 +930,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma409_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma410_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -939,7 +939,7 @@ free(ctx);
 		// update & normalize weights
 		// using equation (63) of Arulampalam Tutorial
  { 
-pragma432 *ctx = (pragma432 *)malloc(sizeof(pragma432));
+pragma433 *ctx = (pragma433 *)malloc(sizeof(pragma433));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -979,7 +979,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma432_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma433_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -987,7 +987,7 @@ free(ctx);
 		printf("TIME TO GET EXP TOOK: %f\n", elapsed_time(likelihood_time, exponential));
 		double sumWeights = 0;
  { 
-pragma439 *ctx = (pragma439 *)malloc(sizeof(pragma439));
+pragma440 *ctx = (pragma440 *)malloc(sizeof(pragma440));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1032,7 +1032,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma439_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma440_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 sumWeights = ctx->sumWeights;
@@ -1040,7 +1040,7 @@ sumWeights = ctx->sumWeights;
 		long long sum_time = get_time();
 		printf("TIME TO SUM WEIGHTS TOOK: %f\n", elapsed_time(exponential, sum_time));
  { 
-pragma445 *ctx = (pragma445 *)malloc(sizeof(pragma445));
+pragma446 *ctx = (pragma446 *)malloc(sizeof(pragma446));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1083,7 +1083,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma445_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma446_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -1093,7 +1093,7 @@ free(ctx);
 		ye = 0;
 		// estimate the object location by expected values
  { 
-pragma454 *ctx = (pragma454 *)malloc(sizeof(pragma454));
+pragma455 *ctx = (pragma455 *)malloc(sizeof(pragma455));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1141,7 +1141,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma454_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma455_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 xe = ctx->xe;
@@ -1168,7 +1168,7 @@ ye = ctx->ye;
 		printf("TIME TO CALC CUM SUM TOOK: %f\n", elapsed_time(move_time, cum_sum));
 		double u1 = (1/((double)(Nparticles)))*randu(seed, 0);
  { 
-pragma479 *ctx = (pragma479 *)malloc(sizeof(pragma479));
+pragma480 *ctx = (pragma480 *)malloc(sizeof(pragma480));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1216,7 +1216,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma479_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma480_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -1225,7 +1225,7 @@ free(ctx);
 		int j, i;
 		
  { 
-pragma487 *ctx = (pragma487 *)malloc(sizeof(pragma487));
+pragma488 *ctx = (pragma488 *)malloc(sizeof(pragma488));
 ctx->I = I;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1276,7 +1276,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma487_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma488_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -1304,8 +1304,8 @@ free(ctx);
 	free(CDF);
 	free(u);
 	free(ind);
-} static void pragma372_hclib_async(void *____arg, const int ___iter0) {
-    pragma372 *ctx = (pragma372 *)____arg;
+} static void pragma373_hclib_async(void *____arg, const int ___iter0) {
+    pragma373 *ctx = (pragma373 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1334,8 +1334,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma387_hclib_async(void *____arg, const int ___iter0) {
-    pragma387 *ctx = (pragma387 *)____arg;
+static void pragma388_hclib_async(void *____arg, const int ___iter0) {
+    pragma388 *ctx = (pragma388 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1374,8 +1374,8 @@ static void pragma387_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma401_hclib_async(void *____arg, const int ___iter0) {
-    pragma401 *ctx = (pragma401 *)____arg;
+static void pragma402_hclib_async(void *____arg, const int ___iter0) {
+    pragma402 *ctx = (pragma402 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1418,8 +1418,8 @@ static void pragma401_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma409_hclib_async(void *____arg, const int ___iter0) {
-    pragma409 *ctx = (pragma409 *)____arg;
+static void pragma410_hclib_async(void *____arg, const int ___iter0) {
+    pragma410 *ctx = (pragma410 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1477,8 +1477,8 @@ static void pragma409_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma432_hclib_async(void *____arg, const int ___iter0) {
-    pragma432 *ctx = (pragma432 *)____arg;
+static void pragma433_hclib_async(void *____arg, const int ___iter0) {
+    pragma433 *ctx = (pragma433 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1522,8 +1522,8 @@ static void pragma432_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma439_hclib_async(void *____arg, const int ___iter0) {
-    pragma439 *ctx = (pragma439 *)____arg;
+static void pragma440_hclib_async(void *____arg, const int ___iter0) {
+    pragma440 *ctx = (pragma440 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1574,8 +1574,8 @@ static void pragma439_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma445_hclib_async(void *____arg, const int ___iter0) {
-    pragma445 *ctx = (pragma445 *)____arg;
+static void pragma446_hclib_async(void *____arg, const int ___iter0) {
+    pragma446 *ctx = (pragma446 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1622,8 +1622,8 @@ static void pragma445_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma454_hclib_async(void *____arg, const int ___iter0) {
-    pragma454 *ctx = (pragma454 *)____arg;
+static void pragma455_hclib_async(void *____arg, const int ___iter0) {
+    pragma455 *ctx = (pragma455 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1678,8 +1678,8 @@ static void pragma454_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma479_hclib_async(void *____arg, const int ___iter0) {
-    pragma479 *ctx = (pragma479 *)____arg;
+static void pragma480_hclib_async(void *____arg, const int ___iter0) {
+    pragma480 *ctx = (pragma480 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1731,8 +1731,8 @@ static void pragma479_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
-static void pragma487_hclib_async(void *____arg, const int ___iter0) {
-    pragma487 *ctx = (pragma487 *)____arg;
+static void pragma488_hclib_async(void *____arg, const int ___iter0) {
+    pragma488 *ctx = (pragma488 *)____arg;
     int *I; I = ctx->I;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;

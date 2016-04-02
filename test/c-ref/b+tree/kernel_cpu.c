@@ -31,7 +31,7 @@
 //	KERNEL_CPU FUNCTION
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma84 {
+typedef struct _pragma85 {
     int cores_arg;
     record *records;
     knode *knodes;
@@ -50,9 +50,9 @@ typedef struct _pragma84 {
     int thid;
     int bid;
     int i;
- } pragma84;
+ } pragma85;
 
-static void pragma84_hclib_async(void *____arg, const int ___iter0);
+static void pragma85_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int cores_arg;
     record *records;
@@ -103,7 +103,7 @@ static void main_entrypoint(void *____arg) {
 
 	// process number of querries
  { 
-pragma84 *ctx = (pragma84 *)malloc(sizeof(pragma84));
+pragma85 *ctx = (pragma85 *)malloc(sizeof(pragma85));
 ctx->cores_arg = cores_arg;
 ctx->records = records;
 ctx->knodes = knodes;
@@ -127,7 +127,7 @@ domain[0].low = 0;
 domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma84_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma85_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -202,8 +202,8 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  static void pragma84_hclib_async(void *____arg, const int ___iter0) {
-    pragma84 *ctx = (pragma84 *)____arg;
+}  static void pragma85_hclib_async(void *____arg, const int ___iter0) {
+    pragma85 *ctx = (pragma85 *)____arg;
     int cores_arg; cores_arg = ctx->cores_arg;
     record *records; records = ctx->records;
     knode *knodes; knodes = ctx->knodes;

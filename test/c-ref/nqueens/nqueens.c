@@ -318,7 +318,7 @@ hclib_pragma_marker("omp", "taskwait");
 #else 
 
 #ifndef FORCE_TIED_TASKS
-typedef struct _pragma351 {
+typedef struct _pragma352 {
     int n;
     int j;
     char *a;
@@ -326,9 +326,9 @@ typedef struct _pragma351 {
     int depth;
     int *csols;
     int i;
- } pragma351;
+ } pragma352;
 
-static void pragma351_hclib_async(void *____arg);
+static void pragma352_hclib_async(void *____arg);
 void nqueens(int n, int j, char *a, int *solutions, int depth)
 #else
 void nqueens(int n, int j, char *a, int depth)
@@ -360,7 +360,7 @@ void nqueens(int n, int j, char *a, int depth)
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
  { 
-pragma351 *ctx = (pragma351 *)malloc(sizeof(pragma351));
+pragma352 *ctx = (pragma352 *)malloc(sizeof(pragma352));
 ctx->n = n;
 ctx->j = j;
 ctx->a = a;
@@ -368,7 +368,7 @@ ctx->solutions = solutions;
 ctx->depth = depth;
 ctx->csols = csols;
 ctx->i = i;
-hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma352_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
 	}
 
@@ -376,8 +376,8 @@ hclib_async(pragma351_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 #ifndef FORCE_TIED_TASKS
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
-} static void pragma351_hclib_async(void *____arg) {
-    pragma351 *ctx = (pragma351 *)____arg;
+} static void pragma352_hclib_async(void *____arg) {
+    pragma352 *ctx = (pragma352 *)____arg;
     int n; n = ctx->n;
     int j; j = ctx->j;
     char *a; a = ctx->a;

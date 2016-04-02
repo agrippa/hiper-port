@@ -2,7 +2,7 @@
 # include "poisson.h"
 
 /* #pragma omp task/taskwait version of SWEEP. */
-typedef struct _pragma22 {
+typedef struct _pragma23 {
     int nx;
     int ny;
     double dx;
@@ -16,9 +16,9 @@ typedef struct _pragma22 {
     int i;
     int it;
     int j;
- } pragma22;
+ } pragma23;
 
-typedef struct _pragma30 {
+typedef struct _pragma31 {
     int nx;
     int ny;
     double dx;
@@ -32,10 +32,10 @@ typedef struct _pragma30 {
     int i;
     int it;
     int j;
- } pragma30;
+ } pragma31;
 
-static void pragma22_hclib_async(void *____arg);
-static void pragma30_hclib_async(void *____arg);
+static void pragma23_hclib_async(void *____arg);
+static void pragma31_hclib_async(void *____arg);
 void sweep (int nx, int ny, double dx, double dy, double *f,
         int itold, int itnew, double *u, double *unew, int block_size)
 {
@@ -51,7 +51,7 @@ hclib_start_finish(); {
             // Save the current estimate.
             for (i = 0; i < nx; i++) {
  { 
-pragma22 *ctx = (pragma22 *)malloc(sizeof(pragma22));
+pragma23 *ctx = (pragma23 *)malloc(sizeof(pragma23));
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -65,14 +65,14 @@ ctx->block_size = block_size;
 ctx->i = i;
 ctx->it = it;
 ctx->j = j;
-hclib_async(pragma22_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma23_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             }
  hclib_end_finish(); hclib_start_finish(); ;
             // Compute a new estimate.
             for (i = 0; i < nx; i++) {
  { 
-pragma30 *ctx = (pragma30 *)malloc(sizeof(pragma30));
+pragma31 *ctx = (pragma31 *)malloc(sizeof(pragma31));
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -86,14 +86,14 @@ ctx->block_size = block_size;
 ctx->i = i;
 ctx->it = it;
 ctx->j = j;
-hclib_async(pragma30_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma31_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             }
  hclib_end_finish(); hclib_start_finish(); ;
         }
     } ; hclib_end_finish(); 
-} static void pragma22_hclib_async(void *____arg) {
-    pragma22 *ctx = (pragma22 *)____arg;
+} static void pragma23_hclib_async(void *____arg) {
+    pragma23 *ctx = (pragma23 *)____arg;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;
@@ -113,8 +113,8 @@ for (j = 0; j < ny; j++) {
                 } ;     ; hclib_end_finish();
 }
 
-static void pragma30_hclib_async(void *____arg) {
-    pragma30 *ctx = (pragma30 *)____arg;
+static void pragma31_hclib_async(void *____arg) {
+    pragma31 *ctx = (pragma31 *)____arg;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;

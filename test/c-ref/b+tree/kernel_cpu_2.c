@@ -36,7 +36,7 @@
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma93 {
+typedef struct _pragma94 {
     int cores_arg;
     knode *knodes;
     long knodes_elem;
@@ -58,9 +58,9 @@ typedef struct _pragma93 {
     int threadsPerBlock;
     int thid;
     int bid;
- } pragma93;
+ } pragma94;
 
-static void pragma93_hclib_async(void *____arg, const int ___iter0);
+static void pragma94_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int cores_arg;
     knode *knodes;
@@ -117,7 +117,7 @@ static void main_entrypoint(void *____arg) {
 
 	// process number of querries
  { 
-pragma93 *ctx = (pragma93 *)malloc(sizeof(pragma93));
+pragma94 *ctx = (pragma94 *)malloc(sizeof(pragma94));
 ctx->cores_arg = cores_arg;
 ctx->knodes = knodes;
 ctx->knodes_elem = knodes_elem;
@@ -144,7 +144,7 @@ domain[0].low = 0;
 domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma93_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma94_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -229,8 +229,8 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  static void pragma93_hclib_async(void *____arg, const int ___iter0) {
-    pragma93 *ctx = (pragma93 *)____arg;
+}  static void pragma94_hclib_async(void *____arg, const int ___iter0) {
+    pragma94 *ctx = (pragma94 *)____arg;
     int cores_arg; cores_arg = ctx->cores_arg;
     knode *knodes; knodes = ctx->knodes;
     long knodes_elem; knodes_elem = ctx->knodes_elem;

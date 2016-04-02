@@ -2,7 +2,7 @@
 # include "poisson.h"
 
 /* #pragma omp task/taskwait version of SWEEP. */
-typedef struct _pragma20 {
+typedef struct _pragma21 {
     int nx;
     int ny;
     double dx;
@@ -18,9 +18,9 @@ typedef struct _pragma20 {
     int block_y;
     int max_blocks_x;
     int max_blocks_y;
- } pragma20;
+ } pragma21;
 
-typedef struct _pragma25 {
+typedef struct _pragma26 {
     int nx;
     int ny;
     double dx;
@@ -36,10 +36,10 @@ typedef struct _pragma25 {
     int block_y;
     int max_blocks_x;
     int max_blocks_y;
- } pragma25;
+ } pragma26;
 
-static void pragma20_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
-static void pragma25_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
+static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
+static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
 void sweep (int nx, int ny, double dx, double dy, double *f_,
         int itold, int itnew, double *u_, double *unew_, int block_size)
 {
@@ -56,7 +56,7 @@ void sweep (int nx, int ny, double dx, double dy, double *f_,
     {
         // Save the current estimate.
  { 
-pragma20 *ctx = (pragma20 *)malloc(sizeof(pragma20));
+pragma21 *ctx = (pragma21 *)malloc(sizeof(pragma21));
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -81,13 +81,13 @@ domain[1].low = 0;
 domain[1].high = max_blocks_y;
 domain[1].stride = 1;
 domain[1].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma20_hclib_async, ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma21_hclib_async, ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } ;
 
  { 
-pragma25 *ctx = (pragma25 *)malloc(sizeof(pragma25));
+pragma26 *ctx = (pragma26 *)malloc(sizeof(pragma26));
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -112,13 +112,13 @@ domain[1].low = 0;
 domain[1].high = max_blocks_y;
 domain[1].stride = 1;
 domain[1].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma25_hclib_async, ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma26_hclib_async, ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } ;
     }
-} static void pragma20_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
-    pragma20 *ctx = (pragma20 *)____arg;
+} static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
+    pragma21 *ctx = (pragma21 *)____arg;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;
@@ -142,8 +142,8 @@ copy_block(nx, ny, block_x, block_y, u_, unew_, block_size) ;     } while (0);
     ; hclib_end_finish();
 }
 
-static void pragma25_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
-    pragma25 *ctx = (pragma25 *)____arg;
+static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
+    pragma26 *ctx = (pragma26 *)____arg;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;

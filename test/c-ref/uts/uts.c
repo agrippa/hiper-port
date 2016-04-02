@@ -171,12 +171,12 @@ int uts_numChildren(Node *parent)
  * Recursive depth-first implementation                    *
  ***********************************************************/
 
-typedef struct _pragma187 {
+typedef struct _pragma188 {
     Node *root;
     unsigned long long num_nodes;
- } pragma187;
+ } pragma188;
 
-static void pragma187_hclib_async(void *____arg);
+static void pragma188_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
     Node *root;
     unsigned long long num_nodes;
@@ -189,10 +189,10 @@ static void main_entrypoint(void *____arg) {
 {
 hclib_start_finish(); {
  { 
-pragma187 *ctx = (pragma187 *)malloc(sizeof(pragma187));
+pragma188 *ctx = (pragma188 *)malloc(sizeof(pragma188));
 ctx->root = root;
 ctx->num_nodes = num_nodes;
-hclib_async(pragma187_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma188_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
            } ; hclib_end_finish(); 
    } ; }
@@ -214,8 +214,8 @@ free(ctx);
    bots_message(" completed!");
 
    return num_nodes;
-}  static void pragma187_hclib_async(void *____arg) {
-    pragma187 *ctx = (pragma187 *)____arg;
+}  static void pragma188_hclib_async(void *____arg) {
+    pragma188 *ctx = (pragma188 *)____arg;
     Node *root; root = ctx->root;
     unsigned long long num_nodes; num_nodes = ctx->num_nodes;
     hclib_start_finish();
@@ -224,7 +224,7 @@ num_nodes = parTreeSearch( 0, root, root->numChildren ) ;     ; hclib_end_finish
 
 
 
-typedef struct _pragma219 {
+typedef struct _pragma220 {
     int depth;
     Node *parent;
     int numChildren;
@@ -234,9 +234,9 @@ typedef struct _pragma219 {
     int j;
     unsigned long long subtreesize;
     unsigned long long *partialCount;
- } pragma219;
+ } pragma220;
 
-static void pragma219_hclib_async(void *____arg);
+static void pragma220_hclib_async(void *____arg);
 unsigned long long parTreeSearch(int depth, Node *parent, int numChildren) 
 {
   Node *n = (Node *)malloc(numChildren * sizeof(Node));
@@ -259,7 +259,7 @@ unsigned long long parTreeSearch(int depth, Node *parent, int numChildren)
      nodePtr->numChildren = uts_numChildren(nodePtr);
 
  { 
-pragma219 *ctx = (pragma219 *)malloc(sizeof(pragma219));
+pragma220 *ctx = (pragma220 *)malloc(sizeof(pragma220));
 ctx->depth = depth;
 ctx->parent = parent;
 ctx->numChildren = numChildren;
@@ -269,7 +269,7 @@ ctx->i = i;
 ctx->j = j;
 ctx->subtreesize = subtreesize;
 ctx->partialCount = partialCount;
-hclib_async(pragma219_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma220_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
   }
 
@@ -282,8 +282,8 @@ hclib_async(pragma219_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
   free(partialCount);
   
   return subtreesize;
-} static void pragma219_hclib_async(void *____arg) {
-    pragma219 *ctx = (pragma219 *)____arg;
+} static void pragma220_hclib_async(void *____arg) {
+    pragma220 *ctx = (pragma220 *)____arg;
     int depth; depth = ctx->depth;
     Node *parent; parent = ctx->parent;
     int numChildren; numChildren = ctx->numChildren;

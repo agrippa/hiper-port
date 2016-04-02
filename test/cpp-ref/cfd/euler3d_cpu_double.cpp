@@ -49,17 +49,17 @@ void dealloc(T* array)
 	delete[] array;
 }
 
-typedef struct _pragma54 {
+typedef struct _pragma55 {
     double *dst;
     double *src;
     int N;
- } pragma54;
+ } pragma55;
 
-static void pragma54_hclib_async(void *____arg, const int ___iter0);
+static void pragma55_hclib_async(void *____arg, const int ___iter0);
 template <typename T> void copy(T* dst, T* src, int N)
 {
  { 
-pragma54 *ctx = (pragma54 *)malloc(sizeof(pragma54));
+pragma55 *ctx = (pragma55 *)malloc(sizeof(pragma55));
 ctx->dst = dst;
 ctx->src = src;
 ctx->N = N;
@@ -68,12 +68,12 @@ domain[0].low = 0;
 domain[0].high = N;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma54_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma55_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma54_hclib_async(void *____arg, const int ___iter0) {
-    pragma54 *ctx = (pragma54 *)____arg;
+} static void pragma55_hclib_async(void *____arg, const int ___iter0) {
+    pragma55 *ctx = (pragma55 *)____arg;
     double *dst; dst = ctx->dst;
     double *src; src = ctx->src;
     int N; N = ctx->N;
@@ -128,16 +128,16 @@ double3 ff_flux_contribution_momentum_z;
 double3 ff_flux_contribution_density_energy;
 
 
-typedef struct _pragma103 {
+typedef struct _pragma104 {
     int nelr;
     double *variables;
- } pragma103;
+ } pragma104;
 
-static void pragma103_hclib_async(void *____arg, const int ___iter0);
+static void pragma104_hclib_async(void *____arg, const int ___iter0);
 void initialize_variables(int nelr, double* variables)
 {
  { 
-pragma103 *ctx = (pragma103 *)malloc(sizeof(pragma103));
+pragma104 *ctx = (pragma104 *)malloc(sizeof(pragma104));
 ctx->nelr = nelr;
 ctx->variables = variables;
 hclib_loop_domain_t domain[1];
@@ -145,12 +145,12 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma103_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma103_hclib_async(void *____arg, const int ___iter0) {
-    pragma103 *ctx = (pragma103 *)____arg;
+} static void pragma104_hclib_async(void *____arg, const int ___iter0) {
+    pragma104 *ctx = (pragma104 *)____arg;
     int nelr; nelr = ctx->nelr;
     double *variables; variables = ctx->variables;
     hclib_start_finish();
@@ -208,18 +208,18 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 
 
-typedef struct _pragma156 {
+typedef struct _pragma157 {
     int nelr;
     double *variables;
     double *areas;
     double *step_factors;
- } pragma156;
+ } pragma157;
 
-static void pragma156_hclib_async(void *____arg, const int ___iter0);
+static void pragma157_hclib_async(void *____arg, const int ___iter0);
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
  { 
-pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
+pragma157 *ctx = (pragma157 *)malloc(sizeof(pragma157));
 ctx->nelr = nelr;
 ctx->variables = variables;
 ctx->areas = areas;
@@ -229,12 +229,12 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma156_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma157_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma156_hclib_async(void *____arg, const int ___iter0) {
-    pragma156 *ctx = (pragma156 *)____arg;
+} static void pragma157_hclib_async(void *____arg, const int ___iter0) {
+    pragma157 *ctx = (pragma157 *)____arg;
     int nelr; nelr = ctx->nelr;
     double *variables; variables = ctx->variables;
     double *areas; areas = ctx->areas;
@@ -270,22 +270,22 @@ free(ctx);
  *
 */
 
-typedef struct _pragma187 {
+typedef struct _pragma188 {
     int nelr;
     int *elements_surrounding_elements;
     double *normals;
     double *variables;
     double *fluxes;
     double smoothing_coefficient;
- } pragma187;
+ } pragma188;
 
-static void pragma187_hclib_async(void *____arg, const int ___iter0);
+static void pragma188_hclib_async(void *____arg, const int ___iter0);
 void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
 {
 	double smoothing_coefficient = double(0.2f);
 
  { 
-pragma187 *ctx = (pragma187 *)malloc(sizeof(pragma187));
+pragma188 *ctx = (pragma188 *)malloc(sizeof(pragma188));
 ctx->nelr = nelr;
 ctx->elements_surrounding_elements = elements_surrounding_elements;
 ctx->normals = normals;
@@ -297,12 +297,12 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma187_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma187_hclib_async(void *____arg, const int ___iter0) {
-    pragma187 *ctx = (pragma187 *)____arg;
+} static void pragma188_hclib_async(void *____arg, const int ___iter0) {
+    pragma188 *ctx = (pragma188 *)____arg;
     int nelr; nelr = ctx->nelr;
     int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
     double *normals; normals = ctx->normals;
@@ -442,20 +442,20 @@ free(ctx);
 
 
 
-typedef struct _pragma318 {
+typedef struct _pragma319 {
     int j;
     int nelr;
     double *old_variables;
     double *variables;
     double *step_factors;
     double *fluxes;
- } pragma318;
+ } pragma319;
 
-static void pragma318_hclib_async(void *____arg, const int ___iter0);
+static void pragma319_hclib_async(void *____arg, const int ___iter0);
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
  { 
-pragma318 *ctx = (pragma318 *)malloc(sizeof(pragma318));
+pragma319 *ctx = (pragma319 *)malloc(sizeof(pragma319));
 ctx->j = j;
 ctx->nelr = nelr;
 ctx->old_variables = old_variables;
@@ -467,12 +467,12 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma318_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma319_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma318_hclib_async(void *____arg, const int ___iter0) {
-    pragma318 *ctx = (pragma318 *)____arg;
+} static void pragma319_hclib_async(void *____arg, const int ___iter0) {
+    pragma319 *ctx = (pragma319 *)____arg;
     int j; j = ctx->j;
     int nelr; nelr = ctx->nelr;
     double *old_variables; old_variables = ctx->old_variables;

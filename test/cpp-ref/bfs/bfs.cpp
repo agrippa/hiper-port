@@ -37,7 +37,7 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 //Apply BFS on a Graph using CUDA
 ////////////////////////////////////////////////////////////////////////////////
-typedef struct _pragma127 {
+typedef struct _pragma128 {
     int argc;
     char **argv;
     int no_of_nodes;
@@ -57,9 +57,9 @@ typedef struct _pragma127 {
     int *h_cost;
     int k;
     _Bool stop;
- } pragma127;
+ } pragma128;
 
-typedef struct _pragma144 {
+typedef struct _pragma145 {
     int argc;
     char **argv;
     int no_of_nodes;
@@ -79,10 +79,10 @@ typedef struct _pragma144 {
     int *h_cost;
     int k;
     _Bool stop;
- } pragma144;
+ } pragma145;
 
-static void pragma127_hclib_async(void *____arg, const int ___iter0);
-static void pragma144_hclib_async(void *____arg, const int ___iter0);
+static void pragma128_hclib_async(void *____arg, const int ___iter0);
+static void pragma145_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -132,7 +132,7 @@ static void main_entrypoint(void *____arg) {
 
             //omp_set_num_threads(num_omp_threads);
  { 
-pragma127 *ctx = (pragma127 *)malloc(sizeof(pragma127));
+pragma128 *ctx = (pragma128 *)malloc(sizeof(pragma128));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->no_of_nodes = no_of_nodes;
@@ -157,13 +157,13 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma127_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma128_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
 
  { 
-pragma144 *ctx = (pragma144 *)malloc(sizeof(pragma144));
+pragma145 *ctx = (pragma145 *)malloc(sizeof(pragma145));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->no_of_nodes = no_of_nodes;
@@ -188,7 +188,7 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma144_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma145_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -312,8 +312,8 @@ free(ctx);
 	free( h_graph_visited);
 	free( h_cost);
 
-}  static void pragma127_hclib_async(void *____arg, const int ___iter0) {
-    pragma127 *ctx = (pragma127 *)____arg;
+}  static void pragma128_hclib_async(void *____arg, const int ___iter0) {
+    pragma128 *ctx = (pragma128 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
@@ -353,8 +353,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma144_hclib_async(void *____arg, const int ___iter0) {
-    pragma144 *ctx = (pragma144 *)____arg;
+static void pragma145_hclib_async(void *____arg, const int ___iter0) {
+    pragma145 *ctx = (pragma145 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;

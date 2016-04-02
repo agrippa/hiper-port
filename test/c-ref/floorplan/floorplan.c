@@ -507,7 +507,7 @@ return nnc+nnl;
 
 #else
 
-typedef struct _pragma525 {
+typedef struct _pragma526 {
     int id;
     int *FOOTPRINT;
     char *BOARD;
@@ -522,9 +522,9 @@ typedef struct _pragma525 {
     char board[4096];
     int footprint[2];
     int NWS[64][2];
- } pragma525;
+ } pragma526;
 
-static void pragma525_hclib_async(void *____arg);
+static void pragma526_hclib_async(void *____arg);
 static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int dummy_level) {
   int  i, j, nn, area, nnc,nnl;
 
@@ -541,7 +541,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
  { 
-pragma525 *ctx = (pragma525 *)malloc(sizeof(pragma525));
+pragma526 *ctx = (pragma526 *)malloc(sizeof(pragma526));
 ctx->id = id;
 ctx->FOOTPRINT = FOOTPRINT;
 ctx->BOARD = BOARD;
@@ -556,14 +556,14 @@ ctx->nnl = nnl;
 memcpy(ctx->board, board, 4096 * (sizeof(char))); 
 memcpy(ctx->footprint, footprint, 2 * (sizeof(int))); 
 memcpy(ctx->NWS, NWS, 64 * (2 * (sizeof(int)))); 
-hclib_async(pragma525_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma526_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
       }
 }
  hclib_end_finish(); hclib_start_finish(); ;
 return nnc+nnl;
-} static void pragma525_hclib_async(void *____arg) {
-    pragma525 *ctx = (pragma525 *)____arg;
+} static void pragma526_hclib_async(void *____arg) {
+    pragma526 *ctx = (pragma526 *)____arg;
     int id; id = ctx->id;
     int *FOOTPRINT; FOOTPRINT = ctx->FOOTPRINT;
     char *BOARD; BOARD = ctx->BOARD;

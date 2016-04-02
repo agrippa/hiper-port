@@ -104,6 +104,7 @@ WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
 echo '#include "hclib.h"' > $WITH_HEADER
+echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_HEADER
 cat $INPUT_PATH >> $WITH_HEADER
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
@@ -148,8 +149,15 @@ until [[ $CHANGED -eq 0 ]]; do
     CHECK_FOR_PTHREAD=false
 done
 
+N_PRAGMA_MARKERS=$(cat $PREV | grep "extern void hclib_pragma_marker" | wc -l)
+if [[ $N_PRAGMA_MARKERS -ne 1 ]]; then
+    echo Unexpected number of leftover pragma markers, should only be the \
+        top-level declaration
+    exit 1
+fi
+
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Producing final output file'
-cp $PREV $OUTPUT_PATH
+cat $PREV | grep -v "extern void hclib_pragma_marker" > $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'

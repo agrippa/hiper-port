@@ -125,7 +125,7 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _pragma145 {
+typedef struct _pragma146 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -133,9 +133,9 @@ typedef struct _pragma145 {
     int right;
     int index;
     sort_data_t *buf;
- } pragma145;
+ } pragma146;
 
-typedef struct _pragma155 {
+typedef struct _pragma156 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -143,10 +143,10 @@ typedef struct _pragma155 {
     int right;
     int index;
     sort_data_t *buf;
- } pragma155;
+ } pragma156;
 
-static void pragma145_hclib_async(void *____arg);
-static void pragma155_hclib_async(void *____arg);
+static void pragma146_hclib_async(void *____arg);
+static void pragma156_hclib_async(void *____arg);
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
@@ -162,7 +162,7 @@ hclib_start_finish(); {
           buf->left = left;
           buf->right = index - 1; 
  { 
-pragma145 *ctx = (pragma145 *)malloc(sizeof(pragma145));
+pragma146 *ctx = (pragma146 *)malloc(sizeof(pragma146));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -170,7 +170,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(pragma145_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma146_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -179,7 +179,7 @@ hclib_async(pragma145_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
           buf->left = index;
           buf->right = right; 
  { 
-pragma155 *ctx = (pragma155 *)malloc(sizeof(pragma155));
+pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -187,7 +187,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         } ; hclib_end_finish(); 
@@ -197,8 +197,8 @@ hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     qsort(data+left, right - left + 1, sizeof(TYPE), compare);
   }
   free(arg);
-} static void pragma145_hclib_async(void *____arg) {
-    pragma145 *ctx = (pragma145 *)____arg;
+} static void pragma146_hclib_async(void *____arg) {
+    pragma146 *ctx = (pragma146 *)____arg;
     void *arg; arg = ctx->arg;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;
@@ -212,8 +212,8 @@ hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
           } ;     ; hclib_end_finish();
 }
 
-static void pragma155_hclib_async(void *____arg) {
-    pragma155 *ctx = (pragma155 *)____arg;
+static void pragma156_hclib_async(void *____arg) {
+    pragma156 *ctx = (pragma156 *)____arg;
     void *arg; arg = ctx->arg;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;

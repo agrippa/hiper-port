@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-typedef struct _pragma101 {
+typedef struct _pragma102 {
     int argc;
     char **argv;
     unsigned long long cycles;
@@ -88,9 +88,9 @@ typedef struct _pragma101 {
     int *temp;
     int min;
     int t;
- } pragma101;
+ } pragma102;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter0);
+static void pragma102_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -115,7 +115,7 @@ for (int t = 0; t < rows-1; t++) {
         src = dst;
         dst = temp;
  { 
-pragma101 *ctx = (pragma101 *)malloc(sizeof(pragma101));
+pragma102 *ctx = (pragma102 *)malloc(sizeof(pragma102));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->cycles = cycles;
@@ -129,7 +129,7 @@ domain[0].low = 0;
 domain[0].high = cols;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma102_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -177,8 +177,8 @@ free(ctx);
     delete [] wall;
     delete [] dst;
     delete [] src;
-}  static void pragma101_hclib_async(void *____arg, const int ___iter0) {
-    pragma101 *ctx = (pragma101 *)____arg;
+}  static void pragma102_hclib_async(void *____arg, const int ___iter0) {
+    pragma102 *ctx = (pragma102 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     unsigned long long cycles; cycles = ctx->cycles;

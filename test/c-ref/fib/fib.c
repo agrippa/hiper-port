@@ -95,44 +95,44 @@ hclib_pragma_marker("omp", "taskwait");
 
 #else
 
-typedef struct _pragma103 {
+typedef struct _pragma104 {
     int n;
     long long x;
     long long y;
- } pragma103;
+ } pragma104;
 
-typedef struct _pragma105 {
+typedef struct _pragma106 {
     int n;
     long long x;
     long long y;
- } pragma105;
+ } pragma106;
 
-static void pragma103_hclib_async(void *____arg);
-static void pragma105_hclib_async(void *____arg);
+static void pragma104_hclib_async(void *____arg);
+static void pragma106_hclib_async(void *____arg);
 long long fib (int n)
 {
 	long long x, y;
 	if (n < 2) return n;
 
  { 
-pragma103 *ctx = (pragma103 *)malloc(sizeof(pragma103));
+pragma104 *ctx = (pragma104 *)malloc(sizeof(pragma104));
 ctx->n = n;
 ctx->x = x;
 ctx->y = y;
-hclib_async(pragma103_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma104_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma105 *ctx = (pragma105 *)malloc(sizeof(pragma105));
+pragma106 *ctx = (pragma106 *)malloc(sizeof(pragma106));
 ctx->n = n;
 ctx->x = x;
 ctx->y = y;
-hclib_async(pragma105_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma106_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
-} static void pragma103_hclib_async(void *____arg) {
-    pragma103 *ctx = (pragma103 *)____arg;
+} static void pragma104_hclib_async(void *____arg) {
+    pragma104 *ctx = (pragma104 *)____arg;
     int n; n = ctx->n;
     long long x; x = ctx->x;
     long long y; y = ctx->y;
@@ -140,8 +140,8 @@ hclib_async(pragma105_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 x = fib(n - 1) ;     ; hclib_end_finish();
 }
 
-static void pragma105_hclib_async(void *____arg) {
-    pragma105 *ctx = (pragma105 *)____arg;
+static void pragma106_hclib_async(void *____arg) {
+    pragma106 *ctx = (pragma106 *)____arg;
     int n; n = ctx->n;
     long long x; x = ctx->x;
     long long y; y = ctx->y;

@@ -132,7 +132,7 @@ float accuracy(float *arr1, float *arr2, int len)
 
 
 }
-typedef struct _pragma158 {
+typedef struct _pragma159 {
     float *pIn;
     float *tIn;
     float *tOut;
@@ -157,9 +157,9 @@ typedef struct _pragma158 {
     float *tIn_t;
     float *tOut_t;
     int z;
- } pragma158;
+ } pragma159;
 
-static void pragma158_hclib_async(void *____arg, const int ___iter0);
+static void pragma159_hclib_async(void *____arg, const int ___iter0);
 void computeTempOMP(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 
@@ -184,7 +184,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
         do {
             int z; 
  { 
-pragma158 *ctx = (pragma158 *)malloc(sizeof(pragma158));
+pragma159 *ctx = (pragma159 *)malloc(sizeof(pragma159));
 ctx->pIn = pIn;
 ctx->tIn = tIn;
 ctx->tOut = tOut;
@@ -214,7 +214,7 @@ domain[0].low = 0;
 domain[0].high = nz;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma158_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -225,8 +225,8 @@ free(ctx);
         } while (count < numiter);
     } 
     return; 
-} static void pragma158_hclib_async(void *____arg, const int ___iter0) {
-    pragma158 *ctx = (pragma158 *)____arg;
+} static void pragma159_hclib_async(void *____arg, const int ___iter0) {
+    pragma159 *ctx = (pragma159 *)____arg;
     float *pIn; pIn = ctx->pIn;
     float *tIn; tIn = ctx->tIn;
     float *tOut; tOut = ctx->tOut;

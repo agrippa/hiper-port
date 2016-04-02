@@ -93,7 +93,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _pragma101 {
+typedef struct _pragma102 {
     int *input_itemsets;
     int *output_itemsets;
     int *referrence;
@@ -101,9 +101,9 @@ typedef struct _pragma101 {
     int max_cols;
     int penalty;
     int blk;
- } pragma101;
+ } pragma102;
 
-typedef struct _pragma153 {
+typedef struct _pragma154 {
     int *input_itemsets;
     int *output_itemsets;
     int *referrence;
@@ -111,17 +111,17 @@ typedef struct _pragma153 {
     int max_cols;
     int penalty;
     int blk;
- } pragma153;
+ } pragma154;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter0);
-static void pragma153_hclib_async(void *____arg, const int ___iter0);
+static void pragma102_hclib_async(void *____arg, const int ___iter0);
+static void pragma154_hclib_async(void *____arg, const int ___iter0);
 void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
         int max_rows, int max_cols, int penalty)
 {
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma101 *ctx = (pragma101 *)malloc(sizeof(pragma101));
+pragma102 *ctx = (pragma102 *)malloc(sizeof(pragma102));
 ctx->input_itemsets = input_itemsets;
 ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
@@ -134,7 +134,7 @@ domain[0].low = 0;
 domain[0].high = blk;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma102_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -145,7 +145,7 @@ free(ctx);
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma153 *ctx = (pragma153 *)malloc(sizeof(pragma153));
+pragma154 *ctx = (pragma154 *)malloc(sizeof(pragma154));
 ctx->input_itemsets = input_itemsets;
 ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
@@ -158,14 +158,14 @@ domain[0].low = blk - 1;
 domain[0].high = (max_cols - 1) / 16;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma153_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma154_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
     }
 
-} static void pragma101_hclib_async(void *____arg, const int ___iter0) {
-    pragma101 *ctx = (pragma101 *)____arg;
+} static void pragma102_hclib_async(void *____arg, const int ___iter0) {
+    pragma102 *ctx = (pragma102 *)____arg;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
     int *referrence; referrence = ctx->referrence;
@@ -223,8 +223,8 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
     ; hclib_end_finish();
 }
 
-static void pragma153_hclib_async(void *____arg, const int ___iter0) {
-    pragma153 *ctx = (pragma153 *)____arg;
+static void pragma154_hclib_async(void *____arg, const int ___iter0) {
+    pragma154 *ctx = (pragma154 *)____arg;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
     int *referrence; referrence = ctx->referrence;

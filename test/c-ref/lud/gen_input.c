@@ -13,7 +13,7 @@ typedef float FP_NUMBER;
 #define GET_RAND_FP ((FP_NUMBER)rand()/((FP_NUMBER)(RAND_MAX)+(FP_NUMBER)(1)))
 char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
-typedef struct _pragma67 {
+typedef struct _pragma68 {
     int argc;
     char **argv;
     int i;
@@ -27,9 +27,9 @@ typedef struct _pragma67 {
     FILE *fl;
     FILE *fu;
     FILE *fa;
- } pragma67;
+ } pragma68;
 
-typedef struct _pragma83 {
+typedef struct _pragma84 {
     int argc;
     char **argv;
     int i;
@@ -43,10 +43,10 @@ typedef struct _pragma83 {
     FILE *fl;
     FILE *fu;
     FILE *fa;
- } pragma83;
+ } pragma84;
 
-static void pragma67_hclib_async(void *____arg, const int ___iter0);
-static void pragma83_hclib_async(void *____arg, const int ___iter0);
+static void pragma68_hclib_async(void *____arg, const int ___iter0);
+static void pragma84_hclib_async(void *____arg, const int ___iter0);
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
     FP_NUMBER sum, **L, **U, **A;
@@ -99,7 +99,7 @@ int main (int argc, char **argv){
         A[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
     }
  { 
-pragma67 *ctx = (pragma67 *)malloc(sizeof(pragma67));
+pragma68 *ctx = (pragma68 *)malloc(sizeof(pragma68));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->i = i;
@@ -118,13 +118,13 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma67_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma68_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
 
  { 
-pragma83 *ctx = (pragma83 *)malloc(sizeof(pragma83));
+pragma84 *ctx = (pragma84 *)malloc(sizeof(pragma84));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->i = i;
@@ -143,7 +143,7 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma83_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma84_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -180,8 +180,8 @@ free(ctx);
     free(A);
 
     return 0;
-} static void pragma67_hclib_async(void *____arg, const int ___iter0) {
-    pragma67 *ctx = (pragma67 *)____arg;
+} static void pragma68_hclib_async(void *____arg, const int ___iter0) {
+    pragma68 *ctx = (pragma68 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int i; i = ctx->i;
@@ -215,8 +215,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma83_hclib_async(void *____arg, const int ___iter0) {
-    pragma83 *ctx = (pragma83 *)____arg;
+static void pragma84_hclib_async(void *____arg, const int ___iter0) {
+    pragma84 *ctx = (pragma84 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int i; i = ctx->i;
