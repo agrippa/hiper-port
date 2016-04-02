@@ -138,7 +138,7 @@ typedef struct _pragma185 {
     pthread_mutex_t reduction_mutex;
  } pragma185;
 
-static void pragma185_hclib_async(void *____arg, const int ___iter);
+static void pragma185_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     float **feature;
     int nfeatures;
@@ -212,12 +212,12 @@ ctx->partial_new_centers = partial_new_centers;
 ctx->delta = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = npoints;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma185_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = npoints;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma185_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 delta = ctx->delta;
@@ -343,7 +343,7 @@ free(ctx);
     free(new_centers_len);
 
     return clusters;
-}  static void pragma185_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma185_hclib_async(void *____arg, const int ___iter0) {
     pragma185 *ctx = (pragma185 *)____arg;
     float **feature; feature = ctx->feature;
     int nfeatures; nfeatures = ctx->nfeatures;
@@ -367,7 +367,7 @@ free(ctx);
     float ***partial_new_centers; partial_new_centers = ctx->partial_new_centers;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				

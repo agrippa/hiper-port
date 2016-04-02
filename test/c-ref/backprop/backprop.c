@@ -245,7 +245,7 @@ typedef struct _pragma245 {
     pthread_mutex_t reduction_mutex;
  } pragma245;
 
-static void pragma245_hclib_async(void *____arg, const int ___iter);
+static void pragma245_hclib_async(void *____arg, const int ___iter0);
 void bpnn_layerforward(l1, l2, conn, n1, n2)
 float *l1, *l2, **conn;
 int n1, n2;
@@ -268,17 +268,17 @@ ctx->k = k;
 ctx->sum = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
-hclib_loop_domain_t domain;
-domain.low = 1;
-domain.high = (n2) + 1;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma245_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 1;
+domain[0].high = (n2) + 1;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma245_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 sum = ctx->sum;
  } 
-} static void pragma245_hclib_async(void *____arg, const int ___iter) {
+} static void pragma245_hclib_async(void *____arg, const int ___iter0) {
     pragma245 *ctx = (pragma245 *)____arg;
     float *l1; l1 = ctx->l1;
     float *l2; l2 = ctx->l2;
@@ -290,7 +290,7 @@ sum = ctx->sum;
     int k; k = ctx->k;
     hclib_start_finish();
     do {
-    j = ___iter;
+    j = ___iter0;
 {
 
     /*** Compute weighted sum of its inputs ***/
@@ -367,7 +367,7 @@ typedef struct _pragma312 {
     int j;
  } pragma312;
 
-static void pragma312_hclib_async(void *____arg, const int ___iter);
+static void pragma312_hclib_async(void *____arg, const int ___iter0);
 void bpnn_adjust_weights(delta, ndelta, ly, nly, w, oldw)
 float *delta, *ly, **w, **oldw;
 {
@@ -388,16 +388,16 @@ ctx->oldw = oldw;
 ctx->new_dw = new_dw;
 ctx->k = k;
 ctx->j = j;
-hclib_loop_domain_t domain;
-domain.low = 1;
-domain.high = (ndelta) + 1;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma312_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 1;
+domain[0].high = (ndelta) + 1;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma312_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma312_hclib_async(void *____arg, const int ___iter) {
+} static void pragma312_hclib_async(void *____arg, const int ___iter0) {
     pragma312 *ctx = (pragma312 *)____arg;
     float *delta; delta = ctx->delta;
     int ndelta; ndelta = ctx->ndelta;
@@ -410,7 +410,7 @@ free(ctx);
     int j; j = ctx->j;
     hclib_start_finish();
     do {
-    j = ___iter;
+    j = ___iter0;
 {
     for (k = 0; k <= nly; k++) {
       new_dw = ((ETA * delta[j] * ly[k]) + (MOMENTUM * oldw[k][j]));

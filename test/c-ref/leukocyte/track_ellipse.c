@@ -28,7 +28,7 @@ typedef struct _pragma84 {
     int Iw;
  } pragma84;
 
-static void pragma84_hclib_async(void *____arg, const int ___iter);
+static void pragma84_hclib_async(void *____arg, const int ___iter0);
 void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
 	/*
 	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
@@ -133,12 +133,12 @@ ctx->cell_num = cell_num;
 ctx->I = I;
 ctx->Ih = Ih;
 ctx->Iw = Iw;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = Nc;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma84_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = Nc;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma84_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -176,7 +176,7 @@ free(ctx);
 	printf("------------------------------------\n");
 	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
 	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
-} static void pragma84_hclib_async(void *____arg, const int ___iter) {
+} static void pragma84_hclib_async(void *____arg, const int ___iter0) {
     pragma84 *ctx = (pragma84 *)____arg;
     avi_t *video; video = ctx->video;
     double *xc0; xc0 = ctx->xc0;
@@ -203,7 +203,7 @@ free(ctx);
     int Iw; Iw = ctx->Iw;
     hclib_start_finish();
     do {
-    cell_num = ___iter;
+    cell_num = ___iter0;
 {
 			// Make copies of the current cell's location
 			double xci = xc[cell_num][frame_num];

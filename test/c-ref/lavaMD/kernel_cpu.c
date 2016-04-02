@@ -73,7 +73,7 @@ typedef struct _pragma114 {
     THREE_VECTOR d;
  } pragma114;
 
-static void pragma114_hclib_async(void *____arg, const int ___iter);
+static void pragma114_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     par_str par;
     dim_str dim;
@@ -183,12 +183,12 @@ ctx->fxij = fxij;
 ctx->fyij = fyij;
 ctx->fzij = fzij;
 ctx->d = d;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = dim.number_boxes;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma114_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = dim.number_boxes;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma114_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  }  // for l
@@ -313,7 +313,7 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time4-time0) / 1000000);
 
-}  static void pragma114_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma114_hclib_async(void *____arg, const int ___iter0) {
     pragma114 *ctx = (pragma114 *)____arg;
     par_str par; par = ctx->par;
     dim_str dim; dim = ctx->dim;
@@ -349,7 +349,7 @@ free(ctx);
     THREE_VECTOR d; d = ctx->d;
     hclib_start_finish();
     do {
-    l = ___iter;
+    l = ___iter0;
 {
 
 		//------------------------------------------------------------------------------------------100

@@ -107,7 +107,7 @@ typedef struct _pragma548 {
     int omp_num_threads;
  } pragma548;
 
-static void pragma548_hclib_async(void *____arg, const int ___iter);
+static void pragma548_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -159,12 +159,12 @@ memcpy(ctx->private, private, 51 * (sizeof(private_struct)));
 ctx->video_file_name = video_file_name;
 ctx->d_frames = d_frames;
 ctx->omp_num_threads = omp_num_threads;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = public.allPoints;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma548_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = public.allPoints;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma548_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -704,7 +704,7 @@ free(ctx);
 		free(private[i].d_mask_conv);
 	}
 
-}  static void pragma548_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma548_hclib_async(void *____arg, const int ___iter0) {
     pragma548 *ctx = (pragma548 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -717,7 +717,7 @@ free(ctx);
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
 			kernel(	public,
 						private[i]);

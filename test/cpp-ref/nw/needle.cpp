@@ -113,8 +113,8 @@ typedef struct _pragma153 {
     int blk;
  } pragma153;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter);
-static void pragma153_hclib_async(void *____arg, const int ___iter);
+static void pragma101_hclib_async(void *____arg, const int ___iter0);
+static void pragma153_hclib_async(void *____arg, const int ___iter0);
 void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
         int max_rows, int max_cols, int penalty)
 {
@@ -129,12 +129,12 @@ ctx->max_rows = max_rows;
 ctx->max_cols = max_cols;
 ctx->penalty = penalty;
 ctx->blk = blk;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = blk;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = blk;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -153,18 +153,18 @@ ctx->max_rows = max_rows;
 ctx->max_cols = max_cols;
 ctx->penalty = penalty;
 ctx->blk = blk;
-hclib_loop_domain_t domain;
-domain.low = blk - 1;
-domain.high = (max_cols - 1) / 16;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma153_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = blk - 1;
+domain[0].high = (max_cols - 1) / 16;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma153_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
     }
 
-} static void pragma101_hclib_async(void *____arg, const int ___iter) {
+} static void pragma101_hclib_async(void *____arg, const int ___iter0) {
     pragma101 *ctx = (pragma101 *)____arg;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
@@ -175,7 +175,7 @@ free(ctx);
     int blk; blk = ctx->blk;
     hclib_start_finish();
     do {
-    int b_index_x;     b_index_x = ___iter;
+    int b_index_x;     b_index_x = ___iter0;
 {
             int b_index_y = blk - 1 - b_index_x;
             int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
@@ -223,7 +223,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
     ; hclib_end_finish();
 }
 
-static void pragma153_hclib_async(void *____arg, const int ___iter) {
+static void pragma153_hclib_async(void *____arg, const int ___iter0) {
     pragma153 *ctx = (pragma153 *)____arg;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
@@ -234,7 +234,7 @@ static void pragma153_hclib_async(void *____arg, const int ___iter) {
     int blk; blk = ctx->blk;
     hclib_start_finish();
     do {
-    int b_index_x;     b_index_x = ___iter;
+    int b_index_x;     b_index_x = ___iter0;
 {
             int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
 

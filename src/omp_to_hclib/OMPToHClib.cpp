@@ -90,10 +90,14 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
                     true);
             return getDeclarationTypeStr(constantArrayType->getElementType(),
                     name, soFarBefore, soFarAfter + "[" + sizeStr + "]");
+        } else if (const clang::ParenType *parenType =
+                clang::dyn_cast<clang::ParenType>(arrayType)) {
+            return getDeclarationTypeStr(parenType->getInnerType(), name,
+                    soFarBefore + " (", ")" + soFarAfter);
         } else {
             std::cerr << "Unsupported array type " <<
-                std::string(type->getTypeClassName()) << " while building " <<
-                "declaration for " << name << std::endl;
+                std::string(arrayType->getTypeClassName()) <<
+                " while building " << "declaration for " << name << std::endl;
             exit(1);
         }
     } else if (const clang::PointerType *pointerType =
@@ -393,11 +397,16 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 }
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
-        bool isForasyncClosure) {
+        bool isForasyncClosure, int forasyncDim) {
     std::stringstream ss;
     ss << "static void " << closureName << "(void *____arg";
     if (isForasyncClosure) {
-        ss << ", const int ___iter";
+        assert(forasyncDim > 0);
+        for (int i = 0; i < forasyncDim; i++) {
+            ss << ", const int ___iter" << i;
+        }
+    } else {
+        assert(forasyncDim == -1);
     }
     ss << ");\n";
     return ss.str();
@@ -407,13 +416,15 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
         std::string bodyStr, std::vector<OMPReductionVar> *reductions,
-        const clang::ValueDecl *condVar) {
+        std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
 
     std::stringstream ss;
     ss << "static void " << closureName << "(void *____arg";
     if (isForasyncClosure) {
-        ss << ", const int ___iter";
+        for (int i = 0; i < condVars->size(); i++) {
+            ss << ", const int ___iter" << i;
+        }
     }
     ss << ") {\n";
 
@@ -448,11 +459,23 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
          * the initialization clause, make sure the condition variable still gets
          * added into the body of the kernel.
          */
-        if (std::find(captured->begin(), captured->end(), condVar) == captured->end()) {
-            ss << "    " << getDeclarationTypeStr(condVar->getType(),
-                    condVar->getNameAsString(), "", "") << "; ";
+        for (std::vector<const clang::ValueDecl *>::iterator i =
+                condVars->begin(), e = condVars->end(); i != e; i++) {
+            const clang::ValueDecl *condVar = *i;
+            if (std::find(captured->begin(), captured->end(), condVar) == captured->end()) {
+                ss << "    " << getDeclarationTypeStr(condVar->getType(),
+                        condVar->getNameAsString(), "", "") << "; ";
+            }
         }
-        ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
+
+        int iterCount = 0;
+        for (std::vector<const clang::ValueDecl *>::iterator i =
+                condVars->begin(), e = condVars->end(); i != e; i++) {
+            const clang::ValueDecl *condVar = *i;
+            ss << "    " << condVar->getNameAsString() << " = ___iter" <<
+                iterCount << ";\n";
+            iterCount++;
+        }
     }
 
     ss << bodyStr << " ; ";
@@ -643,7 +666,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     std::string bodyStr = stmtToString(body);
 
                     accumulatedKernelDecls += getClosureDecl(
-                            node->getLbl() + ASYNC_SUFFIX, false);
+                            node->getLbl() + ASYNC_SUFFIX, false, -1);
 
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
@@ -684,7 +707,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                     if (clauses->hasClause("for")) {
 
-                        const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
+                        const clang::ForStmt *forLoop =
+                            clang::dyn_cast<clang::ForStmt>(node->getBody());
                         if (!forLoop) {
                             std::cerr << "Expected to find for loop " <<
                                 "inside omp parallel for at line " <<
@@ -694,34 +718,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             std::cerr << stmtToString(node->getBody()) << std::endl;
                             exit(1);
                         }
-                        const clang::Stmt *init = forLoop->getInit();
-                        const clang::Stmt *cond = forLoop->getCond();
-                        const clang::Expr *inc = forLoop->getInc();
-
-                        std::string bodyStr = stmtToString(forLoop->getBody());
-
-                        const clang::ValueDecl *condVar = NULL;
-                        std::string lowStr =
-                            getCondVarAndLowerBoundFromInit(init,
-                                    &condVar);
-                        assert(condVar);
-
-                        std::string highStr = getUpperBoundFromCond(
-                                cond, condVar);
-
-                        std::string strideStr = getStrideFromIncr(inc,
-                                condVar);
-
-                        accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, true);
 
                         std::vector<OMPReductionVar> *reductions =
                             getReductions(clauses);
-
-                        accumulatedKernelDefs += getClosureDef(
-                                node->getLbl() + ASYNC_SUFFIX, true, false,
-                                node->getLbl(), node->getCaptures(),
-                                bodyStr, reductions, condVar);
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(), node->getCaptures(),
@@ -733,14 +732,57 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             getContextSetup(node->getLbl(), node->getCaptures(),
                                     reductions);
 
-                        contextCreation << "hclib_loop_domain_t domain;\n";
-                        contextCreation << "domain.low = " << lowStr << ";\n";
-                        contextCreation << "domain.high = " << highStr << ";\n";
-                        contextCreation << "domain.stride = " << strideStr << ";\n";
-                        contextCreation << "domain.tile = 1;\n";
-                        contextCreation << "hclib_future_t *fut = hclib_forasync_future((void *)" <<
-                            node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, 1, " <<
-                            "&domain, FORASYNC_MODE_RECURSIVE);\n";
+                        std::string bodyStr;
+                        std::vector<const clang::ValueDecl *> condVars;
+                        const int nLoops = clauses->getNumCollapsedLoops();
+                        contextCreation << "hclib_loop_domain_t domain[" <<
+                            nLoops << "];\n";
+
+                        accumulatedKernelDecls += getClosureDecl(
+                                node->getLbl() + ASYNC_SUFFIX, true, nLoops);
+
+                        const clang::ForStmt *currLoop = forLoop;
+                        for (int l = 0; l < nLoops; l++) {
+                            const clang::Stmt *init = currLoop->getInit();
+                            const clang::Stmt *cond = currLoop->getCond();
+                            const clang::Expr *inc = currLoop->getInc();
+
+                            const clang::ValueDecl *condVar = NULL;
+                            std::string lowStr =
+                                getCondVarAndLowerBoundFromInit(init,
+                                        &condVar);
+                            assert(condVar);
+                            condVars.push_back(condVar);
+                            std::string highStr = getUpperBoundFromCond(
+                                    cond, condVar);
+                            std::string strideStr = getStrideFromIncr(inc,
+                                    condVar);
+
+                            bodyStr = stmtToString(currLoop->getBody());
+
+                            contextCreation << "domain["  << l << "].low = " <<
+                                lowStr << ";\n";
+                            contextCreation << "domain["  << l << "].high = " <<
+                                highStr << ";\n";
+                            contextCreation << "domain["  << l <<
+                                "].stride = " << strideStr << ";\n";
+                            contextCreation << "domain["  << l <<
+                                "].tile = 1;\n";
+
+                            currLoop = clang::dyn_cast<clang::ForStmt>(
+                                    currLoop->getBody());
+                            assert(currLoop || l == nLoops - 1);
+                        }
+
+                        accumulatedKernelDefs += getClosureDef(
+                                node->getLbl() + ASYNC_SUFFIX, true, false,
+                                node->getLbl(), node->getCaptures(),
+                                bodyStr, reductions, &condVars);
+
+                        contextCreation << "hclib_future_t *fut = " <<
+                            "hclib_forasync_future((void *)" <<
+                            node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, " <<
+                            nLoops << ", domain, FORASYNC_MODE_RECURSIVE);\n";
                         contextCreation << "hclib_future_wait(fut);\n";
                         contextCreation << "free(ctx);\n";
 
@@ -948,13 +990,61 @@ OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
     size_t ompPragmaNameEnd = pragmaArgs.find(' ');
     std::string ompPragma;
 
+    OMPClauses *parsed = NULL;
     if (ompPragmaNameEnd != std::string::npos) {
         // Some clauses, non-empty args
         std::string clauses = pragmaArgs.substr(ompPragmaNameEnd + 1);
-        return new OMPClauses(clauses);
+        parsed = new OMPClauses(clauses);
+        ompPragma = pragmaArgs.substr(0, ompPragmaNameEnd);
     } else {
-        return new OMPClauses();
+        parsed = new OMPClauses();
+        ompPragma = pragmaArgs;
     }
+
+    /*
+     * This block of code is just here to make sure that if we run into a new
+     * OMP clause we haven't tested before an error message prompts us. Since it
+     * is decoupled from the actual handling of these clauses, this isn't a
+     * particularly safe check.
+     */
+    for (std::map<std::string, std::vector<SingleClauseArgs *> *>::iterator i =
+            parsed->begin(), e = parsed->end(); i != e; i++) {
+        std::string clauseName = i->first;
+        bool handledClause = false;
+
+        if (ompPragma == "parallel") {
+            if (clauseName == "collapse") {
+                assert(parsed->hasClause("for"));
+                handledClause = true;
+            } else if (clauseName == "for" || clauseName == "private" ||
+                    clauseName == "shared" || clauseName == "schedule" ||
+                    clauseName == "reduction" || clauseName == "firstprivate" ||
+                    clauseName == "num_threads" || clauseName == "default") {
+                // Do nothing
+                handledClause = true;
+            }
+        } else if (ompPragma == "task") {
+            //TODO support depend
+            if (clauseName == "firstprivate" || clauseName == "private" ||
+                    clauseName == "shared" || clauseName == "untied" ||
+                    clauseName == "default") {
+                // Do nothing
+                handledClause = true;
+            }
+        } else if (ompPragma == "single") {
+            if (clauseName == "private" || clauseName == "nowait") {
+                // Do nothing
+                handledClause = true;
+            }
+        }
+        if (!handledClause) {
+            std::cerr << "Unchecked clause \"" << clauseName <<
+                "\" on OMP pragma \"" << ompPragma << "\"" << std::endl;
+            exit(1);
+        }
+    }
+
+    return parsed;
 }
 
 std::vector<OMPReductionVar> *OMPToHClib::getReductions(OMPClauses *clauses) {

@@ -52,8 +52,8 @@ typedef struct _pragma104 {
     int chunks_per_inter;
  } pragma104;
 
-static void pragma52_hclib_async(void *____arg, const int ___iter);
-static void pragma104_hclib_async(void *____arg, const int ___iter);
+static void pragma52_hclib_async(void *____arg, const int ___iter0);
+static void pragma104_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     float *a;
     int size;
@@ -86,12 +86,12 @@ ctx->chunk_idx = chunk_idx;
 ctx->size_inter = size_inter;
 ctx->chunks_in_inter_row = chunks_in_inter_row;
 ctx->chunks_per_inter = chunks_per_inter;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = chunks_in_inter_row;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma52_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = chunks_in_inter_row;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma52_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -109,12 +109,12 @@ ctx->chunk_idx = chunk_idx;
 ctx->size_inter = size_inter;
 ctx->chunks_in_inter_row = chunks_in_inter_row;
 ctx->chunks_per_inter = chunks_per_inter;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = chunks_per_inter;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = chunks_per_inter;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -131,7 +131,7 @@ ctx->size = size;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma52_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma52_hclib_async(void *____arg, const int ___iter0) {
     pragma52 *ctx = (pragma52 *)____arg;
     float *a; a = ctx->a;
     int size; size = ctx->size;
@@ -142,7 +142,7 @@ free(ctx);
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
     hclib_start_finish();
     do {
-    chunk_idx = ___iter;
+    chunk_idx = ___iter0;
 {
             int i, j, k, i_global, j_global, i_here, j_here;
             float sum;           
@@ -191,7 +191,7 @@ for (j =0; j < BS; j++){
     ; hclib_end_finish();
 }
 
-static void pragma104_hclib_async(void *____arg, const int ___iter) {
+static void pragma104_hclib_async(void *____arg, const int ___iter0) {
     pragma104 *ctx = (pragma104 *)____arg;
     float *a; a = ctx->a;
     int size; size = ctx->size;
@@ -202,7 +202,7 @@ static void pragma104_hclib_async(void *____arg, const int ___iter) {
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
     hclib_start_finish();
     do {
-    chunk_idx = ___iter;
+    chunk_idx = ___iter0;
 {
             int i, j, k, i_global, j_global;
             float temp_top[BS*BS] __attribute__ ((aligned (64)));

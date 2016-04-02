@@ -17,6 +17,11 @@ class OMPClauses {
         bool hasClause(std::string clause);
         std::string getSingleArg(std::string clause);
         std::vector<SingleClauseArgs *> *getArgs(std::string clause);
+
+        int getNumCollapsedLoops();
+
+        std::map<std::string, std::vector<SingleClauseArgs *> *>::iterator begin();
+        std::map<std::string, std::vector<SingleClauseArgs *> *>::iterator end();
 };
 
 #endif

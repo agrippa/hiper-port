@@ -99,7 +99,7 @@ typedef struct _pragma113 {
     MAT *gicov;
  } pragma113;
 
-static void pragma113_hclib_async(void *____arg, const int ___iter);
+static void pragma113_hclib_async(void *____arg, const int ___iter0);
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
@@ -144,18 +144,18 @@ ctx->MaxR = MaxR;
 ctx->height = height;
 ctx->width = width;
 ctx->gicov = gicov;
-hclib_loop_domain_t domain;
-domain.low = MaxR;
-domain.high = width - MaxR;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma113_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = MaxR;
+domain[0].high = width - MaxR;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma113_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
 	
 	return gicov;
-} static void pragma113_hclib_async(void *____arg, const int ___iter) {
+} static void pragma113_hclib_async(void *____arg, const int ___iter0) {
     pragma113 *ctx = (pragma113 *)____arg;
     MAT *grad_x; grad_x = ctx->grad_x;
     MAT *grad_y; grad_y = ctx->grad_y;
@@ -173,7 +173,7 @@ free(ctx);
     MAT *gicov; gicov = ctx->gicov;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
@@ -250,7 +250,7 @@ typedef struct _pragma188 {
     int i;
  } pragma188;
 
-static void pragma188_hclib_async(void *____arg, const int ___iter);
+static void pragma188_hclib_async(void *____arg, const int ___iter0);
 MAT * dilate_f(MAT * img_in, MAT * strel) {
 	MAT * dilated = m_get(img_in->m, img_in->n);
 	
@@ -266,18 +266,18 @@ ctx->dilated = dilated;
 ctx->el_center_i = el_center_i;
 ctx->el_center_j = el_center_j;
 ctx->i = i;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = img_in->m;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = img_in->m;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
 
 	return dilated;
-} static void pragma188_hclib_async(void *____arg, const int ___iter) {
+} static void pragma188_hclib_async(void *____arg, const int ___iter0) {
     pragma188 *ctx = (pragma188 *)____arg;
     MAT *img_in; img_in = ctx->img_in;
     MAT *strel; strel = ctx->strel;
@@ -287,7 +287,7 @@ free(ctx);
     int i; i = ctx->i;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {

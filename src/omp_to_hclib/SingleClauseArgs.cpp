@@ -1,5 +1,6 @@
 #include "SingleClauseArgs.h"
 
+#include <iostream>
 #include <assert.h>
 
 int skipWhiteSpace(std::string s, int index) {
@@ -10,8 +11,14 @@ int skipWhiteSpace(std::string s, int index) {
 }
 
 int seekPastToken(std::string s, int index) {
-    while (index < s.size() && s[index] != ',' &&
-            s[index] != ' ' && s[index] != ':') {
+    int braceDepth = 0;
+    while (index < s.size() && (braceDepth > 0 || (s[index] != ',' &&
+            s[index] != ' ' && s[index] != ':'))) {
+        if (s[index] == '[') {
+            braceDepth++;
+        } else if (s[index] == ']') {
+            braceDepth--;
+        }
         index++;
     }
     return index;
@@ -28,8 +35,8 @@ SingleClauseArgs::SingleClauseArgs(std::string argsStr) {
 
         const int delimiterIndex = skipWhiteSpace(argsStr, end);
         assert(delimiterIndex == argsStr.size() ||
-                argsStr[delimiterIndex] == ',' ||
-                argsStr[delimiterIndex] == ':');
+                argsStr.at(delimiterIndex) == ',' ||
+                argsStr.at(delimiterIndex) == ':');
         index = skipWhiteSpace(argsStr, delimiterIndex + 1);
     }
 }

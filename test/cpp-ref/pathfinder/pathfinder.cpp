@@ -90,7 +90,7 @@ typedef struct _pragma101 {
     int t;
  } pragma101;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter);
+static void pragma101_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -124,12 +124,12 @@ ctx->dst = dst;
 ctx->temp = temp;
 ctx->min = min;
 ctx->t = t;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = cols;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = cols;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -177,7 +177,7 @@ free(ctx);
     delete [] wall;
     delete [] dst;
     delete [] src;
-}  static void pragma101_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma101_hclib_async(void *____arg, const int ___iter0) {
     pragma101 *ctx = (pragma101 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -189,7 +189,7 @@ free(ctx);
     int t; t = ctx->t;
     hclib_start_finish();
     do {
-    int n;     n = ___iter;
+    int n;     n = ___iter0;
 {
           min = src[n];
           if (n > 0)

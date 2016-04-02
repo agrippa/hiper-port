@@ -127,8 +127,8 @@ typedef struct _pragma159 {
     int nthreads;
  } pragma159;
 
-static void pragma126_hclib_async(void *____arg, const int ___iter);
-static void pragma159_hclib_async(void *____arg, const int ___iter);
+static void pragma126_hclib_async(void *____arg, const int ___iter0);
+static void pragma159_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -285,12 +285,12 @@ ctx->lambda = lambda;
 ctx->i = i;
 ctx->j = j;
 ctx->nthreads = nthreads;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = rows;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma126_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = rows;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma126_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -341,12 +341,12 @@ ctx->lambda = lambda;
 ctx->i = i;
 ctx->j = j;
 ctx->nthreads = nthreads;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = rows;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = rows;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -501,7 +501,7 @@ free(ctx);
 
 	free(c);
 	return 0;
-}  static void pragma126_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma126_hclib_async(void *____arg, const int ___iter0) {
     pragma126 *ctx = (pragma126 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -550,7 +550,7 @@ free(ctx);
     int nthreads; nthreads = ctx->nthreads;
     hclib_start_finish();
     do {
-    int i;     i = ___iter;
+    int i;     i = ___iter0;
 {
             for (int j = 0; j < cols; j++) { 
 		
@@ -586,7 +586,7 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma159_hclib_async(void *____arg, const int ___iter) {
+static void pragma159_hclib_async(void *____arg, const int ___iter0) {
     pragma159 *ctx = (pragma159 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -635,7 +635,7 @@ static void pragma159_hclib_async(void *____arg, const int ___iter) {
     int nthreads; nthreads = ctx->nthreads;
     hclib_start_finish();
     do {
-    int i;     i = ___iter;
+    int i;     i = ___iter0;
 {
             for (int j = 0; j < cols; j++) {        
 

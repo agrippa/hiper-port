@@ -354,8 +354,8 @@ typedef struct _pragma466 {
     double t2;
  } pragma466;
 
-static void pragma390_hclib_async(void *____arg, const int ___iter);
-static void pragma466_hclib_async(void *____arg, const int ___iter);
+static void pragma390_hclib_async(void *____arg, const int ___iter0);
+static void pragma466_hclib_async(void *____arg, const int ___iter0);
 double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
@@ -468,12 +468,12 @@ ctx->gl_lower = gl_lower;
 ctx->cost_of_opening_x = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
-hclib_loop_domain_t domain;
-domain.low = k1;
-domain.high = k2;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma390_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = k1;
+domain[0].high = k2;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma390_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 cost_of_opening_x = ctx->cost_of_opening_x;
@@ -553,12 +553,12 @@ ctx->t1 = t1;
 ctx->lower = lower;
 ctx->gl_lower = gl_lower;
 ctx->t2 = t2;
-hclib_loop_domain_t domain;
-domain.low = k1;
-domain.high = k2;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma466_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = k1;
+domain[0].high = k2;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma466_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -595,7 +595,7 @@ free(ctx);
 #endif
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
-} static void pragma390_hclib_async(void *____arg, const int ___iter) {
+} static void pragma390_hclib_async(void *____arg, const int ___iter0) {
     pragma390 *ctx = (pragma390 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
@@ -621,7 +621,7 @@ free(ctx);
     double *gl_lower; gl_lower = ctx->gl_lower;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
     float x_cost = dist(points->p[i], points->p[x], points->dim) 
       * points->p[i].weight;
@@ -655,7 +655,7 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma466_hclib_async(void *____arg, const int ___iter) {
+static void pragma466_hclib_async(void *____arg, const int ___iter0) {
     pragma466 *ctx = (pragma466 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
@@ -682,7 +682,7 @@ static void pragma466_hclib_async(void *____arg, const int ___iter) {
     double t2; t2 = ctx->t2;
     hclib_start_finish();
     do {
-    int i;     i = ___iter;
+    int i;     i = ___iter0;
 {
       bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
       if ( switch_membership[i] || close_center ) {

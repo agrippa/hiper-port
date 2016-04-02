@@ -60,7 +60,7 @@ typedef struct _pragma93 {
     int bid;
  } pragma93;
 
-static void pragma93_hclib_async(void *____arg, const int ___iter);
+static void pragma93_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int cores_arg;
     knode *knodes;
@@ -139,12 +139,12 @@ ctx->i = i;
 ctx->threadsPerBlock = threadsPerBlock;
 ctx->thid = thid;
 ctx->bid = bid;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = count;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma93_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = count;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma93_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -229,7 +229,7 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  static void pragma93_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma93_hclib_async(void *____arg, const int ___iter0) {
     pragma93 *ctx = (pragma93 *)____arg;
     int cores_arg; cores_arg = ctx->cores_arg;
     knode *knodes; knodes = ctx->knodes;
@@ -254,7 +254,7 @@ free(ctx);
     int bid; bid = ctx->bid;
     hclib_start_finish();
     do {
-    bid = ___iter;
+    bid = ___iter0;
 {
 
 		// process levels of the tree

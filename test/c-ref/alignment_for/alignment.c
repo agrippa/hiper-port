@@ -462,7 +462,7 @@ typedef struct _pragma465 {
     int *matptr;
  } pragma465;
 
-static void pragma465_hclib_async(void *____arg, const int ___iter);
+static void pragma465_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int i;
     int n;
@@ -508,12 +508,12 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = nseqs;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma465_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = nseqs;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma465_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  }  // end parallel for (i)
@@ -548,7 +548,7 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
    return 0;
-}  static void pragma465_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma465_hclib_async(void *____arg, const int ___iter0) {
     pragma465 *ctx = (pragma465 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
@@ -564,7 +564,7 @@ free(ctx);
     int *matptr; matptr = ctx->matptr;
     hclib_start_finish();
     do {
-    si = ___iter;
+    si = ___iter0;
 {
      n = seqlen_array[si+1];
      for (i = 1, len1 = 0; i <= n; i++) {

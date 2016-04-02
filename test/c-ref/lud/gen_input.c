@@ -45,8 +45,8 @@ typedef struct _pragma83 {
     FILE *fa;
  } pragma83;
 
-static void pragma67_hclib_async(void *____arg, const int ___iter);
-static void pragma83_hclib_async(void *____arg, const int ___iter);
+static void pragma67_hclib_async(void *____arg, const int ___iter0);
+static void pragma83_hclib_async(void *____arg, const int ___iter0);
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
     FP_NUMBER sum, **L, **U, **A;
@@ -113,12 +113,12 @@ ctx->A = A;
 ctx->fl = fl;
 ctx->fu = fu;
 ctx->fa = fa;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = MatrixDim;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma67_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = MatrixDim;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma67_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -138,12 +138,12 @@ ctx->A = A;
 ctx->fl = fl;
 ctx->fu = fu;
 ctx->fa = fa;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = MatrixDim;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma83_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = MatrixDim;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma83_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -180,7 +180,7 @@ free(ctx);
     free(A);
 
     return 0;
-} static void pragma67_hclib_async(void *____arg, const int ___iter) {
+} static void pragma67_hclib_async(void *____arg, const int ___iter0) {
     pragma67 *ctx = (pragma67 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -197,7 +197,7 @@ free(ctx);
     FILE *fa; fa = ctx->fa;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
         for (j=0; j < MatrixDim; j++){
             if ( i == j) {
@@ -215,7 +215,7 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma83_hclib_async(void *____arg, const int ___iter) {
+static void pragma83_hclib_async(void *____arg, const int ___iter0) {
     pragma83 *ctx = (pragma83 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -232,7 +232,7 @@ static void pragma83_hclib_async(void *____arg, const int ___iter) {
     FILE *fa; fa = ctx->fa;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
         for (j=0; j < MatrixDim; j++){
             sum = 0;

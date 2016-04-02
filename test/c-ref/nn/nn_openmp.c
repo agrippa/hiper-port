@@ -52,7 +52,7 @@ typedef struct _pragma117 {
     float *z;
  } pragma117;
 
-static void pragma117_hclib_async(void *____arg, const int ___iter);
+static void pragma117_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -156,12 +156,12 @@ ctx->tmp_long = tmp_long;
 memcpy(ctx->filename_buf, filename_buf, 1024 * (sizeof(char))); 
 ctx->rodinia_data_dir = rodinia_data_dir;
 ctx->z = z;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = rec_count;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma117_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = rec_count;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma117_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -281,7 +281,7 @@ free(ctx);
     long long time1 = clock();
     printf("total time : %15.12f s\n", (float) (time1 - time0) / 1000000);
     return 0;
-}  static void pragma117_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma117_hclib_async(void *____arg, const int ___iter0) {
     pragma117 *ctx = (pragma117 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -307,7 +307,7 @@ free(ctx);
     float *z; z = ctx->z;
     hclib_start_finish();
     do {
-    i = ___iter;
+    i = ___iter0;
 {
 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
             float tmp_lat = atof(rec_iter);

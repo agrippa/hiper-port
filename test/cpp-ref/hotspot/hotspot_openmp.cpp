@@ -68,7 +68,7 @@ typedef struct _pragma63 {
     int chunks_in_col;
  } pragma63;
 
-static void pragma63_hclib_async(void *____arg, const int ___iter);
+static void pragma63_hclib_async(void *____arg, const int ___iter0);
 void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
 					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
 					  FLOAT step)
@@ -100,16 +100,16 @@ ctx->chunk = chunk;
 ctx->num_chunk = num_chunk;
 ctx->chunks_in_row = chunks_in_row;
 ctx->chunks_in_col = chunks_in_col;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = num_chunk;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma63_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = num_chunk;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma63_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma63_hclib_async(void *____arg, const int ___iter) {
+} static void pragma63_hclib_async(void *____arg, const int ___iter0) {
     pragma63 *ctx = (pragma63 *)____arg;
     FLOAT *result; result = ctx->result;
     FLOAT *temp; temp = ctx->temp;
@@ -130,7 +130,7 @@ free(ctx);
     int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
     hclib_start_finish();
     do {
-    chunk = ___iter;
+    chunk = ___iter0;
 {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 

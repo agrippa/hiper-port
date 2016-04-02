@@ -84,3 +84,23 @@ std::vector<SingleClauseArgs *> *OMPClauses::getArgs(std::string clause) {
     assert(hasClause(clause));
     return parsedClauses.at(clause);
 }
+
+std::map<std::string, std::vector<SingleClauseArgs *> *>::iterator
+OMPClauses::begin() {
+    return parsedClauses.begin();
+}
+
+std::map<std::string, std::vector<SingleClauseArgs *> *>::iterator
+OMPClauses::end() {
+    return parsedClauses.end();
+}
+
+int OMPClauses::getNumCollapsedLoops() {
+    assert(hasClause("for"));
+    if (hasClause("collapse")) {
+        std::string collapseArg = getSingleArg("collapse");
+        return atoi(collapseArg.c_str());
+    } else {
+        return 1;
+    }
+}

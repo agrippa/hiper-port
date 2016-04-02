@@ -81,8 +81,8 @@ typedef struct _pragma144 {
     _Bool stop;
  } pragma144;
 
-static void pragma127_hclib_async(void *____arg, const int ___iter);
-static void pragma144_hclib_async(void *____arg, const int ___iter);
+static void pragma127_hclib_async(void *____arg, const int ___iter0);
+static void pragma144_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
@@ -152,12 +152,12 @@ ctx->h_graph_edges = h_graph_edges;
 ctx->h_cost = h_cost;
 ctx->k = k;
 ctx->stop = stop;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = no_of_nodes;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma127_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = no_of_nodes;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma127_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -183,12 +183,12 @@ ctx->h_graph_edges = h_graph_edges;
 ctx->h_cost = h_cost;
 ctx->k = k;
 ctx->stop = stop;
-hclib_loop_domain_t domain;
-domain.low = 0;
-domain.high = no_of_nodes;
-domain.stride = 1;
-domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma144_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = no_of_nodes;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma144_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -312,7 +312,7 @@ free(ctx);
 	free( h_graph_visited);
 	free( h_cost);
 
-}  static void pragma127_hclib_async(void *____arg, const int ___iter) {
+}  static void pragma127_hclib_async(void *____arg, const int ___iter0) {
     pragma127 *ctx = (pragma127 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -335,7 +335,7 @@ free(ctx);
     _Bool stop; stop = ctx->stop;
     hclib_start_finish();
     do {
-    int tid;     tid = ___iter;
+    int tid;     tid = ___iter0;
 {
                 if (h_graph_mask[tid] == true){ 
                     h_graph_mask[tid]=false;
@@ -353,7 +353,7 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pragma144_hclib_async(void *____arg, const int ___iter) {
+static void pragma144_hclib_async(void *____arg, const int ___iter0) {
     pragma144 *ctx = (pragma144 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
@@ -376,7 +376,7 @@ static void pragma144_hclib_async(void *____arg, const int ___iter) {
     _Bool stop; stop = ctx->stop;
     hclib_start_finish();
     do {
-    int tid;     tid = ___iter;
+    int tid;     tid = ___iter0;
 {
                 if (h_updating_graph_mask[tid] == true){
                     h_graph_mask[tid]=true;
