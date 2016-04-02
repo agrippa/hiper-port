@@ -296,15 +296,18 @@ std::string OMPToHClib::getCondVarAndLowerBoundFromInit(const clang::Stmt *init,
 std::string OMPToHClib::getUpperBoundFromCond(const clang::Stmt *cond,
         const clang::ValueDecl *condVar) {
     if (const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(cond)) {
+        clang::Expr *lhs = unwrapCasts(bin->getLHS());
+        const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
+        assert(declref);
+        const clang::ValueDecl *decl = declref->getDecl();
+        assert(condVar == decl);
+
         if (bin->getOpcode() == clang::BO_LT) {
-            clang::Expr *lhs = unwrapCasts(bin->getLHS());
-            const clang::DeclRefExpr *declref = clang::dyn_cast<clang::DeclRefExpr>(lhs);
-            assert(declref);
-            const clang::ValueDecl *decl = declref->getDecl();
-            assert(condVar == decl);
             return stringForAST(bin->getRHS());
+        } else if (bin->getOpcode() == clang::BO_LE) {
+            return "(" + stringForAST(bin->getRHS()) + ") + 1"; // assumes integral values?
         } else {
-            std::cerr << "Unsupported binary operator" << std::endl;
+            std::cerr << "Unsupported binary operator " << bin->getOpcode() << std::endl;
             exit(1);
         }
     } else {
@@ -780,6 +783,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
         if (accumulatedStructDefs.length() > 0 ||
                 accumulatedKernelDefs.length() > 0) {
+            std::cerr << "Function " << func->getNameAsString() << " " << clang::isa<clang::CXXMethodDecl>(func) << std::endl;
+
             bool failed = rewriter->InsertText(func->getLocStart(),
                     accumulatedStructDefs + accumulatedKernelDecls, true, true);
             assert(!failed);
