@@ -138,7 +138,8 @@ typedef struct _pragma185 {
     pthread_mutex_t reduction_mutex;
  } pragma185;
 
-static void pragma185_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma185_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     float **feature;
     int nfeatures;
     int npoints;

@@ -267,7 +267,10 @@ typedef struct _pragma286 {
     int kk;
  } pragma286;
 
-static void pragma267_hclib_async(void *____arg);static void pragma275_hclib_async(void *____arg);static void pragma286_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma267_hclib_async(void *____arg);
+static void pragma275_hclib_async(void *____arg);
+static void pragma286_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     float **BENCH;
     int ii;
     int jj;

@@ -73,7 +73,8 @@ typedef struct _pragma114 {
     THREE_VECTOR d;
  } pragma114;
 
-static void pragma114_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma114_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     par_str par;
     dim_str dim;
     box_str *box;

@@ -1309,7 +1309,14 @@ typedef struct _pragma1155 {
     PTR RowIncrementC;
  } pragma1155;
 
-static void pragma1131_hclib_async(void *____arg);static void pragma1135_hclib_async(void *____arg);static void pragma1139_hclib_async(void *____arg);static void pragma1143_hclib_async(void *____arg);static void pragma1147_hclib_async(void *____arg);static void pragma1151_hclib_async(void *____arg);static void pragma1155_hclib_async(void *____arg);void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSize,
+static void pragma1131_hclib_async(void *____arg);
+static void pragma1135_hclib_async(void *____arg);
+static void pragma1139_hclib_async(void *____arg);
+static void pragma1143_hclib_async(void *____arg);
+static void pragma1147_hclib_async(void *____arg);
+static void pragma1151_hclib_async(void *____arg);
+static void pragma1155_hclib_async(void *____arg);
+void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSize,
      unsigned RowWidthC, unsigned RowWidthA, unsigned RowWidthB, int Depth)
 {
   unsigned QuadrantSize = MatrixSize >> 1; /* MatixSize / 2 */
@@ -2189,7 +2196,8 @@ typedef struct _pragma1277 {
     int n;
  } pragma1277;
 
-static void pragma1277_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma1277_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     REAL *A;
     REAL *B;
     REAL *C;

@@ -159,7 +159,8 @@ typedef struct _pragma158 {
     int z;
  } pragma158;
 
-static void pragma158_hclib_async(void *____arg, const int ___iter);void computeTempOMP(float *pIn, float* tIn, float *tOut, 
+static void pragma158_hclib_async(void *____arg, const int ___iter);
+void computeTempOMP(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 
         float dt, int numiter) 

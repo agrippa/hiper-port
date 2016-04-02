@@ -245,7 +245,8 @@ typedef struct _pragma245 {
     pthread_mutex_t reduction_mutex;
  } pragma245;
 
-static void pragma245_hclib_async(void *____arg, const int ___iter);void bpnn_layerforward(l1, l2, conn, n1, n2)
+static void pragma245_hclib_async(void *____arg, const int ___iter);
+void bpnn_layerforward(l1, l2, conn, n1, n2)
 float *l1, *l2, **conn;
 int n1, n2;
 {
@@ -366,7 +367,8 @@ typedef struct _pragma312 {
     int j;
  } pragma312;
 
-static void pragma312_hclib_async(void *____arg, const int ___iter);void bpnn_adjust_weights(delta, ndelta, ly, nly, w, oldw)
+static void pragma312_hclib_async(void *____arg, const int ___iter);
+void bpnn_adjust_weights(delta, ndelta, ly, nly, w, oldw)
 float *delta, *ly, **w, **oldw;
 {
   float new_dw;

@@ -145,7 +145,9 @@ typedef struct _pragma155 {
     sort_data_t *buf;
  } pragma155;
 
-static void pragma145_hclib_async(void *____arg);static void pragma155_hclib_async(void *____arg);void par_sort(void* arg) {
+static void pragma145_hclib_async(void *____arg);
+static void pragma155_hclib_async(void *____arg);
+void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
   int left = in->left; 

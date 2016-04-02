@@ -354,7 +354,9 @@ typedef struct _pragma466 {
     double t2;
  } pragma466;
 
-static void pragma390_hclib_async(void *____arg, const int ___iter);static void pragma466_hclib_async(void *____arg, const int ___iter);double pgain(long x, Points *points, double z, long int *numcenters, int pid)
+static void pragma390_hclib_async(void *____arg, const int ___iter);
+static void pragma466_hclib_async(void *____arg, const int ___iter);
+double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
 #ifdef PROFILE

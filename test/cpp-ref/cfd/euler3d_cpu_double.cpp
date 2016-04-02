@@ -55,7 +55,8 @@ typedef struct _pragma54 {
     int N;
  } pragma54;
 
-static void pragma54_hclib_async(void *____arg, const int ___iter);template <typename T> void copy(T* dst, T* src, int N)
+static void pragma54_hclib_async(void *____arg, const int ___iter);
+template <typename T> void copy(T* dst, T* src, int N)
 {
  { 
 pragma54 *ctx = (pragma54 *)malloc(sizeof(pragma54));
@@ -132,7 +133,8 @@ typedef struct _pragma103 {
     double *variables;
  } pragma103;
 
-static void pragma103_hclib_async(void *____arg, const int ___iter);void initialize_variables(int nelr, double* variables)
+static void pragma103_hclib_async(void *____arg, const int ___iter);
+void initialize_variables(int nelr, double* variables)
 {
  { 
 pragma103 *ctx = (pragma103 *)malloc(sizeof(pragma103));
@@ -213,7 +215,8 @@ typedef struct _pragma156 {
     double *step_factors;
  } pragma156;
 
-static void pragma156_hclib_async(void *____arg, const int ___iter);void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
+static void pragma156_hclib_async(void *____arg, const int ___iter);
+void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
  { 
 pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
@@ -276,7 +279,8 @@ typedef struct _pragma187 {
     double smoothing_coefficient;
  } pragma187;
 
-static void pragma187_hclib_async(void *____arg, const int ___iter);void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
+static void pragma187_hclib_async(void *____arg, const int ___iter);
+void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
 {
 	double smoothing_coefficient = double(0.2f);
 
@@ -447,7 +451,8 @@ typedef struct _pragma318 {
     double *fluxes;
  } pragma318;
 
-static void pragma318_hclib_async(void *____arg, const int ___iter);void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
+static void pragma318_hclib_async(void *____arg, const int ___iter);
+void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
  { 
 pragma318 *ctx = (pragma318 *)malloc(sizeof(pragma318));

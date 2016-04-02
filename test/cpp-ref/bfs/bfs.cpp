@@ -81,7 +81,9 @@ typedef struct _pragma144 {
     _Bool stop;
  } pragma144;
 
-static void pragma127_hclib_async(void *____arg, const int ___iter);static void pragma144_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma127_hclib_async(void *____arg, const int ___iter);
+static void pragma144_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     int no_of_nodes;

@@ -447,7 +447,8 @@ typedef struct _pragma464 {
     int *matptr;
  } pragma464;
 
-static void pragma464_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma464_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;

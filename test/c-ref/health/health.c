@@ -497,7 +497,8 @@ typedef struct _pragma508 {
     struct Village *vlist;
  } pragma508;
 
-static void pragma508_hclib_async(void *____arg);void sim_village_par(struct Village *village)
+static void pragma508_hclib_async(void *____arg);
+void sim_village_par(struct Village *village)
 {
    struct Village *vlist;
 
@@ -655,7 +656,8 @@ typedef struct _pragma645 {
     long i;
  } pragma645;
 
-static void pragma645_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma645_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     struct Village *top;
     long i;
  } main_entrypoint_ctx;

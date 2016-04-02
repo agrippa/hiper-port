@@ -153,6 +153,8 @@ std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
         return "sizeof(" + qualType.getAsString() + ")";
     } else if (const clang::DecayedType *decayedType = type->getAs<clang::DecayedType>()) {
         return getArraySizeExpr(decayedType->getOriginalType());
+    } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
+        return "sizeof(" + qualType.getAsString() + ")";
     } else {
         std::cerr << "Unsupported type while getting array size expression " <<
             std::string(type->getTypeClassName()) << std::endl;
@@ -397,7 +399,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
     if (isForasyncClosure) {
         ss << ", const int ___iter";
     }
-    ss << ");";
+    ss << ");\n";
     return ss.str();
 }
 

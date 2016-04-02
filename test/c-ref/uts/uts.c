@@ -176,7 +176,8 @@ typedef struct _pragma187 {
     unsigned long long num_nodes;
  } pragma187;
 
-static void pragma187_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma187_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     Node *root;
     unsigned long long num_nodes;
  } main_entrypoint_ctx;
@@ -235,7 +236,8 @@ typedef struct _pragma219 {
     unsigned long long *partialCount;
  } pragma219;
 
-static void pragma219_hclib_async(void *____arg);unsigned long long parTreeSearch(int depth, Node *parent, int numChildren) 
+static void pragma219_hclib_async(void *____arg);
+unsigned long long parTreeSearch(int depth, Node *parent, int numChildren) 
 {
   Node *n = (Node *)malloc(numChildren * sizeof(Node));
   Node *nodePtr;

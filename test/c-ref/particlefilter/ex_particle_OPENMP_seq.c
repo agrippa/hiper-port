@@ -717,7 +717,17 @@ typedef struct _pragma487 {
     int i;
  } pragma487;
 
-static void pragma372_hclib_async(void *____arg, const int ___iter);static void pragma387_hclib_async(void *____arg, const int ___iter);static void pragma401_hclib_async(void *____arg, const int ___iter);static void pragma409_hclib_async(void *____arg, const int ___iter);static void pragma432_hclib_async(void *____arg, const int ___iter);static void pragma439_hclib_async(void *____arg, const int ___iter);static void pragma445_hclib_async(void *____arg, const int ___iter);static void pragma454_hclib_async(void *____arg, const int ___iter);static void pragma479_hclib_async(void *____arg, const int ___iter);static void pragma487_hclib_async(void *____arg, const int ___iter);void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
+static void pragma372_hclib_async(void *____arg, const int ___iter);
+static void pragma387_hclib_async(void *____arg, const int ___iter);
+static void pragma401_hclib_async(void *____arg, const int ___iter);
+static void pragma409_hclib_async(void *____arg, const int ___iter);
+static void pragma432_hclib_async(void *____arg, const int ___iter);
+static void pragma439_hclib_async(void *____arg, const int ___iter);
+static void pragma445_hclib_async(void *____arg, const int ___iter);
+static void pragma454_hclib_async(void *____arg, const int ___iter);
+static void pragma479_hclib_async(void *____arg, const int ___iter);
+static void pragma487_hclib_async(void *____arg, const int ___iter);
+void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
 	
 	int max_size = IszX*IszY*Nfr;
 	long long start = get_time();

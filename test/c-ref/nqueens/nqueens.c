@@ -328,7 +328,8 @@ typedef struct _pragma351 {
     int i;
  } pragma351;
 
-static void pragma351_hclib_async(void *____arg);void nqueens(int n, int j, char *a, int *solutions, int depth)
+static void pragma351_hclib_async(void *____arg);
+void nqueens(int n, int j, char *a, int *solutions, int depth)
 #else
 void nqueens(int n, int j, char *a, int depth)
 #endif

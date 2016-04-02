@@ -28,7 +28,8 @@ typedef struct _pragma84 {
     int Iw;
  } pragma84;
 
-static void pragma84_hclib_async(void *____arg, const int ___iter);void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
+static void pragma84_hclib_async(void *____arg, const int ___iter);
+void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
 	/*
 	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
 	%  locations 'xc0'/'yc0' with radii R using an ellipse with Np discrete

@@ -113,7 +113,9 @@ typedef struct _pragma153 {
     int blk;
  } pragma153;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter);static void pragma153_hclib_async(void *____arg, const int ___iter);void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
+static void pragma101_hclib_async(void *____arg, const int ___iter);
+static void pragma153_hclib_async(void *____arg, const int ___iter);
+void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
         int max_rows, int max_cols, int penalty)
 {
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )

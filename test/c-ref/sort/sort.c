@@ -316,7 +316,9 @@ typedef struct _pragma351 {
     long lowsize;
  } pragma351;
 
-static void pragma349_hclib_async(void *____arg);static void pragma351_hclib_async(void *____arg);void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
+static void pragma349_hclib_async(void *____arg);
+static void pragma351_hclib_async(void *____arg);
+void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
 {
      /*
       * Cilkmerge: Merges range [low1, high1] with range [low2, high2] 
@@ -516,7 +518,13 @@ typedef struct _pragma397 {
     ELM *tmpD;
  } pragma397;
 
-static void pragma385_hclib_async(void *____arg);static void pragma387_hclib_async(void *____arg);static void pragma389_hclib_async(void *____arg);static void pragma391_hclib_async(void *____arg);static void pragma395_hclib_async(void *____arg);static void pragma397_hclib_async(void *____arg);void cilksort_par(ELM *low, ELM *tmp, long size)
+static void pragma385_hclib_async(void *____arg);
+static void pragma387_hclib_async(void *____arg);
+static void pragma389_hclib_async(void *____arg);
+static void pragma391_hclib_async(void *____arg);
+static void pragma395_hclib_async(void *____arg);
+static void pragma397_hclib_async(void *____arg);
+void cilksort_par(ELM *low, ELM *tmp, long size)
 {
      /*
       * divide the input in four parts of the same size (A, B, C, D)
@@ -820,7 +828,8 @@ void sort_init ( void )
 typedef struct _pragma477 {
  } pragma477;
 
-static void pragma477_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma477_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 static void main_entrypoint(void *____arg) {

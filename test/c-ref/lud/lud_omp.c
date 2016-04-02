@@ -52,7 +52,9 @@ typedef struct _pragma104 {
     int chunks_per_inter;
  } pragma104;
 
-static void pragma52_hclib_async(void *____arg, const int ___iter);static void pragma104_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma52_hclib_async(void *____arg, const int ___iter);
+static void pragma104_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     float *a;
     int size;
  } main_entrypoint_ctx;

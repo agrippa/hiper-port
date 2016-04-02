@@ -52,7 +52,8 @@ typedef struct _pragma117 {
     float *z;
  } pragma117;
 
-static void pragma117_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma117_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     long long time0;

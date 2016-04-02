@@ -63,7 +63,9 @@ typedef struct _pragma61 {
     int ab;
  } pragma61;
 
-static void pragma59_hclib_async(void *____arg);static void pragma61_hclib_async(void *____arg);void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
+static void pragma59_hclib_async(void *____arg);
+static void pragma61_hclib_async(void *____arg);
+void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
 {
      register double twoPiOverN;
      register int k;
@@ -212,7 +214,9 @@ typedef struct _pragma138 {
     int ab;
  } pragma138;
 
-static void pragma136_hclib_async(void *____arg);static void pragma138_hclib_async(void *____arg);void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
+static void pragma136_hclib_async(void *____arg);
+static void pragma138_hclib_async(void *____arg);
+void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
      int i, j;
      int r4 = r & (~0x3);
@@ -408,7 +412,10 @@ typedef struct _pragma214 {
     int i2;
  } pragma214;
 
-static void pragma206_hclib_async(void *____arg);static void pragma211_hclib_async(void *____arg);static void pragma214_hclib_async(void *____arg);void fft_twiddle_gen(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int r, int m)
+static void pragma206_hclib_async(void *____arg);
+static void pragma211_hclib_async(void *____arg);
+static void pragma214_hclib_async(void *____arg);
+void fft_twiddle_gen(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int r, int m)
 {
      if (i == i1 - 1) {
  { 
@@ -575,7 +582,9 @@ typedef struct _pragma278 {
     int ab;
  } pragma278;
 
-static void pragma276_hclib_async(void *____arg);static void pragma278_hclib_async(void *____arg);void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
+static void pragma276_hclib_async(void *____arg);
+static void pragma278_hclib_async(void *____arg);
+void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
      int l1, i;
      COMPLEX *jp, *kp;
@@ -750,7 +759,9 @@ typedef struct _pragma332 {
     int ab;
  } pragma332;
 
-static void pragma330_hclib_async(void *____arg);static void pragma332_hclib_async(void *____arg);void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
+static void pragma330_hclib_async(void *____arg);
+static void pragma332_hclib_async(void *____arg);
+void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
      const COMPLEX *ip;
@@ -922,7 +933,9 @@ typedef struct _pragma459 {
     int ab;
  } pragma459;
 
-static void pragma457_hclib_async(void *____arg);static void pragma459_hclib_async(void *____arg);void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
+static void pragma457_hclib_async(void *____arg);
+static void pragma459_hclib_async(void *____arg);
+void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
      int l1, i;
      COMPLEX *jp, *kp;
@@ -1165,7 +1178,9 @@ typedef struct _pragma551 {
     int ab;
  } pragma551;
 
-static void pragma549_hclib_async(void *____arg);static void pragma551_hclib_async(void *____arg);void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
+static void pragma549_hclib_async(void *____arg);
+static void pragma551_hclib_async(void *____arg);
+void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
      const COMPLEX *ip;
@@ -1416,7 +1431,9 @@ typedef struct _pragma837 {
     int ab;
  } pragma837;
 
-static void pragma835_hclib_async(void *____arg);static void pragma837_hclib_async(void *____arg);void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
+static void pragma835_hclib_async(void *____arg);
+static void pragma837_hclib_async(void *____arg);
+void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
      int l1, i;
      COMPLEX *jp, *kp;
@@ -1827,7 +1844,9 @@ typedef struct _pragma1021 {
     int ab;
  } pragma1021;
 
-static void pragma1019_hclib_async(void *____arg);static void pragma1021_hclib_async(void *____arg);void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
+static void pragma1019_hclib_async(void *____arg);
+static void pragma1021_hclib_async(void *____arg);
+void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
      const COMPLEX *ip;
@@ -2262,7 +2281,9 @@ typedef struct _pragma1683 {
     int ab;
  } pragma1683;
 
-static void pragma1681_hclib_async(void *____arg);static void pragma1683_hclib_async(void *____arg);void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
+static void pragma1681_hclib_async(void *____arg);
+static void pragma1683_hclib_async(void *____arg);
+void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
      int l1, i;
      COMPLEX *jp, *kp;
@@ -3073,7 +3094,9 @@ typedef struct _pragma2083 {
     int ab;
  } pragma2083;
 
-static void pragma2081_hclib_async(void *____arg);static void pragma2083_hclib_async(void *____arg);void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
+static void pragma2081_hclib_async(void *____arg);
+static void pragma2083_hclib_async(void *____arg);
+void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
      const COMPLEX *ip;
@@ -3940,7 +3963,9 @@ typedef struct _pragma3625 {
     int ab;
  } pragma3625;
 
-static void pragma3623_hclib_async(void *____arg);static void pragma3625_hclib_async(void *____arg);void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
+static void pragma3623_hclib_async(void *____arg);
+static void pragma3625_hclib_async(void *____arg);
+void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
      int l1, i;
      COMPLEX *jp, *kp;
@@ -5679,7 +5704,9 @@ typedef struct _pragma4521 {
     int ab;
  } pragma4521;
 
-static void pragma4519_hclib_async(void *____arg);static void pragma4521_hclib_async(void *____arg);void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
+static void pragma4519_hclib_async(void *____arg);
+static void pragma4521_hclib_async(void *____arg);
+void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
      int i;
      const COMPLEX *ip;
@@ -6053,7 +6080,19 @@ typedef struct _pragma4706 {
     int k;
  } pragma4706;
 
-static void pragma4661_hclib_async(void *____arg);static void pragma4664_hclib_async(void *____arg);static void pragma4667_hclib_async(void *____arg);static void pragma4670_hclib_async(void *____arg);static void pragma4673_hclib_async(void *____arg);static void pragma4681_hclib_async(void *____arg);static void pragma4691_hclib_async(void *____arg);static void pragma4694_hclib_async(void *____arg);static void pragma4697_hclib_async(void *____arg);static void pragma4700_hclib_async(void *____arg);static void pragma4703_hclib_async(void *____arg);static void pragma4706_hclib_async(void *____arg);void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int nW)
+static void pragma4661_hclib_async(void *____arg);
+static void pragma4664_hclib_async(void *____arg);
+static void pragma4667_hclib_async(void *____arg);
+static void pragma4670_hclib_async(void *____arg);
+static void pragma4673_hclib_async(void *____arg);
+static void pragma4681_hclib_async(void *____arg);
+static void pragma4691_hclib_async(void *____arg);
+static void pragma4694_hclib_async(void *____arg);
+static void pragma4697_hclib_async(void *____arg);
+static void pragma4700_hclib_async(void *____arg);
+static void pragma4703_hclib_async(void *____arg);
+static void pragma4706_hclib_async(void *____arg);
+void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int nW)
 {
      int r, m;
      int k;
@@ -6545,7 +6584,9 @@ typedef struct _pragma4821 {
     COMPLEX *W;
  } pragma4821;
 
-static void pragma4798_hclib_async(void *____arg);static void pragma4821_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma4798_hclib_async(void *____arg);
+static void pragma4821_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     int n;
     COMPLEX *in;
     COMPLEX *out;

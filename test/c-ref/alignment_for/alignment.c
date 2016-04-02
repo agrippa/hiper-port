@@ -446,7 +446,8 @@ typedef struct _pragma462 {
     int *matptr;
  } pragma462;
 
-static void pragma462_hclib_async(void *____arg);typedef struct _pragma464 {
+static void pragma462_hclib_async(void *____arg);
+typedef struct _pragma465 {
     int i;
     int n;
     int m;
@@ -459,9 +460,10 @@ static void pragma462_hclib_async(void *____arg);typedef struct _pragma464 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pragma464;
+ } pragma465;
 
-static void pragma464_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma465_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;
@@ -493,7 +495,7 @@ static void main_entrypoint(void *____arg) {
 {
 
  { 
-pragma464 *ctx = (pragma464 *)malloc(sizeof(pragma464));
+pragma465 *ctx = (pragma465 *)malloc(sizeof(pragma465));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -511,7 +513,7 @@ domain.low = 0;
 domain.high = nseqs;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma464_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma465_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  }  // end parallel for (i)
@@ -546,8 +548,8 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
    return 0;
-}  static void pragma464_hclib_async(void *____arg, const int ___iter) {
-    pragma464 *ctx = (pragma464 *)____arg;
+}  static void pragma465_hclib_async(void *____arg, const int ___iter) {
+    pragma465 *ctx = (pragma465 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;

@@ -68,7 +68,8 @@ typedef struct _pragma63 {
     int chunks_in_col;
  } pragma63;
 
-static void pragma63_hclib_async(void *____arg, const int ___iter);void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
+static void pragma63_hclib_async(void *____arg, const int ___iter);
+void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
 					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
 					  FLOAT step)
 {

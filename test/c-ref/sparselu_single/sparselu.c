@@ -234,14 +234,18 @@ typedef struct _pragma256 {
     int kk;
  } pragma256;
 
-static void pragma235_hclib_async(void *____arg);static void pragma243_hclib_async(void *____arg);static void pragma256_hclib_async(void *____arg);typedef struct _pragma249 {
+static void pragma235_hclib_async(void *____arg);
+static void pragma243_hclib_async(void *____arg);
+static void pragma256_hclib_async(void *____arg);
+typedef struct _pragma252 {
     float **BENCH;
     int ii;
     int jj;
     int kk;
- } pragma249;
+ } pragma252;
 
-static void pragma249_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma252_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
     float **BENCH;
     int ii;
     int jj;
@@ -257,12 +261,12 @@ static void main_entrypoint(void *____arg) {
 {
 hclib_start_finish(); {
  { 
-pragma249 *ctx = (pragma249 *)malloc(sizeof(pragma249));
+pragma252 *ctx = (pragma252 *)malloc(sizeof(pragma252));
 ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
-hclib_async(pragma249_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma252_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
 
            } ; hclib_end_finish(); 
@@ -283,8 +287,8 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
    bots_message(" completed!\n");
-}  static void pragma249_hclib_async(void *____arg) {
-    pragma249 *ctx = (pragma249 *)____arg;
+}  static void pragma252_hclib_async(void *____arg) {
+    pragma252 *ctx = (pragma252 *)____arg;
     float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;

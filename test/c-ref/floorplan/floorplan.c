@@ -523,7 +523,8 @@ typedef struct _pragma525 {
     int NWS[64][2];
  } pragma525;
 
-static void pragma525_hclib_async(void *____arg);static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
+static void pragma525_hclib_async(void *____arg);
+static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS) {
   int  i, j, nn, area, nnc,nnl;
 
   ibrd board;

@@ -90,7 +90,8 @@ typedef struct _pragma101 {
     int t;
  } pragma101;
 
-static void pragma101_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma101_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     unsigned long long cycles;

@@ -107,7 +107,9 @@ typedef struct _pragma105 {
     long long y;
  } pragma105;
 
-static void pragma103_hclib_async(void *____arg);static void pragma105_hclib_async(void *____arg);long long fib (int n)
+static void pragma103_hclib_async(void *____arg);
+static void pragma105_hclib_async(void *____arg);
+long long fib (int n)
 {
 	long long x, y;
 	if (n < 2) return n;

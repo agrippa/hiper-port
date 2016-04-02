@@ -99,7 +99,8 @@ typedef struct _pragma113 {
     MAT *gicov;
  } pragma113;
 
-static void pragma113_hclib_async(void *____arg, const int ___iter);MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
+static void pragma113_hclib_async(void *____arg, const int ___iter);
+MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
 	//  (which are the same across all sample circles)
@@ -249,7 +250,8 @@ typedef struct _pragma188 {
     int i;
  } pragma188;
 
-static void pragma188_hclib_async(void *____arg, const int ___iter);MAT * dilate_f(MAT * img_in, MAT * strel) {
+static void pragma188_hclib_async(void *____arg, const int ___iter);
+MAT * dilate_f(MAT * img_in, MAT * strel) {
 	MAT * dilated = m_get(img_in->m, img_in->n);
 	
 	// Find the center of the structuring element

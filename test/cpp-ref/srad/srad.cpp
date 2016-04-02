@@ -127,7 +127,9 @@ typedef struct _pragma159 {
     int nthreads;
  } pragma159;
 
-static void pragma126_hclib_async(void *____arg, const int ___iter);static void pragma159_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma126_hclib_async(void *____arg, const int ___iter);
+static void pragma159_hclib_async(void *____arg, const int ___iter);
+typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     int rows;

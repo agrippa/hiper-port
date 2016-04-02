@@ -45,7 +45,9 @@ typedef struct _pragma83 {
     FILE *fa;
  } pragma83;
 
-static void pragma67_hclib_async(void *____arg, const int ___iter);static void pragma83_hclib_async(void *____arg, const int ___iter);int main (int argc, char **argv){
+static void pragma67_hclib_async(void *____arg, const int ___iter);
+static void pragma83_hclib_async(void *____arg, const int ___iter);
+int main (int argc, char **argv){
     int i,j,k,MatrixDim;
     FP_NUMBER sum, **L, **U, **A;
     FILE *fl,*fu,*fa;
