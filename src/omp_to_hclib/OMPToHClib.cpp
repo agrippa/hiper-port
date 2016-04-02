@@ -397,7 +397,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
     if (isForasyncClosure) {
         ss << ", const int ___iter";
     }
-    ss << ");";
+    ss << ");\n";
     return ss.str();
 }
 
@@ -784,7 +784,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
         if (accumulatedStructDefs.length() > 0 ||
                 accumulatedKernelDefs.length() > 0) {
 
-            bool failed = rewriter->InsertText(func->getLocStart(),
+            clang::SourceLocation insertLocation = func->getLocStart();
+            if (func->getTemplatedKind() == clang::FunctionDecl::TemplatedKind::TK_FunctionTemplateSpecialization) {
+                insertLocation = func->getPrimaryTemplate()->getLocStart();
+            }
+
+            bool failed = rewriter->InsertText(insertLocation,
                     accumulatedStructDefs + accumulatedKernelDecls, true, true);
             assert(!failed);
             failed = rewriter->ReplaceText(func->getLocEnd(), 1,
