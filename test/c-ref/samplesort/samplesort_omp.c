@@ -125,7 +125,7 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _par_sort145 {
+typedef struct _pragma145 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -133,9 +133,9 @@ typedef struct _par_sort145 {
     int right;
     int index;
     sort_data_t *buf;
- } par_sort145;
+ } pragma145;
 
-typedef struct _par_sort155 {
+typedef struct _pragma155 {
     void *arg;
     sort_data_t *in;
     uint64_t *data;
@@ -143,9 +143,9 @@ typedef struct _par_sort155 {
     int right;
     int index;
     sort_data_t *buf;
- } par_sort155;
+ } pragma155;
 
-static void par_sort145_hclib_async(void *____arg);static void par_sort155_hclib_async(void *____arg);void par_sort(void* arg) {
+static void pragma145_hclib_async(void *____arg);static void pragma155_hclib_async(void *____arg);void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
   int left = in->left; 
@@ -153,15 +153,14 @@ static void par_sort145_hclib_async(void *____arg);static void par_sort155_hclib
 
   if (right - left + 1 > HC_GRANULARITY) {
     int index = partition(data, left, right);
-    {
-        hclib_start_finish(); {
+hclib_start_finish(); {
         if (left < index - 1) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = left;
           buf->right = index - 1; 
-           { 
-par_sort145 *ctx = (par_sort145 *)malloc(sizeof(par_sort145));
+ { 
+pragma145 *ctx = (pragma145 *)malloc(sizeof(pragma145));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -169,7 +168,7 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(par_sort145_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma145_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -177,8 +176,8 @@ hclib_async(par_sort145_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
           buf->buffer = data;
           buf->left = index;
           buf->right = right; 
-           { 
-par_sort155 *ctx = (par_sort155 *)malloc(sizeof(par_sort155));
+ { 
+pragma155 *ctx = (pragma155 *)malloc(sizeof(pragma155));
 ctx->arg = arg;
 ctx->in = in;
 ctx->data = data;
@@ -186,19 +185,18 @@ ctx->left = left;
 ctx->right = right;
 ctx->index = index;
 ctx->buf = buf;
-hclib_async(par_sort155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  } 
         }
-        } hclib_end_finish(); 
-    }
+        } ; hclib_end_finish(); 
   }
   else {
     //  quicksort in C library
     qsort(data+left, right - left + 1, sizeof(TYPE), compare);
   }
   free(arg);
-} static void par_sort145_hclib_async(void *____arg) {
-    par_sort145 *ctx = (par_sort145 *)____arg;
+} static void pragma145_hclib_async(void *____arg) {
+    pragma145 *ctx = (pragma145 *)____arg;
     void *arg; arg = ctx->arg;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;
@@ -209,11 +207,11 @@ hclib_async(par_sort155_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
     hclib_start_finish();
 {
               par_sort(buf);
-          }    ; hclib_end_finish();
+          } ;     ; hclib_end_finish();
 }
 
-static void par_sort155_hclib_async(void *____arg) {
-    par_sort155 *ctx = (par_sort155 *)____arg;
+static void pragma155_hclib_async(void *____arg) {
+    pragma155 *ctx = (pragma155 *)____arg;
     void *arg; arg = ctx->arg;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;
@@ -224,7 +222,7 @@ static void par_sort155_hclib_async(void *____arg) {
     hclib_start_finish();
 {
               par_sort(buf);
-          }    ; hclib_end_finish();
+          } ;     ; hclib_end_finish();
 }
 
 
@@ -291,7 +289,7 @@ static void main_entrypoint(void *____arg) {
     uint64_t *LocalBucket; LocalBucket = ctx->LocalBucket;
     uint64_t *OutputBuffer; OutputBuffer = ctx->OutputBuffer;
     uint64_t *Output; Output = ctx->Output;
-sorting(InputData, NoofElements_Bloc); }
+sorting(InputData, NoofElements_Bloc) ; }
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
@@ -352,9 +350,7 @@ int main (int argc, char *argv[]) {
   }
   shmem_barrier_all();
 
-
-  /**** Sorting Locally ****/
-  main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->Numprocs = Numprocs;
@@ -380,7 +376,6 @@ ctx->Output = Output;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;
-
 
   /**** Choosing Local Splitters ****/
   Splitter = (TYPE *) shmem_malloc (sizeof (TYPE) * (Numprocs-1));
@@ -523,5 +518,5 @@ free(ctx);
 
    /**** Finalize ****/
   shmem_finalize();
-}
+} 
 

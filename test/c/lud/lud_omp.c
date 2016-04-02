@@ -33,6 +33,8 @@ void lud_diagonal_omp (float* a, int size, int offset)
 // implements block LU factorization 
 void lud_omp(float *a, int size)
 {
+#pragma omp_to_hclib
+    {
     int offset, chunk_idx, size_inter, chunks_in_inter_row, chunks_per_inter;
 
     for (offset = 0; offset < size - BS ; offset += BS)
@@ -138,4 +140,5 @@ void lud_omp(float *a, int size)
     }
 
     lud_diagonal_omp(a, size, offset);
+    }
 }

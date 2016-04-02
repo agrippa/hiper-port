@@ -31,7 +31,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _main126 {
+typedef struct _pragma126 {
     int argc;
     char **argv;
     int rows;
@@ -77,9 +77,9 @@ typedef struct _main126 {
     int i;
     int j;
     int nthreads;
- } main126;
+ } pragma126;
 
-typedef struct _main159 {
+typedef struct _pragma159 {
     int argc;
     char **argv;
     int rows;
@@ -125,9 +125,9 @@ typedef struct _main159 {
     int i;
     int j;
     int nthreads;
- } main159;
+ } pragma159;
 
-static void main126_hclib_async(void *____arg, const int ___iter);static void main159_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma126_hclib_async(void *____arg, const int ___iter);static void pragma159_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     int rows;
@@ -236,8 +236,8 @@ for (iter=0; iter< niter; iter++){
         q0sqr   = varROI / (meanROI*meanROI);
 		
 
-		 { 
-main126 *ctx = (main126 *)malloc(sizeof(main126));
+ { 
+pragma126 *ctx = (pragma126 *)malloc(sizeof(pragma126));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->rows = rows;
@@ -288,12 +288,12 @@ domain.low = 0;
 domain.high = rows;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)main126_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma126_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-		 { 
-main159 *ctx = (main159 *)malloc(sizeof(main159));
+ { 
+pragma159 *ctx = (pragma159 *)malloc(sizeof(pragma159));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->rows = rows;
@@ -344,12 +344,12 @@ domain.low = 0;
 domain.high = rows;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)main159_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
 
-	}; }
+	} ; }
 
 int main(int argc, char* argv[])
 {   
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
    
 	printf("Start the SRAD main loop\n");
 
-	main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->rows = rows;
@@ -499,8 +499,8 @@ free(ctx);
 
 	free(c);
 	return 0;
-} static void main126_hclib_async(void *____arg, const int ___iter) {
-    main126 *ctx = (main126 *)____arg;
+}  static void pragma126_hclib_async(void *____arg, const int ___iter) {
+    pragma126 *ctx = (pragma126 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
@@ -580,12 +580,12 @@ free(ctx);
    
 		}
   
-    }    } while (0);
+    } ;     } while (0);
     ; hclib_end_finish();
 }
 
-static void main159_hclib_async(void *____arg, const int ___iter) {
-    main159 *ctx = (main159 *)____arg;
+static void pragma159_hclib_async(void *____arg, const int ___iter) {
+    pragma159 *ctx = (pragma159 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
@@ -658,7 +658,7 @@ static void main159_hclib_async(void *____arg, const int ___iter) {
 	            #ifdef OUTPUT
                 //printf("\n"); 
                 #endif //output
-	     }    } while (0);
+	     } ;     } while (0);
     ; hclib_end_finish();
 }
 

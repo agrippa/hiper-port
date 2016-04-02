@@ -118,9 +118,8 @@ main ( int argc, char *argv[] )
 
 
   stopwatch_start(&sw);
-#pragma omp_to_hclib body_start
   lud_omp(m, matrix_dim);
-#pragma omp_to_hclib body_end
+
   stopwatch_stop(&sw);
   printf("Time consumed(ms): %lf\n", 1000*get_interval_by_sec(&sw));
 

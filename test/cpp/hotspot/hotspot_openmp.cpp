@@ -288,6 +288,7 @@ int main(int argc, char **argv)
 	
     long long start_time = get_time();
 
+#pragma omp_to_hclib
     compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
 
     long long end_time = get_time();

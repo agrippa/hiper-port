@@ -91,7 +91,8 @@ void run(int argc, char** argv)
     src = new int[cols];
 
     pin_stats_reset();
-#pragma omp_to_hclib body_start
+
+#pragma omp_to_hclib
     for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
@@ -106,7 +107,6 @@ void run(int argc, char** argv)
           dst[n] = wall[t+1][n]+min;
         }
     }
-#pragma omp_to_hclib body_end
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);

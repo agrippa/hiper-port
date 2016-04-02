@@ -248,6 +248,8 @@ int main(int argc, char** argv)
 
     memcpy(tempCopy,tempIn, size * sizeof(float));
 
+#pragma omp_to_hclib
+    {
     struct timeval start, stop;
     float time;
     gettimeofday(&start,NULL);
@@ -259,6 +261,7 @@ int main(int argc, char** argv)
     float acc = accuracy(tempOut,answer,numRows*numCols*layers);
     printf("Time: %.3f (s)\n",time);
     printf("Accuracy: %e\n",acc);
+    }
     writeoutput(tempOut,numRows, numCols, layers, ofile);
     free(tempIn);
     free(tempOut); free(powerIn);

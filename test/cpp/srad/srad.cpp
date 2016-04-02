@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
    
 	printf("Start the SRAD main loop\n");
 
-#pragma omp_to_hclib body_start
+#pragma omp_to_hclib
 	for (iter=0; iter< niter; iter++){
 		sum=0; sum2=0;     
 		for (i=r1; i<=r2; i++) {
@@ -183,7 +183,6 @@ int main(int argc, char* argv[])
 	     }
 
 	}
-#pragma omp_to_hclib body_end
 
 
 #ifdef OUTPUT

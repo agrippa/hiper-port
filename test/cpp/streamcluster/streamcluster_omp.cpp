@@ -739,8 +739,7 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
     }
 
 
-#pragma omp_to_hclib body_start
-
+#pragma omp_to_hclib
   while(1) {
 		d++;
 #ifdef PRINTINFO
@@ -792,8 +791,6 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 	break;
       }
   }
-
-#pragma omp_to_hclib body_end
 
   //clean up...
   if( pid==0 ) {

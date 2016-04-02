@@ -442,8 +442,8 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-#pragma omp_to_hclib body_start
-
+#pragma omp_to_hclib
+   {
 
    #pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
   for (si = 0; si < nseqs; si++) {
@@ -500,7 +500,7 @@ int pairalign()
         } // end if (n == 0 || m == 0)
      } // for (j)
   } // end parallel for (i)
-#pragma omp_to_hclib body_end
+   }
    return 0;
 }
 

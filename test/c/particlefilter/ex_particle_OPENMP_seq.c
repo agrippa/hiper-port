@@ -590,9 +590,9 @@ int main(int argc, char * argv[]){
 	long long endVideoSequence = get_time();
 	printf("VIDEO SEQUENCE TOOK %f\n", elapsed_time(start, endVideoSequence));
 	//call particle filter
-#pragma omp_to_hclib body_start
+#pragma omp_to_hclib
 	particleFilter(I, IszX, IszY, Nfr, seed, Nparticles);
-#pragma omp_to_hclib body_end
+
 	long long endParticleFilter = get_time();
 	printf("PARTICLE FILTER TOOK %f\n", elapsed_time(endVideoSequence, endParticleFilter));
 	printf("ENTIRE PROGRAM TOOK %f\n", elapsed_time(start, endParticleFilter));

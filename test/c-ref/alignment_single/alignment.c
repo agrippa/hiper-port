@@ -432,7 +432,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int s
 }
 
 
-typedef struct _pairalign464 {
+typedef struct _pragma464 {
     int i;
     int n;
     int m;
@@ -445,9 +445,9 @@ typedef struct _pairalign464 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign464;
+ } pragma464;
 
-static void pairalign464_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
+static void pragma464_hclib_async(void *____arg);typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;
@@ -477,7 +477,7 @@ static void main_entrypoint(void *____arg) {
     int *mat_xref; mat_xref = ctx->mat_xref;
     int *matptr; matptr = ctx->matptr;
 {
-      hclib_start_finish(); for (si = 0; si < nseqs; si++) {
+hclib_start_finish(); for (si = 0; si < nseqs; si++) {
          n = seqlen_array[si+1];
          for (i = 1, len1 = 0; i <= n; i++) {
             char c = seq_array[si+1][i];
@@ -489,8 +489,8 @@ static void main_entrypoint(void *____arg) {
             if ( n == 0 || m == 0 ) {
                bench_output[si*nseqs+sj] = (int) 1.0;
             } else {
-                { 
-pairalign464 *ctx = (pairalign464 *)malloc(sizeof(pairalign464));
+ { 
+pragma464 *ctx = (pragma464 *)malloc(sizeof(pragma464));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -503,12 +503,12 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_async(pairalign464_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma464_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  }  // end task
             } // end if (n == 0 || m == 0)
          } // for (j)
-      } hclib_end_finish();  // end parallel for (i)
-   }; }
+      } ; hclib_end_finish();  // end parallel
+   } ; }
 
 int pairalign()
 {
@@ -522,8 +522,7 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-
-   main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -538,10 +537,11 @@ ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
- // end parallel
+
+
    return 0;
-} static void pairalign464_hclib_async(void *____arg) {
-    pairalign464 *ctx = (pairalign464 *)____arg;
+}  static void pragma464_hclib_async(void *____arg) {
+    pragma464 *ctx = (pragma464 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
@@ -589,7 +589,7 @@ free(ctx);
                   else                        mm_score /= (double) MIN(len1,len2);
 
                   bench_output[si*nseqs+sj] = (int) mm_score;
-               }    ; hclib_end_finish();
+               } ;     ; hclib_end_finish();
 }
 
 

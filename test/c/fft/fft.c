@@ -4787,7 +4787,8 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 
 
      bots_message("Computing coefficients ");
-#pragma omp_to_hclib body_start
+#pragma omp_to_hclib
+     {
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
      #pragma omp parallel
      {
@@ -4824,7 +4825,7 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      }
 
      free(W);
-#pragma omp_to_hclib body_end
+     }
      bots_message(" completed!\n");
 
      return;

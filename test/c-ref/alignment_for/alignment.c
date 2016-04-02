@@ -431,7 +431,7 @@ double tracepath(int tsb1, int tsb2, int *print_ptr, int *displ, int seq1, int s
 }
 
 
-typedef struct _pairalign462 {
+typedef struct _pragma462 {
     int i;
     int n;
     int m;
@@ -444,9 +444,9 @@ typedef struct _pairalign462 {
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign462;
+ } pragma462;
 
-static void pairalign462_hclib_async(void *____arg);typedef struct _pairalign464 {
+static void pragma462_hclib_async(void *____arg);typedef struct _pragma464 {
     int i;
     int n;
     int m;
@@ -459,9 +459,9 @@ static void pairalign462_hclib_async(void *____arg);typedef struct _pairalign464
     double mm_score;
     int *mat_xref;
     int *matptr;
- } pairalign464;
+ } pragma464;
 
-static void pairalign464_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma464_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
     int i;
     int n;
     int m;
@@ -490,8 +490,10 @@ static void main_entrypoint(void *____arg) {
     double mm_score; mm_score = ctx->mm_score;
     int *mat_xref; mat_xref = ctx->mat_xref;
     int *matptr; matptr = ctx->matptr;
-{ 
-pairalign464 *ctx = (pairalign464 *)malloc(sizeof(pairalign464));
+{
+
+ { 
+pragma464 *ctx = (pragma464 *)malloc(sizeof(pragma464));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -509,10 +511,11 @@ domain.low = 0;
 domain.high = nseqs;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pairalign464_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma464_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
- }; }
+ }  // end parallel for (i)
+   } ; }
 
 int pairalign()
 {
@@ -526,9 +529,7 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-
-
-   main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -543,10 +544,10 @@ ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
-  // end parallel for (i)
+
    return 0;
-} static void pairalign464_hclib_async(void *____arg, const int ___iter) {
-    pairalign464 *ctx = (pairalign464 *)____arg;
+}  static void pragma464_hclib_async(void *____arg, const int ___iter) {
+    pragma464 *ctx = (pragma464 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
@@ -574,8 +575,8 @@ free(ctx);
         if ( n == 0 || m == 0 ) {
            bench_output[si*nseqs+sj] = (int) 1.0;
         } else {
-            { 
-pairalign462 *ctx = (pairalign462 *)malloc(sizeof(pairalign462));
+ { 
+pragma462 *ctx = (pragma462 *)malloc(sizeof(pragma462));
 ctx->i = i;
 ctx->n = n;
 ctx->m = m;
@@ -588,16 +589,16 @@ ctx->gg = gg;
 ctx->mm_score = mm_score;
 ctx->mat_xref = mat_xref;
 ctx->matptr = matptr;
-hclib_async(pairalign462_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
+hclib_async(pragma462_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
  }  // end task
         } // end if (n == 0 || m == 0)
      } // for (j)
-  }    } while (0);
+  } ;     } while (0);
     ; hclib_end_finish();
 }
 
- static void pairalign462_hclib_async(void *____arg) {
-    pairalign462 *ctx = (pairalign462 *)____arg;
+ static void pragma462_hclib_async(void *____arg) {
+    pragma462 *ctx = (pragma462 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int m; m = ctx->m;
@@ -646,7 +647,7 @@ hclib_async(pairalign462_hclib_async, ctx, NO_FUTURE, NO_PHASER, ANY_PLACE);
               else                        mm_score /= (double) MIN(len1,len2);
 
               bench_output[si*nseqs+sj] = (int) mm_score;
-           }    ; hclib_end_finish();
+           } ;     ; hclib_end_finish();
 }
 
 

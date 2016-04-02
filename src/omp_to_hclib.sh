@@ -11,6 +11,8 @@ OMP_TO_HCLIB=$SCRIPT_DIR/omp_to_hclib/omp_to_hclib
 REMOVE_OMP_PRAGMAS=$SCRIPT_DIR/remove_omp_pragmas.py
 OMP_TO_HCLIB_PRAGMA_FINDER=$SCRIPT_DIR/omp_to_hclib_pragma_finder.py
 ADD_PRAGMA_LINE_LABELS=$SCRIPT_DIR/add_pragma_line_labels.py
+REPLACE_PRAGMAS_WITH_FUNCTIONS=$SCRIPT_DIR/replace_pragmas_with_functions.py
+INSERT_CRITICAL_LOCKS=$SCRIPT_DIR/insert_critical_locks.py
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
@@ -102,15 +104,20 @@ fi
 DEFINES=-D_FORTIFY_SOURCE=0
 
 WITH_HEADER=$DIRNAME/$FILE_PREFIX.$NAME.header.$EXTENSION
+WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
 echo '#include "hclib.h"' > $WITH_HEADER
 cat $INPUT_PATH >> $WITH_HEADER
 
+[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
+cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS > $WITH_PRAGMA_MARKERS
+
 COUNT=1
 CHANGED=1
-PREV=$WITH_HEADER
+PREV=$WITH_PRAGMA_MARKERS
 CHECK_FOR_PTHREAD=true
+CRITICAL_SECTION_ID=0
 until [[ $CHANGED -eq 0 ]]; do
     OMP_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp.$COUNT.info
     OMP_TO_HCLIB_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp_to_hclib.$COUNT.info
@@ -118,41 +125,56 @@ until [[ $CHANGED -eq 0 ]]; do
     TMP_OUTPUT=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$COUNT.$EXTENSION
     WITHOUT_PRAGMAS=$DIRNAME/$FILE_PREFIX.$NAME.no_pragmas.$COUNT.$EXTENSION
     HANDLED_PRAGMAS_INFO=$DIRNAME/$FILE_PREFIX.handled_pragmas.$COUNT.info
+    CRITICAL_SECTION_ID_FILE=$DIRNAME/$FILE_PREFIX.critical_id.$COUNT.info
+    WITH_LOCKS=$DIRNAME/$FILE_PREFIX.$NAME.with_locks.$COUNT.$EXTENSION
 
-    # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
-    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
-    python $OPENMP_FINDER $PREV > $OMP_INFO
+#     # Find all uses of OpenMP pragrams in the input file and store them in $OMP_INFO
+#     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding OMP pragmas'
+#     python $OPENMP_FINDER $PREV > $OMP_INFO
+# 
+#     # Search for pragmas specific to this framework
+#     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
+#     cat $PREV | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
+# 
+#     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Adding line labels to pragmas'
+#     cat $PREV | python $ADD_PRAGMA_LINE_LABELS > $WITH_LINE_LABELS
 
-    # Search for pragmas specific to this framework
-    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Finding omp_to_hclib-specific pragmas'
-    cat $PREV | python $OMP_TO_HCLIB_PRAGMA_FINDER > $OMP_TO_HCLIB_INFO
-
-    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Adding line labels to pragmas'
-    cat $PREV | python $ADD_PRAGMA_LINE_LABELS > $WITH_LINE_LABELS
+#     # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
+#     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
+#     $OMP_TO_HCLIB -o $TMP_OUTPUT -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $WITH_LINE_LABELS \
+#         -d $HANDLED_PRAGMAS_INFO -n $CHECK_FOR_PTHREAD -- $INCLUDE $USER_INCLUDES $DEFINES \
+#         -I$HCLIB_ROOT/include
 
     # Translate OMP pragmas detected by OPENMP_FINDER into HClib constructs.
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
-    $OMP_TO_HCLIB -o $TMP_OUTPUT -m $OMP_INFO -s $OMP_TO_HCLIB_INFO $WITH_LINE_LABELS \
-        -d $HANDLED_PRAGMAS_INFO -n $CHECK_FOR_PTHREAD -- $INCLUDE $USER_INCLUDES $DEFINES \
-        -I$HCLIB_ROOT/include
+    $OMP_TO_HCLIB -o $TMP_OUTPUT -c $CRITICAL_SECTION_ID \
+        -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD $PREV -- $INCLUDE \
+        $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
 
-    # Remove any OMP pragmas that this iteration handled
-    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
-    cat $TMP_OUTPUT | python $REMOVE_OMP_PRAGMAS $HANDLED_PRAGMAS_INFO > $WITHOUT_PRAGMAS
+    PREV_CRITICAL_SECTION_ID=$CRITICAL_SECTION_ID
+    CRITICAL_SECTION_ID=$(cat $CRITICAL_SECTION_ID_FILE)
+
+    # Insert critical/atomic section locks
+    [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting critical section locks'
+    cat $TMP_OUTPUT | python $INSERT_CRITICAL_LOCKS $PREV_CRITICAL_SECTION_ID $CRITICAL_SECTION_ID > $WITH_LOCKS
+
+#     # Remove any OMP pragmas that this iteration handled
+#     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Removing OMP pragmas'
+#     cat $TMP_OUTPUT | python $REMOVE_OMP_PRAGMAS $HANDLED_PRAGMAS_INFO > $WITHOUT_PRAGMAS
 
     # Check to see if there were any changes to the code during this iteration. If not, exit.
     set +e
-    diff $WITH_LINE_LABELS $TMP_OUTPUT > /dev/null
+    diff $WITH_LOCKS $PREV > /dev/null
     CHANGED=$?
     set -e
 
     COUNT=$(($COUNT + 1))
-    PREV=$WITHOUT_PRAGMAS
+    PREV=$WITH_LOCKS
     CHECK_FOR_PTHREAD=false
 done
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Producing final output file'
-cp $WITHOUT_PRAGMAS $OUTPUT_PATH
+cp $PREV $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'

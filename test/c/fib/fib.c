@@ -114,21 +114,21 @@ static long long par_res, seq_res;
 
 void fib0 (int n)
 {
-#pragma omp_to_hclib body_start
-
-	#pragma omp parallel
+#pragma omp_to_hclib
     {
-	#pragma omp single
+#pragma omp parallel
         {
+#pragma omp single
+            {
 #if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
-	par_res = fib(n,0);
+                par_res = fib(n,0);
 #else
-	par_res = fib(n);
+                par_res = fib(n);
 #endif
+            }
         }
     }
-#pragma omp_to_hclib body_end
-	bots_message("Fibonacci result for %d is %lld\n",n,par_res);
+    bots_message("Fibonacci result for %d is %lld\n",n,par_res);
 }
 
 void fib0_seq (int n)

@@ -18,7 +18,6 @@
 #include <iostream>
 
 #include "OMPToHClib.h"
-#include "OMPNode.h"
 
 /*
  * NOTE: The one thing to be careful about whenever inserting code in an
@@ -28,47 +27,15 @@
  * flow of the application. This should be kept in mind anywhere that an
  * InsertText, ReplaceText, etc API is called.
  *
- * NOTE: In general, each rewriter use is followed by an assertion that it should not fail. Rewrites can fail if the target location is invalid, e.g. the target location is in a macro. So if you start getting these assert failures, it's usually simpler to change the application code than figure out 
+ * NOTE: In general, each rewriter use is followed by an assertion that it
+ * should not fail. Rewrites can fail if the target location is invalid, e.g.
+ * the target location is in a macro. So if you start getting these assert
+ * failures, it's usually simpler to change the application code.
  */
 
 extern clang::FunctionDecl *curr_func_decl;
 
 #define ASYNC_SUFFIX "_hclib_async"
-
-std::vector<OMPPragma *> *OMPToHClib::getOMPPragmasFor(
-        clang::FunctionDecl *decl, clang::SourceManager &SM) {
-    std::vector<OMPPragma *> *result = new std::vector<OMPPragma *>();
-    if (!decl->hasBody()) return result;
-
-    clang::SourceLocation start = decl->getBody()->getLocStart();
-    clang::SourceLocation end = decl->getBody()->getLocEnd();
-
-    clang::PresumedLoc startLoc = SM.getPresumedLoc(start);
-    clang::PresumedLoc endLoc = SM.getPresumedLoc(end);
-
-    for (std::vector<OMPPragma>::iterator i = pragmas->begin(),
-            e = pragmas->end(); i != e; i++) {
-        OMPPragma *curr = &*i;
-
-        bool before = (curr->getLine() < startLoc.getLine());
-        bool after = (curr->getLine() > endLoc.getLine());
-
-        if (!before && !after) {
-            result->push_back(curr);
-        }
-    }
-
-    return result;
-}
-
-OMPPragma *OMPToHClib::getOMPPragmaFor(int lineNo) {
-    for (std::vector<OMPPragma>::iterator i = pragmas->begin(),
-            e = pragmas->end(); i != e; i++) {
-        OMPPragma *curr = &*i;
-        if (curr->getLine() == lineNo) return curr;
-    }
-    return NULL;
-}
 
 void OMPToHClib::setParent(const clang::Stmt *child,
         const clang::Stmt *parent) {
@@ -181,6 +148,8 @@ std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
         }
     } else if (const clang::BuiltinType *builtinType = type->getAs<clang::BuiltinType>()) {
         return "sizeof(" + qualType.getAsString() + ")";
+    } else if (const clang::DecayedType *decayedType = type->getAs<clang::DecayedType>()) {
+        return getArraySizeExpr(decayedType->getOriginalType());
     } else {
         std::cerr << "Unsupported type while getting array size expression " <<
             std::string(type->getTypeClassName()) << std::endl;
@@ -220,6 +189,10 @@ std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
     assert(type);
 
     std::stringstream ss;
+
+    if (type->getAs<clang::DecayedType>()) {
+        type = type->getAs<clang::DecayedType>()->getPointeeType().getTypePtr();
+    }
 
     if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
         std::string arraySizeExpr = getArraySizeExpr(decl->getType());
@@ -269,6 +242,12 @@ void OMPToHClib::preFunctionVisit(clang::FunctionDecl *func) {
         clang::ParmVarDecl *param = func->getParamDecl(i);
         addToCurrentScope(param);
     }
+
+    clang::PresumedLoc presumedStart = SM->getPresumedLoc(
+            func->getLocStart());
+    const int functionStartLine = presumedStart.getLine();
+    pragmaTree = new PragmaNode(NULL, func->getBody(),
+            new std::vector<clang::ValueDecl *>(), SM);
 }
 
 clang::Expr *OMPToHClib::unwrapCasts(clang::Expr *expr) {
@@ -468,7 +447,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         ss << "    " << condVar->getNameAsString() << " = ___iter;\n";
     }
 
-    ss << bodyStr;
+    ss << bodyStr << " ; ";
 
     if (isForasyncClosure) {
         ss << "    } while (0);\n";
@@ -524,20 +503,6 @@ std::string OMPToHClib::getContextSetup(std::string structName,
     return ss.str();
 }
 
-static const clang::Stmt *removeCompoundWrappers(const clang::Stmt *curr) {
-    if (const clang::CompoundStmt *compound =
-            clang::dyn_cast<clang::CompoundStmt>(curr)) {
-        if (compound->size() == 1) {
-            return removeCompoundWrappers(*compound->body_begin());
-        }
-    }
-    return curr;
-}
-
-void OMPToHClib::outputHandledPragma(int line, std::string pragmaName) {
-    handledPragmasFp << line << " " << pragmaName << std::endl;
-}
-
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
     assert(getCurrentLexicalDepth() == 1);
     popScope();
@@ -548,106 +513,175 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 func->getLocStart());
         const int functionStartLine = presumedStart.getLine();
 
-        OMPNode rootNode(-1, -1, functionStartLine, NULL,
-                std::string("root"), SM);
-
-        if (launchStartLine > 0 && functionContainingLaunch == func) {
-            rootNode.manuallyAddChild(new OMPNode(launchStartLine,
-                        launchEndLine, launchStartLine,
-                        &rootNode, std::string("launch"), SM));
-        }
-
-        std::vector<OMPPragma *> *omp_pragmas = getOMPPragmasFor(func, *SM);
-        for (std::vector<OMPPragma *>::iterator i = omp_pragmas->begin(),
-                e = omp_pragmas->end(); i != e; i++) {
-            OMPPragma *pragma = *i;
-            const int line = pragma->getLine();
-
-            const clang::Stmt *succ = NULL;
-            if (pragma->expectsSuccessorBlock()) {
-                if (successors.find(line) == successors.end()) {
-                    std::cerr << "Missing successor block for pragma at " <<
-                        "line " << line << std::endl;
-                    exit(1);
-                }
-                succ = successors.at(line);
-                assert(captures.find(line) != captures.end());
-            }
-
-            if (supportedPragmas.find(pragma->getPragmaName()) ==
-                    supportedPragmas.end()) {
-                std::cerr << "Encountered an unknown pragma \"" <<
-                    pragma->getPragmaName() << "\" at line " << line <<
-                    std::endl;
-                exit(1);
-            }
-
-            if (pragma->getPragmaName() == "parallel" ||
-                    pragma->getPragmaName() == "single" ||
-                    pragma->getPragmaName() == "task" ||
-                    pragma->getPragmaName() == "taskwait") {
-                std::string lbl = fname + std::to_string(line);
-                rootNode.addChild(succ, line, pragma, lbl, SM);
-            } else if (pragma->getPragmaName() == "simd") {
-                // ignore and don't add to pragma tree
-            } else {
-                std::cerr << "Unhandled supported pragma \"" <<
-                    pragma->getPragmaName() << "\"" << std::endl;
-                exit(1);
-            }
-        }
-
-        rootNode.print();
+        pragmaTree->print();
 
         std::string accumulatedStructDefs = "";
         std::string accumulatedKernelDecls = "";
         std::string accumulatedKernelDefs = "";
 
-        if (rootNode.nchildren() > 0) {
-            std::vector<OMPNode *> *leaves = rootNode.getLeaves();
+        std::vector<PragmaNode *> *leaves = pragmaTree->getLeaves();
 
-            for (std::vector<OMPNode *>::iterator i = leaves->begin(),
-                    e = leaves->end(); i != e; i++) {
-                OMPNode *node = *i;
-                const clang::Stmt *succ = NULL;
-                if (successors.find(node->getPragmaLine()) != successors.end()) {
-                    succ = successors.at(node->getPragmaLine());
+        for (std::vector<PragmaNode *>::iterator i = leaves->begin(),
+                e = leaves->end(); i != e; i++) {
+            PragmaNode *node = *i;
+            std::string pragmaName = getPragmaNameForMarker(node->getMarker());
+
+            if (pragmaName == "omp_to_hclib") {
+                if (foundOmpToHclibLaunch) {
+                    std::cerr << "Found multiple locations where the " <<
+                        "omp_to_hclib pragma is used. This use case is " <<
+                        "currently unsupported." << std::endl;
+                    exit(1);
                 }
+                foundOmpToHclibLaunch = true;
 
-                assert(node->getLbl() == "launch" || supportedPragmas.find(
-                            node->getPragma()->getPragmaName()) !=
-                        supportedPragmas.end());
+                std::string launchBody = stmtToString(node->getBody());
+                std::string launchStruct = getStructDef(
+                        "main_entrypoint_ctx", node->getCaptures(), false);
+                std::string closureFunction = getClosureDef(
+                        "main_entrypoint", false, false, "main_entrypoint_ctx",
+                        node->getCaptures(), launchBody);
+                std::string contextSetup = getContextSetup(
+                        "main_entrypoint_ctx", node->getCaptures(), NULL);
+                std::string launchStr = contextSetup +
+                    "hclib_launch(main_entrypoint, ctx);\n" +
+                    "free(ctx);\n";
 
-                if (node->getLbl() == "launch") {
-                    std::string launchBody = getLaunchBody();
-                    std::string launchStruct = getStructDef(
-                            "main_entrypoint_ctx", getLaunchCaptures(), false);
-                    std::string closureFunction = getClosureDef(
-                            "main_entrypoint", false, false, "main_entrypoint_ctx",
-                            getLaunchCaptures(), launchBody);
-                    std::string contextSetup = getContextSetup(
-                            "main_entrypoint_ctx", getLaunchCaptures(), NULL);
-                    std::string launchStr = contextSetup +
-                        "hclib_launch(main_entrypoint, ctx);\n" +
-                        "free(ctx);\n";
-                    bool failed = rewriter->ReplaceText(clang::SourceRange(getLaunchBodyBeginLoc(),
-                                getLaunchBodyEndLoc()), launchStr);
+                bool failed = rewriter->ReplaceText(
+                        clang::SourceRange(node->getStartLoc(),
+                            node->getEndLoc()), launchStr);
+                assert(!failed);
+
+                accumulatedStructDefs += launchStruct;
+                accumulatedKernelDecls += closureFunction;
+            } else if (pragmaName == "omp") {
+                std::string ompCmd = getOMPPragmaNameForMarker(node->getMarker());
+                OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
+
+                if (ompCmd == "critical" || ompCmd == "atomic") {
+                    // For now we implement atomic with rather heavyweight locks
+                    const clang::Stmt *body = node->getBody();
+
+                    std::stringstream lock_ss;
+                    lock_ss << " { const int ____lock_" << criticalSectionId <<
+                        "_err = pthread_mutex_lock(&critical_" <<
+                        criticalSectionId << "_lock); assert(____lock_" <<
+                        criticalSectionId << "_err == 0); ";
+
+                    std::stringstream unlock_ss;
+                    unlock_ss << "; const int ____unlock_" <<
+                        criticalSectionId << "_err = " <<
+                        "pthread_mutex_unlock(&critical_" <<
+                        criticalSectionId << "_lock); assert(____unlock_" <<
+                        criticalSectionId << "_err); } ";
+
+                    criticalSectionId++;
+
+                    const bool failed = rewriter->ReplaceText(
+                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                            lock_ss.str() + stmtToString(body) + unlock_ss.str());
                     assert(!failed);
-                    failed = rewriter->InsertText(getFunctionContainingLaunch()->getLocStart(),
-                            launchStruct + closureFunction, true, true);
+                } else if (ompCmd == "taskwait") {
+                    const bool failed = rewriter->ReplaceText(
+                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                            " hclib_end_finish(); hclib_start_finish(); ");
                     assert(!failed);
+                } else if (ompCmd == "single") {
+                    assert(node->getParent()); // should not be root
+                    assert(getPragmaNameForMarker(node->getParent()->getMarker()) == "omp");
 
-                    outputHandledPragma(node->getStartLine(), "launch");
-                    outputHandledPragma(node->getEndLine(), "launch");
-                } else if (node->getPragma()->getPragmaName() == "parallel") {
-                    std::map<std::string, std::vector<std::string> > clauses = node->getPragma()->getClauses();
-                    if (clauses.find("for") != clauses.end()) {
+                    std::string parentCmd = getOMPPragmaNameForMarker(
+                            node->getParent()->getMarker());
+                    if (parentCmd != "parallel") {
+                        std::cerr << "It appears the \"single\" pragma " <<
+                            "on line " << node->getStartLine() <<
+                            " does not have a \"parallel\" pragma as " <<
+                            "its parent. Instead has \"" << parentCmd <<
+                            "\" at line " <<
+                            node->getParent()->getStartLine() << "." <<
+                            std::endl;
+                        node->getParent()->print();
+                        exit(1);
+                    }
+
+                    const clang::CompoundStmt *parentCmpd =
+                        clang::dyn_cast<clang::CompoundStmt>(
+                                node->getParent()->getBody());
+                    assert(parentCmpd);
+                    assert(parentCmpd->size() == 2);
+                    clang::CompoundStmt::const_body_iterator bodyIter = parentCmpd->body_begin();
+                    assert(*bodyIter == node->getMarker());
+                    bodyIter++;
+                    assert(*bodyIter == node->getBody());
+
+                    /*
+                     * Verify that at least one of these pragmas does not
+                     * have the nowait clause.
+                     */
+                    OMPClauses *parentClauses = getOMPClausesForMarker(
+                            node->getParent()->getMarker());
+                    assert(!clauses->hasClause("nowait") ||
+                            !parentClauses->hasClause("nowait"));
+
+                    // Insert finish
+                    const clang::Stmt *body = node->getBody();
+
+                    const bool failed = rewriter->ReplaceText(
+                            clang::SourceRange(node->getParent()->getStartLoc(), node->getParent()->getEndLoc()),
+                            "hclib_start_finish(); " + stmtToString(body) + " ; hclib_end_finish(); ");
+                    assert(!failed);
+                } else if (ompCmd == "task") {
+                    const clang::Stmt *body = node->getBody();
+                    std::string bodyStr = stmtToString(body);
+
+                    accumulatedKernelDecls += getClosureDecl(
+                            node->getLbl() + ASYNC_SUFFIX, false);
+
+                    accumulatedKernelDefs += getClosureDef(
+                            node->getLbl() + ASYNC_SUFFIX, false, true,
+                            node->getLbl(), node->getCaptures(),
+                            bodyStr, NULL, NULL);
+
+                    const std::string structDef = getStructDef(
+                            node->getLbl(), node->getCaptures(),
+                            false);
+                    accumulatedStructDefs += structDef;
+
+                    std::stringstream contextCreation;
+                    contextCreation << "\n" <<
+                        getContextSetup(node->getLbl(), node->getCaptures(),
+                                NULL);
+                    OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
+                    if (clauses->hasClause("if")) {
+                        // We have already asserted there is only one if arg
+                        std::string ifArg = clauses->getSingleArg("if");
+                        // If the if condition is false, just call the task body sequentially
+                        contextCreation << "if (!(" << ifArg << ")) {\n";
+                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(ctx);\n";
+                        contextCreation << "} else {\n";
+                    }
+                    contextCreation << "hclib_async(" << node->getLbl() <<
+                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
+                        "ANY_PLACE);\n";
+                    if (clauses->hasClause("if")) {
+                        contextCreation << "}\n";
+                    }
+
+                    // Add braces to ensure we don't change control flow
+                    const bool failed = rewriter->ReplaceText(
+                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                            " { " + contextCreation.str() + " } ");
+                    assert(!failed);
+                } else if (ompCmd == "parallel") {
+                    OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
+
+                    if (clauses->hasClause("for")) {
 
                         const clang::ForStmt *forLoop = clang::dyn_cast<clang::ForStmt>(node->getBody());
                         if (!forLoop) {
                             std::cerr << "Expected to find for loop " <<
                                 "inside omp parallel for at line " <<
-                                node->getPragmaLine() << " but found a " <<
+                                node->getStartLine() << " but found a " <<
                                 node->getBody()->getStmtClassName() <<
                                 " instead." << std::endl;
                             std::cerr << stmtToString(node->getBody()) << std::endl;
@@ -674,24 +708,22 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true);
 
+                        std::vector<OMPReductionVar> *reductions =
+                            getReductions(clauses);
+
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
-                                node->getLbl(),
-                                captures[node->getPragmaLine()], bodyStr,
-                                node->getPragma()->getReductions(), condVar);
+                                node->getLbl(), node->getCaptures(),
+                                bodyStr, reductions, condVar);
 
                         const std::string structDef = getStructDef(
-                                node->getLbl(),
-                                captures[node->getPragmaLine()],
-                                !node->getPragma()->getReductions()->empty());
+                                node->getLbl(), node->getCaptures(),
+                                !reductions->empty());
                         accumulatedStructDefs += structDef;
 
-                        std::vector<OMPReductionVar> *reductions =
-                            node->getPragma()->getReductions();
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<
-                            getContextSetup(node->getLbl(),
-                                    captures[node->getPragmaLine()],
+                            getContextSetup(node->getLbl(), node->getCaptures(),
                                     reductions);
 
                         contextCreation << "hclib_loop_domain_t domain;\n";
@@ -714,114 +746,32 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         }
 
                         // Add braces to ensure we don't change control flow
-                        const bool failed = rewriter->ReplaceText(succ->getSourceRange(),
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
                                 " { " + contextCreation.str() + " } ");
                         assert(!failed);
-                    } else if (node->nchildren() == 1 &&
-                            node->getChildren()->at(0)->getPragma()->getPragmaName() == "single" &&
-                            removeCompoundWrappers(node->getBody()) ==
-                            removeCompoundWrappers(node->getChildren()->at(0)->getBody())) {
-                        /*
-                         * A parallel followed immediately by a single that
-                         * includes its entire body, ignore because we do
-                         * the start_finish/end_finish insert below when we
-                         * encounter the single.
-                         */
                     } else {
                         std::cerr << "Parallel pragma without a for at line " <<
-                            node->getPragmaLine() << std::endl;
+                            node->getStartLine() << std::endl;
                         exit(1);
                     }
-                    outputHandledPragma(node->getPragma()->getLine(), "parallel");
-                } else if (node->getPragma()->getPragmaName() == "task") {
-                    const clang::Stmt *body = node->getBody();
-                    std::string bodyStr = stmtToString(body);
-
-                    accumulatedKernelDecls += getClosureDecl(
-                            node->getLbl() + ASYNC_SUFFIX, false);
-
-                    accumulatedKernelDefs += getClosureDef(
-                            node->getLbl() + ASYNC_SUFFIX, false, true,
-                            node->getLbl(), captures[node->getPragmaLine()],
-                            bodyStr, NULL, NULL);
-
-                    const std::string structDef = getStructDef(
-                            node->getLbl(),
-                            captures[node->getPragmaLine()], false);
-                    accumulatedStructDefs += structDef;
-
-                    std::stringstream contextCreation;
-                    contextCreation << "\n" <<
-                        getContextSetup(node->getLbl(),
-                                captures[node->getPragmaLine()], NULL);
-                    if (node->getPragma()->hasClause("if")) {
-                        // We have already asserted there is only one if arg
-                        std::vector<std::string> ifArgs = node->getPragma()->getArgsForClause("if");
-                        // If the if condition is false, just call the task body sequentially
-                        contextCreation << "if (!(" << ifArgs[0] << ")) {\n";
-                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(ctx);\n";
-                        contextCreation << "} else {\n";
-                    }
-                    contextCreation << "hclib_async(" << node->getLbl() <<
-                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, NO_PHASER, " <<
-                        "ANY_PLACE);\n";
-                    if (node->getPragma()->hasClause("if")) {
-                        contextCreation << "}\n";
-                    }
-
-                    // Add braces to ensure we don't change control flow
-                    const bool failed = rewriter->ReplaceText(succ->getSourceRange(),
-                            " { " + contextCreation.str() + " } ");
+                } else if (ompCmd == "simd") {
+                    // Do nothing for now, just delete this pragma
+                    std::string bodyStr = stmtToString(node->getBody());
+                    const bool failed = rewriter->ReplaceText(clang::SourceRange(
+                                node->getStartLoc(), node->getEndLoc()), bodyStr);
                     assert(!failed);
-                    outputHandledPragma(node->getPragma()->getLine(), "task");
-                } else if (node->getPragma()->getPragmaName() == "taskwait") {
-                    /*
-                     * taskwait is handled by a standalone script that inserts
-                     * 'hclib_end_finish(); hclib_start_finish();' for each
-                     * taskwait.
-                     */
-                    outputHandledPragma(node->getPragma()->getLine(), "taskwait");
-                } else if (node->getPragma()->getPragmaName() == "single") {
-                    assert(node->getParent()); // should not be root
-                    assert(node->getParent()->getPragma());
-
-                    if (node->getParent()->getPragma()->getPragmaName() !=
-                            "parallel") {
-                        std::cerr << "It appears the \"single\" pragma " <<
-                            "on line " << node->getPragmaLine() <<
-                            " does not have a \"parallel\" pragma as " <<
-                            "its parent. Instead has \"" <<
-                            node->getParent()->getPragma()->getPragmaName() <<
-                            "\" at line " <<
-                            node->getParent()->getPragmaLine() << "." <<
-                            std::endl;
-                        node->getParent()->print();
-                        exit(1);
-                    }
-                    assert(removeCompoundWrappers(node->getBody()) ==
-                            removeCompoundWrappers(node->getParent()->getBody()));
-                    /*
-                     * Verify that at least one of these pragmas does not
-                     * have the nowait clause.
-                     */
-                    assert(!node->getPragma()->hasClause("nowait") ||
-                            !node->getParent()->getPragma()->hasClause("nowait"));
-
-                    // Insert finish
-                    const clang::Stmt *body = node->getBody();
-
-                    const bool failed = rewriter->ReplaceText(
-                            body->getSourceRange(), "hclib_start_finish(); " +
-                            stmtToString(body) + " hclib_end_finish(); ");
-                    assert(!failed);
-
-                    outputHandledPragma(node->getPragma()->getLine(), "single");
-                    outputHandledPragma(node->getParent()->getPragma()->getLine(), "parallel");
                 } else {
-                    std::cerr << "Unhandled supported pragma \"" <<
-                        node->getPragma()->getPragmaName() << "\"" << std::endl;
+                    std::cerr << "Unhandled OMP command \"" << ompCmd << "\"" <<
+                        std::endl;
                     exit(1);
                 }
+            } else if (pragmaName == "root") {
+                // Nothing to do once we get to the top of the pragma tree
+            } else {
+                std::cerr << "Unhandled pragma type \"" << pragmaName << "\"" <<
+                    std::endl;
+                exit(1);
             }
         }
 
@@ -834,9 +784,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     "} " + accumulatedKernelDefs);
             assert(!failed);
         }
-
-        successors.clear();
-        predecessors.clear();
     }
 }
 
@@ -874,50 +821,146 @@ std::vector<clang::ValueDecl *> *OMPToHClib::visibleDecls() {
     return visible;
 }
 
-bool OMPToHClib::hasLaunchBody() {
-    return launchStartLine > 0;
-}
-
-clang::SourceLocation OMPToHClib::getLaunchBodyBeginLoc() {
-    assert(firstInsideLaunch);
-    return firstInsideLaunch->getLocStart();
-}
-
-clang::SourceLocation OMPToHClib::getLaunchBodyEndLoc() {
-    assert(lastInsideLaunch);
-    return lastInsideLaunch->getLocEnd();
-}
-
-std::string OMPToHClib::getLaunchBody() {
-    assert(launchStartLine > 0 && launchEndLine > 0);
-    assert(firstInsideLaunch);
-    assert(lastInsideLaunch);
-    assert(launchCaptures);
-
-    assert(getParent(firstInsideLaunch) == getParent(lastInsideLaunch));
-
-    const clang::Stmt *parent = getParent(firstInsideLaunch);
-    clang::Stmt::const_child_iterator i = parent->child_begin();
-    while (*i != firstInsideLaunch) {
-        i++;
+std::string OMPToHClib::getPragmaNameForMarker(const clang::CallExpr *call) {
+    if (call == NULL) {
+        // Root node only
+        return "root";
     }
-    std::stringstream ss;
-    while (*i != lastInsideLaunch) {
-        ss << stmtToString(*i) << "; ";
-        i++;
+    assert(call->getNumArgs() == 2);
+    const clang::Expr *pragmaNameArg = call->getArg(0);
+    while (clang::isa<clang::ImplicitCastExpr>(pragmaNameArg)) {
+        pragmaNameArg = clang::dyn_cast<clang::ImplicitCastExpr>(pragmaNameArg)->getSubExpr();
     }
-    ss << stmtToString(lastInsideLaunch) << "; " << std::flush;
-    return ss.str();
+    const clang::StringLiteral *literal = clang::dyn_cast<clang::StringLiteral>(pragmaNameArg);
+    assert(literal);
+    std::string pragmaName = literal->getString().str();
+    return pragmaName;
 }
 
-std::vector<clang::ValueDecl *> *OMPToHClib::getLaunchCaptures() {
-    assert(launchCaptures);
-    return launchCaptures;
+std::string OMPToHClib::getPragmaArgumentsForMarker(const clang::CallExpr *call) {
+    assert(call->getNumArgs() == 2);
+    const clang::Expr *pragmaArgsArg = call->getArg(1);
+    while (clang::isa<clang::ImplicitCastExpr>(pragmaArgsArg)) {
+        pragmaArgsArg = clang::dyn_cast<clang::ImplicitCastExpr>(pragmaArgsArg)->getSubExpr();
+    }
+    const clang::StringLiteral *literal = clang::dyn_cast<clang::StringLiteral>(pragmaArgsArg);
+    assert(literal);
+    return literal->getString().str();
 }
 
-const clang::FunctionDecl *OMPToHClib::getFunctionContainingLaunch() {
-    assert(functionContainingLaunch);
-    return functionContainingLaunch;
+const clang::Stmt *OMPToHClib::getBodyFrom(const clang::CallExpr *call) {
+    const clang::Stmt *parent = getParent(call);
+    const clang::Stmt *body = NULL;
+
+    if (const clang::CompoundStmt *compound =
+            clang::dyn_cast<clang::CompoundStmt>(parent)) {
+        clang::CompoundStmt::const_body_iterator i = compound->body_begin();
+        clang::CompoundStmt::const_body_iterator e = compound->body_end();
+        while (i != e) {
+            const clang::Stmt *curr = *i;
+            if (curr == call) {
+                i++;
+                body = *i;
+                break;
+            }
+            i++;
+        }
+    } else {
+        std::cerr << "Unhandled parent while looking for body: " <<
+            parent->getStmtClassName() << std::endl;
+        exit(1);
+    }
+
+    assert(body);
+    return body;
+}
+
+const clang::Stmt *OMPToHClib::getBodyForMarker(const clang::CallExpr *call) {
+    std::string pragmaName = getPragmaNameForMarker(call);
+    std::string pragmaArgs = getPragmaArgumentsForMarker(call);
+
+    if (pragmaName == "omp") {
+        size_t ompPragmaNameEnd = pragmaArgs.find(' ');
+        std::string ompPragma;
+
+        if (ompPragmaNameEnd == std::string::npos) {
+            // No clauses
+            ompPragma = pragmaArgs;
+        } else {
+            ompPragma = pragmaArgs.substr(0, ompPragmaNameEnd);
+        }
+
+        if (ompPragma == "taskwait") {
+            return NULL;
+        } else if (ompPragma == "task" || ompPragma == "critical" ||
+                ompPragma == "atomic" || ompPragma == "parallel" ||
+                ompPragma == "single" || ompPragma == "simd") {
+            return getBodyFrom(call);
+        } else {
+            std::cerr << "Unhandled OMP pragma \"" << ompPragma << "\"" << std::endl;
+            exit(1);
+        }
+    } else if (pragmaName == "omp_to_hclib") {
+        return getBodyFrom(call);
+    } else {
+        std::cerr << "Unhandled pragma name \"" << pragmaName << "\"" <<
+            std::endl;
+        exit(1);
+    }
+}
+
+std::string OMPToHClib::getOMPPragmaNameForMarker(const clang::CallExpr *call) {
+    std::string pragmaName = getPragmaNameForMarker(call);
+    assert(pragmaName == "omp");
+
+    std::string pragmaArgs = getPragmaArgumentsForMarker(call);
+    size_t ompPragmaNameEnd = pragmaArgs.find(' ');
+    std::string ompPragma;
+
+    if (ompPragmaNameEnd == std::string::npos) {
+        // No clauses
+        ompPragma = pragmaArgs;
+    } else {
+        ompPragma = pragmaArgs.substr(0, ompPragmaNameEnd);
+    }
+    return ompPragma;
+}
+
+OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
+    std::string pragmaName = getPragmaNameForMarker(call);
+    assert(pragmaName == "omp");
+
+    std::string pragmaArgs = getPragmaArgumentsForMarker(call);
+
+    size_t ompPragmaNameEnd = pragmaArgs.find(' ');
+    std::string ompPragma;
+
+    if (ompPragmaNameEnd != std::string::npos) {
+        // Some clauses, non-empty args
+        std::string clauses = pragmaArgs.substr(ompPragmaNameEnd + 1);
+        return new OMPClauses(clauses);
+    } else {
+        return new OMPClauses();
+    }
+}
+
+std::vector<OMPReductionVar> *OMPToHClib::getReductions(OMPClauses *clauses) {
+    std::vector<OMPReductionVar> *reductions = new std::vector<OMPReductionVar>();
+    if (clauses->hasClause("reduction")) {
+        std::vector<SingleClauseArgs *> *args = clauses->getArgs("reduction");
+        for (std::vector<SingleClauseArgs *>::iterator i = args->begin(),
+                e = args->end(); i != e; i++) {
+            SingleClauseArgs *single_arg = *i;
+            std::vector<std::string> *raw_args = single_arg->getArgs();
+
+            std::string op = raw_args->at(0);
+            assert(op == "+");
+            for (int v = 1; v < raw_args->size(); v++) {
+                reductions->push_back(OMPReductionVar(op, raw_args->at(v)));
+            }
+        }
+    }
+    return reductions;
 }
 
 void OMPToHClib::VisitStmt(const clang::Stmt *s) {
@@ -962,83 +1005,16 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
             }
         }
 
-        /*
-         * This block of code checks if the current statement is either the
-         * first before (predecessors) or after (successors) the line that an
-         * OMP pragma is on.
-         */
-        std::vector<OMPPragma *> *omp_pragmas =
-            getOMPPragmasFor(curr_func_decl, *SM);
-        for (std::vector<OMPPragma *>::iterator i = omp_pragmas->begin(),
-                e = omp_pragmas->end(); i != e; i++) {
-            OMPPragma *pragma = *i;
+        if (const clang::CallExpr *call = clang::dyn_cast<clang::CallExpr>(s)) {
+            if (call->getDirectCallee()) {
+                const clang::FunctionDecl *callee = call->getDirectCallee();
+                std::string calleeName = callee->getNameAsString();
 
-            if (presumedEnd.getLine() < pragma->getLine()) {
-                if (predecessors.find(pragma->getLine()) ==
-                        predecessors.end()) {
-                    predecessors[pragma->getLine()] = s;
-                } else {
-                    const clang::Stmt *curr = predecessors[pragma->getLine()];
-                    clang::PresumedLoc curr_loc = SM->getPresumedLoc(
-                            curr->getLocEnd());
-                    if (presumedEnd.getLine() > curr_loc.getLine() ||
-                            (presumedEnd.getLine() == curr_loc.getLine() &&
-                             presumedEnd.getColumn() > curr_loc.getColumn())) {
-                        predecessors[pragma->getLine()] = s;
-                    }
-                }
-            }
-
-            if (presumedStart.getLine() >= pragma->getLine()) {
-                if (successors.find(pragma->getLine()) == successors.end()) {
-                    successors[pragma->getLine()] = s;
-                    captures[pragma->getLine()] = visibleDecls();
-                } else {
-                    const clang::Stmt *curr = successors[pragma->getLine()];
-                    clang::PresumedLoc curr_loc =
-                        SM->getPresumedLoc(curr->getLocStart());
-                    if (presumedStart.getLine() < curr_loc.getLine() ||
-                            (presumedStart.getLine() == curr_loc.getLine() &&
-                             presumedStart.getColumn() < curr_loc.getColumn())) {
-                        successors[pragma->getLine()] = s;
-                        captures[pragma->getLine()] = visibleDecls();
-                    }
-                }
-            }
-        }
-
-        /*
-         * If the provided file contained launch pragmas for HClib, search for
-         * the first and last statements inside these pragmas.
-         */
-        if (launchStartLine > 0) {
-            assert(launchEndLine > 0);
-
-            if (presumedEnd.getLine() < launchEndLine) {
-                if (lastInsideLaunch) {
-                    size_t latestSoFar = SM->getPresumedLoc(
-                            lastInsideLaunch->getLocEnd()).getLine();
-                    if (presumedEnd.getLine() > latestSoFar) {
-                        lastInsideLaunch = s;
-                    }
-                } else {
-                    lastInsideLaunch = s;
-                }
-            }
-
-            if (presumedStart.getLine() > launchStartLine) {
-                if (firstInsideLaunch) {
-                    size_t earliestSoFar = SM->getPresumedLoc(
-                            firstInsideLaunch->getLocStart()).getLine();
-                    if (presumedStart.getLine() < earliestSoFar) {
-                        firstInsideLaunch = s;
-                        launchCaptures = visibleDecls();
-                        functionContainingLaunch = curr_func_decl;
-                    }
-                } else {
-                    firstInsideLaunch = s;
-                    launchCaptures = visibleDecls();
-                    functionContainingLaunch = curr_func_decl;
+                if (calleeName == "hclib_pragma_marker") {
+                    const clang::Stmt *body = getBodyForMarker(call);
+                    std::vector<clang::ValueDecl *> *captures = visibleDecls();
+                    PragmaNode *node = new PragmaNode(call, body, captures, SM);
+                    pragmaTree->addChild(node);
                 }
             }
         }
@@ -1070,175 +1046,8 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
     assert(currentScope == getCurrentLexicalDepth());
 }
 
-
-void OMPToHClib::parseHClibPragmas(const char *filename) {
-    std::ifstream fp;
-    fp.open(std::string(filename), std::ios::in);
-    if (!fp.is_open()) {
-        std::cerr << "Failed opening " << std::string(filename) << std::endl;
-        exit(1);
-    }
-
-    std::string line;
-
-    while (getline(fp, line)) {
-        size_t end = line.find(' ');
-        std::string firstToken = line.substr(0, end);
-        if (firstToken == "BODY") {
-            line = line.substr(end + 1);
-            end = line.find(' ');
-            launchStartLine = atoi(line.substr(0, end).c_str());
-            line = line.substr(end + 1);
-            end = line.find(' ');
-            launchEndLine = atoi(line.substr(0, end).c_str());
-            std::cerr << "Parsed HClib body from line " << launchStartLine <<
-                " to " << launchEndLine << std::endl;
-        } else {
-            std::cerr << "Unknown label \"" << firstToken << "\"" << std::endl;
-            exit(1);
-        }
-    }
-
-    fp.close();
-}
-
-std::vector<OMPPragma> *OMPToHClib::parseOMPPragmas(const char *ompPragmaFile) {
-    std::vector<OMPPragma> *pragmas = new std::vector<OMPPragma>();
-
-    std::ifstream fp;
-    fp.open(std::string(ompPragmaFile), std::ios::in);
-    if (!fp.is_open()) {
-        std::cerr << "Failed opening " << std::string(ompPragmaFile) << std::endl;
-        exit(1);
-    }
-
-    std::string line;
-
-    while (getline(fp, line)) {
-        size_t end = line.find(' ');
-        unsigned line_no = atoi(line.substr(0, end).c_str());
-        line = line.substr(end + 1);
-
-        end = line.find(' ');
-        unsigned last_line = atoi(line.substr(0, end).c_str());
-        line = line.substr(end + 1);
-
-        std::string pragma = line;
-
-        line = line.substr(line.find(' ') + 1);
-        assert(line.find("omp") == 0);
-
-        line = line.substr(line.find(' ') + 1);
-
-        // Look for a command like parallel, for, etc.
-        end = line.find(' ');
-
-        if (end == std::string::npos) {
-            // No clauses, just pragma name
-            std::string pragma_name = line;
-
-            pragmas->push_back(OMPPragma(line_no, last_line, line,
-                        pragma_name));
-        } else {
-            std::string pragma_name = line.substr(0, end);
-
-            OMPPragma pragma(line_no, last_line, line, pragma_name);
-            std::string clauses = line.substr(end + 1);
-
-            std::vector<std::string> split_clauses;
-            std::stringstream acc;
-            int paren_depth = 0;
-            int start = 0;
-            int index = 0;
-
-            while (index < clauses.size()) {
-                if (clauses[index] == ' ' && paren_depth == 0) {
-                    int seek = index;
-                    while (seek < clauses.size() && clauses[seek] == ' ') seek++;
-                    if (seek < clauses.size() && clauses[seek] == '(') {
-                        index = seek;
-                    } else {
-                        split_clauses.push_back(clauses.substr(start,
-                                    index - start));
-                        index++;
-                        while (index < clauses.size() && clauses[index] == ' ') {
-                            index++;
-                        }
-                        start = index;
-                    }
-                } else {
-                    if (clauses[index] == '(') paren_depth++;
-                    else if (clauses[index] == ')') paren_depth--;
-                    index++;
-                }
-            }
-            if (index != start) {
-                split_clauses.push_back(clauses.substr(start));
-            }
-
-            for (std::vector<std::string>::iterator i = split_clauses.begin(),
-                    e = split_clauses.end(); i != e; i++) {
-                std::string clause = *i;
-
-                if (clause.find("(") == std::string::npos) {
-                    pragma.addClause(clause, std::vector<std::string>());
-                } else {
-                    size_t open = clause.find("(");
-                    assert(open != std::string::npos);
-
-                    std::string args = clause.substr(open + 1);
-
-                    size_t close = args.find_last_of(")");
-                    assert(close != std::string::npos);
-
-                    args = args.substr(0, close);
-
-                    std::string clause_name = clause.substr(0, open);
-                    while (clause_name.at(clause_name.size() - 1) == ' ') {
-                        clause_name = clause_name.substr(0, clause_name.size() - 1);
-                    }
-
-                    std::vector<std::string> clause_args;
-                    int args_index = 0;
-                    int args_start = 0;
-                    while (args_index < args.size()) {
-                        if (args[args_index] == ',') {
-                            clause_args.push_back(args.substr(args_start,
-                                        args_index - args_start));
-                            args_index++;
-                            while (args_index < args.size() &&
-                                    args[args_index] == ' ') {
-                                args_index++;
-                            }
-                            args_start = args_index;
-                        } else {
-                            args_index++;
-                        }
-                    }
-
-                    if (args_start != args_index) {
-                        clause_args.push_back(args.substr(args_start));
-                    }
-
-                    pragma.addClause(clause_name, clause_args);
-                }
-            }
-
-            pragmas->push_back(pragma);
-        }
-    }
-    fp.close();
-
-    std::cerr << "Parsed " << pragmas->size() << " pragmas from " <<
-        std::string(ompPragmaFile) << std::endl;
-
-    return pragmas;
-}
-
-OMPToHClib::OMPToHClib(const char *ompPragmaFile,
-        const char *ompToHclibPragmaFile, const char *handledPragmasFile,
-        const char *checkForPthreadStr) {
-    pragmas = parseOMPPragmas(ompPragmaFile);
+OMPToHClib::OMPToHClib(const char *checkForPthreadStr,
+        const char *startCriticalSectionId) {
 
     if (strcmp(checkForPthreadStr, "true") == 0) {
         checkForPthread = true;
@@ -1250,24 +1059,8 @@ OMPToHClib::OMPToHClib(const char *ompPragmaFile,
         exit(1);
     }
 
-    supportedPragmas.insert("parallel");
-    supportedPragmas.insert("simd"); // ignore
-    supportedPragmas.insert("single");
-    supportedPragmas.insert("task");
-    supportedPragmas.insert("taskwait");
-
-    launchStartLine = -1;
-    launchEndLine = -1;
-    firstInsideLaunch = NULL;
-    lastInsideLaunch = NULL;
-    launchCaptures = NULL;
-    functionContainingLaunch = NULL;
-    parseHClibPragmas(ompToHclibPragmaFile);
-
-    handledPragmasFp.open(std::string(handledPragmasFile));
-    assert(handledPragmasFp.is_open());
+    criticalSectionId = atoi(startCriticalSectionId);
 }
 
 OMPToHClib::~OMPToHClib() {
-    handledPragmasFp.close();
 }

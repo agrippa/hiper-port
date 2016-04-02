@@ -275,12 +275,11 @@ runTest( int argc, char** argv)
     printf("Processing top-left matrix\n");
    
     long long start_time = get_time();
-#pragma omp_to_hclib body_start
 
+#pragma omp_to_hclib
     nw_optimized( input_itemsets, output_itemsets, referrence,
         max_rows, max_cols, penalty );
 
-#pragma omp_to_hclib body_end
     long long end_time = get_time();
 
     printf("Total time: %.3f seconds\n", ((float) (end_time - start_time)) / (1000*1000));

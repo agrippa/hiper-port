@@ -18,9 +18,38 @@ for line in handled_fp:
 
     handled[int(tokens[0])] = tokens[1]
 
-prev_stripped = None
+# assume first line is always this include
+sys.stdout.write('#include "hclib.h"\n')
+
+lines = []
 line = sys.stdin.readline()
+prev_stripped = None
 while len(line) > 0:
+    lines.append(line)
+    stripped = line.strip()
+    tokens = stripped.split()
+
+    if len(tokens) >= 3 and tokens[0] == '#pragma' and tokens[1] == 'omp' and \
+                      tokens[2] == 'critical':
+        assert prev_stripped.startswith('# ')
+        line_no = int(prev_stripped.split()[1])
+
+        if line_no in handled:
+            sys.stdout.write('pthread_mutex_t critical_' + str(line_no) +
+                    '_lock = PTHREAD_MUTEX_INITIALIZER;\n')
+
+    prev_stripped = line.strip()
+    line = sys.stdin.readline()
+
+
+prev_stripped = None
+line_index = 1 # skip hclib include as we already output it above
+assert lines[0].strip() == '#include "hclib.h"'
+
+while line_index < len(lines):
+    line = lines[line_index]
+    line_index += 1
+
     stripped = line.strip()
     tokens = stripped.split()
 
@@ -31,7 +60,8 @@ while len(line) > 0:
 
         if line_no in handled:
             while stripped.endswith('\\'):
-                line = sys.stdin.readline()
+                line = lines[line_index]
+                line_index += 1
                 stripped = line.strip()
 
             if handled[line_no] == 'taskwait':
@@ -45,6 +75,5 @@ while len(line) > 0:
         sys.stdout.write(line)
 
     prev_stripped = line.strip()
-    line = sys.stdin.readline()
 
 handled_fp.close()

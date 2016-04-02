@@ -16,13 +16,15 @@
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "OMPPragma.h"
-#include "OMPNode.h"
+#include "PragmaNode.h"
+#include "SingleClauseArgs.h"
+#include "OMPClauses.h"
+#include "OMPReductionVar.h"
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
-        OMPToHClib(const char *ompPragmaFile, const char *ompToHclibPragmaFile,
-                const char *handledPragmaFile, const char *checkForPthread);
+        OMPToHClib(const char *checkForPthread,
+                const char *startCriticalSectionId);
         ~OMPToHClib();
 
         void setRewriter(clang::Rewriter &R) {
@@ -44,13 +46,6 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void preFunctionVisit(clang::FunctionDecl *func);
         void postFunctionVisit(clang::FunctionDecl *func);
 
-        bool hasLaunchBody();
-        std::string getLaunchBody();
-        std::vector<clang::ValueDecl *> *getLaunchCaptures();
-        const clang::FunctionDecl *getFunctionContainingLaunch();
-        clang::SourceLocation getLaunchBodyBeginLoc();
-        clang::SourceLocation getLaunchBodyEndLoc();
-
         std::string getClosureDecl(std::string closureName,
                 bool isForasyncClosure);
         std::string getClosureDef(std::string closureName,
@@ -65,6 +60,15 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::vector<clang::ValueDecl *> *captured,
                 std::vector<OMPReductionVar> *reductions);
 
+        const clang::Stmt *getBodyFrom(const clang::CallExpr *call);
+        const clang::Stmt *getBodyForMarker(const clang::CallExpr *call);
+        std::string getPragmaNameForMarker(const clang::CallExpr *call);
+        std::string getPragmaArgumentsForMarker(const clang::CallExpr *call);
+        OMPClauses *getOMPClausesForMarker(const clang::CallExpr *call);
+        std::string getOMPPragmaNameForMarker(const clang::CallExpr *call);
+        std::vector<OMPReductionVar> *getReductions(OMPClauses *clauses);
+        int getCriticalSectionId() { return criticalSectionId; }
+
     protected:
         clang::ASTContext *Context;
         clang::SourceManager *SM;
@@ -73,12 +77,6 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::map<const clang::Stmt *, const clang::Stmt *> parentMap;
 
     private:
-        std::vector<OMPPragma> *parseOMPPragmas(const char *ompPragmaFile);
-        void parseHClibPragmas(const char *filename);
-        std::vector<OMPPragma *> *getOMPPragmasFor(
-                clang::FunctionDecl *decl, clang::SourceManager &SM);
-        OMPPragma *getOMPPragmaFor(int lineNo);
-
         std::string getDeclarationTypeStr(clang::QualType qualType,
                 std::string name, std::string soFarBefore, std::string soFarAfter);
         std::string getDeclarationStr(clang::ValueDecl *decl);
@@ -102,32 +100,22 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         clang::Expr *unwrapCasts(clang::Expr *expr);
 
-        std::vector<OMPPragma> *pragmas;
-
         /*
          * Map from line containing a OMP pragma to its immediate predessor. It is
          * safe to use a line here because no more than one pragma can appear on
          * each line.
          */
-        std::map<int, const clang::Stmt *> predecessors;
-        std::map<int, const clang::Stmt *> successors;
         std::map<int, std::vector<clang::ValueDecl *> *> captures;
-
-        std::set<std::string> supportedPragmas;
 
         std::vector<std::vector<clang::ValueDecl *> *> in_scope;
 
-        int launchStartLine;
-        int launchEndLine;
-        const clang::Stmt *firstInsideLaunch;
-        const clang::Stmt *lastInsideLaunch;
-        std::vector<clang::ValueDecl *> *launchCaptures;
-        const clang::FunctionDecl *functionContainingLaunch;
-
-        std::ofstream handledPragmasFp;
-        void outputHandledPragma(int line, std::string pragmaName);
-
         bool checkForPthread;
+
+        PragmaNode *pragmaTree;
+
+        int criticalSectionId;
+
+        bool foundOmpToHclibLaunch = false;
 };
 
 #endif

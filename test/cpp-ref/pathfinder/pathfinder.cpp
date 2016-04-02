@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-typedef struct _run100 {
+typedef struct _pragma101 {
     int argc;
     char **argv;
     unsigned long long cycles;
@@ -88,9 +88,9 @@ typedef struct _run100 {
     int *temp;
     int min;
     int t;
- } run100;
+ } pragma101;
 
-static void run100_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
+static void pragma101_hclib_async(void *____arg, const int ___iter);typedef struct _main_entrypoint_ctx {
     int argc;
     char **argv;
     unsigned long long cycles;
@@ -113,8 +113,8 @@ for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
-         { 
-run100 *ctx = (run100 *)malloc(sizeof(run100));
+ { 
+pragma101 *ctx = (pragma101 *)malloc(sizeof(pragma101));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->cycles = cycles;
@@ -128,11 +128,11 @@ domain.low = 0;
 domain.high = cols;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)run100_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma101_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
-    }; }
+    } ; }
 
 void run(int argc, char** argv)
 {
@@ -147,7 +147,8 @@ void run(int argc, char** argv)
     src = new int[cols];
 
     pin_stats_reset();
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->argc = argc;
 ctx->argv = argv;
 ctx->cycles = cycles;
@@ -175,8 +176,8 @@ free(ctx);
     delete [] wall;
     delete [] dst;
     delete [] src;
-} static void run100_hclib_async(void *____arg, const int ___iter) {
-    run100 *ctx = (run100 *)____arg;
+}  static void pragma101_hclib_async(void *____arg, const int ___iter) {
+    pragma101 *ctx = (pragma101 *)____arg;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
     unsigned long long cycles; cycles = ctx->cycles;
@@ -195,7 +196,7 @@ free(ctx);
           if (n < cols-1)
             min = MIN(min, src[n+1]);
           dst[n] = wall[t+1][n]+min;
-        }    } while (0);
+        } ;     } while (0);
     ; hclib_end_finish();
 }
 

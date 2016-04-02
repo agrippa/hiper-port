@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 	float *z;
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
-#pragma omp_to_hclib body_start
+#pragma omp_to_hclib
 	while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
@@ -140,7 +140,6 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}//End while loop
-#pragma omp_to_hclib body_end
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {

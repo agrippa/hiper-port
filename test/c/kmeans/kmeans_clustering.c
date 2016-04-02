@@ -177,6 +177,7 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
             partial_new_centers[i][j] = (float*)calloc(nfeatures, sizeof(float));
 	}
 	printf("num of threads = %d\n", num_omp_threads);
+#pragma omp_to_hclib
     do {
         delta = 0.0;
         {

@@ -302,7 +302,7 @@ float pspeedy(Points *points, float z, long *kcenter, int pid)
 /* z is the facility cost, x is the number of this point in the array 
    points */
 
-typedef struct _pgain390 {
+typedef struct _pragma390 {
     long x;
     Points *points;
     double z;
@@ -326,9 +326,9 @@ typedef struct _pgain390 {
     double *lower;
     double *gl_lower;
     pthread_mutex_t reduction_mutex;
- } pgain390;
+ } pragma390;
 
-typedef struct _pgain466 {
+typedef struct _pragma466 {
     long x;
     Points *points;
     double z;
@@ -352,9 +352,9 @@ typedef struct _pgain466 {
     double *lower;
     double *gl_lower;
     double t2;
- } pgain466;
+ } pragma466;
 
-static void pgain390_hclib_async(void *____arg, const int ___iter);static void pgain466_hclib_async(void *____arg, const int ___iter);double pgain(long x, Points *points, double z, long int *numcenters, int pid)
+static void pragma390_hclib_async(void *____arg, const int ___iter);static void pragma466_hclib_async(void *____arg, const int ___iter);double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
 #ifdef PROFILE
@@ -439,8 +439,8 @@ static void pgain390_hclib_async(void *____arg, const int ___iter);static void p
 	
 	// OpenMP parallelization
 //	#pragma omp parallel for 
-   { 
-pgain390 *ctx = (pgain390 *)malloc(sizeof(pgain390));
+ { 
+pragma390 *ctx = (pragma390 *)malloc(sizeof(pragma390));
 ctx->x = x;
 ctx->points = points;
 ctx->z = z;
@@ -471,7 +471,7 @@ domain.low = k1;
 domain.high = k2;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pgain390_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma390_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
 cost_of_opening_x = ctx->cost_of_opening_x;
@@ -526,8 +526,8 @@ cost_of_opening_x = ctx->cost_of_opening_x;
 
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
-     { 
-pgain466 *ctx = (pgain466 *)malloc(sizeof(pgain466));
+ { 
+pragma466 *ctx = (pragma466 *)malloc(sizeof(pragma466));
 ctx->x = x;
 ctx->points = points;
 ctx->z = z;
@@ -556,7 +556,7 @@ domain.low = k1;
 domain.high = k2;
 domain.stride = 1;
 domain.tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pgain466_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma466_hclib_async, ctx, NULL, 1, &domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(ctx);
  } 
@@ -593,8 +593,8 @@ free(ctx);
 #endif
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
-} static void pgain390_hclib_async(void *____arg, const int ___iter) {
-    pgain390 *ctx = (pgain390 *)____arg;
+} static void pragma390_hclib_async(void *____arg, const int ___iter) {
+    pragma390 *ctx = (pragma390 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
     double z; z = ctx->z;
@@ -644,7 +644,7 @@ free(ctx);
       int assign = points->p[i].assign;
       lower[center_table[assign]] += current_cost - x_cost;			
     }
-  }    } while (0);
+  } ;     } while (0);
     const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
     assert(lock_err == 0);
     ctx->cost_of_opening_x += cost_of_opening_x;
@@ -653,8 +653,8 @@ free(ctx);
     ; hclib_end_finish();
 }
 
-static void pgain466_hclib_async(void *____arg, const int ___iter) {
-    pgain466 *ctx = (pgain466 *)____arg;
+static void pragma466_hclib_async(void *____arg, const int ___iter) {
+    pragma466 *ctx = (pragma466 *)____arg;
     long x; x = ctx->x;
     Points *points; points = ctx->points;
     double z; z = ctx->z;
@@ -690,7 +690,7 @@ static void pgain466_hclib_async(void *____arg, const int ___iter) {
 					dist(points->p[i], points->p[x], points->dim);
 				points->p[i].assign = x;
       }
-    }    } while (0);
+    } ;     } while (0);
     ; hclib_end_finish();
 }
 
@@ -917,7 +917,7 @@ while(1) {
       { 
 	break;
       }
-  }; }
+  } ; }
 
 float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 	       int pid)
@@ -1026,8 +1026,7 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
     }
 
 
-
-  main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 ctx->points = points;
 ctx->kmin = kmin;
 ctx->kmax = kmax;
@@ -1053,7 +1052,6 @@ hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
 
-
   //clean up...
   if( pid==0 ) {
     free(feasible); 
@@ -1062,7 +1060,7 @@ free(ctx);
   }
 
   return cost;
-}
+} 
 
 /* compute the means for the k clusters */
 int contcenters(Points *points)

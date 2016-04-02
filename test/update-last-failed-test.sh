@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 RUN_TESTS=$SCRIPT_DIR/run-tests.sh
 
 set +e
-$RUN_TESTS > tmp
+$RUN_TESTS $* > tmp
 set -e
 
 PASSED=$(cat tmp | grep Passed | wc -l)
