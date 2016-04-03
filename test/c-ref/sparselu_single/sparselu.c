@@ -214,58 +214,59 @@ void sparselu_init (float ***pBENCH, char *pass)
 }
 
 typedef struct _pragma236 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma236;
 
 typedef struct _pragma244 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma244;
 
 typedef struct _pragma257 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma257;
 
 static void pragma236_hclib_async(void *____arg);
 static void pragma244_hclib_async(void *____arg);
 static void pragma257_hclib_async(void *____arg);
 typedef struct _pragma253 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma253;
 
 static void pragma253_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
 {
 hclib_start_finish(); {
  { 
 pragma253 *ctx = (pragma253 *)malloc(sizeof(pragma253));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma253_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
 
@@ -279,20 +280,21 @@ void sparselu_par_call(float **BENCH)
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
    bots_message(" completed!\n");
-}  static void pragma253_hclib_async(void *____arg) {
+}  
+static void pragma253_hclib_async(void *____arg) {
     pragma253 *ctx = (pragma253 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 for (kk=0; kk<bots_arg_size; kk++) 
                {
@@ -302,10 +304,10 @@ for (kk=0; kk<bots_arg_size; kk++)
                        {
  { 
 pragma236 *ctx = (pragma236 *)malloc(sizeof(pragma236));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma236_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
@@ -314,10 +316,10 @@ hclib_async(pragma236_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
                        {
  { 
 pragma244 *ctx = (pragma244 *)malloc(sizeof(pragma244));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma244_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
@@ -331,10 +333,10 @@ hclib_async(pragma244_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
                                {
  { 
 pragma257 *ctx = (pragma257 *)malloc(sizeof(pragma257));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma257_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                                }
@@ -343,36 +345,39 @@ hclib_async(pragma257_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
                } ;     ; hclib_end_finish();
 }
 
- static void pragma236_hclib_async(void *____arg) {
+ 
+static void pragma236_hclib_async(void *____arg) {
     pragma236 *ctx = (pragma236 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
                            fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
                            } ;     ; hclib_end_finish();
 }
 
+
 static void pragma244_hclib_async(void *____arg) {
     pragma244 *ctx = (pragma244 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
                            bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
                            } ;     ; hclib_end_finish();
 }
 
+
 static void pragma257_hclib_async(void *____arg) {
     pragma257 *ctx = (pragma257 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
                                    if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();

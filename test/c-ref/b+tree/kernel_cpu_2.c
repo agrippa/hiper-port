@@ -37,6 +37,13 @@
 //========================================================================================================================================================================================================200
 
 typedef struct _pragma94 {
+    int thid;
+    int bid;
+    long long time0;
+    long long time1;
+    long long time2;
+    int i;
+    int threadsPerBlock;
     int cores_arg;
     knode *knodes;
     long knodes_elem;
@@ -51,17 +58,15 @@ typedef struct _pragma94 {
     int *end;
     int *recstart;
     int *reclength;
-    long long time0;
-    long long time1;
-    long long time2;
-    int i;
-    int threadsPerBlock;
-    int thid;
-    int bid;
  } pragma94;
 
 static void pragma94_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
+    long long time0;
+    long long time1;
+    long long time2;
+    int i;
+    int threadsPerBlock;
     int cores_arg;
     knode *knodes;
     long knodes_elem;
@@ -76,15 +81,16 @@ typedef struct _main_entrypoint_ctx {
     int *end;
     int *recstart;
     int *reclength;
-    long long time0;
-    long long time1;
-    long long time2;
-    int i;
-    int threadsPerBlock;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    long long time0; time0 = ctx->time0;
+    long long time1; time1 = ctx->time1;
+    long long time2; time2 = ctx->time2;
+    int i; i = ctx->i;
+    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
     int cores_arg; cores_arg = ctx->cores_arg;
     knode *knodes; knodes = ctx->knodes;
     long knodes_elem; knodes_elem = ctx->knodes_elem;
@@ -99,11 +105,6 @@ static void main_entrypoint(void *____arg) {
     int *end; end = ctx->end;
     int *recstart; recstart = ctx->recstart;
     int *reclength; reclength = ctx->reclength;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    int i; i = ctx->i;
-    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
 {
 	time1 = get_time();
 
@@ -118,6 +119,13 @@ static void main_entrypoint(void *____arg) {
 	// process number of querries
  { 
 pragma94 *ctx = (pragma94 *)malloc(sizeof(pragma94));
+ctx->thid = thid;
+ctx->bid = bid;
+ctx->time0 = time0;
+ctx->time1 = time1;
+ctx->time2 = time2;
+ctx->i = i;
+ctx->threadsPerBlock = threadsPerBlock;
 ctx->cores_arg = cores_arg;
 ctx->knodes = knodes;
 ctx->knodes_elem = knodes_elem;
@@ -132,13 +140,6 @@ ctx->start = start;
 ctx->end = end;
 ctx->recstart = recstart;
 ctx->reclength = reclength;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->i = i;
-ctx->threadsPerBlock = threadsPerBlock;
-ctx->thid = thid;
-ctx->bid = bid;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = count;
@@ -194,6 +195,11 @@ kernel_cpu_2(	int cores_arg,
 	threadsPerBlock = order < 1024 ? order : 1024;
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->time0 = time0;
+ctx->time1 = time1;
+ctx->time2 = time2;
+ctx->i = i;
+ctx->threadsPerBlock = threadsPerBlock;
 ctx->cores_arg = cores_arg;
 ctx->knodes = knodes;
 ctx->knodes_elem = knodes_elem;
@@ -208,11 +214,6 @@ ctx->start = start;
 ctx->end = end;
 ctx->recstart = recstart;
 ctx->reclength = reclength;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->i = i;
-ctx->threadsPerBlock = threadsPerBlock;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -229,8 +230,16 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  static void pragma94_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma94_hclib_async(void *____arg, const int ___iter0) {
     pragma94 *ctx = (pragma94 *)____arg;
+    int thid; thid = ctx->thid;
+    int bid; bid = ctx->bid;
+    long long time0; time0 = ctx->time0;
+    long long time1; time1 = ctx->time1;
+    long long time2; time2 = ctx->time2;
+    int i; i = ctx->i;
+    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
     int cores_arg; cores_arg = ctx->cores_arg;
     knode *knodes; knodes = ctx->knodes;
     long knodes_elem; knodes_elem = ctx->knodes_elem;
@@ -245,13 +254,6 @@ free(ctx);
     int *end; end = ctx->end;
     int *recstart; recstart = ctx->recstart;
     int *reclength; reclength = ctx->reclength;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    int i; i = ctx->i;
-    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
-    int thid; thid = ctx->thid;
-    int bid; bid = ctx->bid;
     hclib_start_finish();
     do {
     bid = ___iter0;

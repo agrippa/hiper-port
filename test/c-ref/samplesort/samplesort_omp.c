@@ -126,23 +126,23 @@ typedef struct sort_data_t {
 } sort_data_t;
 
 typedef struct _pragma146 {
-    void *arg;
+    sort_data_t *buf;
+    int index;
     sort_data_t *in;
     uint64_t *data;
     int left;
     int right;
-    int index;
-    sort_data_t *buf;
+    void *arg;
  } pragma146;
 
 typedef struct _pragma156 {
-    void *arg;
+    sort_data_t *buf;
+    int index;
     sort_data_t *in;
     uint64_t *data;
     int left;
     int right;
-    int index;
-    sort_data_t *buf;
+    void *arg;
  } pragma156;
 
 static void pragma146_hclib_async(void *____arg);
@@ -163,13 +163,13 @@ hclib_start_finish(); {
           buf->right = index - 1; 
  { 
 pragma146 *ctx = (pragma146 *)malloc(sizeof(pragma146));
-ctx->arg = arg;
+ctx->buf = buf;
+ctx->index = index;
 ctx->in = in;
 ctx->data = data;
 ctx->left = left;
 ctx->right = right;
-ctx->index = index;
-ctx->buf = buf;
+ctx->arg = arg;
 hclib_async(pragma146_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
@@ -180,13 +180,13 @@ hclib_async(pragma146_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
           buf->right = right; 
  { 
 pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
-ctx->arg = arg;
+ctx->buf = buf;
+ctx->index = index;
 ctx->in = in;
 ctx->data = data;
 ctx->left = left;
 ctx->right = right;
-ctx->index = index;
-ctx->buf = buf;
+ctx->arg = arg;
 hclib_async(pragma156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
@@ -197,30 +197,32 @@ hclib_async(pragma156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     qsort(data+left, right - left + 1, sizeof(TYPE), compare);
   }
   free(arg);
-} static void pragma146_hclib_async(void *____arg) {
+} 
+static void pragma146_hclib_async(void *____arg) {
     pragma146 *ctx = (pragma146 *)____arg;
-    void *arg; arg = ctx->arg;
+    sort_data_t *buf; buf = ctx->buf;
+    int index; index = ctx->index;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;
     int left; left = ctx->left;
     int right; right = ctx->right;
-    int index; index = ctx->index;
-    sort_data_t *buf; buf = ctx->buf;
+    void *arg; arg = ctx->arg;
     hclib_start_finish();
 {
               par_sort(buf);
           } ;     ; hclib_end_finish();
 }
 
+
 static void pragma156_hclib_async(void *____arg) {
     pragma156 *ctx = (pragma156 *)____arg;
-    void *arg; arg = ctx->arg;
+    sort_data_t *buf; buf = ctx->buf;
+    int index; index = ctx->index;
     sort_data_t *in; in = ctx->in;
     uint64_t *data; data = ctx->data;
     int left; left = ctx->left;
     int right; right = ctx->right;
-    int index; index = ctx->index;
-    sort_data_t *buf; buf = ctx->buf;
+    void *arg; arg = ctx->arg;
     hclib_start_finish();
 {
               par_sort(buf);
@@ -243,8 +245,6 @@ void sorting(TYPE* buffer, int size) {
 #endif
 
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int Numprocs;
     int MyRank;
     int Root;
@@ -265,12 +265,13 @@ typedef struct _main_entrypoint_ctx {
     uint64_t *LocalBucket;
     uint64_t *OutputBuffer;
     uint64_t *Output;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int Numprocs; Numprocs = ctx->Numprocs;
     int MyRank; MyRank = ctx->MyRank;
     int Root; Root = ctx->Root;
@@ -291,6 +292,8 @@ static void main_entrypoint(void *____arg) {
     uint64_t *LocalBucket; LocalBucket = ctx->LocalBucket;
     uint64_t *OutputBuffer; OutputBuffer = ctx->OutputBuffer;
     uint64_t *Output; Output = ctx->Output;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 sorting(InputData, NoofElements_Bloc) ; }
 
 int main (int argc, char *argv[]) {
@@ -353,8 +356,6 @@ int main (int argc, char *argv[]) {
   shmem_barrier_all();
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->Numprocs = Numprocs;
 ctx->MyRank = MyRank;
 ctx->Root = Root;
@@ -375,6 +376,8 @@ ctx->BucketBuffer = BucketBuffer;
 ctx->LocalBucket = LocalBucket;
 ctx->OutputBuffer = OutputBuffer;
 ctx->Output = Output;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;

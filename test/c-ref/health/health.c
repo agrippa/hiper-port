@@ -493,8 +493,8 @@ hclib_pragma_marker("omp", "taskwait");
 }
 #else
 typedef struct _pragma509 {
-    struct Village *village;
     struct Village *vlist;
+    struct Village *village;
  } pragma509;
 
 static void pragma509_hclib_async(void *____arg);
@@ -513,8 +513,8 @@ void sim_village_par(struct Village *village)
    {
  { 
 pragma509 *ctx = (pragma509 *)malloc(sizeof(pragma509));
-ctx->village = village;
 ctx->vlist = vlist;
+ctx->village = village;
 hclib_async(pragma509_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
       vlist = vlist->next;
@@ -536,10 +536,11 @@ hclib_async(pragma509_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 
    /* Uses list v->population, v->hosp->asses and v->h->waiting */
    check_patients_population(village);
-} static void pragma509_hclib_async(void *____arg) {
+} 
+static void pragma509_hclib_async(void *____arg) {
     pragma509 *ctx = (pragma509 *)____arg;
-    struct Village *village; village = ctx->village;
     struct Village *vlist; vlist = ctx->vlist;
+    struct Village *village; village = ctx->village;
     hclib_start_finish();
 sim_village_par(vlist) ;     ; hclib_end_finish();
 }
@@ -652,26 +653,27 @@ int check_village(struct Village *top)
 }
 /**********************************************************************/
 typedef struct _pragma646 {
-    struct Village *top;
     long i;
+    struct Village *top;
  } pragma646;
 
 static void pragma646_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
-    struct Village *top;
     long i;
+    struct Village *top;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    struct Village *top; top = ctx->top;
     long i; i = ctx->i;
+    struct Village *top; top = ctx->top;
 {
 hclib_start_finish(); {
  { 
 pragma646 *ctx = (pragma646 *)malloc(sizeof(pragma646));
-ctx->top = top;
 ctx->i = i;
+ctx->top = top;
 hclib_async(pragma646_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
@@ -681,15 +683,16 @@ void sim_village_main_par(struct Village *top)
 {
     long i;
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->top = top;
 ctx->i = i;
+ctx->top = top;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma646_hclib_async(void *____arg) {
+}  
+static void pragma646_hclib_async(void *____arg) {
     pragma646 *ctx = (pragma646 *)____arg;
-    struct Village *top; top = ctx->top;
     long i; i = ctx->i;
+    struct Village *top; top = ctx->top;
     hclib_start_finish();
 {
                     for (i = 0; i < sim_time; i++) sim_village_par(top);   

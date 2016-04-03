@@ -133,6 +133,18 @@ float accuracy(float *arr1, float *arr2, int len)
 
 }
 typedef struct _pragma159 {
+    int z;
+    int count;
+    float *tIn_t;
+    float *tOut_t;
+    float ce;
+    float cw;
+    float cn;
+    float cs;
+    float ct;
+    float cb;
+    float cc;
+    float stepDivCap;
     float *pIn;
     float *tIn;
     float *tOut;
@@ -145,18 +157,6 @@ typedef struct _pragma159 {
     float Rz;
     float dt;
     int numiter;
-    float ce;
-    float cw;
-    float cn;
-    float cs;
-    float ct;
-    float cb;
-    float cc;
-    float stepDivCap;
-    int count;
-    float *tIn_t;
-    float *tOut_t;
-    int z;
  } pragma159;
 
 static void pragma159_hclib_async(void *____arg, const int ___iter0);
@@ -185,6 +185,18 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
             int z; 
  { 
 pragma159 *ctx = (pragma159 *)malloc(sizeof(pragma159));
+ctx->z = z;
+ctx->count = count;
+ctx->tIn_t = tIn_t;
+ctx->tOut_t = tOut_t;
+ctx->ce = ce;
+ctx->cw = cw;
+ctx->cn = cn;
+ctx->cs = cs;
+ctx->ct = ct;
+ctx->cb = cb;
+ctx->cc = cc;
+ctx->stepDivCap = stepDivCap;
 ctx->pIn = pIn;
 ctx->tIn = tIn;
 ctx->tOut = tOut;
@@ -197,18 +209,6 @@ ctx->Ry = Ry;
 ctx->Rz = Rz;
 ctx->dt = dt;
 ctx->numiter = numiter;
-ctx->ce = ce;
-ctx->cw = cw;
-ctx->cn = cn;
-ctx->cs = cs;
-ctx->ct = ct;
-ctx->cb = cb;
-ctx->cc = cc;
-ctx->stepDivCap = stepDivCap;
-ctx->count = count;
-ctx->tIn_t = tIn_t;
-ctx->tOut_t = tOut_t;
-ctx->z = z;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nz;
@@ -225,8 +225,21 @@ free(ctx);
         } while (count < numiter);
     } 
     return; 
-} static void pragma159_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma159_hclib_async(void *____arg, const int ___iter0) {
     pragma159 *ctx = (pragma159 *)____arg;
+    int z; z = ctx->z;
+    int count; count = ctx->count;
+    float *tIn_t; tIn_t = ctx->tIn_t;
+    float *tOut_t; tOut_t = ctx->tOut_t;
+    float ce; ce = ctx->ce;
+    float cw; cw = ctx->cw;
+    float cn; cn = ctx->cn;
+    float cs; cs = ctx->cs;
+    float ct; ct = ctx->ct;
+    float cb; cb = ctx->cb;
+    float cc; cc = ctx->cc;
+    float stepDivCap; stepDivCap = ctx->stepDivCap;
     float *pIn; pIn = ctx->pIn;
     float *tIn; tIn = ctx->tIn;
     float *tOut; tOut = ctx->tOut;
@@ -239,18 +252,6 @@ free(ctx);
     float Rz; Rz = ctx->Rz;
     float dt; dt = ctx->dt;
     int numiter; numiter = ctx->numiter;
-    float ce; ce = ctx->ce;
-    float cw; cw = ctx->cw;
-    float cn; cn = ctx->cn;
-    float cs; cs = ctx->cs;
-    float ct; ct = ctx->ct;
-    float cb; cb = ctx->cb;
-    float cc; cc = ctx->cc;
-    float stepDivCap; stepDivCap = ctx->stepDivCap;
-    int count; count = ctx->count;
-    float *tIn_t; tIn_t = ctx->tIn_t;
-    float *tOut_t; tOut_t = ctx->tOut_t;
-    int z; z = ctx->z;
     hclib_start_finish();
     do {
     z = ___iter0;
@@ -293,8 +294,6 @@ void usage(int argc, char **argv)
 
 
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     char *pfile;
     char *tfile;
     char *ofile;
@@ -317,12 +316,13 @@ typedef struct _main_entrypoint_ctx {
     float *tempCopy;
     int size;
     float *answer;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     char *pfile; pfile = ctx->pfile;
     char *tfile; tfile = ctx->tfile;
     char *ofile; ofile = ctx->ofile;
@@ -345,6 +345,8 @@ static void main_entrypoint(void *____arg) {
     float *tempCopy; tempCopy = ctx->tempCopy;
     int size; size = ctx->size;
     float *answer; answer = ctx->answer;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 {
     struct timeval start, stop;
     float time;
@@ -411,8 +413,6 @@ int main(int argc, char** argv)
     memcpy(tempCopy,tempIn, size * sizeof(float));
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->pfile = pfile;
 ctx->tfile = tfile;
 ctx->ofile = ofile;
@@ -435,6 +435,8 @@ ctx->tempIn = tempIn;
 ctx->tempCopy = tempCopy;
 ctx->size = size;
 ctx->answer = answer;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 

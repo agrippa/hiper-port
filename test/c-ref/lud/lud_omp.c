@@ -33,23 +33,23 @@ void lud_diagonal_omp (float* a, int size, int offset)
 
 // implements block LU factorization 
 typedef struct _pragma53 {
-    float *a;
-    int size;
     int offset;
     int chunk_idx;
     int size_inter;
     int chunks_in_inter_row;
     int chunks_per_inter;
+    float *a;
+    int size;
  } pragma53;
 
 typedef struct _pragma105 {
-    float *a;
-    int size;
     int offset;
     int chunk_idx;
     int size_inter;
     int chunks_in_inter_row;
     int chunks_per_inter;
+    float *a;
+    int size;
  } pragma105;
 
 static void pragma53_hclib_async(void *____arg, const int ___iter0);
@@ -58,6 +58,7 @@ typedef struct _main_entrypoint_ctx {
     float *a;
     int size;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -79,13 +80,13 @@ static void main_entrypoint(void *____arg) {
         // 
  { 
 pragma53 *ctx = (pragma53 *)malloc(sizeof(pragma53));
-ctx->a = a;
-ctx->size = size;
 ctx->offset = offset;
 ctx->chunk_idx = chunk_idx;
 ctx->size_inter = size_inter;
 ctx->chunks_in_inter_row = chunks_in_inter_row;
 ctx->chunks_per_inter = chunks_per_inter;
+ctx->a = a;
+ctx->size = size;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = chunks_in_inter_row;
@@ -102,13 +103,13 @@ free(ctx);
 
  { 
 pragma105 *ctx = (pragma105 *)malloc(sizeof(pragma105));
-ctx->a = a;
-ctx->size = size;
 ctx->offset = offset;
 ctx->chunk_idx = chunk_idx;
 ctx->size_inter = size_inter;
 ctx->chunks_in_inter_row = chunks_in_inter_row;
 ctx->chunks_per_inter = chunks_per_inter;
+ctx->a = a;
+ctx->size = size;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = chunks_per_inter;
@@ -131,15 +132,16 @@ ctx->size = size;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma53_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma53_hclib_async(void *____arg, const int ___iter0) {
     pragma53 *ctx = (pragma53 *)____arg;
-    float *a; a = ctx->a;
-    int size; size = ctx->size;
     int offset; offset = ctx->offset;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     int size_inter; size_inter = ctx->size_inter;
     int chunks_in_inter_row; chunks_in_inter_row = ctx->chunks_in_inter_row;
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
+    float *a; a = ctx->a;
+    int size; size = ctx->size;
     hclib_start_finish();
     do {
     chunk_idx = ___iter0;
@@ -191,15 +193,16 @@ for (j =0; j < BS; j++){
     ; hclib_end_finish();
 }
 
+
 static void pragma105_hclib_async(void *____arg, const int ___iter0) {
     pragma105 *ctx = (pragma105 *)____arg;
-    float *a; a = ctx->a;
-    int size; size = ctx->size;
     int offset; offset = ctx->offset;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     int size_inter; size_inter = ctx->size_inter;
     int chunks_in_inter_row; chunks_in_inter_row = ctx->chunks_in_inter_row;
     int chunks_per_inter; chunks_per_inter = ctx->chunks_per_inter;
+    float *a; a = ctx->a;
+    int size; size = ctx->size;
     hclib_start_finish();
     do {
     chunk_idx = ___iter0;

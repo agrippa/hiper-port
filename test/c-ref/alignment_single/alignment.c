@@ -463,6 +463,7 @@ typedef struct _main_entrypoint_ctx {
     int *matptr;
  } main_entrypoint_ctx;
 
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int i; i = ctx->i;
@@ -541,7 +542,8 @@ free(ctx);
 
 
    return 0;
-}  static void pragma465_hclib_async(void *____arg) {
+}  
+static void pragma465_hclib_async(void *____arg) {
     pragma465 *ctx = (pragma465 *)____arg;
     int i; i = ctx->i;
     int n; n = ctx->n;

@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "OMPToHClib.h"
+#include "OMPDependencies.h"
 
 /*
  * NOTE: The one thing to be careful about whenever inserting code in an
@@ -397,9 +398,15 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 }
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
-        bool isForasyncClosure, int forasyncDim) {
+        bool isForasyncClosure, int forasyncDim, bool emulatesOmpDepends) {
     std::stringstream ss;
-    ss << "static void " << closureName << "(void *____arg";
+    ss << "static ";
+    if (emulatesOmpDepends) {
+        ss << "void *";
+    } else {
+        ss << "void ";
+    }
+    ss << closureName << "(void *____arg";
     if (isForasyncClosure) {
         assert(forasyncDim > 0);
         for (int i = 0; i < forasyncDim; i++) {
@@ -415,12 +422,18 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, std::vector<OMPReductionVar> *reductions,
+        std::string bodyStr, bool emulatesOmpDepends, std::vector<OMPReductionVar> *reductions,
         std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
 
     std::stringstream ss;
-    ss << "static void " << closureName << "(void *____arg";
+    ss << "\nstatic ";
+    if (emulatesOmpDepends) {
+        ss << "void *";
+    } else {
+        ss << "void ";
+    }
+    ss << closureName << "(void *____arg";
     if (isForasyncClosure) {
         for (int i = 0; i < condVars->size(); i++) {
             ss << ", const int ___iter" << i;
@@ -502,6 +515,9 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     if (isAsyncClosure || isForasyncClosure) {
         ss << "    ; hclib_end_finish();\n";
     }
+    if (emulatesOmpDepends) {
+        ss << "    return NULL;\n";
+    }
     ss << "}\n\n";
     return ss.str();
 }
@@ -571,7 +587,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", node->getCaptures(), false);
                 std::string closureFunction = getClosureDef(
                         "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        node->getCaptures(), launchBody);
+                        node->getCaptures(), launchBody, false);
                 std::string contextSetup = getContextSetup(
                         "main_entrypoint_ctx", node->getCaptures(), NULL);
                 std::string launchStr = contextSetup +
@@ -665,13 +681,17 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     const clang::Stmt *body = node->getBody();
                     std::string bodyStr = stmtToString(body);
 
+                    OMPClauses *clauses = getOMPClausesForMarker(
+                            node->getMarker());
+
                     accumulatedKernelDecls += getClosureDecl(
-                            node->getLbl() + ASYNC_SUFFIX, false, -1);
+                            node->getLbl() + ASYNC_SUFFIX, false, -1,
+                            clauses->hasClause("depend"));
 
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
                             node->getLbl(), node->getCaptures(),
-                            bodyStr, NULL, NULL);
+                            bodyStr, clauses->hasClause("depend"), NULL, NULL);
 
                     const std::string structDef = getStructDef(
                             node->getLbl(), node->getCaptures(),
@@ -682,7 +702,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     contextCreation << "\n" <<
                         getContextSetup(node->getLbl(), node->getCaptures(),
                                 NULL);
-                    OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
+
                     if (clauses->hasClause("if")) {
                         // We have already asserted there is only one if arg
                         std::string ifArg = clauses->getSingleArg("if");
@@ -691,8 +711,38 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(ctx);\n";
                         contextCreation << "} else {\n";
                     }
-                    contextCreation << "hclib_async(" << node->getLbl() <<
-                        ASYNC_SUFFIX << ", ctx, NO_FUTURE, ANY_PLACE);\n";
+
+                    if (clauses->hasClause("depend")) {
+                        OMPDependencies *depends = new OMPDependencies(
+                                clauses->getArgs("depend"));
+                        std::vector<OMPDependency> *in =
+                            depends->getInDependencies();
+                        std::vector<OMPDependency> *out =
+                            depends->getOutDependencies();
+                        contextCreation << "hclib_emulate_omp_task(" <<
+                            node->getLbl() << ASYNC_SUFFIX <<
+                            ", ctx, ANY_PLACE, " << in->size() << ", " <<
+                            out->size();
+
+                        for (std::vector<OMPDependency>::iterator i =
+                                in->begin(), e = in->end(); i != e; i++) {
+                            OMPDependency curr = *i;
+                            contextCreation << ", " << curr.getAddrStr() <<
+                                ", " << curr.getLengthStr();
+                        }
+                        for (std::vector<OMPDependency>::iterator i =
+                                out->begin(), e = out->end(); i != e; i++) {
+                            OMPDependency curr = *i;
+                            contextCreation << ", " << curr.getAddrStr() <<
+                                ", " << curr.getLengthStr();
+                        }
+                        contextCreation << ");\n";
+
+                    } else {
+                        contextCreation << "hclib_async(" << node->getLbl() <<
+                            ASYNC_SUFFIX << ", ctx, NO_FUTURE, ANY_PLACE);\n";
+                    }
+
                     if (clauses->hasClause("if")) {
                         contextCreation << "}\n";
                     }
@@ -739,7 +789,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             nLoops << "];\n";
 
                         accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, true, nLoops);
+                                node->getLbl() + ASYNC_SUFFIX, true, nLoops, false);
 
                         const clang::ForStmt *currLoop = forLoop;
                         for (int l = 0; l < nLoops; l++) {
@@ -777,7 +827,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, reductions, &condVars);
+                                bodyStr, false, reductions, &condVars);
 
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<
@@ -863,13 +913,23 @@ void OMPToHClib::addToCurrentScope(clang::ValueDecl *d) {
 }
 
 std::vector<clang::ValueDecl *> *OMPToHClib::visibleDecls() {
-    std::vector<clang::ValueDecl *> *visible = new std::vector<clang::ValueDecl *>();
-    for (std::vector<std::vector<clang::ValueDecl *> *>::iterator i =
-            in_scope.begin(), e = in_scope.end(); i != e; i++) {
+    std::vector<std::string> alreadyCaptured;
+    std::vector<clang::ValueDecl *> *visible =
+        new std::vector<clang::ValueDecl *>();
+
+    for (std::vector<std::vector<clang::ValueDecl *> *>::reverse_iterator i =
+            in_scope.rbegin(), e = in_scope.rend(); i != e; i++) {
         std::vector<clang::ValueDecl *> *currentScope = *i;
-        for (std::vector<clang::ValueDecl *>::iterator ii = currentScope->begin(),
-                ee = currentScope->end(); ii != ee; ii++) {
-            visible->push_back(*ii);
+        for (std::vector<clang::ValueDecl *>::iterator ii =
+                currentScope->begin(), ee = currentScope->end(); ii != ee;
+                ii++) {
+            std::string varname = (*ii)->getNameAsString();
+            // Deal with variables with the same name but in nested scopes
+            if (std::find(alreadyCaptured.begin(), alreadyCaptured.end(),
+                        varname) == alreadyCaptured.end()) {
+                visible->push_back(*ii);
+            }
+            alreadyCaptured.push_back(varname);
         }
     }
     return visible;
@@ -1029,6 +1089,9 @@ OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
                     clauseName == "shared" || clauseName == "untied" ||
                     clauseName == "default") {
                 // Do nothing
+                handledClause = true;
+            } else if (clauseName == "depend") {
+                // Handled during code generation.
                 handledClause = true;
             }
         } else if (ompPragma == "single") {

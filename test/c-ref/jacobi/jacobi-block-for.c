@@ -3,6 +3,11 @@
 
 /* #pragma omp task/taskwait version of SWEEP. */
 typedef struct _pragma21 {
+    int it;
+    int block_x;
+    int block_y;
+    int max_blocks_x;
+    int max_blocks_y;
     int nx;
     int ny;
     double dx;
@@ -13,14 +18,14 @@ typedef struct _pragma21 {
     double *u_;
     double *unew_;
     int block_size;
-    int it;
-    int block_x;
-    int block_y;
-    int max_blocks_x;
-    int max_blocks_y;
  } pragma21;
 
 typedef struct _pragma26 {
+    int it;
+    int block_x;
+    int block_y;
+    int max_blocks_x;
+    int max_blocks_y;
     int nx;
     int ny;
     double dx;
@@ -31,11 +36,6 @@ typedef struct _pragma26 {
     double *u_;
     double *unew_;
     int block_size;
-    int it;
-    int block_x;
-    int block_y;
-    int max_blocks_x;
-    int max_blocks_y;
  } pragma26;
 
 static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
@@ -57,6 +57,11 @@ void sweep (int nx, int ny, double dx, double dy, double *f_,
         // Save the current estimate.
  { 
 pragma21 *ctx = (pragma21 *)malloc(sizeof(pragma21));
+ctx->it = it;
+ctx->block_x = block_x;
+ctx->block_y = block_y;
+ctx->max_blocks_x = max_blocks_x;
+ctx->max_blocks_y = max_blocks_y;
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -67,11 +72,6 @@ ctx->itnew = itnew;
 ctx->u_ = u_;
 ctx->unew_ = unew_;
 ctx->block_size = block_size;
-ctx->it = it;
-ctx->block_x = block_x;
-ctx->block_y = block_y;
-ctx->max_blocks_x = max_blocks_x;
-ctx->max_blocks_y = max_blocks_y;
 hclib_loop_domain_t domain[2];
 domain[0].low = 0;
 domain[0].high = max_blocks_x;
@@ -88,6 +88,11 @@ free(ctx);
 
  { 
 pragma26 *ctx = (pragma26 *)malloc(sizeof(pragma26));
+ctx->it = it;
+ctx->block_x = block_x;
+ctx->block_y = block_y;
+ctx->max_blocks_x = max_blocks_x;
+ctx->max_blocks_y = max_blocks_y;
 ctx->nx = nx;
 ctx->ny = ny;
 ctx->dx = dx;
@@ -98,11 +103,6 @@ ctx->itnew = itnew;
 ctx->u_ = u_;
 ctx->unew_ = unew_;
 ctx->block_size = block_size;
-ctx->it = it;
-ctx->block_x = block_x;
-ctx->block_y = block_y;
-ctx->max_blocks_x = max_blocks_x;
-ctx->max_blocks_y = max_blocks_y;
 hclib_loop_domain_t domain[2];
 domain[0].low = 0;
 domain[0].high = max_blocks_x;
@@ -117,8 +117,14 @@ hclib_future_wait(fut);
 free(ctx);
  } ;
     }
-} static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
+} 
+static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma21 *ctx = (pragma21 *)____arg;
+    int it; it = ctx->it;
+    int block_x; block_x = ctx->block_x;
+    int block_y; block_y = ctx->block_y;
+    int max_blocks_x; max_blocks_x = ctx->max_blocks_x;
+    int max_blocks_y; max_blocks_y = ctx->max_blocks_y;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;
@@ -129,11 +135,6 @@ free(ctx);
     double *u_; u_ = ctx->u_;
     double *unew_; unew_ = ctx->unew_;
     int block_size; block_size = ctx->block_size;
-    int it; it = ctx->it;
-    int block_x; block_x = ctx->block_x;
-    int block_y; block_y = ctx->block_y;
-    int max_blocks_x; max_blocks_x = ctx->max_blocks_x;
-    int max_blocks_y; max_blocks_y = ctx->max_blocks_y;
     hclib_start_finish();
     do {
     block_x = ___iter0;
@@ -142,8 +143,14 @@ copy_block(nx, ny, block_x, block_y, u_, unew_, block_size) ;     } while (0);
     ; hclib_end_finish();
 }
 
+
 static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma26 *ctx = (pragma26 *)____arg;
+    int it; it = ctx->it;
+    int block_x; block_x = ctx->block_x;
+    int block_y; block_y = ctx->block_y;
+    int max_blocks_x; max_blocks_x = ctx->max_blocks_x;
+    int max_blocks_y; max_blocks_y = ctx->max_blocks_y;
     int nx; nx = ctx->nx;
     int ny; ny = ctx->ny;
     double dx; dx = ctx->dx;
@@ -154,11 +161,6 @@ static void pragma26_hclib_async(void *____arg, const int ___iter0, const int __
     double *u_; u_ = ctx->u_;
     double *unew_; unew_ = ctx->unew_;
     int block_size; block_size = ctx->block_size;
-    int it; it = ctx->it;
-    int block_x; block_x = ctx->block_x;
-    int block_y; block_y = ctx->block_y;
-    int max_blocks_x; max_blocks_x = ctx->max_blocks_x;
-    int max_blocks_y; max_blocks_y = ctx->max_blocks_y;
     hclib_start_finish();
     do {
     block_x = ___iter0;

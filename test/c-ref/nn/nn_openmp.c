@@ -28,8 +28,6 @@ struct neighbor {
 * REC_WINDOW has been arbitrarily assigned; A larger value would allow more work for the threads
 */
 typedef struct _pragma118 {
-    int argc;
-    char **argv;
     long long time0;
     FILE *flist;
     FILE *fp;
@@ -50,12 +48,12 @@ typedef struct _pragma118 {
     char filename_buf[1024];
     char *rodinia_data_dir;
     float *z;
+    int argc;
+    char **argv;
  } pragma118;
 
 static void pragma118_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     long long time0;
     FILE *flist;
     FILE *fp;
@@ -76,12 +74,13 @@ typedef struct _main_entrypoint_ctx {
     char filename_buf[1024];
     char *rodinia_data_dir;
     float *z;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     long long time0; time0 = ctx->time0;
     FILE *flist; flist = ctx->flist;
     FILE *fp; fp = ctx->fp;
@@ -102,6 +101,8 @@ static void main_entrypoint(void *____arg) {
     char filename_buf[1024]; memcpy(filename_buf, ctx->filename_buf, 1024 * (sizeof(char))); 
     char *rodinia_data_dir; rodinia_data_dir = ctx->rodinia_data_dir;
     float *z; z = ctx->z;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
@@ -134,8 +135,6 @@ while(!done) {
 
  { 
 pragma118 *ctx = (pragma118 *)malloc(sizeof(pragma118));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->time0 = time0;
 ctx->flist = flist;
 ctx->fp = fp;
@@ -156,6 +155,8 @@ ctx->tmp_long = tmp_long;
 memcpy(ctx->filename_buf, filename_buf, 1024 * (sizeof(char))); 
 ctx->rodinia_data_dir = rodinia_data_dir;
 ctx->z = z;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = rec_count;
@@ -243,8 +244,6 @@ int main(int argc, char* argv[]) {
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->time0 = time0;
 ctx->flist = flist;
 ctx->fp = fp;
@@ -265,6 +264,8 @@ ctx->tmp_long = tmp_long;
 memcpy(ctx->filename_buf, filename_buf, 1024 * (sizeof(char))); 
 ctx->rodinia_data_dir = rodinia_data_dir;
 ctx->z = z;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 //End while loop
@@ -281,10 +282,9 @@ free(ctx);
     long long time1 = clock();
     printf("total time : %15.12f s\n", (float) (time1 - time0) / 1000000);
     return 0;
-}  static void pragma118_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma118_hclib_async(void *____arg, const int ___iter0) {
     pragma118 *ctx = (pragma118 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     long long time0; time0 = ctx->time0;
     FILE *flist; flist = ctx->flist;
     FILE *fp; fp = ctx->fp;
@@ -305,6 +305,8 @@ free(ctx);
     char filename_buf[1024]; memcpy(filename_buf, ctx->filename_buf, 1024 * (sizeof(char))); 
     char *rodinia_data_dir; rodinia_data_dir = ctx->rodinia_data_dir;
     float *z; z = ctx->z;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     i = ___iter0;

@@ -80,50 +80,51 @@ int main(int argc, char** argv)
 }
 
 typedef struct _pragma102 {
-    int argc;
-    char **argv;
+    int t;
     unsigned long long cycles;
     int *src;
     int *dst;
     int *temp;
     int min;
-    int t;
+    int argc;
+    char **argv;
  } pragma102;
 
 static void pragma102_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     unsigned long long cycles;
     int *src;
     int *dst;
     int *temp;
     int min;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     unsigned long long cycles; cycles = ctx->cycles;
     int *src; src = ctx->src;
     int *dst; dst = ctx->dst;
     int *temp; temp = ctx->temp;
     int min; min = ctx->min;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
  { 
 pragma102 *ctx = (pragma102 *)malloc(sizeof(pragma102));
-ctx->argc = argc;
-ctx->argv = argv;
+ctx->t = t;
 ctx->cycles = cycles;
 ctx->src = src;
 ctx->dst = dst;
 ctx->temp = temp;
 ctx->min = min;
-ctx->t = t;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = cols;
@@ -150,13 +151,13 @@ void run(int argc, char** argv)
     pin_stats_reset();
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->cycles = cycles;
 ctx->src = src;
 ctx->dst = dst;
 ctx->temp = temp;
 ctx->min = min;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -177,16 +178,17 @@ free(ctx);
     delete [] wall;
     delete [] dst;
     delete [] src;
-}  static void pragma102_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma102_hclib_async(void *____arg, const int ___iter0) {
     pragma102 *ctx = (pragma102 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    int t; t = ctx->t;
     unsigned long long cycles; cycles = ctx->cycles;
     int *src; src = ctx->src;
     int *dst; dst = ctx->dst;
     int *temp; temp = ctx->temp;
     int min; min = ctx->min;
-    int t; t = ctx->t;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     int n;     n = ___iter0;

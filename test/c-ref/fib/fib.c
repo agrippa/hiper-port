@@ -96,15 +96,15 @@ hclib_pragma_marker("omp", "taskwait");
 #else
 
 typedef struct _pragma104 {
-    int n;
     long long x;
     long long y;
+    int n;
  } pragma104;
 
 typedef struct _pragma106 {
-    int n;
     long long x;
     long long y;
+    int n;
  } pragma106;
 
 static void pragma104_hclib_async(void *____arg);
@@ -116,35 +116,37 @@ long long fib (int n)
 
  { 
 pragma104 *ctx = (pragma104 *)malloc(sizeof(pragma104));
-ctx->n = n;
 ctx->x = x;
 ctx->y = y;
+ctx->n = n;
 hclib_async(pragma104_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma106 *ctx = (pragma106 *)malloc(sizeof(pragma106));
-ctx->n = n;
 ctx->x = x;
 ctx->y = y;
+ctx->n = n;
 hclib_async(pragma106_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
-} static void pragma104_hclib_async(void *____arg) {
+} 
+static void pragma104_hclib_async(void *____arg) {
     pragma104 *ctx = (pragma104 *)____arg;
-    int n; n = ctx->n;
     long long x; x = ctx->x;
     long long y; y = ctx->y;
+    int n; n = ctx->n;
     hclib_start_finish();
 x = fib(n - 1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma106_hclib_async(void *____arg) {
     pragma106 *ctx = (pragma106 *)____arg;
-    int n; n = ctx->n;
     long long x; x = ctx->x;
     long long y; y = ctx->y;
+    int n; n = ctx->n;
     hclib_start_finish();
 y = fib(n - 2) ;     ; hclib_end_finish();
 }
@@ -158,6 +160,7 @@ static long long par_res, seq_res;
 typedef struct _main_entrypoint_ctx {
     int n;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;

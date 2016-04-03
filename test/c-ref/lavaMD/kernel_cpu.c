@@ -39,12 +39,6 @@ extern "C" {
 //========================================================================================================================================================================================================200
 
 typedef struct _pragma115 {
-    par_str par;
-    dim_str dim;
-    box_str *box;
-    FOUR_VECTOR *rv;
-    double *qv;
-    FOUR_VECTOR *fv;
     long long time0;
     long long time1;
     long long time2;
@@ -71,16 +65,16 @@ typedef struct _pragma115 {
     double fyij;
     double fzij;
     THREE_VECTOR d;
+    par_str par;
+    dim_str dim;
+    box_str *box;
+    FOUR_VECTOR *rv;
+    double *qv;
+    FOUR_VECTOR *fv;
  } pragma115;
 
 static void pragma115_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    par_str par;
-    dim_str dim;
-    box_str *box;
-    FOUR_VECTOR *rv;
-    double *qv;
-    FOUR_VECTOR *fv;
     long long time0;
     long long time1;
     long long time2;
@@ -107,16 +101,17 @@ typedef struct _main_entrypoint_ctx {
     double fyij;
     double fzij;
     THREE_VECTOR d;
+    par_str par;
+    dim_str dim;
+    box_str *box;
+    FOUR_VECTOR *rv;
+    double *qv;
+    FOUR_VECTOR *fv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    par_str par; par = ctx->par;
-    dim_str dim; dim = ctx->dim;
-    box_str *box; box = ctx->box;
-    FOUR_VECTOR *rv; rv = ctx->rv;
-    double *qv; qv = ctx->qv;
-    FOUR_VECTOR *fv; fv = ctx->fv;
     long long time0; time0 = ctx->time0;
     long long time1; time1 = ctx->time1;
     long long time2; time2 = ctx->time2;
@@ -143,6 +138,12 @@ static void main_entrypoint(void *____arg) {
     double fyij; fyij = ctx->fyij;
     double fzij; fzij = ctx->fzij;
     THREE_VECTOR d; d = ctx->d;
+    par_str par; par = ctx->par;
+    dim_str dim; dim = ctx->dim;
+    box_str *box; box = ctx->box;
+    FOUR_VECTOR *rv; rv = ctx->rv;
+    double *qv; qv = ctx->qv;
+    FOUR_VECTOR *fv; fv = ctx->fv;
 {
 
 	//======================================================================================================================================================150
@@ -151,12 +152,6 @@ static void main_entrypoint(void *____arg) {
 
  { 
 pragma115 *ctx = (pragma115 *)malloc(sizeof(pragma115));
-ctx->par = par;
-ctx->dim = dim;
-ctx->box = box;
-ctx->rv = rv;
-ctx->qv = qv;
-ctx->fv = fv;
 ctx->time0 = time0;
 ctx->time1 = time1;
 ctx->time2 = time2;
@@ -183,6 +178,12 @@ ctx->fxij = fxij;
 ctx->fyij = fyij;
 ctx->fzij = fzij;
 ctx->d = d;
+ctx->par = par;
+ctx->dim = dim;
+ctx->box = box;
+ctx->rv = rv;
+ctx->qv = qv;
+ctx->fv = fv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = dim.number_boxes;
@@ -261,12 +262,6 @@ void  kernel_cpu(	par_str par,
 	time3 = get_time();
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->par = par;
-ctx->dim = dim;
-ctx->box = box;
-ctx->rv = rv;
-ctx->qv = qv;
-ctx->fv = fv;
 ctx->time0 = time0;
 ctx->time1 = time1;
 ctx->time2 = time2;
@@ -293,6 +288,12 @@ ctx->fxij = fxij;
 ctx->fyij = fyij;
 ctx->fzij = fzij;
 ctx->d = d;
+ctx->par = par;
+ctx->dim = dim;
+ctx->box = box;
+ctx->rv = rv;
+ctx->qv = qv;
+ctx->fv = fv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -313,14 +314,9 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time4-time0) / 1000000);
 
-}  static void pragma115_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma115_hclib_async(void *____arg, const int ___iter0) {
     pragma115 *ctx = (pragma115 *)____arg;
-    par_str par; par = ctx->par;
-    dim_str dim; dim = ctx->dim;
-    box_str *box; box = ctx->box;
-    FOUR_VECTOR *rv; rv = ctx->rv;
-    double *qv; qv = ctx->qv;
-    FOUR_VECTOR *fv; fv = ctx->fv;
     long long time0; time0 = ctx->time0;
     long long time1; time1 = ctx->time1;
     long long time2; time2 = ctx->time2;
@@ -347,6 +343,12 @@ free(ctx);
     double fyij; fyij = ctx->fyij;
     double fzij; fzij = ctx->fzij;
     THREE_VECTOR d; d = ctx->d;
+    par_str par; par = ctx->par;
+    dim_str dim; dim = ctx->dim;
+    box_str *box; box = ctx->box;
+    FOUR_VECTOR *rv; rv = ctx->rv;
+    double *qv; qv = ctx->qv;
+    FOUR_VECTOR *fv; fv = ctx->fv;
     hclib_start_finish();
     do {
     l = ___iter0;

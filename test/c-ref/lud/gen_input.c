@@ -14,8 +14,6 @@ typedef float FP_NUMBER;
 char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
 typedef struct _pragma68 {
-    int argc;
-    char **argv;
     int i;
     int j;
     int k;
@@ -27,11 +25,11 @@ typedef struct _pragma68 {
     FILE *fl;
     FILE *fu;
     FILE *fa;
+    int argc;
+    char **argv;
  } pragma68;
 
 typedef struct _pragma84 {
-    int argc;
-    char **argv;
     int i;
     int j;
     int k;
@@ -43,6 +41,8 @@ typedef struct _pragma84 {
     FILE *fl;
     FILE *fu;
     FILE *fa;
+    int argc;
+    char **argv;
  } pragma84;
 
 static void pragma68_hclib_async(void *____arg, const int ___iter0);
@@ -100,8 +100,6 @@ int main (int argc, char **argv){
     }
  { 
 pragma68 *ctx = (pragma68 *)malloc(sizeof(pragma68));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->i = i;
 ctx->j = j;
 ctx->k = k;
@@ -113,6 +111,8 @@ ctx->A = A;
 ctx->fl = fl;
 ctx->fu = fu;
 ctx->fa = fa;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = MatrixDim;
@@ -125,8 +125,6 @@ free(ctx);
 
  { 
 pragma84 *ctx = (pragma84 *)malloc(sizeof(pragma84));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->i = i;
 ctx->j = j;
 ctx->k = k;
@@ -138,6 +136,8 @@ ctx->A = A;
 ctx->fl = fl;
 ctx->fu = fu;
 ctx->fa = fa;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = MatrixDim;
@@ -180,10 +180,9 @@ free(ctx);
     free(A);
 
     return 0;
-} static void pragma68_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma68_hclib_async(void *____arg, const int ___iter0) {
     pragma68 *ctx = (pragma68 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
@@ -195,6 +194,8 @@ free(ctx);
     FILE *fl; fl = ctx->fl;
     FILE *fu; fu = ctx->fu;
     FILE *fa; fa = ctx->fa;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     i = ___iter0;
@@ -215,10 +216,9 @@ free(ctx);
     ; hclib_end_finish();
 }
 
+
 static void pragma84_hclib_async(void *____arg, const int ___iter0) {
     pragma84 *ctx = (pragma84 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
@@ -230,6 +230,8 @@ static void pragma84_hclib_async(void *____arg, const int ___iter0) {
     FILE *fl; fl = ctx->fl;
     FILE *fu; fu = ctx->fu;
     FILE *fa; fa = ctx->fa;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     i = ___iter0;

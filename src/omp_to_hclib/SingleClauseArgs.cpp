@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <sstream>
 
 int skipWhiteSpace(std::string s, int index) {
     while (index < s.size() && s[index] == ' ') {
@@ -52,4 +53,15 @@ std::string SingleClauseArgs::getSingleArg() {
 
 std::vector<std::string> *SingleClauseArgs::getArgs() {
     return &args;
+}
+
+std::string SingleClauseArgs::str() {
+    std::stringstream ss;
+    ss << "[";
+    for (std::vector<std::string>::iterator i = args.begin(), e = args.end();
+            i != e; i++) {
+        ss << " \"" << *i << "\"";
+    }
+    ss << " ]";
+    return ss.str();
 }

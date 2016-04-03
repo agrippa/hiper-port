@@ -303,11 +303,6 @@ float pspeedy(Points *points, float z, long *kcenter, int pid)
    points */
 
 typedef struct _pragma391 {
-    long x;
-    Points *points;
-    double z;
-    long *numcenters;
-    int pid;
     double t0;
     long bsize;
     long k1;
@@ -325,15 +320,15 @@ typedef struct _pragma391 {
     double t1;
     double *lower;
     double *gl_lower;
-    pthread_mutex_t reduction_mutex;
- } pragma391;
-
-typedef struct _pragma467 {
     long x;
     Points *points;
     double z;
     long *numcenters;
     int pid;
+    pthread_mutex_t reduction_mutex;
+ } pragma391;
+
+typedef struct _pragma467 {
     double t0;
     long bsize;
     long k1;
@@ -352,6 +347,11 @@ typedef struct _pragma467 {
     double *lower;
     double *gl_lower;
     double t2;
+    long x;
+    Points *points;
+    double z;
+    long *numcenters;
+    int pid;
  } pragma467;
 
 static void pragma391_hclib_async(void *____arg, const int ___iter0);
@@ -443,11 +443,6 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 //	#pragma omp parallel for 
  { 
 pragma391 *ctx = (pragma391 *)malloc(sizeof(pragma391));
-ctx->x = x;
-ctx->points = points;
-ctx->z = z;
-ctx->numcenters = numcenters;
-ctx->pid = pid;
 ctx->t0 = t0;
 ctx->bsize = bsize;
 ctx->k1 = k1;
@@ -465,6 +460,11 @@ ctx->count = count;
 ctx->t1 = t1;
 ctx->lower = lower;
 ctx->gl_lower = gl_lower;
+ctx->x = x;
+ctx->points = points;
+ctx->z = z;
+ctx->numcenters = numcenters;
+ctx->pid = pid;
 ctx->cost_of_opening_x = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
@@ -530,11 +530,6 @@ cost_of_opening_x = ctx->cost_of_opening_x;
     //  we'd save money by opening x; we'll do it
  { 
 pragma467 *ctx = (pragma467 *)malloc(sizeof(pragma467));
-ctx->x = x;
-ctx->points = points;
-ctx->z = z;
-ctx->numcenters = numcenters;
-ctx->pid = pid;
 ctx->t0 = t0;
 ctx->bsize = bsize;
 ctx->k1 = k1;
@@ -553,6 +548,11 @@ ctx->t1 = t1;
 ctx->lower = lower;
 ctx->gl_lower = gl_lower;
 ctx->t2 = t2;
+ctx->x = x;
+ctx->points = points;
+ctx->z = z;
+ctx->numcenters = numcenters;
+ctx->pid = pid;
 hclib_loop_domain_t domain[1];
 domain[0].low = k1;
 domain[0].high = k2;
@@ -595,13 +595,9 @@ free(ctx);
 #endif
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
-} static void pragma391_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma391_hclib_async(void *____arg, const int ___iter0) {
     pragma391 *ctx = (pragma391 *)____arg;
-    long x; x = ctx->x;
-    Points *points; points = ctx->points;
-    double z; z = ctx->z;
-    long *numcenters; numcenters = ctx->numcenters;
-    int pid; pid = ctx->pid;
     double t0; t0 = ctx->t0;
     long bsize; bsize = ctx->bsize;
     long k1; k1 = ctx->k1;
@@ -619,6 +615,11 @@ free(ctx);
     double t1; t1 = ctx->t1;
     double *lower; lower = ctx->lower;
     double *gl_lower; gl_lower = ctx->gl_lower;
+    long x; x = ctx->x;
+    Points *points; points = ctx->points;
+    double z; z = ctx->z;
+    long *numcenters; numcenters = ctx->numcenters;
+    int pid; pid = ctx->pid;
     hclib_start_finish();
     do {
     i = ___iter0;
@@ -655,13 +656,9 @@ free(ctx);
     ; hclib_end_finish();
 }
 
+
 static void pragma467_hclib_async(void *____arg, const int ___iter0) {
     pragma467 *ctx = (pragma467 *)____arg;
-    long x; x = ctx->x;
-    Points *points; points = ctx->points;
-    double z; z = ctx->z;
-    long *numcenters; numcenters = ctx->numcenters;
-    int pid; pid = ctx->pid;
     double t0; t0 = ctx->t0;
     long bsize; bsize = ctx->bsize;
     long k1; k1 = ctx->k1;
@@ -680,6 +677,11 @@ static void pragma467_hclib_async(void *____arg, const int ___iter0) {
     double *lower; lower = ctx->lower;
     double *gl_lower; gl_lower = ctx->gl_lower;
     double t2; t2 = ctx->t2;
+    long x; x = ctx->x;
+    Points *points; points = ctx->points;
+    double z; z = ctx->z;
+    long *numcenters; numcenters = ctx->numcenters;
+    int pid; pid = ctx->pid;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
@@ -823,11 +825,6 @@ int selectfeasible_fast(Points *points, int **feasible, int kmin, int pid)
 
 /* compute approximate kmedian on the points */
 typedef struct _main_entrypoint_ctx {
-    Points *points;
-    long kmin;
-    long kmax;
-    long *kfinal;
-    int pid;
     int i;
     double cost;
     double lastcost;
@@ -844,15 +841,16 @@ typedef struct _main_entrypoint_ctx {
     long k1;
     long k2;
     double myhiz;
+    Points *points;
+    long kmin;
+    long kmax;
+    long *kfinal;
+    int pid;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    Points *points; points = ctx->points;
-    long kmin; kmin = ctx->kmin;
-    long kmax; kmax = ctx->kmax;
-    long *kfinal; kfinal = ctx->kfinal;
-    int pid; pid = ctx->pid;
     int i; i = ctx->i;
     double cost; cost = ctx->cost;
     double lastcost; lastcost = ctx->lastcost;
@@ -869,6 +867,11 @@ static void main_entrypoint(void *____arg) {
     long k1; k1 = ctx->k1;
     long k2; k2 = ctx->k2;
     double myhiz; myhiz = ctx->myhiz;
+    Points *points; points = ctx->points;
+    long kmin; kmin = ctx->kmin;
+    long kmax; kmax = ctx->kmax;
+    long *kfinal; kfinal = ctx->kfinal;
+    int pid; pid = ctx->pid;
 while(1) {
 		d++;
 #ifdef PRINTINFO
@@ -1029,11 +1032,6 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->points = points;
-ctx->kmin = kmin;
-ctx->kmax = kmax;
-ctx->kfinal = kfinal;
-ctx->pid = pid;
 ctx->i = i;
 ctx->cost = cost;
 ctx->lastcost = lastcost;
@@ -1050,6 +1048,11 @@ ctx->bsize = bsize;
 ctx->k1 = k1;
 ctx->k2 = k2;
 ctx->myhiz = myhiz;
+ctx->points = points;
+ctx->kmin = kmin;
+ctx->kmax = kmax;
+ctx->kfinal = kfinal;
+ctx->pid = pid;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 

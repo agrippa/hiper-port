@@ -83,8 +83,6 @@ MAT * chop_flip_image(unsigned char *image, int height, int width, int top, int 
 // Given x- and y-gradients of a video frame, computes the GICOV
 //  score for each sample ellipse at every pixel in the frame
 typedef struct _pragma114 {
-    MAT *grad_x;
-    MAT *grad_y;
     int i;
     int n;
     int k;
@@ -97,6 +95,8 @@ typedef struct _pragma114 {
     int height;
     int width;
     MAT *gicov;
+    MAT *grad_x;
+    MAT *grad_y;
  } pragma114;
 
 static void pragma114_hclib_async(void *____arg, const int ___iter0);
@@ -130,8 +130,6 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	// Split the work among multiple threads, if OPEN is defined
  { 
 pragma114 *ctx = (pragma114 *)malloc(sizeof(pragma114));
-ctx->grad_x = grad_x;
-ctx->grad_y = grad_y;
 ctx->i = i;
 ctx->n = n;
 ctx->k = k;
@@ -144,6 +142,8 @@ ctx->MaxR = MaxR;
 ctx->height = height;
 ctx->width = width;
 ctx->gicov = gicov;
+ctx->grad_x = grad_x;
+ctx->grad_y = grad_y;
 hclib_loop_domain_t domain[1];
 domain[0].low = MaxR;
 domain[0].high = width - MaxR;
@@ -155,10 +155,9 @@ free(ctx);
  } 
 	
 	return gicov;
-} static void pragma114_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma114_hclib_async(void *____arg, const int ___iter0) {
     pragma114 *ctx = (pragma114 *)____arg;
-    MAT *grad_x; grad_x = ctx->grad_x;
-    MAT *grad_y; grad_y = ctx->grad_y;
     int i; i = ctx->i;
     int n; n = ctx->n;
     int k; k = ctx->k;
@@ -171,6 +170,8 @@ free(ctx);
     int height; height = ctx->height;
     int width; width = ctx->width;
     MAT *gicov; gicov = ctx->gicov;
+    MAT *grad_x; grad_x = ctx->grad_x;
+    MAT *grad_y; grad_y = ctx->grad_y;
     hclib_start_finish();
     do {
     i = ___iter0;
@@ -242,12 +243,12 @@ MAT * structuring_element(int radius) {
 // Performs an image dilation on the specified matrix
 //  using the specified structuring element
 typedef struct _pragma189 {
-    MAT *img_in;
-    MAT *strel;
     MAT *dilated;
     int el_center_i;
     int el_center_j;
     int i;
+    MAT *img_in;
+    MAT *strel;
  } pragma189;
 
 static void pragma189_hclib_async(void *____arg, const int ___iter0);
@@ -260,12 +261,12 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	// Split the work among multiple threads, if OPEN is defined
  { 
 pragma189 *ctx = (pragma189 *)malloc(sizeof(pragma189));
-ctx->img_in = img_in;
-ctx->strel = strel;
 ctx->dilated = dilated;
 ctx->el_center_i = el_center_i;
 ctx->el_center_j = el_center_j;
 ctx->i = i;
+ctx->img_in = img_in;
+ctx->strel = strel;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = img_in->m;
@@ -277,14 +278,15 @@ free(ctx);
  } 
 
 	return dilated;
-} static void pragma189_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma189_hclib_async(void *____arg, const int ___iter0) {
     pragma189 *ctx = (pragma189 *)____arg;
-    MAT *img_in; img_in = ctx->img_in;
-    MAT *strel; strel = ctx->strel;
     MAT *dilated; dilated = ctx->dilated;
     int el_center_i; el_center_i = ctx->el_center_i;
     int el_center_j; el_center_j = ctx->el_center_j;
     int i; i = ctx->i;
+    MAT *img_in; img_in = ctx->img_in;
+    MAT *strel; strel = ctx->strel;
     hclib_start_finish();
     do {
     i = ___iter0;

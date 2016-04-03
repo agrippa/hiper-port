@@ -38,8 +38,8 @@ int main( int argc, char** argv)
 //Apply BFS on a Graph using CUDA
 ////////////////////////////////////////////////////////////////////////////////
 typedef struct _pragma128 {
-    int argc;
-    char **argv;
+    int k;
+    _Bool stop;
     int no_of_nodes;
     int edge_list_size;
     char *input_f;
@@ -55,13 +55,13 @@ typedef struct _pragma128 {
     int cost;
     int *h_graph_edges;
     int *h_cost;
-    int k;
-    _Bool stop;
+    int argc;
+    char **argv;
  } pragma128;
 
 typedef struct _pragma145 {
-    int argc;
-    char **argv;
+    int k;
+    _Bool stop;
     int no_of_nodes;
     int edge_list_size;
     char *input_f;
@@ -77,15 +77,13 @@ typedef struct _pragma145 {
     int cost;
     int *h_graph_edges;
     int *h_cost;
-    int k;
-    _Bool stop;
+    int argc;
+    char **argv;
  } pragma145;
 
 static void pragma128_hclib_async(void *____arg, const int ___iter0);
 static void pragma145_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int no_of_nodes;
     int edge_list_size;
     char *input_f;
@@ -101,12 +99,13 @@ typedef struct _main_entrypoint_ctx {
     int cost;
     int *h_graph_edges;
     int *h_cost;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
     int edge_list_size; edge_list_size = ctx->edge_list_size;
     char *input_f; input_f = ctx->input_f;
@@ -122,6 +121,8 @@ static void main_entrypoint(void *____arg) {
     int cost; cost = ctx->cost;
     int *h_graph_edges; h_graph_edges = ctx->h_graph_edges;
     int *h_cost; h_cost = ctx->h_cost;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 {
 	int k=0;
 	bool stop;
@@ -133,8 +134,8 @@ static void main_entrypoint(void *____arg) {
             //omp_set_num_threads(num_omp_threads);
  { 
 pragma128 *ctx = (pragma128 *)malloc(sizeof(pragma128));
-ctx->argc = argc;
-ctx->argv = argv;
+ctx->k = k;
+ctx->stop = stop;
 ctx->no_of_nodes = no_of_nodes;
 ctx->edge_list_size = edge_list_size;
 ctx->input_f = input_f;
@@ -150,8 +151,8 @@ ctx->id = id;
 ctx->cost = cost;
 ctx->h_graph_edges = h_graph_edges;
 ctx->h_cost = h_cost;
-ctx->k = k;
-ctx->stop = stop;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = no_of_nodes;
@@ -164,8 +165,8 @@ free(ctx);
 
  { 
 pragma145 *ctx = (pragma145 *)malloc(sizeof(pragma145));
-ctx->argc = argc;
-ctx->argv = argv;
+ctx->k = k;
+ctx->stop = stop;
 ctx->no_of_nodes = no_of_nodes;
 ctx->edge_list_size = edge_list_size;
 ctx->input_f = input_f;
@@ -181,8 +182,8 @@ ctx->id = id;
 ctx->cost = cost;
 ctx->h_graph_edges = h_graph_edges;
 ctx->h_cost = h_cost;
-ctx->k = k;
-ctx->stop = stop;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = no_of_nodes;
@@ -275,8 +276,6 @@ void BFSGraph( int argc, char** argv)
 	printf("Start traversing the tree\n");
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->no_of_nodes = no_of_nodes;
 ctx->edge_list_size = edge_list_size;
 ctx->input_f = input_f;
@@ -292,6 +291,8 @@ ctx->id = id;
 ctx->cost = cost;
 ctx->h_graph_edges = h_graph_edges;
 ctx->h_cost = h_cost;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -312,10 +313,11 @@ free(ctx);
 	free( h_graph_visited);
 	free( h_cost);
 
-}  static void pragma128_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma128_hclib_async(void *____arg, const int ___iter0) {
     pragma128 *ctx = (pragma128 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    int k; k = ctx->k;
+    _Bool stop; stop = ctx->stop;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
     int edge_list_size; edge_list_size = ctx->edge_list_size;
     char *input_f; input_f = ctx->input_f;
@@ -331,8 +333,8 @@ free(ctx);
     int cost; cost = ctx->cost;
     int *h_graph_edges; h_graph_edges = ctx->h_graph_edges;
     int *h_cost; h_cost = ctx->h_cost;
-    int k; k = ctx->k;
-    _Bool stop; stop = ctx->stop;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     int tid;     tid = ___iter0;
@@ -353,10 +355,11 @@ free(ctx);
     ; hclib_end_finish();
 }
 
+
 static void pragma145_hclib_async(void *____arg, const int ___iter0) {
     pragma145 *ctx = (pragma145 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    int k; k = ctx->k;
+    _Bool stop; stop = ctx->stop;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
     int edge_list_size; edge_list_size = ctx->edge_list_size;
     char *input_f; input_f = ctx->input_f;
@@ -372,8 +375,8 @@ static void pragma145_hclib_async(void *____arg, const int ___iter0) {
     int cost; cost = ctx->cost;
     int *h_graph_edges; h_graph_edges = ctx->h_graph_edges;
     int *h_cost; h_cost = ctx->h_cost;
-    int k; k = ctx->k;
-    _Bool stop; stop = ctx->stop;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     int tid;     tid = ___iter0;

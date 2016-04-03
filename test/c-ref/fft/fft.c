@@ -40,27 +40,27 @@
  * and store them into an array.
  */
 typedef struct _pragma60 {
-    int n;
-    int a;
-    int b;
-    COMPLEX *W;
+    int ab;
     double twoPiOverN;
     int k;
     REAL s;
     REAL c;
-    int ab;
+    int n;
+    int a;
+    int b;
+    COMPLEX *W;
  } pragma60;
 
 typedef struct _pragma62 {
-    int n;
-    int a;
-    int b;
-    COMPLEX *W;
+    int ab;
     double twoPiOverN;
     int k;
     REAL s;
     REAL c;
-    int ab;
+    int n;
+    int a;
+    int b;
+    COMPLEX *W;
  } pragma62;
 
 static void pragma60_hclib_async(void *____arg);
@@ -84,58 +84,60 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
 	  int ab = (a + b) / 2;
  { 
 pragma60 *ctx = (pragma60 *)malloc(sizeof(pragma60));
-ctx->n = n;
-ctx->a = a;
-ctx->b = b;
-ctx->W = W;
+ctx->ab = ab;
 ctx->twoPiOverN = twoPiOverN;
 ctx->k = k;
 ctx->s = s;
 ctx->c = c;
-ctx->ab = ab;
+ctx->n = n;
+ctx->a = a;
+ctx->b = b;
+ctx->W = W;
 hclib_async(pragma60_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma62 *ctx = (pragma62 *)malloc(sizeof(pragma62));
-ctx->n = n;
-ctx->a = a;
-ctx->b = b;
-ctx->W = W;
+ctx->ab = ab;
 ctx->twoPiOverN = twoPiOverN;
 ctx->k = k;
 ctx->s = s;
 ctx->c = c;
-ctx->ab = ab;
+ctx->n = n;
+ctx->a = a;
+ctx->b = b;
+ctx->W = W;
 hclib_async(pragma62_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma60_hclib_async(void *____arg) {
+} 
+static void pragma60_hclib_async(void *____arg) {
     pragma60 *ctx = (pragma60 *)____arg;
-    int n; n = ctx->n;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *W; W = ctx->W;
+    int ab; ab = ctx->ab;
     double twoPiOverN; twoPiOverN = ctx->twoPiOverN;
     int k; k = ctx->k;
     REAL s; s = ctx->s;
     REAL c; c = ctx->c;
-    int ab; ab = ctx->ab;
+    int n; n = ctx->n;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *W; W = ctx->W;
     hclib_start_finish();
 compute_w_coefficients(n, a, ab, W) ;     ; hclib_end_finish();
 }
 
+
 static void pragma62_hclib_async(void *____arg) {
     pragma62 *ctx = (pragma62 *)____arg;
-    int n; n = ctx->n;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *W; W = ctx->W;
+    int ab; ab = ctx->ab;
     double twoPiOverN; twoPiOverN = ctx->twoPiOverN;
     int k; k = ctx->k;
     REAL s; s = ctx->s;
     REAL c; c = ctx->c;
-    int ab; ab = ctx->ab;
+    int n; n = ctx->n;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *W; W = ctx->W;
     hclib_start_finish();
 compute_w_coefficients(n, ab + 1, b, W) ;     ; hclib_end_finish();
 }
@@ -185,33 +187,33 @@ int factor(int n)
 }
 
 typedef struct _pragma137 {
+    int ab;
+    int i;
+    int j;
+    int r4;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int r;
     int m;
-    int i;
-    int j;
-    int r4;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma137;
 
 typedef struct _pragma139 {
+    int ab;
+    int i;
+    int j;
+    int r4;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int r;
     int m;
-    int i;
-    int j;
-    int r4;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma139;
 
 static void pragma137_hclib_async(void *____arg);
@@ -245,70 +247,72 @@ void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma137 *ctx = (pragma137 *)malloc(sizeof(pragma137));
+ctx->ab = ab;
+ctx->i = i;
+ctx->j = j;
+ctx->r4 = r4;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->r = r;
 ctx->m = m;
-ctx->i = i;
-ctx->j = j;
-ctx->r4 = r4;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma137_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma139 *ctx = (pragma139 *)malloc(sizeof(pragma139));
+ctx->ab = ab;
+ctx->i = i;
+ctx->j = j;
+ctx->r4 = r4;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->r = r;
 ctx->m = m;
-ctx->i = i;
-ctx->j = j;
-ctx->r4 = r4;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma139_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma137_hclib_async(void *____arg) {
+} 
+static void pragma137_hclib_async(void *____arg) {
     pragma137 *ctx = (pragma137 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    int j; j = ctx->j;
+    int r4; r4 = ctx->r4;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int r; r = ctx->r;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    int j; j = ctx->j;
-    int r4; r4 = ctx->r4;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 unshuffle(a, ab, in, out, r, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma139_hclib_async(void *____arg) {
     pragma139 *ctx = (pragma139 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    int j; j = ctx->j;
+    int r4; r4 = ctx->r4;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int r; r = ctx->r;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    int j; j = ctx->j;
-    int r4; r4 = ctx->r4;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 unshuffle(ab, b, in, out, r, m) ;     ; hclib_end_finish();
 }
@@ -387,6 +391,7 @@ typedef struct _pragma207 {
  } pragma207;
 
 typedef struct _pragma212 {
+    int i2;
     int i;
     int i1;
     COMPLEX *in;
@@ -396,10 +401,10 @@ typedef struct _pragma212 {
     int nWdn;
     int r;
     int m;
-    int i2;
  } pragma212;
 
 typedef struct _pragma215 {
+    int i2;
     int i;
     int i1;
     COMPLEX *in;
@@ -409,7 +414,6 @@ typedef struct _pragma215 {
     int nWdn;
     int r;
     int m;
-    int i2;
  } pragma215;
 
 static void pragma207_hclib_async(void *____arg);
@@ -435,6 +439,7 @@ hclib_async(pragma207_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 	  int i2 = (i + i1) / 2;
  { 
 pragma212 *ctx = (pragma212 *)malloc(sizeof(pragma212));
+ctx->i2 = i2;
 ctx->i = i;
 ctx->i1 = i1;
 ctx->in = in;
@@ -444,11 +449,11 @@ ctx->nW = nW;
 ctx->nWdn = nWdn;
 ctx->r = r;
 ctx->m = m;
-ctx->i2 = i2;
 hclib_async(pragma212_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma215 *ctx = (pragma215 *)malloc(sizeof(pragma215));
+ctx->i2 = i2;
 ctx->i = i;
 ctx->i1 = i1;
 ctx->in = in;
@@ -458,12 +463,12 @@ ctx->nW = nW;
 ctx->nWdn = nWdn;
 ctx->r = r;
 ctx->m = m;
-ctx->i2 = i2;
 hclib_async(pragma215_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      }
  hclib_end_finish(); hclib_start_finish(); ;
-} static void pragma207_hclib_async(void *____arg) {
+} 
+static void pragma207_hclib_async(void *____arg) {
     pragma207 *ctx = (pragma207 *)____arg;
     int i; i = ctx->i;
     int i1; i1 = ctx->i1;
@@ -479,8 +484,10 @@ fft_twiddle_gen1(in + i, out + i, W,
 				 r, m, nW, nWdn * i, nWdn * m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma212_hclib_async(void *____arg) {
     pragma212 *ctx = (pragma212 *)____arg;
+    int i2; i2 = ctx->i2;
     int i; i = ctx->i;
     int i1; i1 = ctx->i1;
     COMPLEX *in; in = ctx->in;
@@ -490,14 +497,15 @@ static void pragma212_hclib_async(void *____arg) {
     int nWdn; nWdn = ctx->nWdn;
     int r; r = ctx->r;
     int m; m = ctx->m;
-    int i2; i2 = ctx->i2;
     hclib_start_finish();
 fft_twiddle_gen(i, i2, in, out, W, nW,
 				nWdn, r, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma215_hclib_async(void *____arg) {
     pragma215 *ctx = (pragma215 *)____arg;
+    int i2; i2 = ctx->i2;
     int i; i = ctx->i;
     int i1; i1 = ctx->i1;
     COMPLEX *in; in = ctx->in;
@@ -507,7 +515,6 @@ static void pragma215_hclib_async(void *____arg) {
     int nWdn; nWdn = ctx->nWdn;
     int r; r = ctx->r;
     int m; m = ctx->m;
-    int i2; i2 = ctx->i2;
     hclib_start_finish();
 fft_twiddle_gen(i2, i1, in, out, W, nW,
 				nWdn, r, m) ;     ; hclib_end_finish();
@@ -543,14 +550,7 @@ void fft_base_2(COMPLEX * in, COMPLEX * out)
      c_im(out[1]) = (i1_0 - i1_1);
 }
 typedef struct _pragma277 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -559,18 +559,18 @@ typedef struct _pragma277 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma277;
 
 typedef struct _pragma279 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -579,7 +579,14 @@ typedef struct _pragma279 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma279;
 
 static void pragma277_hclib_async(void *____arg);
@@ -614,14 +621,7 @@ void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  int ab = (a + b) / 2;
  { 
 pragma277 *ctx = (pragma277 *)malloc(sizeof(pragma277));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -630,19 +630,19 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma277_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma279 *ctx = (pragma279 *)malloc(sizeof(pragma279));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -651,21 +651,22 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma279_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma277_hclib_async(void *____arg) {
+} 
+static void pragma277_hclib_async(void *____arg) {
     pragma277 *ctx = (pragma277 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -674,21 +675,22 @@ hclib_async(pragma279_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma279_hclib_async(void *____arg) {
     pragma279 *ctx = (pragma279 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -697,7 +699,14 @@ static void pragma279_hclib_async(void *____arg) {
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
@@ -736,27 +745,27 @@ void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
      }
 }
 typedef struct _pragma331 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma331;
 
 typedef struct _pragma333 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma333;
 
 static void pragma331_hclib_async(void *____arg);
@@ -778,58 +787,60 @@ void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma331 *ctx = (pragma331 *)malloc(sizeof(pragma331));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma331_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma333 *ctx = (pragma333 *)malloc(sizeof(pragma333));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma333_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma331_hclib_async(void *____arg) {
+} 
+static void pragma331_hclib_async(void *____arg) {
     pragma331 *ctx = (pragma331 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_2(a, ab, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma333_hclib_async(void *____arg) {
     pragma333 *ctx = (pragma333 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_2(ab, b, in, out, m) ;     ; hclib_end_finish();
 }
@@ -894,14 +905,7 @@ void fft_base_4(COMPLEX * in, COMPLEX * out)
      c_im(out[3]) = (i1_2 + r1_3);
 }
 typedef struct _pragma458 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -910,18 +914,18 @@ typedef struct _pragma458 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma458;
 
 typedef struct _pragma460 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -930,7 +934,14 @@ typedef struct _pragma460 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma460;
 
 static void pragma458_hclib_async(void *____arg);
@@ -999,14 +1010,7 @@ void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  int ab = (a + b) / 2;
  { 
 pragma458 *ctx = (pragma458 *)malloc(sizeof(pragma458));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -1015,19 +1019,19 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma458_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma460 *ctx = (pragma460 *)malloc(sizeof(pragma460));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -1036,21 +1040,22 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma460_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma458_hclib_async(void *____arg) {
+} 
+static void pragma458_hclib_async(void *____arg) {
     pragma458 *ctx = (pragma458 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -1059,21 +1064,22 @@ hclib_async(pragma460_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma460_hclib_async(void *____arg) {
     pragma460 *ctx = (pragma460 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -1082,7 +1088,14 @@ static void pragma460_hclib_async(void *____arg) {
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
@@ -1155,27 +1168,27 @@ void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
      }
 }
 typedef struct _pragma550 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma550;
 
 typedef struct _pragma552 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma552;
 
 static void pragma550_hclib_async(void *____arg);
@@ -1201,58 +1214,60 @@ void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma550 *ctx = (pragma550 *)malloc(sizeof(pragma550));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma550_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma552 *ctx = (pragma552 *)malloc(sizeof(pragma552));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma552_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma550_hclib_async(void *____arg) {
+} 
+static void pragma550_hclib_async(void *____arg) {
     pragma550 *ctx = (pragma550 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_4(a, ab, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma552_hclib_async(void *____arg) {
     pragma552 *ctx = (pragma552 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_4(ab, b, in, out, m) ;     ; hclib_end_finish();
 }
@@ -1392,14 +1407,7 @@ void fft_base_8(COMPLEX * in, COMPLEX * out)
      }
 }
 typedef struct _pragma836 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -1408,18 +1416,18 @@ typedef struct _pragma836 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma836;
 
 typedef struct _pragma838 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -1428,7 +1436,14 @@ typedef struct _pragma838 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma838;
 
 static void pragma836_hclib_async(void *____arg);
@@ -1581,14 +1596,7 @@ void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  int ab = (a + b) / 2;
  { 
 pragma836 *ctx = (pragma836 *)malloc(sizeof(pragma836));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -1597,19 +1605,19 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma836_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma838 *ctx = (pragma838 *)malloc(sizeof(pragma838));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -1618,21 +1626,22 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma838_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma836_hclib_async(void *____arg) {
+} 
+static void pragma836_hclib_async(void *____arg) {
     pragma836 *ctx = (pragma836 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -1641,21 +1650,22 @@ hclib_async(pragma838_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma838_hclib_async(void *____arg) {
     pragma838 *ctx = (pragma838 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -1664,7 +1674,14 @@ static void pragma838_hclib_async(void *____arg) {
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
@@ -1821,27 +1838,27 @@ void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, i
      }
 }
 typedef struct _pragma1020 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma1020;
 
 typedef struct _pragma1022 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma1022;
 
 static void pragma1020_hclib_async(void *____arg);
@@ -1875,58 +1892,60 @@ void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma1020 *ctx = (pragma1020 *)malloc(sizeof(pragma1020));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma1020_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma1022 *ctx = (pragma1022 *)malloc(sizeof(pragma1022));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma1022_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma1020_hclib_async(void *____arg) {
+} 
+static void pragma1020_hclib_async(void *____arg) {
     pragma1020 *ctx = (pragma1020 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_8(a, ab, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1022_hclib_async(void *____arg) {
     pragma1022 *ctx = (pragma1022 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_8(ab, b, in, out, m) ;     ; hclib_end_finish();
 }
@@ -2242,14 +2261,7 @@ void fft_base_16(COMPLEX * in, COMPLEX * out)
      }
 }
 typedef struct _pragma1682 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -2258,18 +2270,18 @@ typedef struct _pragma1682 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma1682;
 
 typedef struct _pragma1684 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -2278,7 +2290,14 @@ typedef struct _pragma1684 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma1684;
 
 static void pragma1682_hclib_async(void *____arg);
@@ -2631,14 +2650,7 @@ void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  int ab = (a + b) / 2;
  { 
 pragma1682 *ctx = (pragma1682 *)malloc(sizeof(pragma1682));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -2647,19 +2659,19 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma1682_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma1684 *ctx = (pragma1684 *)malloc(sizeof(pragma1684));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -2668,21 +2680,22 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma1684_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma1682_hclib_async(void *____arg) {
+} 
+static void pragma1682_hclib_async(void *____arg) {
     pragma1682 *ctx = (pragma1682 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -2691,21 +2704,22 @@ hclib_async(pragma1684_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1684_hclib_async(void *____arg) {
     pragma1684 *ctx = (pragma1684 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -2714,7 +2728,14 @@ static void pragma1684_hclib_async(void *____arg) {
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
@@ -3071,27 +3092,27 @@ void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, 
      }
 }
 typedef struct _pragma2082 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma2082;
 
 typedef struct _pragma2084 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma2084;
 
 static void pragma2082_hclib_async(void *____arg);
@@ -3141,58 +3162,60 @@ void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma2082 *ctx = (pragma2082 *)malloc(sizeof(pragma2082));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma2082_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma2084 *ctx = (pragma2084 *)malloc(sizeof(pragma2084));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma2084_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma2082_hclib_async(void *____arg) {
+} 
+static void pragma2082_hclib_async(void *____arg) {
     pragma2082 *ctx = (pragma2082 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_16(a, ab, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma2084_hclib_async(void *____arg) {
     pragma2084 *ctx = (pragma2084 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_16(ab, b, in, out, m) ;     ; hclib_end_finish();
 }
@@ -3924,14 +3947,7 @@ void fft_base_32(COMPLEX * in, COMPLEX * out)
      }
 }
 typedef struct _pragma3624 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -3940,18 +3956,18 @@ typedef struct _pragma3624 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma3624;
 
 typedef struct _pragma3626 {
-    int a;
-    int b;
-    COMPLEX *in;
-    COMPLEX *out;
-    COMPLEX *W;
-    int nW;
-    int nWdn;
-    int m;
+    int ab;
     int l1;
     int i;
     COMPLEX *jp;
@@ -3960,7 +3976,14 @@ typedef struct _pragma3626 {
     REAL tmpi;
     REAL wr;
     REAL wi;
-    int ab;
+    int a;
+    int b;
+    COMPLEX *in;
+    COMPLEX *out;
+    COMPLEX *W;
+    int nW;
+    int nWdn;
+    int m;
  } pragma3626;
 
 static void pragma3624_hclib_async(void *____arg);
@@ -4777,14 +4800,7 @@ void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  int ab = (a + b) / 2;
  { 
 pragma3624 *ctx = (pragma3624 *)malloc(sizeof(pragma3624));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -4793,19 +4809,19 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma3624_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma3626 *ctx = (pragma3626 *)malloc(sizeof(pragma3626));
-ctx->a = a;
-ctx->b = b;
-ctx->in = in;
-ctx->out = out;
-ctx->W = W;
-ctx->nW = nW;
-ctx->nWdn = nWdn;
-ctx->m = m;
+ctx->ab = ab;
 ctx->l1 = l1;
 ctx->i = i;
 ctx->jp = jp;
@@ -4814,21 +4830,22 @@ ctx->tmpr = tmpr;
 ctx->tmpi = tmpi;
 ctx->wr = wr;
 ctx->wi = wi;
-ctx->ab = ab;
+ctx->a = a;
+ctx->b = b;
+ctx->in = in;
+ctx->out = out;
+ctx->W = W;
+ctx->nW = nW;
+ctx->nWdn = nWdn;
+ctx->m = m;
 hclib_async(pragma3626_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma3624_hclib_async(void *____arg) {
+} 
+static void pragma3624_hclib_async(void *____arg) {
     pragma3624 *ctx = (pragma3624 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -4837,21 +4854,22 @@ hclib_async(pragma3626_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma3626_hclib_async(void *____arg) {
     pragma3626 *ctx = (pragma3626 *)____arg;
-    int a; a = ctx->a;
-    int b; b = ctx->b;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
-    COMPLEX *W; W = ctx->W;
-    int nW; nW = ctx->nW;
-    int nWdn; nWdn = ctx->nWdn;
-    int m; m = ctx->m;
+    int ab; ab = ctx->ab;
     int l1; l1 = ctx->l1;
     int i; i = ctx->i;
     COMPLEX *jp; jp = ctx->jp;
@@ -4860,7 +4878,14 @@ static void pragma3626_hclib_async(void *____arg) {
     REAL tmpi; tmpi = ctx->tmpi;
     REAL wr; wr = ctx->wr;
     REAL wi; wi = ctx->wi;
-    int ab; ab = ctx->ab;
+    int a; a = ctx->a;
+    int b; b = ctx->b;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
+    COMPLEX *W; W = ctx->W;
+    int nW; nW = ctx->nW;
+    int nWdn; nWdn = ctx->nWdn;
+    int m; m = ctx->m;
     hclib_start_finish();
 fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m) ;     ; hclib_end_finish();
 }
@@ -5681,27 +5706,27 @@ void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, 
      }
 }
 typedef struct _pragma4520 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma4520;
 
 typedef struct _pragma4522 {
+    int ab;
+    int i;
+    COMPLEX *ip;
+    COMPLEX *jp;
     int a;
     int b;
     COMPLEX *in;
     COMPLEX *out;
     int m;
-    int i;
-    COMPLEX *ip;
-    COMPLEX *jp;
-    int ab;
  } pragma4522;
 
 static void pragma4520_hclib_async(void *____arg);
@@ -5783,58 +5808,60 @@ void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  int ab = (a + b) / 2;
  { 
 pragma4520 *ctx = (pragma4520 *)malloc(sizeof(pragma4520));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma4520_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
 pragma4522 *ctx = (pragma4522 *)malloc(sizeof(pragma4522));
+ctx->ab = ab;
+ctx->i = i;
+ctx->ip = ip;
+ctx->jp = jp;
 ctx->a = a;
 ctx->b = b;
 ctx->in = in;
 ctx->out = out;
 ctx->m = m;
-ctx->i = i;
-ctx->ip = ip;
-ctx->jp = jp;
-ctx->ab = ab;
 hclib_async(pragma4522_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  hclib_end_finish(); hclib_start_finish(); ;
      }
-} static void pragma4520_hclib_async(void *____arg) {
+} 
+static void pragma4520_hclib_async(void *____arg) {
     pragma4520 *ctx = (pragma4520 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_32(a, ab, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4522_hclib_async(void *____arg) {
     pragma4522 *ctx = (pragma4522 *)____arg;
+    int ab; ab = ctx->ab;
+    int i; i = ctx->i;
+    COMPLEX *ip; ip = ctx->ip;
+    COMPLEX *jp; jp = ctx->jp;
     int a; a = ctx->a;
     int b; b = ctx->b;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int m; m = ctx->m;
-    int i; i = ctx->i;
-    COMPLEX *ip; ip = ctx->ip;
-    COMPLEX *jp; jp = ctx->jp;
-    int ab; ab = ctx->ab;
     hclib_start_finish();
 fft_unshuffle_32(ab, b, in, out, m) ;     ; hclib_end_finish();
 }
@@ -5937,147 +5964,147 @@ void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
  *
  */
 typedef struct _pragma4662 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4662;
 
 typedef struct _pragma4665 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4665;
 
 typedef struct _pragma4668 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4668;
 
 typedef struct _pragma4671 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4671;
 
 typedef struct _pragma4674 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4674;
 
 typedef struct _pragma4682 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4682;
 
 typedef struct _pragma4692 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4692;
 
 typedef struct _pragma4695 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4695;
 
 typedef struct _pragma4698 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4698;
 
 typedef struct _pragma4701 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4701;
 
 typedef struct _pragma4704 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4704;
 
 typedef struct _pragma4707 {
+    int r;
+    int m;
+    int k;
     int n;
     COMPLEX *in;
     COMPLEX *out;
     int *factors;
     COMPLEX *W;
     int nW;
-    int r;
-    int m;
-    int k;
  } pragma4707;
 
 static void pragma4662_hclib_async(void *____arg);
@@ -6133,71 +6160,71 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
 	  if (r == 32) {
  { 
 pragma4662 *ctx = (pragma4662 *)malloc(sizeof(pragma4662));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4662_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 16) {
  { 
 pragma4665 *ctx = (pragma4665 *)malloc(sizeof(pragma4665));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4665_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 8) {
  { 
 pragma4668 *ctx = (pragma4668 *)malloc(sizeof(pragma4668));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4668_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 4) {
  { 
 pragma4671 *ctx = (pragma4671 *)malloc(sizeof(pragma4671));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4671_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else if (r == 2) {
  { 
 pragma4674 *ctx = (pragma4674 *)malloc(sizeof(pragma4674));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4674_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  } else
@@ -6208,15 +6235,15 @@ hclib_async(pragma4674_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 	  for (k = 0; k < n; k += m) {
  { 
 pragma4682 *ctx = (pragma4682 *)malloc(sizeof(pragma4682));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4682_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 	  }
@@ -6229,85 +6256,85 @@ hclib_async(pragma4682_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
      if (r == 2) {
  { 
 pragma4692 *ctx = (pragma4692 *)malloc(sizeof(pragma4692));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4692_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 4) {
  { 
 pragma4695 *ctx = (pragma4695 *)malloc(sizeof(pragma4695));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4695_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 8) {
  { 
 pragma4698 *ctx = (pragma4698 *)malloc(sizeof(pragma4698));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4698_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 16) {
  { 
 pragma4701 *ctx = (pragma4701 *)malloc(sizeof(pragma4701));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4701_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else if (r == 32) {
  { 
 pragma4704 *ctx = (pragma4704 *)malloc(sizeof(pragma4704));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4704_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      } else {
  { 
 pragma4707 *ctx = (pragma4707 *)malloc(sizeof(pragma4707));
+ctx->r = r;
+ctx->m = m;
+ctx->k = k;
 ctx->n = n;
 ctx->in = in;
 ctx->out = out;
 ctx->factors = factors;
 ctx->W = W;
 ctx->nW = nW;
-ctx->r = r;
-ctx->m = m;
-ctx->k = k;
 hclib_async(pragma4707_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
      }
@@ -6315,182 +6342,194 @@ hclib_async(pragma4707_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
 
      return;
-} static void pragma4662_hclib_async(void *____arg) {
+} 
+static void pragma4662_hclib_async(void *____arg) {
     pragma4662 *ctx = (pragma4662 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_unshuffle_32(0, m, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4665_hclib_async(void *____arg) {
     pragma4665 *ctx = (pragma4665 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_unshuffle_16(0, m, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4668_hclib_async(void *____arg) {
     pragma4668 *ctx = (pragma4668 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_unshuffle_8(0, m, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4671_hclib_async(void *____arg) {
     pragma4671 *ctx = (pragma4671 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_unshuffle_4(0, m, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4674_hclib_async(void *____arg) {
     pragma4674 *ctx = (pragma4674 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_unshuffle_2(0, m, in, out, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4682_hclib_async(void *____arg) {
     pragma4682 *ctx = (pragma4682 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_aux(m, out + k, in + k, factors + 1, W, nW) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4692_hclib_async(void *____arg) {
     pragma4692 *ctx = (pragma4692 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_2(0, m, in, out, W, nW, nW / n, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4695_hclib_async(void *____arg) {
     pragma4695 *ctx = (pragma4695 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_4(0, m, in, out, W, nW, nW / n, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4698_hclib_async(void *____arg) {
     pragma4698 *ctx = (pragma4698 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_8(0, m, in, out, W, nW, nW / n, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4701_hclib_async(void *____arg) {
     pragma4701 *ctx = (pragma4701 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_16(0, m, in, out, W, nW, nW / n, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4704_hclib_async(void *____arg) {
     pragma4704 *ctx = (pragma4704 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_32(0, m, in, out, W, nW, nW / n, m) ;     ; hclib_end_finish();
 }
 
+
 static void pragma4707_hclib_async(void *____arg) {
     pragma4707 *ctx = (pragma4707 *)____arg;
+    int r; r = ctx->r;
+    int m; m = ctx->m;
+    int k; k = ctx->k;
     int n; n = ctx->n;
     COMPLEX *in; in = ctx->in;
     COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     COMPLEX *W; W = ctx->W;
     int nW; nW = ctx->nW;
-    int r; r = ctx->r;
-    int m; m = ctx->m;
-    int k; k = ctx->k;
     hclib_start_finish();
 fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m) ;     ; hclib_end_finish();
 }
@@ -6563,63 +6602,64 @@ void fft_aux_seq(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, 
  * user interface for fft_aux
  */
 typedef struct _pragma4799 {
-    int n;
-    COMPLEX *in;
-    COMPLEX *out;
     int *factors;
     int *p;
     int l;
     int r;
     COMPLEX *W;
+    int n;
+    COMPLEX *in;
+    COMPLEX *out;
  } pragma4799;
 
 typedef struct _pragma4822 {
-    int n;
-    COMPLEX *in;
-    COMPLEX *out;
     int *factors;
     int *p;
     int l;
     int r;
     COMPLEX *W;
+    int n;
+    COMPLEX *in;
+    COMPLEX *out;
  } pragma4822;
 
 static void pragma4799_hclib_async(void *____arg);
 static void pragma4822_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
-    int n;
-    COMPLEX *in;
-    COMPLEX *out;
     int *factors;
     int *p;
     int l;
     int r;
     COMPLEX *W;
+    int n;
+    COMPLEX *in;
+    COMPLEX *out;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int n; n = ctx->n;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
     COMPLEX *W; W = ctx->W;
+    int n; n = ctx->n;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
 {
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
 hclib_start_finish(); {
  { 
 pragma4799 *ctx = (pragma4799 *)malloc(sizeof(pragma4799));
-ctx->n = n;
-ctx->in = in;
-ctx->out = out;
 ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
+ctx->n = n;
+ctx->in = in;
+ctx->out = out;
 hclib_async(pragma4799_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          } ; hclib_end_finish(); 
@@ -6639,14 +6679,14 @@ hclib_async(pragma4799_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 hclib_start_finish(); {
  { 
 pragma4822 *ctx = (pragma4822 *)malloc(sizeof(pragma4822));
-ctx->n = n;
-ctx->in = in;
-ctx->out = out;
 ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
+ctx->n = n;
+ctx->in = in;
+ctx->out = out;
 hclib_async(pragma4822_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          } ; hclib_end_finish(); 
@@ -6666,46 +6706,48 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 
      bots_message("Computing coefficients ");
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->n = n;
-ctx->in = in;
-ctx->out = out;
 ctx->factors = factors;
 ctx->p = p;
 ctx->l = l;
 ctx->r = r;
 ctx->W = W;
+ctx->n = n;
+ctx->in = in;
+ctx->out = out;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
      bots_message(" completed!\n");
 
      return;
-}  static void pragma4799_hclib_async(void *____arg) {
+}  
+static void pragma4799_hclib_async(void *____arg) {
     pragma4799 *ctx = (pragma4799 *)____arg;
-    int n; n = ctx->n;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
     COMPLEX *W; W = ctx->W;
+    int n; n = ctx->n;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
     hclib_start_finish();
 {
                  compute_w_coefficients(n, 0, n / 2, W);
              } ;     ; hclib_end_finish();
 }
 
+
 static void pragma4822_hclib_async(void *____arg) {
     pragma4822 *ctx = (pragma4822 *)____arg;
-    int n; n = ctx->n;
-    COMPLEX *in; in = ctx->in;
-    COMPLEX *out; out = ctx->out;
     int *factors; factors = ctx->factors;
     int *p; p = ctx->p;
     int l; l = ctx->l;
     int r; r = ctx->r;
     COMPLEX *W; W = ctx->W;
+    int n; n = ctx->n;
+    COMPLEX *in; in = ctx->in;
+    COMPLEX *out; out = ctx->out;
     hclib_start_finish();
 {
                  fft_aux(n, in, out, factors, W, n);

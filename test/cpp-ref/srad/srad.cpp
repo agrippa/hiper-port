@@ -32,8 +32,6 @@ void usage(int argc, char **argv)
 }
 
 typedef struct _pragma127 {
-    int argc;
-    char **argv;
     int rows;
     int cols;
     int size_I;
@@ -77,11 +75,11 @@ typedef struct _pragma127 {
     int i;
     int j;
     int nthreads;
+    int argc;
+    char **argv;
  } pragma127;
 
 typedef struct _pragma160 {
-    int argc;
-    char **argv;
     int rows;
     int cols;
     int size_I;
@@ -125,13 +123,13 @@ typedef struct _pragma160 {
     int i;
     int j;
     int nthreads;
+    int argc;
+    char **argv;
  } pragma160;
 
 static void pragma127_hclib_async(void *____arg, const int ___iter0);
 static void pragma160_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int rows;
     int cols;
     int size_I;
@@ -175,12 +173,13 @@ typedef struct _main_entrypoint_ctx {
     int i;
     int j;
     int nthreads;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
     int cols; cols = ctx->cols;
     int size_I; size_I = ctx->size_I;
@@ -224,6 +223,8 @@ static void main_entrypoint(void *____arg) {
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nthreads; nthreads = ctx->nthreads;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 for (iter=0; iter< niter; iter++){
 		sum=0; sum2=0;     
 		for (i=r1; i<=r2; i++) {
@@ -240,8 +241,6 @@ for (iter=0; iter< niter; iter++){
 
  { 
 pragma127 *ctx = (pragma127 *)malloc(sizeof(pragma127));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->rows = rows;
 ctx->cols = cols;
 ctx->size_I = size_I;
@@ -285,6 +284,8 @@ ctx->lambda = lambda;
 ctx->i = i;
 ctx->j = j;
 ctx->nthreads = nthreads;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = rows;
@@ -296,8 +297,6 @@ free(ctx);
  } 
  { 
 pragma160 *ctx = (pragma160 *)malloc(sizeof(pragma160));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->rows = rows;
 ctx->cols = cols;
 ctx->size_I = size_I;
@@ -341,6 +340,8 @@ ctx->lambda = lambda;
 ctx->i = i;
 ctx->j = j;
 ctx->nthreads = nthreads;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = rows;
@@ -431,8 +432,6 @@ int main(int argc, char* argv[])
 	printf("Start the SRAD main loop\n");
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->rows = rows;
 ctx->cols = cols;
 ctx->size_I = size_I;
@@ -476,6 +475,8 @@ ctx->lambda = lambda;
 ctx->i = i;
 ctx->j = j;
 ctx->nthreads = nthreads;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -501,10 +502,9 @@ free(ctx);
 
 	free(c);
 	return 0;
-}  static void pragma127_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma127_hclib_async(void *____arg, const int ___iter0) {
     pragma127 *ctx = (pragma127 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
     int cols; cols = ctx->cols;
     int size_I; size_I = ctx->size_I;
@@ -548,6 +548,8 @@ free(ctx);
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nthreads; nthreads = ctx->nthreads;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
@@ -586,10 +588,9 @@ free(ctx);
     ; hclib_end_finish();
 }
 
+
 static void pragma160_hclib_async(void *____arg, const int ___iter0) {
     pragma160 *ctx = (pragma160 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int rows; rows = ctx->rows;
     int cols; cols = ctx->cols;
     int size_I; size_I = ctx->size_I;
@@ -633,6 +634,8 @@ static void pragma160_hclib_async(void *____arg, const int ___iter0) {
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nthreads; nthreads = ctx->nthreads;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;

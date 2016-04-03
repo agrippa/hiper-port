@@ -3,13 +3,9 @@
 
 
 typedef struct _pragma85 {
-    avi_t *video;
-    double *xc0;
-    double *yc0;
-    int Nc;
-    int R;
-    int Np;
-    int Nf;
+    MAT *I;
+    int Ih;
+    int Iw;
     int i;
     int j;
     double *t;
@@ -23,9 +19,13 @@ typedef struct _pragma85 {
     long long snake_time;
     int frame_num;
     int cell_num;
-    MAT *I;
-    int Ih;
-    int Iw;
+    avi_t *video;
+    double *xc0;
+    double *yc0;
+    int Nc;
+    int R;
+    int Np;
+    int Nf;
  } pragma85;
 
 static void pragma85_hclib_async(void *____arg, const int ___iter0);
@@ -110,13 +110,9 @@ void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np,
 		// Split the work among multiple threads, if OPEN is defined
  { 
 pragma85 *ctx = (pragma85 *)malloc(sizeof(pragma85));
-ctx->video = video;
-ctx->xc0 = xc0;
-ctx->yc0 = yc0;
-ctx->Nc = Nc;
-ctx->R = R;
-ctx->Np = Np;
-ctx->Nf = Nf;
+ctx->I = I;
+ctx->Ih = Ih;
+ctx->Iw = Iw;
 ctx->i = i;
 ctx->j = j;
 ctx->t = t;
@@ -130,9 +126,13 @@ ctx->MGVF_time = MGVF_time;
 ctx->snake_time = snake_time;
 ctx->frame_num = frame_num;
 ctx->cell_num = cell_num;
-ctx->I = I;
-ctx->Ih = Ih;
-ctx->Iw = Iw;
+ctx->video = video;
+ctx->xc0 = xc0;
+ctx->yc0 = yc0;
+ctx->Nc = Nc;
+ctx->R = R;
+ctx->Np = Np;
+ctx->Nf = Nf;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nc;
@@ -176,15 +176,12 @@ free(ctx);
 	printf("------------------------------------\n");
 	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
 	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
-} static void pragma85_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma85_hclib_async(void *____arg, const int ___iter0) {
     pragma85 *ctx = (pragma85 *)____arg;
-    avi_t *video; video = ctx->video;
-    double *xc0; xc0 = ctx->xc0;
-    double *yc0; yc0 = ctx->yc0;
-    int Nc; Nc = ctx->Nc;
-    int R; R = ctx->R;
-    int Np; Np = ctx->Np;
-    int Nf; Nf = ctx->Nf;
+    MAT *I; I = ctx->I;
+    int Ih; Ih = ctx->Ih;
+    int Iw; Iw = ctx->Iw;
     int i; i = ctx->i;
     int j; j = ctx->j;
     double *t; t = ctx->t;
@@ -198,9 +195,13 @@ free(ctx);
     long long snake_time; snake_time = ctx->snake_time;
     int frame_num; frame_num = ctx->frame_num;
     int cell_num; cell_num = ctx->cell_num;
-    MAT *I; I = ctx->I;
-    int Ih; Ih = ctx->Ih;
-    int Iw; Iw = ctx->Iw;
+    avi_t *video; video = ctx->video;
+    double *xc0; xc0 = ctx->xc0;
+    double *yc0; yc0 = ctx->yc0;
+    int Nc; Nc = ctx->Nc;
+    int R; R = ctx->R;
+    int Np; Np = ctx->Np;
+    int Nf; Nf = ctx->Nf;
     hclib_start_finish();
     do {
     cell_num = ___iter0;

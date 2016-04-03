@@ -342,12 +342,6 @@ int findIndexBin(double * CDF, int beginIndex, int endIndex, double value){
 * @param Nparticles The number of particles to be used
 */
 typedef struct _pragma373 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -361,15 +355,15 @@ typedef struct _pragma373 {
     double *objxy;
     long long get_neighbors;
     double *weights;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
  } pragma373;
 
 typedef struct _pragma388 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -392,15 +386,16 @@ typedef struct _pragma388 {
     double *CDF;
     double *u;
     int *ind;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
  } pragma388;
 
 typedef struct _pragma402 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
+    long long set_arrays;
     int max_size;
     long long start;
     double xe;
@@ -426,16 +421,17 @@ typedef struct _pragma402 {
     int k;
     int indX;
     int indY;
-    long long set_arrays;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
  } pragma402;
 
 typedef struct _pragma410 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
+    long long set_arrays;
+    long long error;
     int max_size;
     long long start;
     double xe;
@@ -461,54 +457,18 @@ typedef struct _pragma410 {
     int k;
     int indX;
     int indY;
-    long long set_arrays;
-    long long error;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
  } pragma410;
 
 typedef struct _pragma433 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
-    int max_size;
-    long long start;
-    double xe;
-    double ye;
-    int radius;
-    int diameter;
-    int *disk;
-    int countOnes;
-    int x;
-    int y;
-    double *objxy;
-    long long get_neighbors;
-    double *weights;
-    long long get_weights;
-    double *likelihood;
-    double *arrayX;
-    double *arrayY;
-    double *xj;
-    double *yj;
-    double *CDF;
-    double *u;
-    int *ind;
-    int k;
-    int indX;
-    int indY;
     long long set_arrays;
     long long error;
     long long likelihood_time;
- } pragma433;
-
-typedef struct _pragma440 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -534,21 +494,20 @@ typedef struct _pragma440 {
     int k;
     int indX;
     int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
+ } pragma433;
+
+typedef struct _pragma440 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
     long long exponential;
     double sumWeights;
-    pthread_mutex_t reduction_mutex;
- } pragma440;
-
-typedef struct _pragma446 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -574,21 +533,22 @@ typedef struct _pragma446 {
     int k;
     int indX;
     int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
+    pthread_mutex_t reduction_mutex;
+ } pragma440;
+
+typedef struct _pragma446 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
     long long exponential;
     double sumWeights;
     long long sum_time;
- } pragma446;
-
-typedef struct _pragma455 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -614,6 +574,15 @@ typedef struct _pragma455 {
     int k;
     int indX;
     int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
+ } pragma446;
+
+typedef struct _pragma455 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
@@ -621,16 +590,6 @@ typedef struct _pragma455 {
     double sumWeights;
     long long sum_time;
     long long normalize;
-    pthread_mutex_t reduction_mutex;
- } pragma455;
-
-typedef struct _pragma480 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -656,6 +615,16 @@ typedef struct _pragma480 {
     int k;
     int indX;
     int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
+    pthread_mutex_t reduction_mutex;
+ } pragma455;
+
+typedef struct _pragma480 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
@@ -667,15 +636,6 @@ typedef struct _pragma480 {
     double distance;
     long long cum_sum;
     double u1;
- } pragma480;
-
-typedef struct _pragma488 {
-    int *I;
-    int IszX;
-    int IszY;
-    int Nfr;
-    int *seed;
-    int Nparticles;
     int max_size;
     long long start;
     double xe;
@@ -701,6 +661,15 @@ typedef struct _pragma488 {
     int k;
     int indX;
     int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
+ } pragma480;
+
+typedef struct _pragma488 {
     long long set_arrays;
     long long error;
     long long likelihood_time;
@@ -715,6 +684,37 @@ typedef struct _pragma488 {
     long long u_time;
     int j;
     int i;
+    int max_size;
+    long long start;
+    double xe;
+    double ye;
+    int radius;
+    int diameter;
+    int *disk;
+    int countOnes;
+    int x;
+    int y;
+    double *objxy;
+    long long get_neighbors;
+    double *weights;
+    long long get_weights;
+    double *likelihood;
+    double *arrayX;
+    double *arrayY;
+    double *xj;
+    double *yj;
+    double *CDF;
+    double *u;
+    int *ind;
+    int k;
+    int indX;
+    int indY;
+    int *I;
+    int IszX;
+    int IszY;
+    int Nfr;
+    int *seed;
+    int Nparticles;
  } pragma488;
 
 static void pragma373_hclib_async(void *____arg, const int ___iter0);
@@ -757,12 +757,6 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 	double * weights = (double *)malloc(sizeof(double)*Nparticles);
  { 
 pragma373 *ctx = (pragma373 *)malloc(sizeof(pragma373));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -776,6 +770,12 @@ ctx->y = y;
 ctx->objxy = objxy;
 ctx->get_neighbors = get_neighbors;
 ctx->weights = weights;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -798,12 +798,6 @@ free(ctx);
 	int * ind = (int*)malloc(sizeof(int)*countOnes*Nparticles);
  { 
 pragma388 *ctx = (pragma388 *)malloc(sizeof(pragma388));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -826,6 +820,12 @@ ctx->yj = yj;
 ctx->CDF = CDF;
 ctx->u = u;
 ctx->ind = ind;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -846,12 +846,7 @@ free(ctx);
 		//is that the object moves 2x as fast as in the y direction
  { 
 pragma402 *ctx = (pragma402 *)malloc(sizeof(pragma402));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -877,7 +872,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -892,12 +892,8 @@ free(ctx);
 		//particle filter likelihood
  { 
 pragma410 *ctx = (pragma410 *)malloc(sizeof(pragma410));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -923,8 +919,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -940,12 +940,9 @@ free(ctx);
 		// using equation (63) of Arulampalam Tutorial
  { 
 pragma433 *ctx = (pragma433 *)malloc(sizeof(pragma433));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -971,9 +968,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -988,12 +988,11 @@ free(ctx);
 		double sumWeights = 0;
  { 
 pragma440 *ctx = (pragma440 *)malloc(sizeof(pragma440));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
+ctx->exponential = exponential;
+ctx->sumWeights = sumWeights;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -1019,11 +1018,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
-ctx->exponential = exponential;
-ctx->sumWeights = sumWeights;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 ctx->sumWeights = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
@@ -1041,12 +1041,12 @@ sumWeights = ctx->sumWeights;
 		printf("TIME TO SUM WEIGHTS TOOK: %f\n", elapsed_time(exponential, sum_time));
  { 
 pragma446 *ctx = (pragma446 *)malloc(sizeof(pragma446));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
+ctx->exponential = exponential;
+ctx->sumWeights = sumWeights;
+ctx->sum_time = sum_time;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -1072,12 +1072,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
-ctx->exponential = exponential;
-ctx->sumWeights = sumWeights;
-ctx->sum_time = sum_time;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -1094,12 +1094,13 @@ free(ctx);
 		// estimate the object location by expected values
  { 
 pragma455 *ctx = (pragma455 *)malloc(sizeof(pragma455));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
+ctx->exponential = exponential;
+ctx->sumWeights = sumWeights;
+ctx->sum_time = sum_time;
+ctx->normalize = normalize;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -1125,13 +1126,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
-ctx->exponential = exponential;
-ctx->sumWeights = sumWeights;
-ctx->sum_time = sum_time;
-ctx->normalize = normalize;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 ctx->xe = 0;
 ctx->ye = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
@@ -1169,12 +1169,17 @@ ye = ctx->ye;
 		double u1 = (1/((double)(Nparticles)))*randu(seed, 0);
  { 
 pragma480 *ctx = (pragma480 *)malloc(sizeof(pragma480));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
+ctx->exponential = exponential;
+ctx->sumWeights = sumWeights;
+ctx->sum_time = sum_time;
+ctx->normalize = normalize;
+ctx->move_time = move_time;
+ctx->distance = distance;
+ctx->cum_sum = cum_sum;
+ctx->u1 = u1;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -1200,17 +1205,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
-ctx->exponential = exponential;
-ctx->sumWeights = sumWeights;
-ctx->sum_time = sum_time;
-ctx->normalize = normalize;
-ctx->move_time = move_time;
-ctx->distance = distance;
-ctx->cum_sum = cum_sum;
-ctx->u1 = u1;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -1226,12 +1226,20 @@ free(ctx);
 		
  { 
 pragma488 *ctx = (pragma488 *)malloc(sizeof(pragma488));
-ctx->I = I;
-ctx->IszX = IszX;
-ctx->IszY = IszY;
-ctx->Nfr = Nfr;
-ctx->seed = seed;
-ctx->Nparticles = Nparticles;
+ctx->set_arrays = set_arrays;
+ctx->error = error;
+ctx->likelihood_time = likelihood_time;
+ctx->exponential = exponential;
+ctx->sumWeights = sumWeights;
+ctx->sum_time = sum_time;
+ctx->normalize = normalize;
+ctx->move_time = move_time;
+ctx->distance = distance;
+ctx->cum_sum = cum_sum;
+ctx->u1 = u1;
+ctx->u_time = u_time;
+ctx->j = j;
+ctx->i = i;
 ctx->max_size = max_size;
 ctx->start = start;
 ctx->xe = xe;
@@ -1257,20 +1265,12 @@ ctx->ind = ind;
 ctx->k = k;
 ctx->indX = indX;
 ctx->indY = indY;
-ctx->set_arrays = set_arrays;
-ctx->error = error;
-ctx->likelihood_time = likelihood_time;
-ctx->exponential = exponential;
-ctx->sumWeights = sumWeights;
-ctx->sum_time = sum_time;
-ctx->normalize = normalize;
-ctx->move_time = move_time;
-ctx->distance = distance;
-ctx->cum_sum = cum_sum;
-ctx->u1 = u1;
-ctx->u_time = u_time;
-ctx->j = j;
-ctx->i = i;
+ctx->I = I;
+ctx->IszX = IszX;
+ctx->IszY = IszY;
+ctx->Nfr = Nfr;
+ctx->seed = seed;
+ctx->Nparticles = Nparticles;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = Nparticles;
@@ -1304,14 +1304,9 @@ free(ctx);
 	free(CDF);
 	free(u);
 	free(ind);
-} static void pragma373_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma373_hclib_async(void *____arg, const int ___iter0) {
     pragma373 *ctx = (pragma373 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1325,6 +1320,12 @@ free(ctx);
     double *objxy; objxy = ctx->objxy;
     long long get_neighbors; get_neighbors = ctx->get_neighbors;
     double *weights; weights = ctx->weights;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1334,14 +1335,9 @@ free(ctx);
     ; hclib_end_finish();
 }
 
+
 static void pragma388_hclib_async(void *____arg, const int ___iter0) {
     pragma388 *ctx = (pragma388 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1364,6 +1360,12 @@ static void pragma388_hclib_async(void *____arg, const int ___iter0) {
     double *CDF; CDF = ctx->CDF;
     double *u; u = ctx->u;
     int *ind; ind = ctx->ind;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1374,14 +1376,10 @@ static void pragma388_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma402_hclib_async(void *____arg, const int ___iter0) {
     pragma402 *ctx = (pragma402 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1407,7 +1405,12 @@ static void pragma402_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1418,14 +1421,11 @@ static void pragma402_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma410_hclib_async(void *____arg, const int ___iter0) {
     pragma410 *ctx = (pragma410 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
+    long long error; error = ctx->error;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1451,8 +1451,12 @@ static void pragma410_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
-    long long error; error = ctx->error;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1477,14 +1481,12 @@ static void pragma410_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma433_hclib_async(void *____arg, const int ___iter0) {
     pragma433 *ctx = (pragma433 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
+    long long error; error = ctx->error;
+    long long likelihood_time; likelihood_time = ctx->likelihood_time;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1510,9 +1512,12 @@ static void pragma433_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
-    long long error; error = ctx->error;
-    long long likelihood_time; likelihood_time = ctx->likelihood_time;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1522,14 +1527,14 @@ static void pragma433_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma440_hclib_async(void *____arg, const int ___iter0) {
     pragma440 *ctx = (pragma440 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
+    long long error; error = ctx->error;
+    long long likelihood_time; likelihood_time = ctx->likelihood_time;
+    long long exponential; exponential = ctx->exponential;
+    double sumWeights; sumWeights = ctx->sumWeights;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1555,11 +1560,12 @@ static void pragma440_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
-    long long error; error = ctx->error;
-    long long likelihood_time; likelihood_time = ctx->likelihood_time;
-    long long exponential; exponential = ctx->exponential;
-    double sumWeights; sumWeights = ctx->sumWeights;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1574,14 +1580,15 @@ static void pragma440_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma446_hclib_async(void *____arg, const int ___iter0) {
     pragma446 *ctx = (pragma446 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
+    long long error; error = ctx->error;
+    long long likelihood_time; likelihood_time = ctx->likelihood_time;
+    long long exponential; exponential = ctx->exponential;
+    double sumWeights; sumWeights = ctx->sumWeights;
+    long long sum_time; sum_time = ctx->sum_time;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1607,12 +1614,12 @@ static void pragma446_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
-    long long error; error = ctx->error;
-    long long likelihood_time; likelihood_time = ctx->likelihood_time;
-    long long exponential; exponential = ctx->exponential;
-    double sumWeights; sumWeights = ctx->sumWeights;
-    long long sum_time; sum_time = ctx->sum_time;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1622,14 +1629,16 @@ static void pragma446_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma455_hclib_async(void *____arg, const int ___iter0) {
     pragma455 *ctx = (pragma455 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
+    long long set_arrays; set_arrays = ctx->set_arrays;
+    long long error; error = ctx->error;
+    long long likelihood_time; likelihood_time = ctx->likelihood_time;
+    long long exponential; exponential = ctx->exponential;
+    double sumWeights; sumWeights = ctx->sumWeights;
+    long long sum_time; sum_time = ctx->sum_time;
+    long long normalize; normalize = ctx->normalize;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1655,13 +1664,12 @@ static void pragma455_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
-    long long set_arrays; set_arrays = ctx->set_arrays;
-    long long error; error = ctx->error;
-    long long likelihood_time; likelihood_time = ctx->likelihood_time;
-    long long exponential; exponential = ctx->exponential;
-    double sumWeights; sumWeights = ctx->sumWeights;
-    long long sum_time; sum_time = ctx->sum_time;
-    long long normalize; normalize = ctx->normalize;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     x = ___iter0;
@@ -1678,39 +1686,9 @@ static void pragma455_hclib_async(void *____arg, const int ___iter0) {
     ; hclib_end_finish();
 }
 
+
 static void pragma480_hclib_async(void *____arg, const int ___iter0) {
     pragma480 *ctx = (pragma480 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
-    int max_size; max_size = ctx->max_size;
-    long long start; start = ctx->start;
-    double xe; xe = ctx->xe;
-    double ye; ye = ctx->ye;
-    int radius; radius = ctx->radius;
-    int diameter; diameter = ctx->diameter;
-    int *disk; disk = ctx->disk;
-    int countOnes; countOnes = ctx->countOnes;
-    int x; x = ctx->x;
-    int y; y = ctx->y;
-    double *objxy; objxy = ctx->objxy;
-    long long get_neighbors; get_neighbors = ctx->get_neighbors;
-    double *weights; weights = ctx->weights;
-    long long get_weights; get_weights = ctx->get_weights;
-    double *likelihood; likelihood = ctx->likelihood;
-    double *arrayX; arrayX = ctx->arrayX;
-    double *arrayY; arrayY = ctx->arrayY;
-    double *xj; xj = ctx->xj;
-    double *yj; yj = ctx->yj;
-    double *CDF; CDF = ctx->CDF;
-    double *u; u = ctx->u;
-    int *ind; ind = ctx->ind;
-    int k; k = ctx->k;
-    int indX; indX = ctx->indX;
-    int indY; indY = ctx->indY;
     long long set_arrays; set_arrays = ctx->set_arrays;
     long long error; error = ctx->error;
     long long likelihood_time; likelihood_time = ctx->likelihood_time;
@@ -1722,23 +1700,6 @@ static void pragma480_hclib_async(void *____arg, const int ___iter0) {
     double distance; distance = ctx->distance;
     long long cum_sum; cum_sum = ctx->cum_sum;
     double u1; u1 = ctx->u1;
-    hclib_start_finish();
-    do {
-    x = ___iter0;
-{
-			u[x] = u1 + x/((double)(Nparticles));
-		} ;     } while (0);
-    ; hclib_end_finish();
-}
-
-static void pragma488_hclib_async(void *____arg, const int ___iter0) {
-    pragma488 *ctx = (pragma488 *)____arg;
-    int *I; I = ctx->I;
-    int IszX; IszX = ctx->IszX;
-    int IszY; IszY = ctx->IszY;
-    int Nfr; Nfr = ctx->Nfr;
-    int *seed; seed = ctx->seed;
-    int Nparticles; Nparticles = ctx->Nparticles;
     int max_size; max_size = ctx->max_size;
     long long start; start = ctx->start;
     double xe; xe = ctx->xe;
@@ -1764,6 +1725,24 @@ static void pragma488_hclib_async(void *____arg, const int ___iter0) {
     int k; k = ctx->k;
     int indX; indX = ctx->indX;
     int indY; indY = ctx->indY;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
+    hclib_start_finish();
+    do {
+    x = ___iter0;
+{
+			u[x] = u1 + x/((double)(Nparticles));
+		} ;     } while (0);
+    ; hclib_end_finish();
+}
+
+
+static void pragma488_hclib_async(void *____arg, const int ___iter0) {
+    pragma488 *ctx = (pragma488 *)____arg;
     long long set_arrays; set_arrays = ctx->set_arrays;
     long long error; error = ctx->error;
     long long likelihood_time; likelihood_time = ctx->likelihood_time;
@@ -1778,6 +1757,37 @@ static void pragma488_hclib_async(void *____arg, const int ___iter0) {
     long long u_time; u_time = ctx->u_time;
     int j; j = ctx->j;
     int i; i = ctx->i;
+    int max_size; max_size = ctx->max_size;
+    long long start; start = ctx->start;
+    double xe; xe = ctx->xe;
+    double ye; ye = ctx->ye;
+    int radius; radius = ctx->radius;
+    int diameter; diameter = ctx->diameter;
+    int *disk; disk = ctx->disk;
+    int countOnes; countOnes = ctx->countOnes;
+    int x; x = ctx->x;
+    int y; y = ctx->y;
+    double *objxy; objxy = ctx->objxy;
+    long long get_neighbors; get_neighbors = ctx->get_neighbors;
+    double *weights; weights = ctx->weights;
+    long long get_weights; get_weights = ctx->get_weights;
+    double *likelihood; likelihood = ctx->likelihood;
+    double *arrayX; arrayX = ctx->arrayX;
+    double *arrayY; arrayY = ctx->arrayY;
+    double *xj; xj = ctx->xj;
+    double *yj; yj = ctx->yj;
+    double *CDF; CDF = ctx->CDF;
+    double *u; u = ctx->u;
+    int *ind; ind = ctx->ind;
+    int k; k = ctx->k;
+    int indX; indX = ctx->indX;
+    int indY; indY = ctx->indY;
+    int *I; I = ctx->I;
+    int IszX; IszX = ctx->IszX;
+    int IszY; IszY = ctx->IszY;
+    int Nfr; Nfr = ctx->Nfr;
+    int *seed; seed = ctx->seed;
+    int Nparticles; Nparticles = ctx->Nparticles;
     hclib_start_finish();
     do {
     j = ___iter0;
@@ -1794,8 +1804,6 @@ static void pragma488_hclib_async(void *____arg, const int ___iter0) {
 
 
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     char *usage;
     int IszX;
     int IszY;
@@ -1806,12 +1814,13 @@ typedef struct _main_entrypoint_ctx {
     int *I;
     long long start;
     long long endVideoSequence;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     char *usage; usage = ctx->usage;
     int IszX; IszX = ctx->IszX;
     int IszY; IszY = ctx->IszY;
@@ -1822,6 +1831,8 @@ static void main_entrypoint(void *____arg) {
     int *I; I = ctx->I;
     long long start; start = ctx->start;
     long long endVideoSequence; endVideoSequence = ctx->endVideoSequence;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) ; }
 
 int main(int argc, char * argv[]){
@@ -1898,8 +1909,6 @@ int main(int argc, char * argv[]){
 	printf("VIDEO SEQUENCE TOOK %f\n", elapsed_time(start, endVideoSequence));
 	//call particle filter
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->usage = usage;
 ctx->IszX = IszX;
 ctx->IszY = IszY;
@@ -1910,6 +1919,8 @@ ctx->i = i;
 ctx->I = I;
 ctx->start = start;
 ctx->endVideoSequence = endVideoSequence;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;

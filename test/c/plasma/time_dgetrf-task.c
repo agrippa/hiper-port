@@ -31,8 +31,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     int* piv = (int*)malloc(N * sizeof(double));
 
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdpltmg_quark(*descA, 3456);
+        }
+    }
 
     /* Save AT in lapack layout for check */
     double *A = NULL;
@@ -43,8 +47,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
 
     START_TIMING();
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdgetrf_rectil_quark(*descA, piv);
+        }
+    }
     STOP_TIMING();
 
     /* Check the solution */

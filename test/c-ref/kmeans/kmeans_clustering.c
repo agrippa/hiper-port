@@ -115,12 +115,6 @@ float euclid_dist_2(float *pt1,
 
 /*----< kmeans_clustering() >---------------------------------------------*/
 typedef struct _pragma186 {
-    float **feature;
-    int nfeatures;
-    int npoints;
-    int nclusters;
-    float threshold;
-    int *membership;
     int i;
     int j;
     int k;
@@ -135,17 +129,17 @@ typedef struct _pragma186 {
     int nthreads;
     int **partial_new_centers_len;
     float ***partial_new_centers;
+    float **feature;
+    int nfeatures;
+    int npoints;
+    int nclusters;
+    float threshold;
+    int *membership;
     pthread_mutex_t reduction_mutex;
  } pragma186;
 
 static void pragma186_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    float **feature;
-    int nfeatures;
-    int npoints;
-    int nclusters;
-    float threshold;
-    int *membership;
     int i;
     int j;
     int k;
@@ -160,16 +154,17 @@ typedef struct _main_entrypoint_ctx {
     int nthreads;
     int **partial_new_centers_len;
     float ***partial_new_centers;
+    float **feature;
+    int nfeatures;
+    int npoints;
+    int nclusters;
+    float threshold;
+    int *membership;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    float **feature; feature = ctx->feature;
-    int nfeatures; nfeatures = ctx->nfeatures;
-    int npoints; npoints = ctx->npoints;
-    int nclusters; nclusters = ctx->nclusters;
-    float threshold; threshold = ctx->threshold;
-    int *membership; membership = ctx->membership;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
@@ -184,17 +179,17 @@ static void main_entrypoint(void *____arg) {
     int nthreads; nthreads = ctx->nthreads;
     int **partial_new_centers_len; partial_new_centers_len = ctx->partial_new_centers_len;
     float ***partial_new_centers; partial_new_centers = ctx->partial_new_centers;
+    float **feature; feature = ctx->feature;
+    int nfeatures; nfeatures = ctx->nfeatures;
+    int npoints; npoints = ctx->npoints;
+    int nclusters; nclusters = ctx->nclusters;
+    float threshold; threshold = ctx->threshold;
+    int *membership; membership = ctx->membership;
 do {
         delta = 0.0;
         {
  { 
 pragma186 *ctx = (pragma186 *)malloc(sizeof(pragma186));
-ctx->feature = feature;
-ctx->nfeatures = nfeatures;
-ctx->npoints = npoints;
-ctx->nclusters = nclusters;
-ctx->threshold = threshold;
-ctx->membership = membership;
 ctx->i = i;
 ctx->j = j;
 ctx->k = k;
@@ -209,6 +204,12 @@ ctx->timing = timing;
 ctx->nthreads = nthreads;
 ctx->partial_new_centers_len = partial_new_centers_len;
 ctx->partial_new_centers = partial_new_centers;
+ctx->feature = feature;
+ctx->nfeatures = nfeatures;
+ctx->npoints = npoints;
+ctx->nclusters = nclusters;
+ctx->threshold = threshold;
+ctx->membership = membership;
 ctx->delta = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
@@ -313,12 +314,6 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
 	}
 	printf("num of threads = %d\n", num_omp_threads);
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->feature = feature;
-ctx->nfeatures = nfeatures;
-ctx->npoints = npoints;
-ctx->nclusters = nclusters;
-ctx->threshold = threshold;
-ctx->membership = membership;
 ctx->i = i;
 ctx->j = j;
 ctx->k = k;
@@ -333,6 +328,12 @@ ctx->timing = timing;
 ctx->nthreads = nthreads;
 ctx->partial_new_centers_len = partial_new_centers_len;
 ctx->partial_new_centers = partial_new_centers;
+ctx->feature = feature;
+ctx->nfeatures = nfeatures;
+ctx->npoints = npoints;
+ctx->nclusters = nclusters;
+ctx->threshold = threshold;
+ctx->membership = membership;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;
@@ -343,14 +344,9 @@ free(ctx);
     free(new_centers_len);
 
     return clusters;
-}  static void pragma186_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma186_hclib_async(void *____arg, const int ___iter0) {
     pragma186 *ctx = (pragma186 *)____arg;
-    float **feature; feature = ctx->feature;
-    int nfeatures; nfeatures = ctx->nfeatures;
-    int npoints; npoints = ctx->npoints;
-    int nclusters; nclusters = ctx->nclusters;
-    float threshold; threshold = ctx->threshold;
-    int *membership; membership = ctx->membership;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
@@ -365,6 +361,12 @@ free(ctx);
     int nthreads; nthreads = ctx->nthreads;
     int **partial_new_centers_len; partial_new_centers_len = ctx->partial_new_centers_len;
     float ***partial_new_centers; partial_new_centers = ctx->partial_new_centers;
+    float **feature; feature = ctx->feature;
+    int nfeatures; nfeatures = ctx->nfeatures;
+    int npoints; npoints = ctx->npoints;
+    int nclusters; nclusters = ctx->nclusters;
+    float threshold; threshold = ctx->threshold;
+    int *membership; membership = ctx->membership;
     hclib_start_finish();
     do {
     i = ___iter0;

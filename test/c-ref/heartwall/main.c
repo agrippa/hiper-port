@@ -96,8 +96,6 @@ void write_data(	char* filename,
 //===============================================================================================================================================================================================================
 
 typedef struct _pragma549 {
-    int argc;
-    char **argv;
     int i;
     int frames_processed;
     public_struct public;
@@ -105,12 +103,12 @@ typedef struct _pragma549 {
     char *video_file_name;
     avi_t *d_frames;
     int omp_num_threads;
+    int argc;
+    char **argv;
  } pragma549;
 
 static void pragma549_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int i;
     int frames_processed;
     public_struct public;
@@ -118,12 +116,13 @@ typedef struct _main_entrypoint_ctx {
     char *video_file_name;
     avi_t *d_frames;
     int omp_num_threads;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int i; i = ctx->i;
     int frames_processed; frames_processed = ctx->frames_processed;
     public_struct public; public = ctx->public;
@@ -131,6 +130,8 @@ static void main_entrypoint(void *____arg) {
     char *video_file_name; video_file_name = ctx->video_file_name;
     avi_t *d_frames; d_frames = ctx->d_frames;
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 
 	//====================================================================================================
@@ -150,8 +151,6 @@ for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 
  { 
 pragma549 *ctx = (pragma549 *)malloc(sizeof(pragma549));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->i = i;
 ctx->frames_processed = frames_processed;
 ctx->public = public;
@@ -159,6 +158,8 @@ memcpy(ctx->private, private, 51 * (sizeof(private_struct)));
 ctx->video_file_name = video_file_name;
 ctx->d_frames = d_frames;
 ctx->omp_num_threads = omp_num_threads;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = public.allPoints;
@@ -618,8 +619,6 @@ int main(int argc, char *argv []){
 	//======================================================================================================================================================
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->i = i;
 ctx->frames_processed = frames_processed;
 ctx->public = public;
@@ -627,6 +626,8 @@ memcpy(ctx->private, private, 51 * (sizeof(private_struct)));
 ctx->video_file_name = video_file_name;
 ctx->d_frames = d_frames;
 ctx->omp_num_threads = omp_num_threads;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -704,10 +705,9 @@ free(ctx);
 		free(private[i].d_mask_conv);
 	}
 
-}  static void pragma549_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma549_hclib_async(void *____arg, const int ___iter0) {
     pragma549 *ctx = (pragma549 *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int i; i = ctx->i;
     int frames_processed; frames_processed = ctx->frames_processed;
     public_struct public; public = ctx->public;
@@ -715,6 +715,8 @@ free(ctx);
     char *video_file_name; video_file_name = ctx->video_file_name;
     avi_t *d_frames; d_frames = ctx->d_frames;
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
     hclib_start_finish();
     do {
     i = ___iter0;

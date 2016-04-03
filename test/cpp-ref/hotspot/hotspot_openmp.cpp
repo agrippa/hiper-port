@@ -49,6 +49,13 @@ int num_omp_threads;
  * by one time step
  */
 typedef struct _pragma64 {
+    FLOAT delta;
+    int r;
+    int c;
+    int chunk;
+    int num_chunk;
+    int chunks_in_row;
+    int chunks_in_col;
     FLOAT *result;
     FLOAT *temp;
     FLOAT *power;
@@ -59,13 +66,6 @@ typedef struct _pragma64 {
     FLOAT Ry_1;
     FLOAT Rz_1;
     FLOAT step;
-    FLOAT delta;
-    int r;
-    int c;
-    int chunk;
-    int num_chunk;
-    int chunks_in_row;
-    int chunks_in_col;
  } pragma64;
 
 static void pragma64_hclib_async(void *____arg, const int ___iter0);
@@ -83,6 +83,13 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
 	// omp_set_num_threads(num_omp_threads);
  { 
 pragma64 *ctx = (pragma64 *)malloc(sizeof(pragma64));
+ctx->delta = delta;
+ctx->r = r;
+ctx->c = c;
+ctx->chunk = chunk;
+ctx->num_chunk = num_chunk;
+ctx->chunks_in_row = chunks_in_row;
+ctx->chunks_in_col = chunks_in_col;
 ctx->result = result;
 ctx->temp = temp;
 ctx->power = power;
@@ -93,13 +100,6 @@ ctx->Rx_1 = Rx_1;
 ctx->Ry_1 = Ry_1;
 ctx->Rz_1 = Rz_1;
 ctx->step = step;
-ctx->delta = delta;
-ctx->r = r;
-ctx->c = c;
-ctx->chunk = chunk;
-ctx->num_chunk = num_chunk;
-ctx->chunks_in_row = chunks_in_row;
-ctx->chunks_in_col = chunks_in_col;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = num_chunk;
@@ -109,8 +109,16 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma64_hclib_async, ctx, N
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma64_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma64_hclib_async(void *____arg, const int ___iter0) {
     pragma64 *ctx = (pragma64 *)____arg;
+    FLOAT delta; delta = ctx->delta;
+    int r; r = ctx->r;
+    int c; c = ctx->c;
+    int chunk; chunk = ctx->chunk;
+    int num_chunk; num_chunk = ctx->num_chunk;
+    int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
+    int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
     FLOAT *result; result = ctx->result;
     FLOAT *temp; temp = ctx->temp;
     FLOAT *power; power = ctx->power;
@@ -121,13 +129,6 @@ free(ctx);
     FLOAT Ry_1; Ry_1 = ctx->Ry_1;
     FLOAT Rz_1; Rz_1 = ctx->Rz_1;
     FLOAT step; step = ctx->step;
-    FLOAT delta; delta = ctx->delta;
-    int r; r = ctx->r;
-    int c; c = ctx->c;
-    int chunk; chunk = ctx->chunk;
-    int num_chunk; num_chunk = ctx->num_chunk;
-    int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
-    int chunks_in_col; chunks_in_col = ctx->chunks_in_col;
     hclib_start_finish();
     do {
     chunk = ___iter0;
@@ -326,8 +327,6 @@ void usage(int argc, char **argv)
 }
 
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int grid_rows;
     int grid_cols;
     int sim_time;
@@ -339,12 +338,13 @@ typedef struct _main_entrypoint_ctx {
     char *pfile;
     char *ofile;
     long long start_time;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int grid_rows; grid_rows = ctx->grid_rows;
     int grid_cols; grid_cols = ctx->grid_cols;
     int sim_time; sim_time = ctx->sim_time;
@@ -356,6 +356,8 @@ static void main_entrypoint(void *____arg) {
     char *pfile; pfile = ctx->pfile;
     char *ofile; ofile = ctx->ofile;
     long long start_time; start_time = ctx->start_time;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; }
 
 int main(int argc, char **argv)
@@ -394,8 +396,6 @@ int main(int argc, char **argv)
     long long start_time = get_time();
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->grid_rows = grid_rows;
 ctx->grid_cols = grid_cols;
 ctx->sim_time = sim_time;
@@ -407,6 +407,8 @@ ctx->tfile = tfile;
 ctx->pfile = pfile;
 ctx->ofile = ofile;
 ctx->start_time = start_time;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;

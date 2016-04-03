@@ -32,8 +32,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     PLASMA_Desc_Create(&descA, ptr, PlasmaRealDouble, NB, NB, NB*NB, N, N, 0, 0, N, N);
 
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdplgsy_quark( (double)N, *descA, 51 );
+        }
+    }
 
     /* Save A for check */
     double *A = NULL;
@@ -45,8 +49,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     /* PLASMA DPOSV */
     START_TIMING();
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdpotrf_quark(uplo, *descA);
+        }
+    }
     STOP_TIMING();
 
     /* Check the solution */

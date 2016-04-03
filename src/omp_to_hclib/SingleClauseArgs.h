@@ -14,6 +14,7 @@ class SingleClauseArgs {
 
         std::string getSingleArg();
         std::vector<std::string> *getArgs();
+        std::string str();
 };
 
 #endif

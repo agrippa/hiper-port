@@ -31,8 +31,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     PLASMA_Desc_Create(&descA, ptr, PlasmaRealDouble, NB, NB, NB*NB, N, N, 0, 0, N, N);
 
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdpltmg_quark(*descA, 5373 );
+        }
+    }
 
     /* Save A for check */
     double *A = NULL;
@@ -47,8 +51,12 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     /* Do the computations */
     START_TIMING();
 #pragma omp parallel
-#pragma omp master
+    {
+#pragma omp single
+        {
     plasma_pdgeqrf_quark( *descA, *descT , IB);
+        }
+    }
     STOP_TIMING();
 
     /* Check the solution */

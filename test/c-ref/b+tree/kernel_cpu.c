@@ -32,6 +32,13 @@
 //========================================================================================================================================================================================================200
 
 typedef struct _pragma85 {
+    int thid;
+    int bid;
+    int i;
+    long long time0;
+    long long time1;
+    long long time2;
+    int threadsPerBlock;
     int cores_arg;
     record *records;
     knode *knodes;
@@ -43,17 +50,14 @@ typedef struct _pragma85 {
     long *offset;
     int *keys;
     record *ans;
-    long long time0;
-    long long time1;
-    long long time2;
-    int threadsPerBlock;
-    int thid;
-    int bid;
-    int i;
  } pragma85;
 
 static void pragma85_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
+    long long time0;
+    long long time1;
+    long long time2;
+    int threadsPerBlock;
     int cores_arg;
     record *records;
     knode *knodes;
@@ -65,14 +69,15 @@ typedef struct _main_entrypoint_ctx {
     long *offset;
     int *keys;
     record *ans;
-    long long time0;
-    long long time1;
-    long long time2;
-    int threadsPerBlock;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    long long time0; time0 = ctx->time0;
+    long long time1; time1 = ctx->time1;
+    long long time2; time2 = ctx->time2;
+    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
     int cores_arg; cores_arg = ctx->cores_arg;
     record *records; records = ctx->records;
     knode *knodes; knodes = ctx->knodes;
@@ -84,10 +89,6 @@ static void main_entrypoint(void *____arg) {
     long *offset; offset = ctx->offset;
     int *keys; keys = ctx->keys;
     record *ans; ans = ctx->ans;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
 {
 
 	time1 = get_time();
@@ -104,6 +105,13 @@ static void main_entrypoint(void *____arg) {
 	// process number of querries
  { 
 pragma85 *ctx = (pragma85 *)malloc(sizeof(pragma85));
+ctx->thid = thid;
+ctx->bid = bid;
+ctx->i = i;
+ctx->time0 = time0;
+ctx->time1 = time1;
+ctx->time2 = time2;
+ctx->threadsPerBlock = threadsPerBlock;
 ctx->cores_arg = cores_arg;
 ctx->records = records;
 ctx->knodes = knodes;
@@ -115,13 +123,6 @@ ctx->currKnode = currKnode;
 ctx->offset = offset;
 ctx->keys = keys;
 ctx->ans = ans;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->threadsPerBlock = threadsPerBlock;
-ctx->thid = thid;
-ctx->bid = bid;
-ctx->i = i;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = count;
@@ -171,6 +172,10 @@ kernel_cpu(	int cores_arg,
 	threadsPerBlock = order < 1024 ? order : 1024;
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->time0 = time0;
+ctx->time1 = time1;
+ctx->time2 = time2;
+ctx->threadsPerBlock = threadsPerBlock;
 ctx->cores_arg = cores_arg;
 ctx->records = records;
 ctx->knodes = knodes;
@@ -182,10 +187,6 @@ ctx->currKnode = currKnode;
 ctx->offset = offset;
 ctx->keys = keys;
 ctx->ans = ans;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->threadsPerBlock = threadsPerBlock;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
@@ -202,8 +203,16 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  static void pragma85_hclib_async(void *____arg, const int ___iter0) {
+}  
+static void pragma85_hclib_async(void *____arg, const int ___iter0) {
     pragma85 *ctx = (pragma85 *)____arg;
+    int thid; thid = ctx->thid;
+    int bid; bid = ctx->bid;
+    int i; i = ctx->i;
+    long long time0; time0 = ctx->time0;
+    long long time1; time1 = ctx->time1;
+    long long time2; time2 = ctx->time2;
+    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
     int cores_arg; cores_arg = ctx->cores_arg;
     record *records; records = ctx->records;
     knode *knodes; knodes = ctx->knodes;
@@ -215,13 +224,6 @@ free(ctx);
     long *offset; offset = ctx->offset;
     int *keys; keys = ctx->keys;
     record *ans; ans = ctx->ans;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
-    int thid; thid = ctx->thid;
-    int bid; bid = ctx->bid;
-    int i; i = ctx->i;
     hclib_start_finish();
     do {
     bid = ___iter0;

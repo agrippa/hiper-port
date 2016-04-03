@@ -1009,14 +1009,6 @@ hclib_pragma_marker("omp", "taskwait");
 }
 #else
 typedef struct _pragma1132 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1049,17 +1041,17 @@ typedef struct _pragma1132 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1132;
 
 typedef struct _pragma1136 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1092,17 +1084,17 @@ typedef struct _pragma1136 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1136;
 
 typedef struct _pragma1140 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1135,17 +1127,17 @@ typedef struct _pragma1140 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1140;
 
 typedef struct _pragma1144 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1178,17 +1170,17 @@ typedef struct _pragma1144 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1144;
 
 typedef struct _pragma1148 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1221,17 +1213,17 @@ typedef struct _pragma1148 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1148;
 
 typedef struct _pragma1152 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1264,17 +1256,17 @@ typedef struct _pragma1152 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1152;
 
 typedef struct _pragma1156 {
-    REAL *C;
-    REAL *A;
-    REAL *B;
-    unsigned int MatrixSize;
-    unsigned int RowWidthC;
-    unsigned int RowWidthA;
-    unsigned int RowWidthB;
-    int Depth;
     unsigned int QuadrantSize;
     unsigned int QuadrantSizeInBytes;
     unsigned int Column;
@@ -1307,6 +1299,14 @@ typedef struct _pragma1156 {
     PTR RowIncrementA;
     PTR RowIncrementB;
     PTR RowIncrementC;
+    REAL *C;
+    REAL *A;
+    REAL *B;
+    unsigned int MatrixSize;
+    unsigned int RowWidthC;
+    unsigned int RowWidthA;
+    unsigned int RowWidthB;
+    int Depth;
  } pragma1156;
 
 static void pragma1132_hclib_async(void *____arg);
@@ -1438,14 +1438,6 @@ void OptimizedStrassenMultiply_par(REAL *C, REAL *A, REAL *B, unsigned MatrixSiz
   /* M2 = A11 x B11 */
  { 
 pragma1132 *ctx = (pragma1132 *)malloc(sizeof(pragma1132));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1478,20 +1470,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1132_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* M5 = S1 * S5 */
  { 
 pragma1136 *ctx = (pragma1136 *)malloc(sizeof(pragma1136));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1524,20 +1516,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1136_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of T1 = S2 x S6 + M2 */
  { 
 pragma1140 *ctx = (pragma1140 *)malloc(sizeof(pragma1140));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1570,20 +1562,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1140_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of T2 = T1 + S3 x S7 */
  { 
 pragma1144 *ctx = (pragma1144 *)malloc(sizeof(pragma1144));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1616,20 +1608,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1144_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of C11 = M2 + A12 * B21 */
  { 
 pragma1148 *ctx = (pragma1148 *)malloc(sizeof(pragma1148));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1662,20 +1654,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1148_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
   
   /* Step 1 of C12 = S4 x B22 + T1 + M5 */
  { 
 pragma1152 *ctx = (pragma1152 *)malloc(sizeof(pragma1152));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1708,20 +1700,20 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1152_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
   /* Step 1 of C21 = T2 - A22 * S8 */
  { 
 pragma1156 *ctx = (pragma1156 *)malloc(sizeof(pragma1156));
-ctx->C = C;
-ctx->A = A;
-ctx->B = B;
-ctx->MatrixSize = MatrixSize;
-ctx->RowWidthC = RowWidthC;
-ctx->RowWidthA = RowWidthA;
-ctx->RowWidthB = RowWidthB;
-ctx->Depth = Depth;
 ctx->QuadrantSize = QuadrantSize;
 ctx->QuadrantSizeInBytes = QuadrantSizeInBytes;
 ctx->Column = Column;
@@ -1754,6 +1746,14 @@ ctx->StartHeap = StartHeap;
 ctx->RowIncrementA = RowIncrementA;
 ctx->RowIncrementB = RowIncrementB;
 ctx->RowIncrementC = RowIncrementC;
+ctx->C = C;
+ctx->A = A;
+ctx->B = B;
+ctx->MatrixSize = MatrixSize;
+ctx->RowWidthC = RowWidthC;
+ctx->RowWidthA = RowWidthA;
+ctx->RowWidthB = RowWidthB;
+ctx->Depth = Depth;
 hclib_async(pragma1156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
@@ -1818,16 +1818,9 @@ hclib_async(pragma1156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     C22 = (REAL*) ( ((PTR) C22 ) + RowIncrementC);
   }
   free(StartHeap);
-} static void pragma1132_hclib_async(void *____arg) {
+} 
+static void pragma1132_hclib_async(void *____arg) {
     pragma1132 *ctx = (pragma1132 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -1860,20 +1853,21 @@ hclib_async(pragma1156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(M2, A11, B11, QuadrantSize, QuadrantSize, RowWidthA, RowWidthB, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1136_hclib_async(void *____arg) {
     pragma1136 *ctx = (pragma1136 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -1906,20 +1900,21 @@ static void pragma1136_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(M5, S1, S5, QuadrantSize, QuadrantSize, QuadrantSize, QuadrantSize, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1140_hclib_async(void *____arg) {
     pragma1140 *ctx = (pragma1140 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -1952,20 +1947,21 @@ static void pragma1140_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(T1sMULT, S2, S6,  QuadrantSize, QuadrantSize, QuadrantSize, QuadrantSize, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1144_hclib_async(void *____arg) {
     pragma1144 *ctx = (pragma1144 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -1998,20 +1994,21 @@ static void pragma1144_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(C22, S3, S7, QuadrantSize, RowWidthC /*FIXME*/, QuadrantSize, QuadrantSize, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1148_hclib_async(void *____arg) {
     pragma1148 *ctx = (pragma1148 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -2044,20 +2041,21 @@ static void pragma1148_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(C11, A12, B21, QuadrantSize, RowWidthC, RowWidthA, RowWidthB, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1152_hclib_async(void *____arg) {
     pragma1152 *ctx = (pragma1152 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -2090,20 +2088,21 @@ static void pragma1152_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(C12, S4, B22, QuadrantSize, RowWidthC, QuadrantSize, RowWidthB, Depth+1) ;     ; hclib_end_finish();
 }
 
+
 static void pragma1156_hclib_async(void *____arg) {
     pragma1156 *ctx = (pragma1156 *)____arg;
-    REAL *C; C = ctx->C;
-    REAL *A; A = ctx->A;
-    REAL *B; B = ctx->B;
-    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
-    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
-    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
-    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
-    int Depth; Depth = ctx->Depth;
     unsigned int QuadrantSize; QuadrantSize = ctx->QuadrantSize;
     unsigned int QuadrantSizeInBytes; QuadrantSizeInBytes = ctx->QuadrantSizeInBytes;
     unsigned int Column; Column = ctx->Column;
@@ -2136,6 +2135,14 @@ static void pragma1156_hclib_async(void *____arg) {
     PTR RowIncrementA; RowIncrementA = ctx->RowIncrementA;
     PTR RowIncrementB; RowIncrementB = ctx->RowIncrementB;
     PTR RowIncrementC; RowIncrementC = ctx->RowIncrementC;
+    REAL *C; C = ctx->C;
+    REAL *A; A = ctx->A;
+    REAL *B; B = ctx->B;
+    unsigned int MatrixSize; MatrixSize = ctx->MatrixSize;
+    unsigned int RowWidthC; RowWidthC = ctx->RowWidthC;
+    unsigned int RowWidthA; RowWidthA = ctx->RowWidthA;
+    unsigned int RowWidthB; RowWidthB = ctx->RowWidthB;
+    int Depth; Depth = ctx->Depth;
     hclib_start_finish();
 OptimizedStrassenMultiply_par(C21, A22, S8, QuadrantSize, RowWidthC, RowWidthA, QuadrantSize, Depth+1) ;     ; hclib_end_finish();
 }
@@ -2204,6 +2211,7 @@ typedef struct _main_entrypoint_ctx {
     int n;
  } main_entrypoint_ctx;
 
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     REAL *A; A = ctx->A;
@@ -2235,7 +2243,8 @@ ctx->n = n;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma1278_hclib_async(void *____arg) {
+}  
+static void pragma1278_hclib_async(void *____arg) {
     pragma1278 *ctx = (pragma1278 *)____arg;
     REAL *A; A = ctx->A;
     REAL *B; B = ctx->B;

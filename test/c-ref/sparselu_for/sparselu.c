@@ -247,42 +247,43 @@ void sparselu_seq_call(float **BENCH)
 }
 
 typedef struct _pragma268 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma268;
 
 typedef struct _pragma276 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma276;
 
 typedef struct _pragma287 {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } pragma287;
 
 static void pragma268_hclib_async(void *____arg);
 static void pragma276_hclib_async(void *____arg);
 static void pragma287_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
-    float **BENCH;
     int ii;
     int jj;
     int kk;
+    float **BENCH;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
 {
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
@@ -295,10 +296,10 @@ hclib_start_finish(); for (kk=0; kk<bots_arg_size; kk++)
          {
  { 
 pragma268 *ctx = (pragma268 *)malloc(sizeof(pragma268));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma268_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          }
@@ -307,10 +308,10 @@ hclib_async(pragma268_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
          {
  { 
 pragma276 *ctx = (pragma276 *)malloc(sizeof(pragma276));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma276_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
          }
@@ -322,10 +323,10 @@ hclib_async(pragma276_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
                {
  { 
 pragma287 *ctx = (pragma287 *)malloc(sizeof(pragma287));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_async(pragma287_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
                }
@@ -339,43 +340,46 @@ void sparselu_par_call(float **BENCH)
    int ii, jj, kk;
  
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->BENCH = BENCH;
 ctx->ii = ii;
 ctx->jj = jj;
 ctx->kk = kk;
+ctx->BENCH = BENCH;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 
-}  static void pragma268_hclib_async(void *____arg) {
+}  
+static void pragma268_hclib_async(void *____arg) {
     pragma268 *ctx = (pragma268 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
             fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
              } ;     ; hclib_end_finish();
 }
 
+
 static void pragma276_hclib_async(void *____arg) {
     pragma276 *ctx = (pragma276 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
             bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
              } ;     ; hclib_end_finish();
 }
 
+
 static void pragma287_hclib_async(void *____arg) {
     pragma287 *ctx = (pragma287 *)____arg;
-    float **BENCH; BENCH = ctx->BENCH;
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
+    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
                      if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();

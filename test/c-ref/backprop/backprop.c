@@ -234,14 +234,14 @@ int n_in, n_hidden, n_out;
 
 
 typedef struct _pragma246 {
+    float sum;
+    int j;
+    int k;
     float *l1;
     float *l2;
     float **conn;
     int n1;
     int n2;
-    float sum;
-    int j;
-    int k;
     pthread_mutex_t reduction_mutex;
  } pragma246;
 
@@ -257,14 +257,14 @@ int n1, n2;
   l1[0] = 1.0;
  { 
 pragma246 *ctx = (pragma246 *)malloc(sizeof(pragma246));
+ctx->sum = sum;
+ctx->j = j;
+ctx->k = k;
 ctx->l1 = l1;
 ctx->l2 = l2;
 ctx->conn = conn;
 ctx->n1 = n1;
 ctx->n2 = n2;
-ctx->sum = sum;
-ctx->j = j;
-ctx->k = k;
 ctx->sum = 0;
 const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);
 assert(init_err == 0);
@@ -278,16 +278,17 @@ hclib_future_wait(fut);
 free(ctx);
 sum = ctx->sum;
  } 
-} static void pragma246_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma246_hclib_async(void *____arg, const int ___iter0) {
     pragma246 *ctx = (pragma246 *)____arg;
+    float sum; sum = ctx->sum;
+    int j; j = ctx->j;
+    int k; k = ctx->k;
     float *l1; l1 = ctx->l1;
     float *l2; l2 = ctx->l2;
     float **conn; conn = ctx->conn;
     int n1; n1 = ctx->n1;
     int n2; n2 = ctx->n2;
-    float sum; sum = ctx->sum;
-    int j; j = ctx->j;
-    int k; k = ctx->k;
     hclib_start_finish();
     do {
     j = ___iter0;
@@ -356,15 +357,15 @@ int nh, no;
 
 
 typedef struct _pragma313 {
+    float new_dw;
+    int k;
+    int j;
     float *delta;
     int ndelta;
     float *ly;
     int nly;
     float **w;
     float **oldw;
-    float new_dw;
-    int k;
-    int j;
  } pragma313;
 
 static void pragma313_hclib_async(void *____arg, const int ___iter0);
@@ -379,15 +380,15 @@ float *delta, *ly, **w, **oldw;
 
  { 
 pragma313 *ctx = (pragma313 *)malloc(sizeof(pragma313));
+ctx->new_dw = new_dw;
+ctx->k = k;
+ctx->j = j;
 ctx->delta = delta;
 ctx->ndelta = ndelta;
 ctx->ly = ly;
 ctx->nly = nly;
 ctx->w = w;
 ctx->oldw = oldw;
-ctx->new_dw = new_dw;
-ctx->k = k;
-ctx->j = j;
 hclib_loop_domain_t domain[1];
 domain[0].low = 1;
 domain[0].high = (ndelta) + 1;
@@ -397,17 +398,18 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma313_hclib_async, ctx, 
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma313_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma313_hclib_async(void *____arg, const int ___iter0) {
     pragma313 *ctx = (pragma313 *)____arg;
+    float new_dw; new_dw = ctx->new_dw;
+    int k; k = ctx->k;
+    int j; j = ctx->j;
     float *delta; delta = ctx->delta;
     int ndelta; ndelta = ctx->ndelta;
     float *ly; ly = ctx->ly;
     int nly; nly = ctx->nly;
     float **w; w = ctx->w;
     float **oldw; oldw = ctx->oldw;
-    float new_dw; new_dw = ctx->new_dw;
-    int k; k = ctx->k;
-    int j; j = ctx->j;
     hclib_start_finish();
     do {
     j = ___iter0;
@@ -447,6 +449,7 @@ typedef struct _main_entrypoint_ctx {
     float *eo;
     float *eh;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;

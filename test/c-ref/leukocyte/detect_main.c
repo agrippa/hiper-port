@@ -5,8 +5,6 @@
 int omp_num_threads = 1;
 
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     long long program_start_time;
     int num_frames;
     char *video_file_name;
@@ -40,12 +38,13 @@ typedef struct _main_entrypoint_ctx {
     MAT *image_chopped;
     MAT *grad_x;
     MAT *grad_y;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     long long program_start_time; program_start_time = ctx->program_start_time;
     int num_frames; num_frames = ctx->num_frames;
     char *video_file_name; video_file_name = ctx->video_file_name;
@@ -79,6 +78,8 @@ static void main_entrypoint(void *____arg) {
     MAT *image_chopped; image_chopped = ctx->image_chopped;
     MAT *grad_x; grad_x = ctx->grad_x;
     MAT *grad_y; grad_y = ctx->grad_y;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 {
 	// Get GICOV matrix corresponding to image gradients
 	long long GICOV_start_time = get_time();
@@ -340,8 +341,6 @@ int main(int argc, char ** argv) {
 	
 	m_free(image_chopped);
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->program_start_time = program_start_time;
 ctx->num_frames = num_frames;
 ctx->video_file_name = video_file_name;
@@ -375,6 +374,8 @@ ctx->b = b;
 ctx->image_chopped = image_chopped;
 ctx->grad_x = grad_x;
 ctx->grad_y = grad_y;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 

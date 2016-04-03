@@ -94,23 +94,23 @@ void usage(int argc, char **argv)
 }
 
 typedef struct _pragma102 {
+    int blk;
     int *input_itemsets;
     int *output_itemsets;
     int *referrence;
     int max_rows;
     int max_cols;
     int penalty;
-    int blk;
  } pragma102;
 
 typedef struct _pragma154 {
+    int blk;
     int *input_itemsets;
     int *output_itemsets;
     int *referrence;
     int max_rows;
     int max_cols;
     int penalty;
-    int blk;
  } pragma154;
 
 static void pragma102_hclib_async(void *____arg, const int ___iter0);
@@ -122,13 +122,13 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
     {
  { 
 pragma102 *ctx = (pragma102 *)malloc(sizeof(pragma102));
+ctx->blk = blk;
 ctx->input_itemsets = input_itemsets;
 ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
 ctx->max_rows = max_rows;
 ctx->max_cols = max_cols;
 ctx->penalty = penalty;
-ctx->blk = blk;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = blk;
@@ -146,13 +146,13 @@ free(ctx);
     {
  { 
 pragma154 *ctx = (pragma154 *)malloc(sizeof(pragma154));
+ctx->blk = blk;
 ctx->input_itemsets = input_itemsets;
 ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
 ctx->max_rows = max_rows;
 ctx->max_cols = max_cols;
 ctx->penalty = penalty;
-ctx->blk = blk;
 hclib_loop_domain_t domain[1];
 domain[0].low = blk - 1;
 domain[0].high = (max_cols - 1) / 16;
@@ -164,15 +164,16 @@ free(ctx);
  } 
     }
 
-} static void pragma102_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma102_hclib_async(void *____arg, const int ___iter0) {
     pragma102 *ctx = (pragma102 *)____arg;
+    int blk; blk = ctx->blk;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
     int *referrence; referrence = ctx->referrence;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
-    int blk; blk = ctx->blk;
     hclib_start_finish();
     do {
     int b_index_x;     b_index_x = ___iter0;
@@ -223,15 +224,16 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
     ; hclib_end_finish();
 }
 
+
 static void pragma154_hclib_async(void *____arg, const int ___iter0) {
     pragma154 *ctx = (pragma154 *)____arg;
+    int blk; blk = ctx->blk;
     int *input_itemsets; input_itemsets = ctx->input_itemsets;
     int *output_itemsets; output_itemsets = ctx->output_itemsets;
     int *referrence; referrence = ctx->referrence;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
-    int blk; blk = ctx->blk;
     hclib_start_finish();
     do {
     int b_index_x;     b_index_x = ___iter0;
@@ -288,8 +290,6 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 //! Run a simple test for CUDA
 ////////////////////////////////////////////////////////////////////////////////
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     int max_rows;
     int max_cols;
     int penalty;
@@ -298,12 +298,13 @@ typedef struct _main_entrypoint_ctx {
     int *referrence;
     int omp_num_threads;
     long long start_time;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
@@ -312,6 +313,8 @@ static void main_entrypoint(void *____arg) {
     int *referrence; referrence = ctx->referrence;
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
     long long start_time; start_time = ctx->start_time;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 nw_optimized( input_itemsets, output_itemsets, referrence,
         max_rows, max_cols, penalty ) ; }
 
@@ -384,8 +387,6 @@ runTest( int argc, char** argv)
     long long start_time = get_time();
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->max_rows = max_rows;
 ctx->max_cols = max_cols;
 ctx->penalty = penalty;
@@ -394,6 +395,8 @@ ctx->output_itemsets = output_itemsets;
 ctx->referrence = referrence;
 ctx->omp_num_threads = omp_num_threads;
 ctx->start_time = start_time;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 ;

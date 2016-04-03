@@ -72,7 +72,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma55_hclib_async, ctx, N
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma55_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma55_hclib_async(void *____arg, const int ___iter0) {
     pragma55 *ctx = (pragma55 *)____arg;
     double *dst; dst = ctx->dst;
     double *src; src = ctx->src;
@@ -149,7 +150,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, ctx, 
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma104_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma104_hclib_async(void *____arg, const int ___iter0) {
     pragma104 *ctx = (pragma104 *)____arg;
     int nelr; nelr = ctx->nelr;
     double *variables; variables = ctx->variables;
@@ -233,7 +235,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma157_hclib_async, ctx, 
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma157_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma157_hclib_async(void *____arg, const int ___iter0) {
     pragma157 *ctx = (pragma157 *)____arg;
     int nelr; nelr = ctx->nelr;
     double *variables; variables = ctx->variables;
@@ -271,12 +274,12 @@ free(ctx);
 */
 
 typedef struct _pragma188 {
+    double smoothing_coefficient;
     int nelr;
     int *elements_surrounding_elements;
     double *normals;
     double *variables;
     double *fluxes;
-    double smoothing_coefficient;
  } pragma188;
 
 static void pragma188_hclib_async(void *____arg, const int ___iter0);
@@ -286,12 +289,12 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 
  { 
 pragma188 *ctx = (pragma188 *)malloc(sizeof(pragma188));
+ctx->smoothing_coefficient = smoothing_coefficient;
 ctx->nelr = nelr;
 ctx->elements_surrounding_elements = elements_surrounding_elements;
 ctx->normals = normals;
 ctx->variables = variables;
 ctx->fluxes = fluxes;
-ctx->smoothing_coefficient = smoothing_coefficient;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nelr;
@@ -301,14 +304,15 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, ctx, 
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma188_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma188_hclib_async(void *____arg, const int ___iter0) {
     pragma188 *ctx = (pragma188 *)____arg;
+    double smoothing_coefficient; smoothing_coefficient = ctx->smoothing_coefficient;
     int nelr; nelr = ctx->nelr;
     int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
     double *normals; normals = ctx->normals;
     double *variables; variables = ctx->variables;
     double *fluxes; fluxes = ctx->fluxes;
-    double smoothing_coefficient; smoothing_coefficient = ctx->smoothing_coefficient;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
@@ -471,7 +475,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma319_hclib_async, ctx, 
 hclib_future_wait(fut);
 free(ctx);
  } 
-} static void pragma319_hclib_async(void *____arg, const int ___iter0) {
+} 
+static void pragma319_hclib_async(void *____arg, const int ___iter0) {
     pragma319 *ctx = (pragma319 *)____arg;
     int j; j = ctx->j;
     int nelr; nelr = ctx->nelr;
@@ -499,8 +504,6 @@ free(ctx);
  * Main function
  */
 typedef struct _main_entrypoint_ctx {
-    int argc;
-    char **argv;
     const char *data_file_name;
     int nel;
     int nelr;
@@ -511,12 +514,13 @@ typedef struct _main_entrypoint_ctx {
     double *old_variables;
     double *fluxes;
     double *step_factors;
+    int argc;
+    char **argv;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
     const char *data_file_name; data_file_name = ctx->data_file_name;
     int nel; nel = ctx->nel;
     int nelr; nelr = ctx->nelr;
@@ -527,6 +531,8 @@ static void main_entrypoint(void *____arg) {
     double *old_variables; old_variables = ctx->old_variables;
     double *fluxes; fluxes = ctx->fluxes;
     double *step_factors; step_factors = ctx->step_factors;
+    int argc; argc = ctx->argc;
+    char **argv; argv = ctx->argv;
 for(int i = 0; i < iterations; i++)
 	{
 		copy<double>(old_variables, variables, nelr*NVAR);
@@ -638,8 +644,6 @@ int main(int argc, char** argv)
 	std::cout << "Starting..." << std::endl;
 
 main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->argc = argc;
-ctx->argv = argv;
 ctx->data_file_name = data_file_name;
 ctx->nel = nel;
 ctx->nelr = nelr;
@@ -650,6 +654,8 @@ ctx->variables = variables;
 ctx->old_variables = old_variables;
 ctx->fluxes = fluxes;
 ctx->step_factors = step_factors;
+ctx->argc = argc;
+ctx->argv = argv;
 hclib_launch(main_entrypoint, ctx);
 free(ctx);
 

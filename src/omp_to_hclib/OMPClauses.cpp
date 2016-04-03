@@ -10,11 +10,12 @@ OMPClauses::OMPClauses(std::string clauses) {
     std::vector<std::string> split_clauses;
     std::stringstream acc;
     int paren_depth = 0;
+    int brace_depth = 0;
     int start = 0;
     int index = 0;
 
     while (index < clauses.size()) {
-        if (clauses[index] == ' ' && paren_depth == 0) {
+        if (clauses[index] == ' ' && paren_depth == 0 && brace_depth == 0) {
             int seek = index;
             while (seek < clauses.size() && clauses[seek] == ' ') seek++;
             if (seek < clauses.size() && clauses[seek] == '(') {
@@ -31,6 +32,8 @@ OMPClauses::OMPClauses(std::string clauses) {
         } else {
             if (clauses[index] == '(') paren_depth++;
             else if (clauses[index] == ')') paren_depth--;
+            else if (clauses[index] == '[') brace_depth++;
+            else if (clauses[index] == ']') brace_depth--;
             index++;
         }
     }

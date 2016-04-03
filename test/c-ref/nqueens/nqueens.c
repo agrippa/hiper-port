@@ -319,13 +319,13 @@ hclib_pragma_marker("omp", "taskwait");
 
 #ifndef FORCE_TIED_TASKS
 typedef struct _pragma352 {
+    int *csols;
+    int i;
     int n;
     int j;
     char *a;
     int *solutions;
     int depth;
-    int *csols;
-    int i;
  } pragma352;
 
 static void pragma352_hclib_async(void *____arg);
@@ -361,13 +361,13 @@ void nqueens(int n, int j, char *a, int depth)
 	for (i = 0; i < n; i++) {
  { 
 pragma352 *ctx = (pragma352 *)malloc(sizeof(pragma352));
+ctx->csols = csols;
+ctx->i = i;
 ctx->n = n;
 ctx->j = j;
 ctx->a = a;
 ctx->solutions = solutions;
 ctx->depth = depth;
-ctx->csols = csols;
-ctx->i = i;
 hclib_async(pragma352_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
 	}
@@ -376,15 +376,16 @@ hclib_async(pragma352_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 #ifndef FORCE_TIED_TASKS
 	for ( i = 0; i < n; i++) *solutions += csols[i];
 #endif
-} static void pragma352_hclib_async(void *____arg) {
+} 
+static void pragma352_hclib_async(void *____arg) {
     pragma352 *ctx = (pragma352 *)____arg;
+    int *csols; csols = ctx->csols;
+    int i; i = ctx->i;
     int n; n = ctx->n;
     int j; j = ctx->j;
     char *a; a = ctx->a;
     int *solutions; solutions = ctx->solutions;
     int depth; depth = ctx->depth;
-    int *csols; csols = ctx->csols;
-    int i; i = ctx->i;
     hclib_start_finish();
 {
 	  		/* allocate a temporary array and copy <a> into it */
@@ -407,6 +408,7 @@ hclib_async(pragma352_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 typedef struct _main_entrypoint_ctx {
     int size;
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;

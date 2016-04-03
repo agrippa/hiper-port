@@ -508,11 +508,6 @@ return nnc+nnl;
 #else
 
 typedef struct _pragma526 {
-    int id;
-    int *FOOTPRINT;
-    char *BOARD;
-    struct cell *CELLS;
-    int dummy_level;
     int i;
     int j;
     int nn;
@@ -522,6 +517,11 @@ typedef struct _pragma526 {
     char board[4096];
     int footprint[2];
     int NWS[64][2];
+    int id;
+    int *FOOTPRINT;
+    char *BOARD;
+    struct cell *CELLS;
+    int dummy_level;
  } pragma526;
 
 static void pragma526_hclib_async(void *____arg);
@@ -542,11 +542,6 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
       for (j = 0; j < nn; j++) {
  { 
 pragma526 *ctx = (pragma526 *)malloc(sizeof(pragma526));
-ctx->id = id;
-ctx->FOOTPRINT = FOOTPRINT;
-ctx->BOARD = BOARD;
-ctx->CELLS = CELLS;
-ctx->dummy_level = dummy_level;
 ctx->i = i;
 ctx->j = j;
 ctx->nn = nn;
@@ -556,19 +551,20 @@ ctx->nnl = nnl;
 memcpy(ctx->board, board, 4096 * (sizeof(char))); 
 memcpy(ctx->footprint, footprint, 2 * (sizeof(int))); 
 memcpy(ctx->NWS, NWS, 64 * (2 * (sizeof(int)))); 
+ctx->id = id;
+ctx->FOOTPRINT = FOOTPRINT;
+ctx->BOARD = BOARD;
+ctx->CELLS = CELLS;
+ctx->dummy_level = dummy_level;
 hclib_async(pragma526_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } 
       }
 }
  hclib_end_finish(); hclib_start_finish(); ;
 return nnc+nnl;
-} static void pragma526_hclib_async(void *____arg) {
+} 
+static void pragma526_hclib_async(void *____arg) {
     pragma526 *ctx = (pragma526 *)____arg;
-    int id; id = ctx->id;
-    int *FOOTPRINT; FOOTPRINT = ctx->FOOTPRINT;
-    char *BOARD; BOARD = ctx->BOARD;
-    struct cell *CELLS; CELLS = ctx->CELLS;
-    int dummy_level; dummy_level = ctx->dummy_level;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nn; nn = ctx->nn;
@@ -578,6 +574,11 @@ return nnc+nnl;
     char board[4096]; memcpy(board, ctx->board, 4096 * (sizeof(char))); 
     int footprint[2]; memcpy(footprint, ctx->footprint, 2 * (sizeof(int))); 
     int NWS[64][2]; memcpy(NWS, ctx->NWS, 64 * (2 * (sizeof(int)))); 
+    int id; id = ctx->id;
+    int *FOOTPRINT; FOOTPRINT = ctx->FOOTPRINT;
+    char *BOARD; BOARD = ctx->BOARD;
+    struct cell *CELLS; CELLS = ctx->CELLS;
+    int dummy_level; dummy_level = ctx->dummy_level;
     hclib_start_finish();
 {
 	  struct cell cells[N+1];
@@ -657,6 +658,7 @@ void floorplan_init (char *filename)
 
 typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
+
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
