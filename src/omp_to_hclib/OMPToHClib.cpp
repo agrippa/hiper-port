@@ -881,7 +881,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 insertLoc = func->getPrimaryTemplate()->getLocStart();
             }
 
-            bool failed = rewriter->InsertText(insertLoc,
+            clang::SourceLocation insertLocation = func->getLocStart();
+            if (func->getTemplatedKind() == clang::FunctionDecl::TemplatedKind::TK_FunctionTemplateSpecialization) {
+                insertLocation = func->getPrimaryTemplate()->getLocStart();
+            }
+
+            bool failed = rewriter->InsertText(insertLocation,
                     accumulatedStructDefs + accumulatedKernelDecls, true, true);
             assert(!failed);
             failed = rewriter->ReplaceText(func->getLocEnd(), 1,
