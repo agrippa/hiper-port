@@ -17,9 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef _OPENMP
 #include <omp.h>
-#endif
 
 #ifdef PLASMA_EZTRACE
 #include <eztrace.h>

@@ -5,9 +5,7 @@
 #include <float.h>
 #include <math.h>
 
-#ifdef _OPENMP
 #  include <omp.h>
-#endif
 
 #include "main.h"
 
@@ -146,11 +144,6 @@ int main(int argc, char* argv[])
     parse(argc, argv, &params);
 
 // get Number of thread if OpenMP is activated
-#ifdef _OPENMP
-hclib_pragma_marker("omp", "parallel");
-hclib_pragma_marker("omp", "master");
-    num_threads = omp_get_num_threads();
-#endif
 
     // warmup
     run(&params);

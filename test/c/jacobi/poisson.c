@@ -85,9 +85,9 @@ double run(struct user_parameters* params)
     int jj,j;
     int nx = matrix_size;
     int ny = matrix_size;
-    double *f = malloc(nx * nx * sizeof(double));
-    double *u = malloc(nx * nx * sizeof(double));
-    double *unew = malloc(nx * ny * sizeof(double));
+    double *f = (double *)malloc(nx * nx * sizeof(double));
+    double *u = (double *)malloc(nx * nx * sizeof(double));
+    double *unew = (double *)malloc(nx * ny * sizeof(double));
 
     /* test if valid */
     if ( (nx % block_size) || (ny % block_size) )
@@ -139,7 +139,7 @@ double run(struct user_parameters* params)
     if(params->check) {
         double x;
         double y;
-        double *udiff = malloc(nx * ny * sizeof(double));
+        double *udiff = (double *)malloc(nx * ny * sizeof(double));
         /// CHECK OUTPUT
         // Check for convergence.
         for (j = 0; j < ny; j++) {
