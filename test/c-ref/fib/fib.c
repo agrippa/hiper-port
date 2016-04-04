@@ -36,104 +36,46 @@ long long fib_seq (int n)
 	return x + y;
 }
 
-#if defined(IF_CUTOFF)
 
-long long fib (int n,int d)
-{
-	long long x, y;
-	if (n < 2) return n;
-
-hclib_pragma_marker("omp", "task untied shared(x) firstprivate(n) if(d < bots_cutoff_value)");
-	x = fib(n - 1,d+1);
-
-hclib_pragma_marker("omp", "task untied shared(y) firstprivate(n) if(d < bots_cutoff_value)");
-	y = fib(n - 2,d+1);
-
-hclib_pragma_marker("omp", "taskwait");
-	return x + y;
-}
-
-#elif defined(FINAL_CUTOFF)
-
-long long fib (int n,int d)
-{
-	long long x, y;
-	if (n < 2) return n;
-
-hclib_pragma_marker("omp", "task untied shared(x) firstprivate(n) final(d+1 >= bots_cutoff_value) mergeable");
-	x = fib(n - 1,d+1);
-
-hclib_pragma_marker("omp", "task untied shared(y) firstprivate(n) final(d+1 >= bots_cutoff_value) mergeable");
-	y = fib(n - 2,d+1);
-
-hclib_pragma_marker("omp", "taskwait");
-	return x + y;
-}
-
-#elif defined(MANUAL_CUTOFF)
-
-long long fib (int n, int d)
-{
-	long long x, y;
-	if (n < 2) return n;
-
-	if ( d < bots_cutoff_value ) {
-hclib_pragma_marker("omp", "task untied shared(x) firstprivate(n)");
-		x = fib(n - 1,d+1);
-
-hclib_pragma_marker("omp", "task untied shared(y) firstprivate(n)");
-		y = fib(n - 2,d+1);
-
-hclib_pragma_marker("omp", "taskwait");
-	} else {
-		x = fib_seq(n-1);
-		y = fib_seq(n-2);
-	}
-
-	return x + y;
-}
-
-#else
-
-typedef struct _pragma104 {
+typedef struct _pragma46 {
     long long x;
     long long y;
     int n;
- } pragma104;
+ } pragma46;
 
-typedef struct _pragma106 {
+typedef struct _pragma48 {
     long long x;
     long long y;
     int n;
- } pragma106;
+ } pragma48;
 
-static void pragma104_hclib_async(void *____arg);
-static void pragma106_hclib_async(void *____arg);
+static void pragma46_hclib_async(void *____arg);
+static void pragma48_hclib_async(void *____arg);
 long long fib (int n)
 {
 	long long x, y;
 	if (n < 2) return n;
 
  { 
-pragma104 *ctx = (pragma104 *)malloc(sizeof(pragma104));
+pragma46 *ctx = (pragma46 *)malloc(sizeof(pragma46));
 ctx->x = x;
 ctx->y = y;
 ctx->n = n;
-hclib_async(pragma104_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma46_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma106 *ctx = (pragma106 *)malloc(sizeof(pragma106));
+pragma48 *ctx = (pragma48 *)malloc(sizeof(pragma48));
 ctx->x = x;
 ctx->y = y;
 ctx->n = n;
-hclib_async(pragma106_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma48_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
 } 
-static void pragma104_hclib_async(void *____arg) {
-    pragma104 *ctx = (pragma104 *)____arg;
+static void pragma46_hclib_async(void *____arg) {
+    pragma46 *ctx = (pragma46 *)____arg;
     long long x; x = ctx->x;
     long long y; y = ctx->y;
     int n; n = ctx->n;
@@ -142,8 +84,8 @@ x = fib(n - 1) ;     ; hclib_end_finish();
 }
 
 
-static void pragma106_hclib_async(void *____arg) {
-    pragma106 *ctx = (pragma106 *)____arg;
+static void pragma48_hclib_async(void *____arg) {
+    pragma48 *ctx = (pragma48 *)____arg;
     long long x; x = ctx->x;
     long long y; y = ctx->y;
     int n; n = ctx->n;
@@ -153,7 +95,6 @@ y = fib(n - 2) ;     ; hclib_end_finish();
 
 
 
-#endif
 
 static long long par_res, seq_res;
 

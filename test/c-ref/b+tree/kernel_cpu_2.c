@@ -36,7 +36,7 @@
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma94 {
+typedef struct _pragma93 {
     int thid;
     int bid;
     long long time0;
@@ -58,101 +58,9 @@ typedef struct _pragma94 {
     int *end;
     int *recstart;
     int *reclength;
- } pragma94;
+ } pragma93;
 
-static void pragma94_hclib_async(void *____arg, const int ___iter0);
-typedef struct _main_entrypoint_ctx {
-    long long time0;
-    long long time1;
-    long long time2;
-    int i;
-    int threadsPerBlock;
-    int cores_arg;
-    knode *knodes;
-    long knodes_elem;
-    int order;
-    long maxheight;
-    int count;
-    long *currKnode;
-    long *offset;
-    long *lastKnode;
-    long *offset_2;
-    int *start;
-    int *end;
-    int *recstart;
-    int *reclength;
- } main_entrypoint_ctx;
-
-
-static void main_entrypoint(void *____arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    int i; i = ctx->i;
-    int threadsPerBlock; threadsPerBlock = ctx->threadsPerBlock;
-    int cores_arg; cores_arg = ctx->cores_arg;
-    knode *knodes; knodes = ctx->knodes;
-    long knodes_elem; knodes_elem = ctx->knodes_elem;
-    int order; order = ctx->order;
-    long maxheight; maxheight = ctx->maxheight;
-    int count; count = ctx->count;
-    long *currKnode; currKnode = ctx->currKnode;
-    long *offset; offset = ctx->offset;
-    long *lastKnode; lastKnode = ctx->lastKnode;
-    long *offset_2; offset_2 = ctx->offset_2;
-    int *start; start = ctx->start;
-    int *end; end = ctx->end;
-    int *recstart; recstart = ctx->recstart;
-    int *reclength; reclength = ctx->reclength;
-{
-	time1 = get_time();
-
-	//======================================================================================================================================================150
-	//	PROCESS INTERACTIONS
-	//======================================================================================================================================================150
-
-	// private thread IDs
-	int thid;
-	int bid;
-
-	// process number of querries
- { 
-pragma94 *ctx = (pragma94 *)malloc(sizeof(pragma94));
-ctx->thid = thid;
-ctx->bid = bid;
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->i = i;
-ctx->threadsPerBlock = threadsPerBlock;
-ctx->cores_arg = cores_arg;
-ctx->knodes = knodes;
-ctx->knodes_elem = knodes_elem;
-ctx->order = order;
-ctx->maxheight = maxheight;
-ctx->count = count;
-ctx->currKnode = currKnode;
-ctx->offset = offset;
-ctx->lastKnode = lastKnode;
-ctx->offset_2 = offset_2;
-ctx->start = start;
-ctx->end = end;
-ctx->recstart = recstart;
-ctx->reclength = reclength;
-hclib_loop_domain_t domain[1];
-domain[0].low = 0;
-domain[0].high = count;
-domain[0].stride = 1;
-domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma94_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
-hclib_future_wait(fut);
-free(ctx);
- } 
-
-	time2 = get_time();
-    } ; }
-
+static void pragma93_hclib_async(void *____arg, const int ___iter0);
 void 
 kernel_cpu_2(	int cores_arg,
 
@@ -194,7 +102,22 @@ kernel_cpu_2(	int cores_arg,
 	int threadsPerBlock;
 	threadsPerBlock = order < 1024 ? order : 1024;
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+    {
+	time1 = get_time();
+
+	//======================================================================================================================================================150
+	//	PROCESS INTERACTIONS
+	//======================================================================================================================================================150
+
+	// private thread IDs
+	int thid;
+	int bid;
+
+	// process number of querries
+ { 
+pragma93 *ctx = (pragma93 *)malloc(sizeof(pragma93));
+ctx->thid = thid;
+ctx->bid = bid;
 ctx->time0 = time0;
 ctx->time1 = time1;
 ctx->time2 = time2;
@@ -214,9 +137,18 @@ ctx->start = start;
 ctx->end = end;
 ctx->recstart = recstart;
 ctx->reclength = reclength;
-hclib_launch(main_entrypoint, ctx);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = count;
+domain[0].stride = 1;
+domain[0].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma93_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
 free(ctx);
+ } 
 
+	time2 = get_time();
+    }
 
 	//======================================================================================================================================================150
 	//	DISPLAY TIMING
@@ -230,9 +162,9 @@ free(ctx);
 	printf("Total time:\n");
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
-}  
-static void pragma94_hclib_async(void *____arg, const int ___iter0) {
-    pragma94 *ctx = (pragma94 *)____arg;
+} 
+static void pragma93_hclib_async(void *____arg, const int ___iter0) {
+    pragma93 *ctx = (pragma93 *)____arg;
     int thid; thid = ctx->thid;
     int bid; bid = ctx->bid;
     long long time0; time0 = ctx->time0;

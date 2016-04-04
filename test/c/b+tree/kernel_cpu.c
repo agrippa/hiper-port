@@ -65,7 +65,6 @@ kernel_cpu(	int cores_arg,
 	int threadsPerBlock;
 	threadsPerBlock = order < 1024 ? order : 1024;
 
-#pragma omp_to_hclib
     {
 
 	time1 = get_time();

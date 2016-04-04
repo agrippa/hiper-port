@@ -15,7 +15,7 @@ struct double3 { double x, y, z; };
  *
  */
 #define GAMMA 1.4
-#define iterations 2000
+#define iterations 5
 
 #define NDIM 3
 #define NNB 4
@@ -338,6 +338,8 @@ int main(int argc, char** argv)
 	}
 	const char* data_file_name = argv[1];
 
+#pragma omp_to_hclib
+    {
 	// set far field conditions
 	{
 		const double angle_of_attack = double(3.1415926535897931 / 180.0) * double(deg_angle_of_attack);
@@ -425,7 +427,6 @@ int main(int argc, char** argv)
 	// these need to be computed the first time in order to compute time step
 	std::cout << "Starting..." << std::endl;
 
-#pragma omp_to_hclib
 	// Begin iterations
 	for(int i = 0; i < iterations; i++)
 	{
@@ -455,6 +456,7 @@ int main(int argc, char** argv)
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
+    }
 
 	std::cout << "Done..." << std::endl;
 

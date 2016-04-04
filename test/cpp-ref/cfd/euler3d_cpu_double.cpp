@@ -16,7 +16,7 @@ struct double3 { double x, y, z; };
  *
  */
 #define GAMMA 1.4
-#define iterations 2000
+#define iterations 5
 
 #define NDIM 3
 #define NNB 4
@@ -505,15 +505,6 @@ static void pragma319_hclib_async(void *____arg, const int ___iter0) {
  */
 typedef struct _main_entrypoint_ctx {
     const char *data_file_name;
-    int nel;
-    int nelr;
-    double *areas;
-    int *elements_surrounding_elements;
-    double *normals;
-    double *variables;
-    double *old_variables;
-    double *fluxes;
-    double *step_factors;
     int argc;
     char **argv;
  } main_entrypoint_ctx;
@@ -522,40 +513,9 @@ typedef struct _main_entrypoint_ctx {
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     const char *data_file_name; data_file_name = ctx->data_file_name;
-    int nel; nel = ctx->nel;
-    int nelr; nelr = ctx->nelr;
-    double *areas; areas = ctx->areas;
-    int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
-    double *normals; normals = ctx->normals;
-    double *variables; variables = ctx->variables;
-    double *old_variables; old_variables = ctx->old_variables;
-    double *fluxes; fluxes = ctx->fluxes;
-    double *step_factors; step_factors = ctx->step_factors;
     int argc; argc = ctx->argc;
     char **argv; argv = ctx->argv;
-for(int i = 0; i < iterations; i++)
-	{
-		copy<double>(old_variables, variables, nelr*NVAR);
-
-		// for the first iteration we compute the time step
-		compute_step_factor(nelr, variables, areas, step_factors);
-
-		for(int j = 0; j < RK; j++)
-		{
-			compute_flux(nelr, elements_surrounding_elements, normals, variables, fluxes);
-			time_step(j, nelr, old_variables, variables, step_factors, fluxes);
-		}
-	} ; }
-
-int main(int argc, char** argv)
 {
-	if (argc < 2)
-	{
-		std::cout << "specify data file name" << std::endl;
-		return 0;
-	}
-	const char* data_file_name = argv[1];
-
 	// set far field conditions
 	{
 		const double angle_of_attack = double(3.1415926535897931 / 180.0) * double(deg_angle_of_attack);
@@ -643,22 +603,20 @@ int main(int argc, char** argv)
 	// these need to be computed the first time in order to compute time step
 	std::cout << "Starting..." << std::endl;
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->data_file_name = data_file_name;
-ctx->nel = nel;
-ctx->nelr = nelr;
-ctx->areas = areas;
-ctx->elements_surrounding_elements = elements_surrounding_elements;
-ctx->normals = normals;
-ctx->variables = variables;
-ctx->old_variables = old_variables;
-ctx->fluxes = fluxes;
-ctx->step_factors = step_factors;
-ctx->argc = argc;
-ctx->argv = argv;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+	// Begin iterations
+	for(int i = 0; i < iterations; i++)
+	{
+		copy<double>(old_variables, variables, nelr*NVAR);
 
+		// for the first iteration we compute the time step
+		compute_step_factor(nelr, variables, areas, step_factors);
+
+		for(int j = 0; j < RK; j++)
+		{
+			compute_flux(nelr, elements_surrounding_elements, normals, variables, fluxes);
+			time_step(j, nelr, old_variables, variables, step_factors, fluxes);
+		}
+	}
 
 	std::cout << "Saving solution..." << std::endl;
 	dump(variables, nel, nelr);
@@ -674,6 +632,24 @@ free(ctx);
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
+    } ; }
+
+int main(int argc, char** argv)
+{
+	if (argc < 2)
+	{
+		std::cout << "specify data file name" << std::endl;
+		return 0;
+	}
+	const char* data_file_name = argv[1];
+
+main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+ctx->data_file_name = data_file_name;
+ctx->argc = argc;
+ctx->argv = argv;
+hclib_launch(main_entrypoint, ctx);
+free(ctx);
+
 
 	std::cout << "Done..." << std::endl;
 
