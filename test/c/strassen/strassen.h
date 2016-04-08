@@ -43,7 +43,7 @@
  * between two rows. This macro produces the element A[i,j]
  * given A, an, i and j
  **********************************************************************/
-#define ELEM(A, an, i, j) (A[(i)*(an)+(j)])
+inline REAL ELEM(REAL *A, int an, int i, int j) { return (A[(i)*(an)+(j)]); }
 
 void matrixmul(int n, REAL *A, int an, REAL *B, int bn, REAL *C, int cn);
 void FastNaiveMatrixMultiply(REAL *C, REAL *A, REAL *B, unsigned MatrixSize,

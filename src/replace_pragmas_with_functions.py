@@ -12,7 +12,7 @@ while len(line) > 0:
         # should check for this scenario in the transform
         acc = ''
         while stripped.endswith('\\'):
-            acc += stripped[0:len(stripped) - 1]
+            acc += stripped[0:len(stripped) - 1] + ' '
             line = sys.stdin.readline()
             stripped = line.strip()
         acc += stripped

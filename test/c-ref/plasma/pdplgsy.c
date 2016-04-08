@@ -24,15 +24,15 @@
  *  Parallel tile Cholesky factorization - dynamic scheduling
  **/
 typedef struct _pragma43 {
-    double *dA;
-    int m;
-    int n;
-    int ldam;
-    int tempmm;
-    int tempnn;
-    double bump;
-    PLASMA_desc A;
-    unsigned long long seed;
+    double (*(*dA_ptr));
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*ldam_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    double (*bump_ptr);
+    PLASMA_desc (*A_ptr);
+    unsigned long long (*seed_ptr);
  } pragma43;
 
 static void *pragma43_hclib_async(void *____arg);
@@ -53,34 +53,26 @@ void plasma_pdplgsy_quark( double bump, PLASMA_desc A, unsigned long long int se
 omp_set_task_affinity( (n%4)*6+(m%6) );
 #endif
  { 
-pragma43 *ctx = (pragma43 *)malloc(sizeof(pragma43));
-ctx->dA = dA;
-ctx->m = m;
-ctx->n = n;
-ctx->ldam = ldam;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->bump = bump;
-ctx->A = A;
-ctx->seed = seed;
-hclib_emulate_omp_task(pragma43_hclib_async, ctx, ANY_PLACE, 0, 1, (dA) + (0), ldam*tempnn);
+pragma43 *new_ctx = (pragma43 *)malloc(sizeof(pragma43));
+new_ctx->dA_ptr = &(dA);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->bump_ptr = &(bump);
+new_ctx->A_ptr = &(A);
+new_ctx->seed_ptr = &(seed);
+hclib_emulate_omp_task(pragma43_hclib_async, new_ctx, ANY_PLACE, 0, 1, (dA) + (0), ldam*tempnn);
  } ;
         }
     }
 } 
 static void *pragma43_hclib_async(void *____arg) {
     pragma43 *ctx = (pragma43 *)____arg;
-    double *dA; dA = ctx->dA;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int ldam; ldam = ctx->ldam;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    double bump; bump = ctx->bump;
-    PLASMA_desc A; A = ctx->A;
-    unsigned long long seed; seed = ctx->seed;
     hclib_start_finish();
-CORE_dplgsy( bump, tempmm, tempnn, dA, ldam, A.m, m*A.mb, n*A.nb, seed ) ;     ; hclib_end_finish();
+CORE_dplgsy( (*(ctx->bump_ptr)), (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)), (*(ctx->A_ptr)).m, (*(ctx->m_ptr))*(*(ctx->A_ptr)).mb, (*(ctx->n_ptr))*(*(ctx->A_ptr)).nb, (*(ctx->seed_ptr)) ) ;     ; hclib_end_finish();
+
     return NULL;
 }
 

@@ -126,23 +126,23 @@ typedef struct sort_data_t {
 } sort_data_t;
 
 typedef struct _pragma146 {
-    sort_data_t *buf;
-    int index;
-    sort_data_t *in;
-    uint64_t *data;
-    int left;
-    int right;
-    void *arg;
+    sort_data_t (*(*buf_ptr));
+    int (*index_ptr);
+    sort_data_t (*(*in_ptr));
+    uint64_t (*(*data_ptr));
+    int (*left_ptr);
+    int (*right_ptr);
+    void (*(*arg_ptr));
  } pragma146;
 
 typedef struct _pragma156 {
-    sort_data_t *buf;
-    int index;
-    sort_data_t *in;
-    uint64_t *data;
-    int left;
-    int right;
-    void *arg;
+    sort_data_t (*(*buf_ptr));
+    int (*index_ptr);
+    sort_data_t (*(*in_ptr));
+    uint64_t (*(*data_ptr));
+    int (*left_ptr);
+    int (*right_ptr);
+    void (*(*arg_ptr));
  } pragma156;
 
 static void pragma146_hclib_async(void *____arg);
@@ -162,15 +162,15 @@ hclib_start_finish(); {
           buf->left = left;
           buf->right = index - 1; 
  { 
-pragma146 *ctx = (pragma146 *)malloc(sizeof(pragma146));
-ctx->buf = buf;
-ctx->index = index;
-ctx->in = in;
-ctx->data = data;
-ctx->left = left;
-ctx->right = right;
-ctx->arg = arg;
-hclib_async(pragma146_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma146 *new_ctx = (pragma146 *)malloc(sizeof(pragma146));
+new_ctx->buf_ptr = &(buf);
+new_ctx->index_ptr = &(index);
+new_ctx->in_ptr = &(in);
+new_ctx->data_ptr = &(data);
+new_ctx->left_ptr = &(left);
+new_ctx->right_ptr = &(right);
+new_ctx->arg_ptr = &(arg);
+hclib_async(pragma146_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -179,15 +179,15 @@ hclib_async(pragma146_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
           buf->left = index;
           buf->right = right; 
  { 
-pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
-ctx->buf = buf;
-ctx->index = index;
-ctx->in = in;
-ctx->data = data;
-ctx->left = left;
-ctx->right = right;
-ctx->arg = arg;
-hclib_async(pragma156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma156 *new_ctx = (pragma156 *)malloc(sizeof(pragma156));
+new_ctx->buf_ptr = &(buf);
+new_ctx->index_ptr = &(index);
+new_ctx->in_ptr = &(in);
+new_ctx->data_ptr = &(data);
+new_ctx->left_ptr = &(left);
+new_ctx->right_ptr = &(right);
+new_ctx->arg_ptr = &(arg);
+hclib_async(pragma156_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         } ; hclib_end_finish(); 
@@ -200,33 +200,21 @@ hclib_async(pragma156_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 } 
 static void pragma146_hclib_async(void *____arg) {
     pragma146 *ctx = (pragma146 *)____arg;
-    sort_data_t *buf; buf = ctx->buf;
-    int index; index = ctx->index;
-    sort_data_t *in; in = ctx->in;
-    uint64_t *data; data = ctx->data;
-    int left; left = ctx->left;
-    int right; right = ctx->right;
-    void *arg; arg = ctx->arg;
     hclib_start_finish();
 {
-              par_sort(buf);
+              par_sort((*(ctx->buf_ptr)));
           } ;     ; hclib_end_finish();
+
 }
 
 
 static void pragma156_hclib_async(void *____arg) {
     pragma156 *ctx = (pragma156 *)____arg;
-    sort_data_t *buf; buf = ctx->buf;
-    int index; index = ctx->index;
-    sort_data_t *in; in = ctx->in;
-    uint64_t *data; data = ctx->data;
-    int left; left = ctx->left;
-    int right; right = ctx->right;
-    void *arg; arg = ctx->arg;
     hclib_start_finish();
 {
-              par_sort(buf);
+              par_sort((*(ctx->buf_ptr)));
           } ;     ; hclib_end_finish();
+
 }
 
 
@@ -256,17 +244,17 @@ typedef struct _main_entrypoint_ctx {
     int NoElementsToSort;
     int count;
     int temp;
-    uint64_t *Input;
-    uint64_t *InputData;
-    uint64_t *Splitter;
-    uint64_t *AllSplitter;
-    uint64_t *Buckets;
-    uint64_t *BucketBuffer;
-    uint64_t *LocalBucket;
-    uint64_t *OutputBuffer;
-    uint64_t *Output;
+    uint64_t (*Input);
+    uint64_t (*InputData);
+    uint64_t (*Splitter);
+    uint64_t (*AllSplitter);
+    uint64_t (*Buckets);
+    uint64_t (*BucketBuffer);
+    uint64_t (*LocalBucket);
+    uint64_t (*OutputBuffer);
+    uint64_t (*Output);
     int argc;
-    char **argv;
+    char (*(*argv));
  } main_entrypoint_ctx;
 
 
@@ -283,17 +271,17 @@ static void main_entrypoint(void *____arg) {
     int NoElementsToSort; NoElementsToSort = ctx->NoElementsToSort;
     int count; count = ctx->count;
     int temp; temp = ctx->temp;
-    uint64_t *Input; Input = ctx->Input;
-    uint64_t *InputData; InputData = ctx->InputData;
-    uint64_t *Splitter; Splitter = ctx->Splitter;
-    uint64_t *AllSplitter; AllSplitter = ctx->AllSplitter;
-    uint64_t *Buckets; Buckets = ctx->Buckets;
-    uint64_t *BucketBuffer; BucketBuffer = ctx->BucketBuffer;
-    uint64_t *LocalBucket; LocalBucket = ctx->LocalBucket;
-    uint64_t *OutputBuffer; OutputBuffer = ctx->OutputBuffer;
-    uint64_t *Output; Output = ctx->Output;
+    uint64_t (*Input); Input = ctx->Input;
+    uint64_t (*InputData); InputData = ctx->InputData;
+    uint64_t (*Splitter); Splitter = ctx->Splitter;
+    uint64_t (*AllSplitter); AllSplitter = ctx->AllSplitter;
+    uint64_t (*Buckets); Buckets = ctx->Buckets;
+    uint64_t (*BucketBuffer); BucketBuffer = ctx->BucketBuffer;
+    uint64_t (*LocalBucket); LocalBucket = ctx->LocalBucket;
+    uint64_t (*OutputBuffer); OutputBuffer = ctx->OutputBuffer;
+    uint64_t (*Output); Output = ctx->Output;
     int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    char (*(*argv)); argv = ctx->argv;
 sorting(InputData, NoofElements_Bloc) ; }
 
 int main (int argc, char *argv[]) {
@@ -355,31 +343,31 @@ int main (int argc, char *argv[]) {
   }
   shmem_barrier_all();
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->Numprocs = Numprocs;
-ctx->MyRank = MyRank;
-ctx->Root = Root;
-ctx->i = i;
-ctx->j = j;
-ctx->k = k;
-ctx->NoofElements = NoofElements;
-ctx->NoofElements_Bloc = NoofElements_Bloc;
-ctx->NoElementsToSort = NoElementsToSort;
-ctx->count = count;
-ctx->temp = temp;
-ctx->Input = Input;
-ctx->InputData = InputData;
-ctx->Splitter = Splitter;
-ctx->AllSplitter = AllSplitter;
-ctx->Buckets = Buckets;
-ctx->BucketBuffer = BucketBuffer;
-ctx->LocalBucket = LocalBucket;
-ctx->OutputBuffer = OutputBuffer;
-ctx->Output = Output;
-ctx->argc = argc;
-ctx->argv = argv;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->Numprocs = Numprocs;
+new_ctx->MyRank = MyRank;
+new_ctx->Root = Root;
+new_ctx->i = i;
+new_ctx->j = j;
+new_ctx->k = k;
+new_ctx->NoofElements = NoofElements;
+new_ctx->NoofElements_Bloc = NoofElements_Bloc;
+new_ctx->NoElementsToSort = NoElementsToSort;
+new_ctx->count = count;
+new_ctx->temp = temp;
+new_ctx->Input = Input;
+new_ctx->InputData = InputData;
+new_ctx->Splitter = Splitter;
+new_ctx->AllSplitter = AllSplitter;
+new_ctx->Buckets = Buckets;
+new_ctx->BucketBuffer = BucketBuffer;
+new_ctx->LocalBucket = LocalBucket;
+new_ctx->OutputBuffer = OutputBuffer;
+new_ctx->Output = Output;
+new_ctx->argc = argc;
+new_ctx->argv = argv;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 ;
 
   /**** Choosing Local Splitters ****/

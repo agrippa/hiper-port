@@ -42,10 +42,14 @@ class PragmaNode {
 
         const clang::Stmt *getBody();
         const clang::CallExpr *getMarker();
+        std::string getPragmaName();
+        std::string getPragmaArguments();
+        std::string getPragmaCmd();
         std::vector<clang::ValueDecl *> *getCaptures();
         PragmaNode *getParent();
         int nchildren();
         std::vector<PragmaNode *> *getChildren();
+        PragmaNode *getParentAccountForFusing();
 
         void setParent(PragmaNode *parent);
 

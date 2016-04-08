@@ -30,125 +30,125 @@ void CORE_dgetrf_rectil_init(void);
  *  Parallel tile LU factorization - dynamic scheduling - Right looking
  **/
 typedef struct _pragma58 {
-    double *dA;
-    int *dB;
-    PLASMA_desc pDesc;
-    int k;
-    int m;
-    int n;
-    int tempk;
-    int tempm;
-    int tempkm;
-    int tempkn;
-    int tempmm;
-    int tempnn;
-    int ldak;
-    int ldam;
-    double zone;
-    double mzone;
-    void *fakedep;
-    PLASMA_desc A;
-    int *IPIV;
+    double (*(*dA_ptr));
+    int (*(*dB_ptr));
+    PLASMA_desc (*pDesc_ptr);
+    int (*k_ptr);
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*tempk_ptr);
+    int (*tempm_ptr);
+    int (*tempkm_ptr);
+    int (*tempkn_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    int (*ldak_ptr);
+    int (*ldam_ptr);
+    double (*zone_ptr);
+    double (*mzone_ptr);
+    void (*(*fakedep_ptr));
+    PLASMA_desc (*A_ptr);
+    int (*(*IPIV_ptr));
  } pragma58;
 
 typedef struct _pragma81 {
-    PLASMA_desc descA;
-    double *dA;
-    double *dB;
-    int *dipiv;
-    PLASMA_desc pDesc;
-    int k;
-    int m;
-    int n;
-    int tempk;
-    int tempm;
-    int tempkm;
-    int tempkn;
-    int tempmm;
-    int tempnn;
-    int ldak;
-    int ldam;
-    double zone;
-    double mzone;
-    void *fakedep;
-    PLASMA_desc A;
-    int *IPIV;
+    PLASMA_desc (*descA_ptr);
+    double (*(*dA_ptr));
+    double (*(*dB_ptr));
+    int (*(*dipiv_ptr));
+    PLASMA_desc (*pDesc_ptr);
+    int (*k_ptr);
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*tempk_ptr);
+    int (*tempm_ptr);
+    int (*tempkm_ptr);
+    int (*tempkn_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    int (*ldak_ptr);
+    int (*ldam_ptr);
+    double (*zone_ptr);
+    double (*mzone_ptr);
+    void (*(*fakedep_ptr));
+    PLASMA_desc (*A_ptr);
+    int (*(*IPIV_ptr));
  } pragma81;
 
 typedef struct _pragma92 {
-    double *dA;
-    double *dB;
-    double *dC;
-    PLASMA_desc descA;
-    int *dipiv;
-    PLASMA_desc pDesc;
-    int k;
-    int m;
-    int n;
-    int tempk;
-    int tempm;
-    int tempkm;
-    int tempkn;
-    int tempmm;
-    int tempnn;
-    int ldak;
-    int ldam;
-    double zone;
-    double mzone;
-    void *fakedep;
-    PLASMA_desc A;
-    int *IPIV;
+    double (*(*dA_ptr));
+    double (*(*dB_ptr));
+    double (*(*dC_ptr));
+    PLASMA_desc (*descA_ptr);
+    int (*(*dipiv_ptr));
+    PLASMA_desc (*pDesc_ptr);
+    int (*k_ptr);
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*tempk_ptr);
+    int (*tempm_ptr);
+    int (*tempkm_ptr);
+    int (*tempkn_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    int (*ldak_ptr);
+    int (*ldam_ptr);
+    double (*zone_ptr);
+    double (*mzone_ptr);
+    void (*(*fakedep_ptr));
+    PLASMA_desc (*A_ptr);
+    int (*(*IPIV_ptr));
  } pragma92;
 
 typedef struct _pragma118 {
-    double *dA;
-    double *dB;
-    double *dC;
-    double *fake1;
-    double *fake2;
-    PLASMA_desc descA;
-    int *dipiv;
-    PLASMA_desc pDesc;
-    int k;
-    int m;
-    int n;
-    int tempk;
-    int tempm;
-    int tempkm;
-    int tempkn;
-    int tempmm;
-    int tempnn;
-    int ldak;
-    int ldam;
-    double zone;
-    double mzone;
-    void *fakedep;
-    PLASMA_desc A;
-    int *IPIV;
+    double (*(*dA_ptr));
+    double (*(*dB_ptr));
+    double (*(*dC_ptr));
+    double (*(*fake1_ptr));
+    double (*(*fake2_ptr));
+    PLASMA_desc (*descA_ptr);
+    int (*(*dipiv_ptr));
+    PLASMA_desc (*pDesc_ptr);
+    int (*k_ptr);
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*tempk_ptr);
+    int (*tempm_ptr);
+    int (*tempkm_ptr);
+    int (*tempkn_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    int (*ldak_ptr);
+    int (*ldam_ptr);
+    double (*zone_ptr);
+    double (*mzone_ptr);
+    void (*(*fakedep_ptr));
+    PLASMA_desc (*A_ptr);
+    int (*(*IPIV_ptr));
  } pragma118;
 
 typedef struct _pragma156 {
-    double *Aij;
-    double *prevSwap;
-    int *dipiv;
-    PLASMA_desc descA;
-    int mintmp;
-    int k;
-    int m;
-    int n;
-    int tempk;
-    int tempm;
-    int tempkm;
-    int tempkn;
-    int tempmm;
-    int tempnn;
-    int ldak;
-    int ldam;
-    double zone;
-    double mzone;
-    void *fakedep;
-    PLASMA_desc A;
-    int *IPIV;
+    double (*(*Aij_ptr));
+    double (*(*prevSwap_ptr));
+    int (*(*dipiv_ptr));
+    PLASMA_desc (*descA_ptr);
+    int (*mintmp_ptr);
+    int (*k_ptr);
+    int (*m_ptr);
+    int (*n_ptr);
+    int (*tempk_ptr);
+    int (*tempm_ptr);
+    int (*tempkm_ptr);
+    int (*tempkn_ptr);
+    int (*tempmm_ptr);
+    int (*tempnn_ptr);
+    int (*ldak_ptr);
+    int (*ldam_ptr);
+    double (*zone_ptr);
+    double (*mzone_ptr);
+    void (*(*fakedep_ptr));
+    PLASMA_desc (*A_ptr);
+    int (*(*IPIV_ptr));
  } pragma156;
 
 static void *pragma58_hclib_async(void *____arg);
@@ -182,27 +182,27 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
         int *dB = IPIV(k);
         PLASMA_desc pDesc = plasma_desc_submatrix(A, tempk, k*A.nb, tempm, tempkn);
  { 
-pragma58 *ctx = (pragma58 *)malloc(sizeof(pragma58));
-ctx->dA = dA;
-ctx->dB = dB;
-ctx->pDesc = pDesc;
-ctx->k = k;
-ctx->m = m;
-ctx->n = n;
-ctx->tempk = tempk;
-ctx->tempm = tempm;
-ctx->tempkm = tempkm;
-ctx->tempkn = tempkn;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->ldak = ldak;
-ctx->ldam = ldam;
-ctx->zone = zone;
-ctx->mzone = mzone;
-ctx->fakedep = fakedep;
-ctx->A = A;
-ctx->IPIV = IPIV;
-hclib_emulate_omp_task(pragma58_hclib_async, ctx, ANY_PLACE, 1, 2, (dA) + (0), A.mb*A.nb, (dA) + (0), A.mb*A.nb, (dB) + (0), pDesc.n);
+pragma58 *new_ctx = (pragma58 *)malloc(sizeof(pragma58));
+new_ctx->dA_ptr = &(dA);
+new_ctx->dB_ptr = &(dB);
+new_ctx->pDesc_ptr = &(pDesc);
+new_ctx->k_ptr = &(k);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->tempk_ptr = &(tempk);
+new_ctx->tempm_ptr = &(tempm);
+new_ctx->tempkm_ptr = &(tempkm);
+new_ctx->tempkn_ptr = &(tempkn);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->ldak_ptr = &(ldak);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->zone_ptr = &(zone);
+new_ctx->mzone_ptr = &(mzone);
+new_ctx->fakedep_ptr = &(fakedep);
+new_ctx->A_ptr = &(A);
+new_ctx->IPIV_ptr = &(IPIV);
+hclib_emulate_omp_task(pragma58_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), A.mb*A.nb, (dA) + (0), A.mb*A.nb, (dB) + (0), pDesc.n);
  } 
 
         /*
@@ -220,29 +220,29 @@ hclib_emulate_omp_task(pragma58_hclib_async, ctx, ANY_PLACE, 1, 2, (dA) + (0), A
             double *dB = A(k, k);
             int *dipiv = IPIV(k);
  { 
-pragma81 *ctx = (pragma81 *)malloc(sizeof(pragma81));
-ctx->descA = descA;
-ctx->dA = dA;
-ctx->dB = dB;
-ctx->dipiv = dipiv;
-ctx->pDesc = pDesc;
-ctx->k = k;
-ctx->m = m;
-ctx->n = n;
-ctx->tempk = tempk;
-ctx->tempm = tempm;
-ctx->tempkm = tempkm;
-ctx->tempkn = tempkn;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->ldak = ldak;
-ctx->ldam = ldam;
-ctx->zone = zone;
-ctx->mzone = mzone;
-ctx->fakedep = fakedep;
-ctx->A = A;
-ctx->IPIV = IPIV;
-hclib_emulate_omp_task(pragma81_hclib_async, ctx, ANY_PLACE, 3, 1, (dA) + (0), 1, (dB) + (0), ldak, (dipiv) + (0), tempkm, (dA) + (0), 1);
+pragma81 *new_ctx = (pragma81 *)malloc(sizeof(pragma81));
+new_ctx->descA_ptr = &(descA);
+new_ctx->dA_ptr = &(dA);
+new_ctx->dB_ptr = &(dB);
+new_ctx->dipiv_ptr = &(dipiv);
+new_ctx->pDesc_ptr = &(pDesc);
+new_ctx->k_ptr = &(k);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->tempk_ptr = &(tempk);
+new_ctx->tempm_ptr = &(tempm);
+new_ctx->tempkm_ptr = &(tempkm);
+new_ctx->tempkn_ptr = &(tempkn);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->ldak_ptr = &(ldak);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->zone_ptr = &(zone);
+new_ctx->mzone_ptr = &(mzone);
+new_ctx->fakedep_ptr = &(fakedep);
+new_ctx->A_ptr = &(A);
+new_ctx->IPIV_ptr = &(IPIV);
+hclib_emulate_omp_task(pragma81_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), 1, (dB) + (0), ldak, (dipiv) + (0), tempkm, (dA) + (0), 1);
  } ;
 
             m = k+1;
@@ -254,30 +254,30 @@ hclib_emulate_omp_task(pragma81_hclib_async, ctx, ANY_PLACE, 3, 1, (dA) + (0), 1
                 double *dB = A(k , n);
                 double *dC = A(m , n);
  { 
-pragma92 *ctx = (pragma92 *)malloc(sizeof(pragma92));
-ctx->dA = dA;
-ctx->dB = dB;
-ctx->dC = dC;
-ctx->descA = descA;
-ctx->dipiv = dipiv;
-ctx->pDesc = pDesc;
-ctx->k = k;
-ctx->m = m;
-ctx->n = n;
-ctx->tempk = tempk;
-ctx->tempm = tempm;
-ctx->tempkm = tempkm;
-ctx->tempkn = tempkn;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->ldak = ldak;
-ctx->ldam = ldam;
-ctx->zone = zone;
-ctx->mzone = mzone;
-ctx->fakedep = fakedep;
-ctx->A = A;
-ctx->IPIV = IPIV;
-hclib_emulate_omp_task(pragma92_hclib_async, ctx, ANY_PLACE, 3, 1, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb);
+pragma92 *new_ctx = (pragma92 *)malloc(sizeof(pragma92));
+new_ctx->dA_ptr = &(dA);
+new_ctx->dB_ptr = &(dB);
+new_ctx->dC_ptr = &(dC);
+new_ctx->descA_ptr = &(descA);
+new_ctx->dipiv_ptr = &(dipiv);
+new_ctx->pDesc_ptr = &(pDesc);
+new_ctx->k_ptr = &(k);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->tempk_ptr = &(tempk);
+new_ctx->tempm_ptr = &(tempm);
+new_ctx->tempkm_ptr = &(tempkm);
+new_ctx->tempkn_ptr = &(tempkn);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->ldak_ptr = &(ldak);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->zone_ptr = &(zone);
+new_ctx->mzone_ptr = &(mzone);
+new_ctx->fakedep_ptr = &(fakedep);
+new_ctx->A_ptr = &(A);
+new_ctx->IPIV_ptr = &(IPIV);
+hclib_emulate_omp_task(pragma92_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb);
  } ;
 
                 for (m = k+2; m < A.mt; m++)
@@ -300,32 +300,32 @@ hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fak
                                 zone, dC, ldam);
 #else
  { 
-pragma118 *ctx = (pragma118 *)malloc(sizeof(pragma118));
-ctx->dA = dA;
-ctx->dB = dB;
-ctx->dC = dC;
-ctx->fake1 = fake1;
-ctx->fake2 = fake2;
-ctx->descA = descA;
-ctx->dipiv = dipiv;
-ctx->pDesc = pDesc;
-ctx->k = k;
-ctx->m = m;
-ctx->n = n;
-ctx->tempk = tempk;
-ctx->tempm = tempm;
-ctx->tempkm = tempkm;
-ctx->tempkn = tempkn;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->ldak = ldak;
-ctx->ldam = ldam;
-ctx->zone = zone;
-ctx->mzone = mzone;
-ctx->fakedep = fakedep;
-ctx->A = A;
-ctx->IPIV = IPIV;
-hclib_emulate_omp_task(pragma118_hclib_async, ctx, ANY_PLACE, 5, 2, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (fake2) + (0), 1, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb);
+pragma118 *new_ctx = (pragma118 *)malloc(sizeof(pragma118));
+new_ctx->dA_ptr = &(dA);
+new_ctx->dB_ptr = &(dB);
+new_ctx->dC_ptr = &(dC);
+new_ctx->fake1_ptr = &(fake1);
+new_ctx->fake2_ptr = &(fake2);
+new_ctx->descA_ptr = &(descA);
+new_ctx->dipiv_ptr = &(dipiv);
+new_ctx->pDesc_ptr = &(pDesc);
+new_ctx->k_ptr = &(k);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->tempk_ptr = &(tempk);
+new_ctx->tempm_ptr = &(tempm);
+new_ctx->tempkm_ptr = &(tempkm);
+new_ctx->tempkn_ptr = &(tempkn);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->ldak_ptr = &(ldak);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->zone_ptr = &(zone);
+new_ctx->mzone_ptr = &(mzone);
+new_ctx->fakedep_ptr = &(fakedep);
+new_ctx->A_ptr = &(A);
+new_ctx->IPIV_ptr = &(IPIV);
+hclib_emulate_omp_task(pragma118_hclib_async, new_ctx, ANY_PLACE, 5, 2, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (fake2) + (0), 1, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb);
  } ;
 #endif
                 }
@@ -360,29 +360,29 @@ hclib_pragma_marker("omp", "task depend(inout:Aij[0:1]) depend(cw:fakedep) depen
             CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
 #else
  { 
-pragma156 *ctx = (pragma156 *)malloc(sizeof(pragma156));
-ctx->Aij = Aij;
-ctx->prevSwap = prevSwap;
-ctx->dipiv = dipiv;
-ctx->descA = descA;
-ctx->mintmp = mintmp;
-ctx->k = k;
-ctx->m = m;
-ctx->n = n;
-ctx->tempk = tempk;
-ctx->tempm = tempm;
-ctx->tempkm = tempkm;
-ctx->tempkn = tempkn;
-ctx->tempmm = tempmm;
-ctx->tempnn = tempnn;
-ctx->ldak = ldak;
-ctx->ldam = ldam;
-ctx->zone = zone;
-ctx->mzone = mzone;
-ctx->fakedep = fakedep;
-ctx->A = A;
-ctx->IPIV = IPIV;
-hclib_emulate_omp_task(pragma156_hclib_async, ctx, ANY_PLACE, 4, 2, (Aij) + (0), 1, fakedep, 0, (dipiv) + (0), mintmp, (prevSwap) + (0), A.lm*A.nb, (Aij) + (0), 1, fakedep, 0);
+pragma156 *new_ctx = (pragma156 *)malloc(sizeof(pragma156));
+new_ctx->Aij_ptr = &(Aij);
+new_ctx->prevSwap_ptr = &(prevSwap);
+new_ctx->dipiv_ptr = &(dipiv);
+new_ctx->descA_ptr = &(descA);
+new_ctx->mintmp_ptr = &(mintmp);
+new_ctx->k_ptr = &(k);
+new_ctx->m_ptr = &(m);
+new_ctx->n_ptr = &(n);
+new_ctx->tempk_ptr = &(tempk);
+new_ctx->tempm_ptr = &(tempm);
+new_ctx->tempkm_ptr = &(tempkm);
+new_ctx->tempkn_ptr = &(tempkn);
+new_ctx->tempmm_ptr = &(tempmm);
+new_ctx->tempnn_ptr = &(tempnn);
+new_ctx->ldak_ptr = &(ldak);
+new_ctx->ldam_ptr = &(ldam);
+new_ctx->zone_ptr = &(zone);
+new_ctx->mzone_ptr = &(mzone);
+new_ctx->fakedep_ptr = &(fakedep);
+new_ctx->A_ptr = &(A);
+new_ctx->IPIV_ptr = &(IPIV);
+hclib_emulate_omp_task(pragma156_hclib_async, new_ctx, ANY_PLACE, 4, 2, (Aij) + (0), 1, fakedep, 0, (dipiv) + (0), mintmp, (prevSwap) + (0), A.lm*A.nb, (Aij) + (0), 1, fakedep, 0);
  } ;
 #endif
         }
@@ -390,161 +390,59 @@ hclib_emulate_omp_task(pragma156_hclib_async, ctx, ANY_PLACE, 4, 2, (Aij) + (0),
 } 
 static void *pragma58_hclib_async(void *____arg) {
     pragma58 *ctx = (pragma58 *)____arg;
-    double *dA; dA = ctx->dA;
-    int *dB; dB = ctx->dB;
-    PLASMA_desc pDesc; pDesc = ctx->pDesc;
-    int k; k = ctx->k;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int tempk; tempk = ctx->tempk;
-    int tempm; tempm = ctx->tempm;
-    int tempkm; tempkm = ctx->tempkm;
-    int tempkn; tempkn = ctx->tempkn;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    int ldak; ldak = ctx->ldak;
-    int ldam; ldam = ctx->ldam;
-    double zone; zone = ctx->zone;
-    double mzone; mzone = ctx->mzone;
-    void *fakedep; fakedep = ctx->fakedep;
-    PLASMA_desc A; A = ctx->A;
-    int *IPIV; IPIV = ctx->IPIV;
     hclib_start_finish();
 {
             int info[3];
             info[1] = 0;
             info[2] = 1;
 
-            CORE_dgetrf_rectil( pDesc, dB, info );
+            CORE_dgetrf_rectil( (*(ctx->pDesc_ptr)), (*(ctx->dB_ptr)), info );
         } ;     ; hclib_end_finish();
+
     return NULL;
 }
 
 
 static void *pragma81_hclib_async(void *____arg) {
     pragma81 *ctx = (pragma81 *)____arg;
-    PLASMA_desc descA; descA = ctx->descA;
-    double *dA; dA = ctx->dA;
-    double *dB; dB = ctx->dB;
-    int *dipiv; dipiv = ctx->dipiv;
-    PLASMA_desc pDesc; pDesc = ctx->pDesc;
-    int k; k = ctx->k;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int tempk; tempk = ctx->tempk;
-    int tempm; tempm = ctx->tempm;
-    int tempkm; tempkm = ctx->tempkm;
-    int tempkn; tempkn = ctx->tempkn;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    int ldak; ldak = ctx->ldak;
-    int ldam; ldam = ctx->ldam;
-    double zone; zone = ctx->zone;
-    double mzone; mzone = ctx->mzone;
-    void *fakedep; fakedep = ctx->fakedep;
-    PLASMA_desc A; A = ctx->A;
-    int *IPIV; IPIV = ctx->IPIV;
     hclib_start_finish();
-CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak) ;     ; hclib_end_finish();
+CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
+
     return NULL;
 }
 
 
 static void *pragma92_hclib_async(void *____arg) {
     pragma92 *ctx = (pragma92 *)____arg;
-    double *dA; dA = ctx->dA;
-    double *dB; dB = ctx->dB;
-    double *dC; dC = ctx->dC;
-    PLASMA_desc descA; descA = ctx->descA;
-    int *dipiv; dipiv = ctx->dipiv;
-    PLASMA_desc pDesc; pDesc = ctx->pDesc;
-    int k; k = ctx->k;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int tempk; tempk = ctx->tempk;
-    int tempm; tempm = ctx->tempm;
-    int tempkm; tempkm = ctx->tempkm;
-    int tempkn; tempkn = ctx->tempkn;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    int ldak; ldak = ctx->ldak;
-    int ldam; ldam = ctx->ldam;
-    double zone; zone = ctx->zone;
-    double mzone; mzone = ctx->mzone;
-    void *fakedep; fakedep = ctx->fakedep;
-    PLASMA_desc A; A = ctx->A;
-    int *IPIV; IPIV = ctx->IPIV;
     hclib_start_finish();
 cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
-                        tempmm, tempnn, A.nb,
-                        mzone, dA, ldam,
-                        dB, ldak,
-                        zone, dC, ldam) ;     ; hclib_end_finish();
+                        (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
+                        (*(ctx->mzone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)),
+                        (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
+                        (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
+
     return NULL;
 }
 
 
 static void *pragma118_hclib_async(void *____arg) {
     pragma118 *ctx = (pragma118 *)____arg;
-    double *dA; dA = ctx->dA;
-    double *dB; dB = ctx->dB;
-    double *dC; dC = ctx->dC;
-    double *fake1; fake1 = ctx->fake1;
-    double *fake2; fake2 = ctx->fake2;
-    PLASMA_desc descA; descA = ctx->descA;
-    int *dipiv; dipiv = ctx->dipiv;
-    PLASMA_desc pDesc; pDesc = ctx->pDesc;
-    int k; k = ctx->k;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int tempk; tempk = ctx->tempk;
-    int tempm; tempm = ctx->tempm;
-    int tempkm; tempkm = ctx->tempkm;
-    int tempkn; tempkn = ctx->tempkn;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    int ldak; ldak = ctx->ldak;
-    int ldam; ldam = ctx->ldam;
-    double zone; zone = ctx->zone;
-    double mzone; mzone = ctx->mzone;
-    void *fakedep; fakedep = ctx->fakedep;
-    PLASMA_desc A; A = ctx->A;
-    int *IPIV; IPIV = ctx->IPIV;
     hclib_start_finish();
 cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
-                                tempmm, tempnn, A.nb,
-                                mzone, dA, ldam,
-                                dB, ldak,
-                                zone, dC, ldam) ;     ; hclib_end_finish();
+                                (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
+                                (*(ctx->mzone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)),
+                                (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
+                                (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
+
     return NULL;
 }
 
 
 static void *pragma156_hclib_async(void *____arg) {
     pragma156 *ctx = (pragma156 *)____arg;
-    double *Aij; Aij = ctx->Aij;
-    double *prevSwap; prevSwap = ctx->prevSwap;
-    int *dipiv; dipiv = ctx->dipiv;
-    PLASMA_desc descA; descA = ctx->descA;
-    int mintmp; mintmp = ctx->mintmp;
-    int k; k = ctx->k;
-    int m; m = ctx->m;
-    int n; n = ctx->n;
-    int tempk; tempk = ctx->tempk;
-    int tempm; tempm = ctx->tempm;
-    int tempkm; tempkm = ctx->tempkm;
-    int tempkn; tempkn = ctx->tempkn;
-    int tempmm; tempmm = ctx->tempmm;
-    int tempnn; tempnn = ctx->tempnn;
-    int ldak; ldak = ctx->ldak;
-    int ldam; ldam = ctx->ldam;
-    double zone; zone = ctx->zone;
-    double mzone; mzone = ctx->mzone;
-    void *fakedep; fakedep = ctx->fakedep;
-    PLASMA_desc A; A = ctx->A;
-    int *IPIV; IPIV = ctx->IPIV;
     hclib_start_finish();
-CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1) ;     ; hclib_end_finish();
+CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish();
+
     return NULL;
 }
 

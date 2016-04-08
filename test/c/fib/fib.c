@@ -61,11 +61,7 @@ void fib0 (int n)
         {
 #pragma omp single
             {
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
-                par_res = fib(n,0);
-#else
                 par_res = fib(n);
-#endif
             }
         }
     }

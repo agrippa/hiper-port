@@ -95,9 +95,9 @@ void usage(int argc, char **argv)
 
 typedef struct _pragma102 {
     int blk;
-    int *input_itemsets;
-    int *output_itemsets;
-    int *referrence;
+    int (*(*input_itemsets_ptr));
+    int (*(*output_itemsets_ptr));
+    int (*(*referrence_ptr));
     int max_rows;
     int max_cols;
     int penalty;
@@ -105,9 +105,9 @@ typedef struct _pragma102 {
 
 typedef struct _pragma154 {
     int blk;
-    int *input_itemsets;
-    int *output_itemsets;
-    int *referrence;
+    int (*(*input_itemsets_ptr));
+    int (*(*output_itemsets_ptr));
+    int (*(*referrence_ptr));
     int max_rows;
     int max_cols;
     int penalty;
@@ -121,22 +121,22 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma102 *ctx = (pragma102 *)malloc(sizeof(pragma102));
-ctx->blk = blk;
-ctx->input_itemsets = input_itemsets;
-ctx->output_itemsets = output_itemsets;
-ctx->referrence = referrence;
-ctx->max_rows = max_rows;
-ctx->max_cols = max_cols;
-ctx->penalty = penalty;
+pragma102 *new_ctx = (pragma102 *)malloc(sizeof(pragma102));
+new_ctx->blk = blk;
+new_ctx->input_itemsets_ptr = &(input_itemsets);
+new_ctx->output_itemsets_ptr = &(output_itemsets);
+new_ctx->referrence_ptr = &(referrence);
+new_ctx->max_rows = max_rows;
+new_ctx->max_cols = max_cols;
+new_ctx->penalty = penalty;
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = blk;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma102_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma102_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
     }    
         
@@ -145,22 +145,22 @@ free(ctx);
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma154 *ctx = (pragma154 *)malloc(sizeof(pragma154));
-ctx->blk = blk;
-ctx->input_itemsets = input_itemsets;
-ctx->output_itemsets = output_itemsets;
-ctx->referrence = referrence;
-ctx->max_rows = max_rows;
-ctx->max_cols = max_cols;
-ctx->penalty = penalty;
+pragma154 *new_ctx = (pragma154 *)malloc(sizeof(pragma154));
+new_ctx->blk = blk;
+new_ctx->input_itemsets_ptr = &(input_itemsets);
+new_ctx->output_itemsets_ptr = &(output_itemsets);
+new_ctx->referrence_ptr = &(referrence);
+new_ctx->max_rows = max_rows;
+new_ctx->max_cols = max_cols;
+new_ctx->penalty = penalty;
 hclib_loop_domain_t domain[1];
 domain[0].low = blk - 1;
 domain[0].high = (max_cols - 1) / 16;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma154_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma154_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
     }
 
@@ -168,9 +168,6 @@ free(ctx);
 static void pragma102_hclib_async(void *____arg, const int ___iter0) {
     pragma102 *ctx = (pragma102 *)____arg;
     int blk; blk = ctx->blk;
-    int *input_itemsets; input_itemsets = ctx->input_itemsets;
-    int *output_itemsets; output_itemsets = ctx->output_itemsets;
-    int *referrence; referrence = ctx->referrence;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
@@ -187,7 +184,7 @@ static void pragma102_hclib_async(void *____arg, const int ___iter0) {
             {
 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
-                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
+                    reference_l[i*BLOCK_SIZE + j] = (*(ctx->referrence_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
                 }
             }
 
@@ -196,7 +193,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             {
 for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
                 {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = (*(ctx->input_itemsets_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
                 }
             }
 
@@ -216,21 +213,19 @@ for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
             {
 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
-                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j + 1];
+                    (*(ctx->input_itemsets_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j + 1];
                 }
             }
             
         } ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
 static void pragma154_hclib_async(void *____arg, const int ___iter0) {
     pragma154 *ctx = (pragma154 *)____arg;
     int blk; blk = ctx->blk;
-    int *input_itemsets; input_itemsets = ctx->input_itemsets;
-    int *output_itemsets; output_itemsets = ctx->output_itemsets;
-    int *referrence; referrence = ctx->referrence;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
@@ -248,7 +243,7 @@ static void pragma154_hclib_async(void *____arg, const int ___iter0) {
             {
 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
-                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
+                    reference_l[i*BLOCK_SIZE + j] = (*(ctx->referrence_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
                 }
             }
 
@@ -257,7 +252,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             {
 for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
                 {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = (*(ctx->input_itemsets_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
                 }
             }
 
@@ -277,11 +272,12 @@ for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
             {
 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
-                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
+                    (*(ctx->input_itemsets_ptr))[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
                 }
             }
         } ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
@@ -293,13 +289,13 @@ typedef struct _main_entrypoint_ctx {
     int max_rows;
     int max_cols;
     int penalty;
-    int *input_itemsets;
-    int *output_itemsets;
-    int *referrence;
+    int (*input_itemsets);
+    int (*output_itemsets);
+    int (*referrence);
     int omp_num_threads;
     long long start_time;
     int argc;
-    char **argv;
+    char (*(*argv));
  } main_entrypoint_ctx;
 
 
@@ -308,13 +304,13 @@ static void main_entrypoint(void *____arg) {
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
     int penalty; penalty = ctx->penalty;
-    int *input_itemsets; input_itemsets = ctx->input_itemsets;
-    int *output_itemsets; output_itemsets = ctx->output_itemsets;
-    int *referrence; referrence = ctx->referrence;
+    int (*input_itemsets); input_itemsets = ctx->input_itemsets;
+    int (*output_itemsets); output_itemsets = ctx->output_itemsets;
+    int (*referrence); referrence = ctx->referrence;
     int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
     long long start_time; start_time = ctx->start_time;
     int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    char (*(*argv)); argv = ctx->argv;
 nw_optimized( input_itemsets, output_itemsets, referrence,
         max_rows, max_cols, penalty ) ; }
 
@@ -386,19 +382,19 @@ runTest( int argc, char** argv)
    
     long long start_time = get_time();
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->max_rows = max_rows;
-ctx->max_cols = max_cols;
-ctx->penalty = penalty;
-ctx->input_itemsets = input_itemsets;
-ctx->output_itemsets = output_itemsets;
-ctx->referrence = referrence;
-ctx->omp_num_threads = omp_num_threads;
-ctx->start_time = start_time;
-ctx->argc = argc;
-ctx->argv = argv;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->max_rows = max_rows;
+new_ctx->max_cols = max_cols;
+new_ctx->penalty = penalty;
+new_ctx->input_itemsets = input_itemsets;
+new_ctx->output_itemsets = output_itemsets;
+new_ctx->referrence = referrence;
+new_ctx->omp_num_threads = omp_num_threads;
+new_ctx->start_time = start_time;
+new_ctx->argc = argc;
+new_ctx->argv = argv;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 ;
 
     long long end_time = get_time();

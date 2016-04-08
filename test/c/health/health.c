@@ -404,93 +404,6 @@ void put_in_hosp(struct Hosp *hosp, struct Patient *patient)
    }
 }
 /**********************************************************************/
-#if defined (IF_CUTOFF)
-void sim_village_par(struct Village *village)
-{
-   struct Village *vlist;
-
-   // lowest level returns nothing
-   // only for sim_village first call with village = NULL
-   // recursive call cannot occurs
-   if (village == NULL) return;
-
-   /* Traverse village hierarchy (lower level first)*/
-   vlist = village->forward;
-   while(vlist)
-   {
-#pragma omp task untied if((sim_level - village->level) < bots_cutoff_value)
-      sim_village_par(vlist);
-      vlist = vlist->next;
-   }
-
-   /* Uses lists v->hosp->inside, and v->return */
-   check_patients_inside(village);
-
-   /* Uses lists v->hosp->assess, v->hosp->inside, v->population and (v->back->hosp->realloc) !!! */
-   check_patients_assess_par(village);
-
-   /* Uses lists v->hosp->waiting, and v->hosp->assess */
-   check_patients_waiting(village);
-
-#pragma omp taskwait
-
-   /* Uses lists v->hosp->realloc, v->hosp->asses and v->hosp->waiting */
-   check_patients_realloc(village);
-
-   /* Uses list v->population, v->hosp->asses and v->h->waiting */
-   check_patients_population(village);
-}
-#elif defined (MANUAL_CUTOFF)
-void sim_village_par(struct Village *village)
-{
-   struct Village *vlist;
-
-   // lowest level returns nothing
-   // only for sim_village first call with village = NULL
-   // recursive call cannot occurs
-   if (village == NULL) return;
-
-   /* Traverse village hierarchy (lower level first)*/
-   vlist = village->forward;
-   if ((sim_level-village->level) < bots_cutoff_value)
-   {
-      while(vlist)
-      {
-#pragma omp task untied
-         sim_village_par(vlist);
-         vlist = vlist->next;
-      }
-   }
-   else
-   {
-      while(vlist)
-      {
-         sim_village_par(vlist);
-         vlist = vlist->next;
-      }
-   }
-
-   /* Uses lists v->hosp->inside, and v->return */
-   check_patients_inside(village);
-
-   /* Uses lists v->hosp->assess, v->hosp->inside, v->population and (v->back->hosp->realloc) !!! */
-   check_patients_assess_par(village);
-
-   /* Uses lists v->hosp->waiting, and v->hosp->assess */
-   check_patients_waiting(village);
-
-   if ((sim_level-village->level) < bots_cutoff_value)
-   {
-#pragma omp taskwait
-   }
-
-   /* Uses lists v->hosp->realloc, v->hosp->asses and v->hosp->waiting */
-   check_patients_realloc(village);
-
-   /* Uses list v->population, v->hosp->asses and v->h->waiting */
-   check_patients_population(village);
-}
-#else
 void sim_village_par(struct Village *village)
 {
    struct Village *vlist;
@@ -526,7 +439,6 @@ void sim_village_par(struct Village *village)
    /* Uses list v->population, v->hosp->asses and v->h->waiting */
    check_patients_population(village);
 }
-#endif
 /**********************************************************************/
 void my_print(struct Village *village)
 {

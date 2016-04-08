@@ -150,10 +150,10 @@ void	m_version( void );
 
 /* type independent min and max operations */
 #ifndef max
-#define	max(a,b)	((a) > (b) ? (a) : (b))
+inline double max(double a, double b) { return ((a) > (b) ? (a) : (b)); }
 #endif /* max */
 #ifndef min
-#define	min(a,b)	((a) > (b) ? (b) : (a))
+inline double min(double a, double b) { return ((a) > (b) ? (b) : (a)); }
 #endif /* min */
 
 
@@ -254,17 +254,17 @@ extern   int bd_free(BAND *);
 	(A)->mat->me[(A)->lb+(j)-(i)][(j)] : \
 	(error(E_BOUNDS,"bd_get_val"), 0.0))
 #else /* no DEBUG */
-#define	m_set_val(A,i,j,val)	((A)->me[(i)][(j)] = (val))
-#define	m_add_val(A,i,j,val)	((A)->me[(i)][(j)] += (val))
-#define	m_sub_val(A,i,j,val)	((A)->me[(i)][(j)] -= (val))
-#define	m_get_val(A,i,j)	((A)->me[(i)][(j)])
-#define	v_set_val(x,i,val)	((x)->ve[(i)] = (val))
-#define	v_add_val(x,i,val)	((x)->ve[(i)] += (val))
-#define	v_sub_val(x,i,val)	((x)->ve[(i)] -= (val))
-#define	v_get_val(x,i)		((x)->ve[(i)])
-#define	bd_set_val(A,i,j,val)	((A)->mat->me[(A)->lb+(j)-(i)][(j)] = (val))
-#define	bd_add_val(A,i,j,val)	((A)->mat->me[(A)->lb+(j)-(i)][(j)] += (val))
-#define	bd_get_val(A,i,j)	((A)->mat->me[(A)->lb+(j)-(i)][(j)])
+inline void m_set_val(MAT *A, int i, int j, double val) {	((A)->me[(i)][(j)] = (val)); }
+inline void m_add_val(MAT *A, int i, int j, double val) {	((A)->me[(i)][(j)] += (val)); }
+inline void m_sub_val(MAT *A, int i, int j, double val) {	((A)->me[(i)][(j)] -= (val)); }
+inline double m_get_val(MAT *A, int i, int j) {	return ((A)->me[(i)][(j)]); }
+inline void v_set_val(VEC *x, int i, double val) {	((x)->ve[(i)] = (val)); }
+inline void v_add_val(VEC *x, int i, double val) {	((x)->ve[(i)] += (val)); }
+inline void v_sub_val(VEC *x, int i, double val) {	((x)->ve[(i)] -= (val)); }
+inline double v_get_val(VEC *x, int i) { return ((x)->ve[(i)]); }
+inline void bd_set_val(MAT *A, int i, int j, double val) {	((A)->mat->me[(A)->lb+(j)-(i)][(j)] = (val)); }
+inline void bd_add_val(MAT *A, int i, int j, double val) {	((A)->mat->me[(A)->lb+(j)-(i)][(j)] += (val)); }
+inline double bd_get_val(MAT *A, int i, int j) { return ((A)->mat->me[(A)->lb+(j)-(i)][(j)]); }
 #endif /* DEBUG */
 
 

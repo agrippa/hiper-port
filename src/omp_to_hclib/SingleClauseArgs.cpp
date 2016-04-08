@@ -25,7 +25,9 @@ int seekPastToken(std::string s, int index) {
     return index;
 }
 
-SingleClauseArgs::SingleClauseArgs(std::string argsStr) {
+SingleClauseArgs::SingleClauseArgs(std::string setClause, std::string argsStr) {
+    clause = setClause;
+
     int index = skipWhiteSpace(argsStr, 0);
 
     while (index < argsStr.size()) {
@@ -42,12 +44,22 @@ SingleClauseArgs::SingleClauseArgs(std::string argsStr) {
     }
 }
 
-SingleClauseArgs::SingleClauseArgs() {
+SingleClauseArgs::SingleClauseArgs(std::string setClause) {
+    clause = setClause;
 }
 
-
 std::string SingleClauseArgs::getSingleArg() {
-    assert(args.size() == 1);
+    if (args.size() != 1) {
+        std::stringstream ss;
+        ss << "Expected single arg to \"" << clause << "\" but got " <<
+            args.size() << " args:";
+        for (std::vector<std::string>::iterator i = args.begin(),
+                e = args.end(); i != e; i++) {
+            ss << " " << *i;
+        }
+        std::cerr << ss.str() << std::endl;
+        exit(1);
+    }
     return args.at(0);
 }
 

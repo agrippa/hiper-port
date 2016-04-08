@@ -38,6 +38,10 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void visitChildren(const clang::Stmt *s, bool firstTraversal = true);
         void VisitStmt(const clang::Stmt *s);
         std::string stmtToString(const clang::Stmt* s);
+        std::string stmtToStringWithSharedVars(const clang::Stmt *stmt,
+                std::vector<OMPVarInfo> *shared);
+        void replaceAllReferencesTo(const clang::Stmt *stmt,
+                std::vector<OMPVarInfo> *shared);
         std::string stringForAST(const clang::Stmt *stmt);
         void setParent(const clang::Stmt *child,
                 const clang::Stmt *parent);
@@ -47,26 +51,29 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         void postFunctionVisit(clang::FunctionDecl *func);
 
         std::string getClosureDecl(std::string closureName,
-                bool isForasyncClosure, int forasyncDim, bool emulatesOmpDepends);
+                bool isForasyncClosure, int forasyncDim,
+                bool emulatesOmpDepends);
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
-                std::string contextName, std::vector<clang::ValueDecl *> *captured,
-                std::string bodyStr, bool emulatesOmpDepends,
-                std::vector<OMPReductionVar> *reductions = NULL,
+                std::string contextName,
+                std::vector<clang::ValueDecl *> *captured, std::string bodyStr,
+                bool emulatesOmpDepends, OMPClauses *clauses,
                 std::vector<const clang::ValueDecl *> *condVars = NULL);
         std::string getStructDef(std::string structName,
-                std::vector<clang::ValueDecl *> *captured, bool hasReductions);
-        std::string getContextSetup(std::string structName,
-                std::vector<clang::ValueDecl *> *captured,
-                std::vector<OMPReductionVar> *reductions);
+                std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);
+        std::string getContextSetup(PragmaNode *node, std::string structName,
+                std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);
 
-        const clang::Stmt *getBodyFrom(const clang::CallExpr *call, std::string lbl);
+        enum CAPTURE_TYPE getParentCaptureType(PragmaNode *curr,
+                std::string varname);
+
+        const clang::Stmt *getBodyFrom(const clang::CallExpr *call,
+                std::string lbl);
         const clang::Stmt *getBodyForMarker(const clang::CallExpr *call);
         std::string getPragmaNameForMarker(const clang::CallExpr *call);
         std::string getPragmaArgumentsForMarker(const clang::CallExpr *call);
         OMPClauses *getOMPClausesForMarker(const clang::CallExpr *call);
         std::string getOMPPragmaNameForMarker(const clang::CallExpr *call);
-        std::vector<OMPReductionVar> *getReductions(OMPClauses *clauses);
         int getCriticalSectionId() { return criticalSectionId; }
 
     protected:
@@ -78,7 +85,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
     private:
         std::string getDeclarationTypeStr(clang::QualType qualType,
-                std::string name, std::string soFarBefore, std::string soFarAfter);
+                std::string name, std::string soFarBefore,
+                std::string soFarAfter);
         std::string getDeclarationStr(clang::ValueDecl *decl);
         std::string getCaptureStr(clang::ValueDecl *decl);
         std::string getUnpackStr(clang::ValueDecl *decl);
@@ -101,9 +109,9 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         clang::Expr *unwrapCasts(clang::Expr *expr);
 
         /*
-         * Map from line containing a OMP pragma to its immediate predessor. It is
-         * safe to use a line here because no more than one pragma can appear on
-         * each line.
+         * Map from line containing a OMP pragma to its immediate predessor. It
+         * is safe to use a line here because no more than one pragma can appear
+         * on each line.
          */
         std::map<int, std::vector<clang::ValueDecl *> *> captures;
 

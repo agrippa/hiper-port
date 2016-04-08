@@ -156,7 +156,7 @@ if [[ $N_PRAGMA_MARKERS -ne 1 ]]; then
     exit 1
 fi
 
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Producing final output file'
+[[ $VERBOSE == 1 ]] && echo "DEBUG >>> Producing final output file at $OUTPUT_PATH from $PREV"
 cat $PREV | grep -v "extern void hclib_pragma_marker" > $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then

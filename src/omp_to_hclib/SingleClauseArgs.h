@@ -6,11 +6,12 @@
 
 class SingleClauseArgs {
     private:
+        std::string clause;
         std::vector<std::string> args;
 
     public:
-        SingleClauseArgs();
-        SingleClauseArgs(std::string args);
+        SingleClauseArgs(std::string clause);
+        SingleClauseArgs(std::string clause, std::string args);
 
         std::string getSingleArg();
         std::vector<std::string> *getArgs();

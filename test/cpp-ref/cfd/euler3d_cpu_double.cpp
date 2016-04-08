@@ -50,41 +50,39 @@ void dealloc(T* array)
 }
 
 typedef struct _pragma55 {
-    double *dst;
-    double *src;
-    int N;
+    double (*(*dst_ptr));
+    double (*(*src_ptr));
+    int (*N_ptr);
  } pragma55;
 
 static void pragma55_hclib_async(void *____arg, const int ___iter0);
 template <typename T> void copy(T* dst, T* src, int N)
 {
  { 
-pragma55 *ctx = (pragma55 *)malloc(sizeof(pragma55));
-ctx->dst = dst;
-ctx->src = src;
-ctx->N = N;
+pragma55 *new_ctx = (pragma55 *)malloc(sizeof(pragma55));
+new_ctx->dst_ptr = &(dst);
+new_ctx->src_ptr = &(src);
+new_ctx->N_ptr = &(N);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = N;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma55_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma55_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
 } 
 static void pragma55_hclib_async(void *____arg, const int ___iter0) {
     pragma55 *ctx = (pragma55 *)____arg;
-    double *dst; dst = ctx->dst;
-    double *src; src = ctx->src;
-    int N; N = ctx->N;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
-		dst[i] = src[i];
+		(*(ctx->dst_ptr))[i] = (*(ctx->src_ptr))[i];
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
@@ -130,38 +128,37 @@ double3 ff_flux_contribution_density_energy;
 
 
 typedef struct _pragma104 {
-    int nelr;
-    double *variables;
+    int (*nelr_ptr);
+    double (*(*variables_ptr));
  } pragma104;
 
 static void pragma104_hclib_async(void *____arg, const int ___iter0);
 void initialize_variables(int nelr, double* variables)
 {
  { 
-pragma104 *ctx = (pragma104 *)malloc(sizeof(pragma104));
-ctx->nelr = nelr;
-ctx->variables = variables;
+pragma104 *new_ctx = (pragma104 *)malloc(sizeof(pragma104));
+new_ctx->nelr_ptr = &(nelr);
+new_ctx->variables_ptr = &(variables);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma104_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
 } 
 static void pragma104_hclib_async(void *____arg, const int ___iter0) {
     pragma104 *ctx = (pragma104 *)____arg;
-    int nelr; nelr = ctx->nelr;
-    double *variables; variables = ctx->variables;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
-		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
+		for(int j = 0; j < NVAR; j++) (*(ctx->variables_ptr))[i*NVAR + j] = ff_variable[j];
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
@@ -211,58 +208,55 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 
 typedef struct _pragma157 {
-    int nelr;
-    double *variables;
-    double *areas;
-    double *step_factors;
+    int (*nelr_ptr);
+    double (*(*variables_ptr));
+    double (*(*areas_ptr));
+    double (*(*step_factors_ptr));
  } pragma157;
 
 static void pragma157_hclib_async(void *____arg, const int ___iter0);
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
  { 
-pragma157 *ctx = (pragma157 *)malloc(sizeof(pragma157));
-ctx->nelr = nelr;
-ctx->variables = variables;
-ctx->areas = areas;
-ctx->step_factors = step_factors;
+pragma157 *new_ctx = (pragma157 *)malloc(sizeof(pragma157));
+new_ctx->nelr_ptr = &(nelr);
+new_ctx->variables_ptr = &(variables);
+new_ctx->areas_ptr = &(areas);
+new_ctx->step_factors_ptr = &(step_factors);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma157_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma157_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
 } 
 static void pragma157_hclib_async(void *____arg, const int ___iter0) {
     pragma157 *ctx = (pragma157 *)____arg;
-    int nelr; nelr = ctx->nelr;
-    double *variables; variables = ctx->variables;
-    double *areas; areas = ctx->areas;
-    double *step_factors; step_factors = ctx->step_factors;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
-		double density = variables[NVAR*i + VAR_DENSITY];
+		double density = (*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY];
 
 		double3 momentum;
-		momentum.x = variables[NVAR*i + (VAR_MOMENTUM+0)];
-		momentum.y = variables[NVAR*i + (VAR_MOMENTUM+1)];
-		momentum.z = variables[NVAR*i + (VAR_MOMENTUM+2)];
+		momentum.x = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+0)];
+		momentum.y = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)];
+		momentum.z = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)];
 
-		double density_energy = variables[NVAR*i + VAR_DENSITY_ENERGY];
+		double density_energy = (*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY_ENERGY];
 		double3 velocity;	   compute_velocity(density, momentum, velocity);
 		double speed_sqd      = compute_speed_sqd(velocity);
 		double pressure       = compute_pressure(density, density_energy, speed_sqd);
 		double speed_of_sound = compute_speed_of_sound(density, pressure);
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
-		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
+		(*(ctx->step_factors_ptr))[i] = double(0.5) / (std::sqrt((*(ctx->areas_ptr))[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
@@ -274,12 +268,12 @@ static void pragma157_hclib_async(void *____arg, const int ___iter0) {
 */
 
 typedef struct _pragma188 {
-    double smoothing_coefficient;
-    int nelr;
-    int *elements_surrounding_elements;
-    double *normals;
-    double *variables;
-    double *fluxes;
+    double (*smoothing_coefficient_ptr);
+    int (*nelr_ptr);
+    int (*(*elements_surrounding_elements_ptr));
+    double (*(*normals_ptr));
+    double (*(*variables_ptr));
+    double (*(*fluxes_ptr));
  } pragma188;
 
 static void pragma188_hclib_async(void *____arg, const int ___iter0);
@@ -288,31 +282,25 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 	double smoothing_coefficient = double(0.2f);
 
  { 
-pragma188 *ctx = (pragma188 *)malloc(sizeof(pragma188));
-ctx->smoothing_coefficient = smoothing_coefficient;
-ctx->nelr = nelr;
-ctx->elements_surrounding_elements = elements_surrounding_elements;
-ctx->normals = normals;
-ctx->variables = variables;
-ctx->fluxes = fluxes;
+pragma188 *new_ctx = (pragma188 *)malloc(sizeof(pragma188));
+new_ctx->smoothing_coefficient_ptr = &(smoothing_coefficient);
+new_ctx->nelr_ptr = &(nelr);
+new_ctx->elements_surrounding_elements_ptr = &(elements_surrounding_elements);
+new_ctx->normals_ptr = &(normals);
+new_ctx->variables_ptr = &(variables);
+new_ctx->fluxes_ptr = &(fluxes);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma188_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
 } 
 static void pragma188_hclib_async(void *____arg, const int ___iter0) {
     pragma188 *ctx = (pragma188 *)____arg;
-    double smoothing_coefficient; smoothing_coefficient = ctx->smoothing_coefficient;
-    int nelr; nelr = ctx->nelr;
-    int *elements_surrounding_elements; elements_surrounding_elements = ctx->elements_surrounding_elements;
-    double *normals; normals = ctx->normals;
-    double *variables; variables = ctx->variables;
-    double *fluxes; fluxes = ctx->fluxes;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
@@ -321,13 +309,13 @@ static void pragma188_hclib_async(void *____arg, const int ___iter0) {
 		double3 normal; double normal_len;
 		double factor;
 
-		double density_i = variables[NVAR*i + VAR_DENSITY];
+		double density_i = (*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY];
 		double3 momentum_i;
-		momentum_i.x = variables[NVAR*i + (VAR_MOMENTUM+0)];
-		momentum_i.y = variables[NVAR*i + (VAR_MOMENTUM+1)];
-		momentum_i.z = variables[NVAR*i + (VAR_MOMENTUM+2)];
+		momentum_i.x = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+0)];
+		momentum_i.y = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)];
+		momentum_i.z = (*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)];
 
-		double density_energy_i = variables[NVAR*i + VAR_DENSITY_ENERGY];
+		double density_energy_i = (*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY_ENERGY];
 
 		double3 velocity_i;             				 compute_velocity(density_i, momentum_i, velocity_i);
 		double speed_sqd_i                          = compute_speed_sqd(velocity_i);
@@ -354,19 +342,19 @@ static void pragma188_hclib_async(void *____arg, const int ___iter0) {
 
 		for(j = 0; j < NNB; j++)
 		{
-			nb = elements_surrounding_elements[i*NNB + j];
-			normal.x = normals[(i*NNB + j)*NDIM + 0];
-			normal.y = normals[(i*NNB + j)*NDIM + 1];
-			normal.z = normals[(i*NNB + j)*NDIM + 2];
+			nb = (*(ctx->elements_surrounding_elements_ptr))[i*NNB + j];
+			normal.x = (*(ctx->normals_ptr))[(i*NNB + j)*NDIM + 0];
+			normal.y = (*(ctx->normals_ptr))[(i*NNB + j)*NDIM + 1];
+			normal.z = (*(ctx->normals_ptr))[(i*NNB + j)*NDIM + 2];
 			normal_len = std::sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
 
 			if(nb >= 0) 	// a legitimate neighbor
 			{
-				density_nb =        variables[nb*NVAR + VAR_DENSITY];
-				momentum_nb.x =     variables[nb*NVAR + (VAR_MOMENTUM+0)];
-				momentum_nb.y =     variables[nb*NVAR + (VAR_MOMENTUM+1)];
-				momentum_nb.z =     variables[nb*NVAR + (VAR_MOMENTUM+2)];
-				density_energy_nb = variables[nb*NVAR + VAR_DENSITY_ENERGY];
+				density_nb =        (*(ctx->variables_ptr))[nb*NVAR + VAR_DENSITY];
+				momentum_nb.x =     (*(ctx->variables_ptr))[nb*NVAR + (VAR_MOMENTUM+0)];
+				momentum_nb.y =     (*(ctx->variables_ptr))[nb*NVAR + (VAR_MOMENTUM+1)];
+				momentum_nb.z =     (*(ctx->variables_ptr))[nb*NVAR + (VAR_MOMENTUM+2)];
+				density_energy_nb = (*(ctx->variables_ptr))[nb*NVAR + VAR_DENSITY_ENERGY];
 													compute_velocity(density_nb, momentum_nb, velocity_nb);
 				speed_sqd_nb                      = compute_speed_sqd(velocity_nb);
 				pressure_nb                       = compute_pressure(density_nb, density_energy_nb, speed_sqd_nb);
@@ -374,7 +362,7 @@ static void pragma188_hclib_async(void *____arg, const int ___iter0) {
 													compute_flux_contribution(density_nb, momentum_nb, density_energy_nb, pressure_nb, velocity_nb, flux_contribution_nb_momentum_x, flux_contribution_nb_momentum_y, flux_contribution_nb_momentum_z, flux_contribution_nb_density_energy);
 
 				// artificial viscosity
-				factor = -normal_len*smoothing_coefficient*double(0.5)*(speed_i + std::sqrt(speed_sqd_nb) + speed_of_sound_i + speed_of_sound_nb);
+				factor = -normal_len*(*(ctx->smoothing_coefficient_ptr))*double(0.5)*(speed_i + std::sqrt(speed_sqd_nb) + speed_of_sound_i + speed_of_sound_nb);
 				flux_i_density += factor*(density_i-density_nb);
 				flux_i_density_energy += factor*(density_energy_i-density_energy_nb);
 				flux_i_momentum.x += factor*(momentum_i.x-momentum_nb.x);
@@ -435,68 +423,64 @@ static void pragma188_hclib_async(void *____arg, const int ___iter0) {
 			}
 		}
 
-		fluxes[i*NVAR + VAR_DENSITY] = flux_i_density;
-		fluxes[i*NVAR + (VAR_MOMENTUM+0)] = flux_i_momentum.x;
-		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
-		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
-		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
+		(*(ctx->fluxes_ptr))[i*NVAR + VAR_DENSITY] = flux_i_density;
+		(*(ctx->fluxes_ptr))[i*NVAR + (VAR_MOMENTUM+0)] = flux_i_momentum.x;
+		(*(ctx->fluxes_ptr))[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
+		(*(ctx->fluxes_ptr))[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
+		(*(ctx->fluxes_ptr))[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
 
 typedef struct _pragma319 {
-    int j;
-    int nelr;
-    double *old_variables;
-    double *variables;
-    double *step_factors;
-    double *fluxes;
+    int (*j_ptr);
+    int (*nelr_ptr);
+    double (*(*old_variables_ptr));
+    double (*(*variables_ptr));
+    double (*(*step_factors_ptr));
+    double (*(*fluxes_ptr));
  } pragma319;
 
 static void pragma319_hclib_async(void *____arg, const int ___iter0);
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
  { 
-pragma319 *ctx = (pragma319 *)malloc(sizeof(pragma319));
-ctx->j = j;
-ctx->nelr = nelr;
-ctx->old_variables = old_variables;
-ctx->variables = variables;
-ctx->step_factors = step_factors;
-ctx->fluxes = fluxes;
+pragma319 *new_ctx = (pragma319 *)malloc(sizeof(pragma319));
+new_ctx->j_ptr = &(j);
+new_ctx->nelr_ptr = &(nelr);
+new_ctx->old_variables_ptr = &(old_variables);
+new_ctx->variables_ptr = &(variables);
+new_ctx->step_factors_ptr = &(step_factors);
+new_ctx->fluxes_ptr = &(fluxes);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma319_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma319_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  } 
 } 
 static void pragma319_hclib_async(void *____arg, const int ___iter0) {
     pragma319 *ctx = (pragma319 *)____arg;
-    int j; j = ctx->j;
-    int nelr; nelr = ctx->nelr;
-    double *old_variables; old_variables = ctx->old_variables;
-    double *variables; variables = ctx->variables;
-    double *step_factors; step_factors = ctx->step_factors;
-    double *fluxes; fluxes = ctx->fluxes;
     hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
-		double factor = step_factors[i]/double(RK+1-j);
+		double factor = (*(ctx->step_factors_ptr))[i]/double(RK+1-(*(ctx->j_ptr)));
 
-		variables[NVAR*i + VAR_DENSITY] = old_variables[NVAR*i + VAR_DENSITY] + factor*fluxes[NVAR*i + VAR_DENSITY];
-		variables[NVAR*i + VAR_DENSITY_ENERGY] = old_variables[NVAR*i + VAR_DENSITY_ENERGY] + factor*fluxes[NVAR*i + VAR_DENSITY_ENERGY];
-		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
-		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
-		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
+		(*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY] = (*(ctx->old_variables_ptr))[NVAR*i + VAR_DENSITY] + factor*(*(ctx->fluxes_ptr))[NVAR*i + VAR_DENSITY];
+		(*(ctx->variables_ptr))[NVAR*i + VAR_DENSITY_ENERGY] = (*(ctx->old_variables_ptr))[NVAR*i + VAR_DENSITY_ENERGY] + factor*(*(ctx->fluxes_ptr))[NVAR*i + VAR_DENSITY_ENERGY];
+		(*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+0)] = (*(ctx->old_variables_ptr))[NVAR*i + (VAR_MOMENTUM+0)] + factor*(*(ctx->fluxes_ptr))[NVAR*i + (VAR_MOMENTUM+0)];
+		(*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)] = (*(ctx->old_variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)] + factor*(*(ctx->fluxes_ptr))[NVAR*i + (VAR_MOMENTUM+1)];
+		(*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)] = (*(ctx->old_variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)] + factor*(*(ctx->fluxes_ptr))[NVAR*i + (VAR_MOMENTUM+2)];
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
 
@@ -504,17 +488,17 @@ static void pragma319_hclib_async(void *____arg, const int ___iter0) {
  * Main function
  */
 typedef struct _main_entrypoint_ctx {
-    const char *data_file_name;
+    const char (*data_file_name);
     int argc;
-    char **argv;
+    char (*(*argv));
  } main_entrypoint_ctx;
 
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    const char *data_file_name; data_file_name = ctx->data_file_name;
+    const char (*data_file_name); data_file_name = ctx->data_file_name;
     int argc; argc = ctx->argc;
-    char **argv; argv = ctx->argv;
+    char (*(*argv)); argv = ctx->argv;
 {
 	// set far field conditions
 	{
@@ -643,12 +627,12 @@ int main(int argc, char** argv)
 	}
 	const char* data_file_name = argv[1];
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->data_file_name = data_file_name;
-ctx->argc = argc;
-ctx->argv = argv;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->data_file_name = data_file_name;
+new_ctx->argc = argc;
+new_ctx->argv = argv;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 
 
 	std::cout << "Done..." << std::endl;

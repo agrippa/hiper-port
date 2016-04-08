@@ -28,6 +28,8 @@ static llvm::cl::opt<std::string> outputCriticalSectionIdFile("r");
 
 static OMPToHClib *transform = NULL;
 FunctionDecl *curr_func_decl = NULL;
+std::vector<ValueDecl *> globals;
+std::vector<std::string> discoveredGlobals;
 
 class TransformASTConsumer : public ASTConsumer {
 public:
@@ -54,13 +56,46 @@ public:
     transform->setRewriter(R);
     transform->setContext(Context);
 
+    for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
+        Decl *toplevel = *b;
+
+        if (VarDecl *vdecl = clang::dyn_cast<VarDecl>(toplevel)) {
+            clang::ValueDecl *asValue = clang::dyn_cast<clang::ValueDecl>(
+                    toplevel);
+            if (std::find(discoveredGlobals.begin(), discoveredGlobals.end(),
+                        asValue->getNameAsString()) == discoveredGlobals.end()) {
+                globals.push_back(asValue);
+            }
+            discoveredGlobals.push_back(asValue->getNameAsString());
+        } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(
+                    toplevel)) {
+            for (DeclContext::decl_iterator di = ldecl->decls_begin(),
+                    de = ldecl->decls_end(); di != de; di++) {
+                Decl *curr_linkage_decl = *di;
+                if (VarDecl *vdecl = clang::dyn_cast<VarDecl>(
+                            curr_linkage_decl)) {
+                    clang::ValueDecl *asValue =
+                        clang::dyn_cast<clang::ValueDecl>(curr_linkage_decl);
+                    if (std::find(discoveredGlobals.begin(),
+                                discoveredGlobals.end(),
+                                asValue->getNameAsString()) ==
+                            discoveredGlobals.end()) {
+                        globals.push_back(asValue);
+                    }
+                    discoveredGlobals.push_back(asValue->getNameAsString());
+                }
+            }
+        }
+    }
+
     // For each top-level function defined
     for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
         Decl *toplevel = *b;
 
         if (FunctionDecl *fdecl = clang::dyn_cast<FunctionDecl>(toplevel)) {
             handleFunctionDecl(fdecl);
-        } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(toplevel)) {
+        } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(
+                    toplevel)) {
             for (DeclContext::decl_iterator di = ldecl->decls_begin(),
                     de = ldecl->decls_end(); di != de; di++) {
                 Decl *curr_linkage_decl = *di;
@@ -149,8 +184,14 @@ int main(int argc, const char **argv) {
   ClangTool *Tool = new ClangTool(op.getCompilations(), op.getSourcePathList());
   int err = Tool->run(factory);
   if (err) {
-      fprintf(stderr, "Error running clang tool: %d\n", err);
-      return err;
+      /*
+       * Right now we ignore clang compilation errors because there are
+       * situations where we insert references to undefined variables, variables
+       * that will be defined on the next iteration of code generation. Is this
+       * safe? Not really.
+       */
+      // fprintf(stderr, "Error running clang tool: %d\n", err);
+      // return err;
   }
 
   std::ofstream out;

@@ -69,7 +69,8 @@ fatal(char *s)
 
 #define IN_RANGE(x, min, max)   ((x)>=(min) && (x)<=(max))
 #define CLAMP_RANGE(x, min, max) x = (x<(min)) ? min : ((x>(max)) ? max : x )
-#define MIN(a, b) ((a)<=(b) ? (a) : (b))
+
+inline int MIN(int a, int b) { return ((a)<=(b) ? (a) : (b)); }
 
 int main(int argc, char** argv)
 {
