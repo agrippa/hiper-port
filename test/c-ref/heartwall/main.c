@@ -705,6 +705,7 @@ free(ctx);
 		free(private[i].d_mask_conv);
 	}
 
+    return 0;
 }  
 static void pragma549_hclib_async(void *____arg, const int ___iter0) {
     pragma549 *ctx = (pragma549 *)____arg;
