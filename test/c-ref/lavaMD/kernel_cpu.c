@@ -39,24 +39,24 @@ extern "C" {
 //========================================================================================================================================================================================================200
 
 typedef struct _pragma115 {
-    long long time0;
-    long long time1;
-    long long time2;
-    long long time3;
-    long long time4;
-    double alpha;
-    double a2;
+    long long (*time0_ptr);
+    long long (*time1_ptr);
+    long long (*time2_ptr);
+    long long (*time3_ptr);
+    long long (*time4_ptr);
+    double (*alpha_ptr);
+    double (*a2_ptr);
     int i;
     int j;
     int k;
     int l;
     long first_i;
-    FOUR_VECTOR *rA;
-    FOUR_VECTOR *fA;
+    FOUR_VECTOR (*rA);
+    FOUR_VECTOR (*fA);
     int pointer;
     long first_j;
-    FOUR_VECTOR *rB;
-    double *qB;
+    FOUR_VECTOR (*rB);
+    double (*qB);
     double r2;
     double u2;
     double fs;
@@ -65,12 +65,12 @@ typedef struct _pragma115 {
     double fyij;
     double fzij;
     THREE_VECTOR d;
-    par_str par;
-    dim_str dim;
-    box_str *box;
-    FOUR_VECTOR *rv;
-    double *qv;
-    FOUR_VECTOR *fv;
+    par_str (*par_ptr);
+    dim_str (*dim_ptr);
+    box_str (*(*box_ptr));
+    FOUR_VECTOR (*(*rv_ptr));
+    double (*(*qv_ptr));
+    FOUR_VECTOR (*(*fv_ptr));
  } pragma115;
 
 static void pragma115_hclib_async(void *____arg, const int ___iter0);
@@ -87,12 +87,12 @@ typedef struct _main_entrypoint_ctx {
     int k;
     int l;
     long first_i;
-    FOUR_VECTOR *rA;
-    FOUR_VECTOR *fA;
+    FOUR_VECTOR (*rA);
+    FOUR_VECTOR (*fA);
     int pointer;
     long first_j;
-    FOUR_VECTOR *rB;
-    double *qB;
+    FOUR_VECTOR (*rB);
+    double (*qB);
     double r2;
     double u2;
     double fs;
@@ -103,10 +103,10 @@ typedef struct _main_entrypoint_ctx {
     THREE_VECTOR d;
     par_str par;
     dim_str dim;
-    box_str *box;
-    FOUR_VECTOR *rv;
-    double *qv;
-    FOUR_VECTOR *fv;
+    box_str (*box);
+    FOUR_VECTOR (*rv);
+    double (*qv);
+    FOUR_VECTOR (*fv);
  } main_entrypoint_ctx;
 
 
@@ -124,12 +124,12 @@ static void main_entrypoint(void *____arg) {
     int k; k = ctx->k;
     int l; l = ctx->l;
     long first_i; first_i = ctx->first_i;
-    FOUR_VECTOR *rA; rA = ctx->rA;
-    FOUR_VECTOR *fA; fA = ctx->fA;
+    FOUR_VECTOR (*rA); rA = ctx->rA;
+    FOUR_VECTOR (*fA); fA = ctx->fA;
     int pointer; pointer = ctx->pointer;
     long first_j; first_j = ctx->first_j;
-    FOUR_VECTOR *rB; rB = ctx->rB;
-    double *qB; qB = ctx->qB;
+    FOUR_VECTOR (*rB); rB = ctx->rB;
+    double (*qB); qB = ctx->qB;
     double r2; r2 = ctx->r2;
     double u2; u2 = ctx->u2;
     double fs; fs = ctx->fs;
@@ -140,10 +140,10 @@ static void main_entrypoint(void *____arg) {
     THREE_VECTOR d; d = ctx->d;
     par_str par; par = ctx->par;
     dim_str dim; dim = ctx->dim;
-    box_str *box; box = ctx->box;
-    FOUR_VECTOR *rv; rv = ctx->rv;
-    double *qv; qv = ctx->qv;
-    FOUR_VECTOR *fv; fv = ctx->fv;
+    box_str (*box); box = ctx->box;
+    FOUR_VECTOR (*rv); rv = ctx->rv;
+    double (*qv); qv = ctx->qv;
+    FOUR_VECTOR (*fv); fv = ctx->fv;
 {
 
 	//======================================================================================================================================================150
@@ -151,47 +151,47 @@ static void main_entrypoint(void *____arg) {
 	//======================================================================================================================================================150
 
  { 
-pragma115 *ctx = (pragma115 *)malloc(sizeof(pragma115));
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->time3 = time3;
-ctx->time4 = time4;
-ctx->alpha = alpha;
-ctx->a2 = a2;
-ctx->i = i;
-ctx->j = j;
-ctx->k = k;
-ctx->l = l;
-ctx->first_i = first_i;
-ctx->rA = rA;
-ctx->fA = fA;
-ctx->pointer = pointer;
-ctx->first_j = first_j;
-ctx->rB = rB;
-ctx->qB = qB;
-ctx->r2 = r2;
-ctx->u2 = u2;
-ctx->fs = fs;
-ctx->vij = vij;
-ctx->fxij = fxij;
-ctx->fyij = fyij;
-ctx->fzij = fzij;
-ctx->d = d;
-ctx->par = par;
-ctx->dim = dim;
-ctx->box = box;
-ctx->rv = rv;
-ctx->qv = qv;
-ctx->fv = fv;
+pragma115 *new_ctx = (pragma115 *)malloc(sizeof(pragma115));
+new_ctx->time0_ptr = &(time0);
+new_ctx->time1_ptr = &(time1);
+new_ctx->time2_ptr = &(time2);
+new_ctx->time3_ptr = &(time3);
+new_ctx->time4_ptr = &(time4);
+new_ctx->alpha_ptr = &(alpha);
+new_ctx->a2_ptr = &(a2);
+new_ctx->i = i;
+new_ctx->j = j;
+new_ctx->k = k;
+new_ctx->l = l;
+new_ctx->first_i = first_i;
+new_ctx->rA = rA;
+new_ctx->fA = fA;
+new_ctx->pointer = pointer;
+new_ctx->first_j = first_j;
+new_ctx->rB = rB;
+new_ctx->qB = qB;
+new_ctx->r2 = r2;
+new_ctx->u2 = u2;
+new_ctx->fs = fs;
+new_ctx->vij = vij;
+new_ctx->fxij = fxij;
+new_ctx->fyij = fyij;
+new_ctx->fzij = fzij;
+new_ctx->d = d;
+new_ctx->par_ptr = &(par);
+new_ctx->dim_ptr = &(dim);
+new_ctx->box_ptr = &(box);
+new_ctx->rv_ptr = &(rv);
+new_ctx->qv_ptr = &(qv);
+new_ctx->fv_ptr = &(fv);
 hclib_loop_domain_t domain[1];
 domain[0].low = 0;
 domain[0].high = dim.number_boxes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma115_hclib_async, ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma115_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
-free(ctx);
+free(new_ctx);
  }  // for l
     } ; }
 
@@ -261,41 +261,41 @@ void  kernel_cpu(	par_str par,
 
 	time3 = get_time();
 
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->time0 = time0;
-ctx->time1 = time1;
-ctx->time2 = time2;
-ctx->time3 = time3;
-ctx->time4 = time4;
-ctx->alpha = alpha;
-ctx->a2 = a2;
-ctx->i = i;
-ctx->j = j;
-ctx->k = k;
-ctx->l = l;
-ctx->first_i = first_i;
-ctx->rA = rA;
-ctx->fA = fA;
-ctx->pointer = pointer;
-ctx->first_j = first_j;
-ctx->rB = rB;
-ctx->qB = qB;
-ctx->r2 = r2;
-ctx->u2 = u2;
-ctx->fs = fs;
-ctx->vij = vij;
-ctx->fxij = fxij;
-ctx->fyij = fyij;
-ctx->fzij = fzij;
-ctx->d = d;
-ctx->par = par;
-ctx->dim = dim;
-ctx->box = box;
-ctx->rv = rv;
-ctx->qv = qv;
-ctx->fv = fv;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->time0 = time0;
+new_ctx->time1 = time1;
+new_ctx->time2 = time2;
+new_ctx->time3 = time3;
+new_ctx->time4 = time4;
+new_ctx->alpha = alpha;
+new_ctx->a2 = a2;
+new_ctx->i = i;
+new_ctx->j = j;
+new_ctx->k = k;
+new_ctx->l = l;
+new_ctx->first_i = first_i;
+new_ctx->rA = rA;
+new_ctx->fA = fA;
+new_ctx->pointer = pointer;
+new_ctx->first_j = first_j;
+new_ctx->rB = rB;
+new_ctx->qB = qB;
+new_ctx->r2 = r2;
+new_ctx->u2 = u2;
+new_ctx->fs = fs;
+new_ctx->vij = vij;
+new_ctx->fxij = fxij;
+new_ctx->fyij = fyij;
+new_ctx->fzij = fzij;
+new_ctx->d = d;
+new_ctx->par = par;
+new_ctx->dim = dim;
+new_ctx->box = box;
+new_ctx->rv = rv;
+new_ctx->qv = qv;
+new_ctx->fv = fv;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 
 
 	time4 = get_time();
@@ -317,24 +317,17 @@ free(ctx);
 }  
 static void pragma115_hclib_async(void *____arg, const int ___iter0) {
     pragma115 *ctx = (pragma115 *)____arg;
-    long long time0; time0 = ctx->time0;
-    long long time1; time1 = ctx->time1;
-    long long time2; time2 = ctx->time2;
-    long long time3; time3 = ctx->time3;
-    long long time4; time4 = ctx->time4;
-    double alpha; alpha = ctx->alpha;
-    double a2; a2 = ctx->a2;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
     int l; l = ctx->l;
     long first_i; first_i = ctx->first_i;
-    FOUR_VECTOR *rA; rA = ctx->rA;
-    FOUR_VECTOR *fA; fA = ctx->fA;
+    FOUR_VECTOR (*rA); rA = ctx->rA;
+    FOUR_VECTOR (*fA); fA = ctx->fA;
     int pointer; pointer = ctx->pointer;
     long first_j; first_j = ctx->first_j;
-    FOUR_VECTOR *rB; rB = ctx->rB;
-    double *qB; qB = ctx->qB;
+    FOUR_VECTOR (*rB); rB = ctx->rB;
+    double (*qB); qB = ctx->qB;
     double r2; r2 = ctx->r2;
     double u2; u2 = ctx->u2;
     double fs; fs = ctx->fs;
@@ -343,12 +336,6 @@ static void pragma115_hclib_async(void *____arg, const int ___iter0) {
     double fyij; fyij = ctx->fyij;
     double fzij; fzij = ctx->fzij;
     THREE_VECTOR d; d = ctx->d;
-    par_str par; par = ctx->par;
-    dim_str dim; dim = ctx->dim;
-    box_str *box; box = ctx->box;
-    FOUR_VECTOR *rv; rv = ctx->rv;
-    double *qv; qv = ctx->qv;
-    FOUR_VECTOR *fv; fv = ctx->fv;
     hclib_start_finish();
     do {
     l = ___iter0;
@@ -358,20 +345,20 @@ static void pragma115_hclib_async(void *____arg, const int ___iter0) {
 		//	home box - box parameters
 		//------------------------------------------------------------------------------------------100
 
-		first_i = box[l].offset;												// offset to common arrays
+		first_i = (*(ctx->box_ptr))[l].offset;												// offset to common arrays
 
 		//------------------------------------------------------------------------------------------100
 		//	home box - distance, force, charge and type parameters from common arrays
 		//------------------------------------------------------------------------------------------100
 
-		rA = &rv[first_i];
-		fA = &fv[first_i];
+		rA = &(*(ctx->rv_ptr))[first_i];
+		fA = &(*(ctx->fv_ptr))[first_i];
 
 		//------------------------------------------------------------------------------------------100
 		//	Do for the # of (home+neighbor) boxes
 		//------------------------------------------------------------------------------------------100
 
-		for (k=0; k<(1+box[l].nn); k++) 
+		for (k=0; k<(1+(*(ctx->box_ptr))[l].nn); k++) 
 		{
 
 			//----------------------------------------50
@@ -382,21 +369,21 @@ static void pragma115_hclib_async(void *____arg, const int ___iter0) {
 				pointer = l;													// set first box to be processed to home box
 			}
 			else{
-				pointer = box[l].nei[k-1].number;							// remaining boxes are neighbor boxes
+				pointer = (*(ctx->box_ptr))[l].nei[k-1].number;							// remaining boxes are neighbor boxes
 			}
 
 			//----------------------------------------50
 			//	neighbor box - box parameters
 			//----------------------------------------50
 
-			first_j = box[pointer].offset; 
+			first_j = (*(ctx->box_ptr))[pointer].offset; 
 
 			//----------------------------------------50
 			//	neighbor box - distance, force, charge and type parameters
 			//----------------------------------------50
 
-			rB = &rv[first_j];
-			qB = &qv[first_j];
+			rB = &(*(ctx->rv_ptr))[first_j];
+			qB = &(*(ctx->qv_ptr))[first_j];
 
 			//----------------------------------------50
 			//	Do for the # of particles in home box
@@ -409,7 +396,7 @@ static void pragma115_hclib_async(void *____arg, const int ___iter0) {
 
 					// // coefficients
 					r2 = rA[i].v + rB[j].v - DOT(rA[i],rB[j]); 
-					u2 = a2*r2;
+					u2 = (*(ctx->a2_ptr))*r2;
 					vij= exp(-u2);
 					fs = 2.*vij;
 					d.x = rA[i].x  - rB[j].x; 
@@ -433,6 +420,7 @@ static void pragma115_hclib_async(void *____arg, const int ___iter0) {
 
 	} ;     } while (0);
     ; hclib_end_finish();
+
 }
 
  // main

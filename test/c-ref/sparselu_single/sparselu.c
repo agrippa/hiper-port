@@ -214,34 +214,34 @@ void sparselu_init (float ***pBENCH, char *pass)
 }
 
 typedef struct _pragma236 {
-    int ii;
+    int (*ii_ptr);
     int jj;
     int kk;
-    float **BENCH;
+    float (*(*(*BENCH_ptr)));
  } pragma236;
 
 typedef struct _pragma244 {
     int ii;
-    int jj;
+    int (*jj_ptr);
     int kk;
-    float **BENCH;
+    float (*(*(*BENCH_ptr)));
  } pragma244;
 
 typedef struct _pragma257 {
     int ii;
     int jj;
     int kk;
-    float **BENCH;
+    float (*(*(*BENCH_ptr)));
  } pragma257;
 
 static void pragma236_hclib_async(void *____arg);
 static void pragma244_hclib_async(void *____arg);
 static void pragma257_hclib_async(void *____arg);
 typedef struct _pragma253 {
-    int ii;
-    int jj;
-    int kk;
-    float **BENCH;
+    int (*ii_ptr);
+    int (*jj_ptr);
+    int (*kk_ptr);
+    float (*(*(*BENCH_ptr)));
  } pragma253;
 
 static void pragma253_hclib_async(void *____arg);
@@ -249,7 +249,7 @@ typedef struct _main_entrypoint_ctx {
     int ii;
     int jj;
     int kk;
-    float **BENCH;
+    float (*(*BENCH));
  } main_entrypoint_ctx;
 
 
@@ -258,16 +258,16 @@ static void main_entrypoint(void *____arg) {
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
-    float **BENCH; BENCH = ctx->BENCH;
+    float (*(*BENCH)); BENCH = ctx->BENCH;
 {
 hclib_start_finish(); {
  { 
-pragma253 *ctx = (pragma253 *)malloc(sizeof(pragma253));
-ctx->ii = ii;
-ctx->jj = jj;
-ctx->kk = kk;
-ctx->BENCH = BENCH;
-hclib_async(pragma253_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma253 *new_ctx = (pragma253 *)malloc(sizeof(pragma253));
+new_ctx->ii_ptr = &(ii);
+new_ctx->jj_ptr = &(jj);
+new_ctx->kk_ptr = &(kk);
+new_ctx->BENCH_ptr = &(BENCH);
+hclib_async(pragma253_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
 
            } ; hclib_end_finish(); 
@@ -279,96 +279,91 @@ void sparselu_par_call(float **BENCH)
 
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->ii = ii;
-ctx->jj = jj;
-ctx->kk = kk;
-ctx->BENCH = BENCH;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->ii = ii;
+new_ctx->jj = jj;
+new_ctx->kk = kk;
+new_ctx->BENCH = BENCH;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 
    bots_message(" completed!\n");
 }  
 static void pragma253_hclib_async(void *____arg) {
     pragma253 *ctx = (pragma253 *)____arg;
-    int ii; ii = ctx->ii;
-    int jj; jj = ctx->jj;
-    int kk; kk = ctx->kk;
-    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
-for (kk=0; kk<bots_arg_size; kk++) 
+for ((*(ctx->kk_ptr))=0; (*(ctx->kk_ptr))<bots_arg_size; (*(ctx->kk_ptr))++) 
                {
-                   lu0(BENCH[kk*bots_arg_size+kk]);
-                   for (jj=kk+1; jj<bots_arg_size; jj++)
-                       if (BENCH[kk*bots_arg_size+jj] != NULL)
+                   lu0((*(ctx->BENCH_ptr))[(*(ctx->kk_ptr))*bots_arg_size+(*(ctx->kk_ptr))]);
+                   for ((*(ctx->jj_ptr))=(*(ctx->kk_ptr))+1; (*(ctx->jj_ptr))<bots_arg_size; (*(ctx->jj_ptr))++)
+                       if ((*(ctx->BENCH_ptr))[(*(ctx->kk_ptr))*bots_arg_size+(*(ctx->jj_ptr))] != NULL)
                        {
  { 
-pragma236 *ctx = (pragma236 *)malloc(sizeof(pragma236));
-ctx->ii = ii;
-ctx->jj = jj;
-ctx->kk = kk;
-ctx->BENCH = BENCH;
-hclib_async(pragma236_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma236 *new_ctx = (pragma236 *)malloc(sizeof(pragma236));
+new_ctx->ii_ptr = ctx->ii_ptr;
+new_ctx->jj = *(ctx->jj_ptr);
+new_ctx->kk = *(ctx->kk_ptr);
+new_ctx->BENCH_ptr = ctx->BENCH_ptr;
+hclib_async(pragma236_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
-                   for (ii=kk+1; ii<bots_arg_size; ii++) 
-                       if (BENCH[ii*bots_arg_size+kk] != NULL)
+                   for ((*(ctx->ii_ptr))=(*(ctx->kk_ptr))+1; (*(ctx->ii_ptr))<bots_arg_size; (*(ctx->ii_ptr))++) 
+                       if ((*(ctx->BENCH_ptr))[(*(ctx->ii_ptr))*bots_arg_size+(*(ctx->kk_ptr))] != NULL)
                        {
  { 
-pragma244 *ctx = (pragma244 *)malloc(sizeof(pragma244));
-ctx->ii = ii;
-ctx->jj = jj;
-ctx->kk = kk;
-ctx->BENCH = BENCH;
-hclib_async(pragma244_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma244 *new_ctx = (pragma244 *)malloc(sizeof(pragma244));
+new_ctx->ii = *(ctx->ii_ptr);
+new_ctx->jj_ptr = ctx->jj_ptr;
+new_ctx->kk = *(ctx->kk_ptr);
+new_ctx->BENCH_ptr = ctx->BENCH_ptr;
+hclib_async(pragma244_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
                        }
 
  hclib_end_finish(); hclib_start_finish(); ;
 
-                   for (ii=kk+1; ii<bots_arg_size; ii++)
-                       if (BENCH[ii*bots_arg_size+kk] != NULL)
-                           for (jj=kk+1; jj<bots_arg_size; jj++)
-                               if (BENCH[kk*bots_arg_size+jj] != NULL)
+                   for ((*(ctx->ii_ptr))=(*(ctx->kk_ptr))+1; (*(ctx->ii_ptr))<bots_arg_size; (*(ctx->ii_ptr))++)
+                       if ((*(ctx->BENCH_ptr))[(*(ctx->ii_ptr))*bots_arg_size+(*(ctx->kk_ptr))] != NULL)
+                           for ((*(ctx->jj_ptr))=(*(ctx->kk_ptr))+1; (*(ctx->jj_ptr))<bots_arg_size; (*(ctx->jj_ptr))++)
+                               if ((*(ctx->BENCH_ptr))[(*(ctx->kk_ptr))*bots_arg_size+(*(ctx->jj_ptr))] != NULL)
                                {
  { 
-pragma257 *ctx = (pragma257 *)malloc(sizeof(pragma257));
-ctx->ii = ii;
-ctx->jj = jj;
-ctx->kk = kk;
-ctx->BENCH = BENCH;
-hclib_async(pragma257_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma257 *new_ctx = (pragma257 *)malloc(sizeof(pragma257));
+new_ctx->ii = *(ctx->ii_ptr);
+new_ctx->jj = *(ctx->jj_ptr);
+new_ctx->kk = *(ctx->kk_ptr);
+new_ctx->BENCH_ptr = ctx->BENCH_ptr;
+hclib_async(pragma257_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
                                }
 
  hclib_end_finish(); hclib_start_finish(); ;
                } ;     ; hclib_end_finish();
+
 }
 
  
 static void pragma236_hclib_async(void *____arg) {
     pragma236 *ctx = (pragma236 *)____arg;
-    int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
-    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
-                           fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
+                           fwd((*(ctx->BENCH_ptr))[kk*bots_arg_size+kk], (*(ctx->BENCH_ptr))[kk*bots_arg_size+jj]);
                            } ;     ; hclib_end_finish();
+
 }
 
 
 static void pragma244_hclib_async(void *____arg) {
     pragma244 *ctx = (pragma244 *)____arg;
     int ii; ii = ctx->ii;
-    int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
-    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
-                           bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
+                           bdiv ((*(ctx->BENCH_ptr))[kk*bots_arg_size+kk], (*(ctx->BENCH_ptr))[ii*bots_arg_size+kk]);
                            } ;     ; hclib_end_finish();
+
 }
 
 
@@ -377,12 +372,12 @@ static void pragma257_hclib_async(void *____arg) {
     int ii; ii = ctx->ii;
     int jj; jj = ctx->jj;
     int kk; kk = ctx->kk;
-    float **BENCH; BENCH = ctx->BENCH;
     hclib_start_finish();
 {
-                                   if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();
-                                   bmod(BENCH[ii*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
+                                   if ((*(ctx->BENCH_ptr))[ii*bots_arg_size+jj]==NULL) (*(ctx->BENCH_ptr))[ii*bots_arg_size+jj] = allocate_clean_block();
+                                   bmod((*(ctx->BENCH_ptr))[ii*bots_arg_size+kk], (*(ctx->BENCH_ptr))[kk*bots_arg_size+jj], (*(ctx->BENCH_ptr))[ii*bots_arg_size+jj]);
                                    } ;     ; hclib_end_finish();
+
 }
 
 

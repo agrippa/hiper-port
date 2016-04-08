@@ -29,6 +29,64 @@ PragmaNode *PragmaNode::getParent() {
     return parent;
 }
 
+std::string PragmaNode::getPragmaName() {
+    if (marker == NULL) {
+        // Root node only
+        return "root";
+    }
+    assert(marker->getNumArgs() == 2);
+    const clang::Expr *pragmaNameArg = marker->getArg(0);
+    while (clang::isa<clang::ImplicitCastExpr>(pragmaNameArg)) {
+        pragmaNameArg = clang::dyn_cast<clang::ImplicitCastExpr>(
+                pragmaNameArg)->getSubExpr();
+    }
+    const clang::StringLiteral *literal = clang::dyn_cast<clang::StringLiteral>(
+            pragmaNameArg);
+    assert(literal);
+    std::string pragmaName = literal->getString().str();
+    return pragmaName;
+}
+
+std::string PragmaNode::getPragmaArguments() {
+    assert(marker->getNumArgs() == 2);
+    const clang::Expr *pragmaArgsArg = marker->getArg(1);
+    while (clang::isa<clang::ImplicitCastExpr>(pragmaArgsArg)) {
+        pragmaArgsArg = clang::dyn_cast<clang::ImplicitCastExpr>(
+                pragmaArgsArg)->getSubExpr();
+    }
+    const clang::StringLiteral *literal = clang::dyn_cast<clang::StringLiteral>(
+            pragmaArgsArg);
+    assert(literal);
+    return literal->getString().str();
+}
+
+std::string PragmaNode::getPragmaCmd() {
+    std::string pragmaName = getPragmaName();
+    assert(pragmaName == "omp");
+
+    std::string pragmaArgs = getPragmaArguments();
+    size_t ompPragmaNameEnd = pragmaArgs.find(' ');
+    std::string ompPragma;
+
+    if (ompPragmaNameEnd == std::string::npos) {
+        // No clauses
+        ompPragma = pragmaArgs;
+    } else {
+        ompPragma = pragmaArgs.substr(0, ompPragmaNameEnd);
+    }
+    return ompPragma;
+}
+
+PragmaNode *PragmaNode::getParentAccountForFusing() {
+    if (getParent()->getPragmaName() == "omp" &&
+            getParent()->getPragmaCmd() == "single" &&
+            getParent()->getParent()->getPragmaCmd() == "parallel") {
+        return getParent()->getParent()->getParent();
+    } else {
+        return getParent();
+    }
+}
+
 std::vector<PragmaNode *> *PragmaNode::getChildren() {
     return &children;
 }

@@ -27,7 +27,8 @@ for FILE in $FILES; do
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
     REFERENCE=$(dirname $DIRNAME)-ref/$TESTNAME/$FILENAME
 
-    $SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME $* &> transform.log
+    CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v"
+    $CMD &> transform.log
 
     if [[ ! -f $REFERENCE ]]; then
         echo

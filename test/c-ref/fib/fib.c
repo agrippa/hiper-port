@@ -38,14 +38,14 @@ long long fib_seq (int n)
 
 
 typedef struct _pragma46 {
-    long long x;
-    long long y;
+    long long (*x_ptr);
+    long long (*y_ptr);
     int n;
  } pragma46;
 
 typedef struct _pragma48 {
-    long long x;
-    long long y;
+    long long (*x_ptr);
+    long long (*y_ptr);
     int n;
  } pragma48;
 
@@ -57,18 +57,18 @@ long long fib (int n)
 	if (n < 2) return n;
 
  { 
-pragma46 *ctx = (pragma46 *)malloc(sizeof(pragma46));
-ctx->x = x;
-ctx->y = y;
-ctx->n = n;
-hclib_async(pragma46_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma46 *new_ctx = (pragma46 *)malloc(sizeof(pragma46));
+new_ctx->x_ptr = &(x);
+new_ctx->y_ptr = &(y);
+new_ctx->n = n;
+hclib_async(pragma46_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma48 *ctx = (pragma48 *)malloc(sizeof(pragma48));
-ctx->x = x;
-ctx->y = y;
-ctx->n = n;
-hclib_async(pragma48_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
+pragma48 *new_ctx = (pragma48 *)malloc(sizeof(pragma48));
+new_ctx->x_ptr = &(x);
+new_ctx->y_ptr = &(y);
+new_ctx->n = n;
+hclib_async(pragma48_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
@@ -76,21 +76,19 @@ hclib_async(pragma48_hclib_async, ctx, NO_FUTURE, ANY_PLACE);
 } 
 static void pragma46_hclib_async(void *____arg) {
     pragma46 *ctx = (pragma46 *)____arg;
-    long long x; x = ctx->x;
-    long long y; y = ctx->y;
     int n; n = ctx->n;
     hclib_start_finish();
-x = fib(n - 1) ;     ; hclib_end_finish();
+(*(ctx->x_ptr)) = fib(n - 1) ;     ; hclib_end_finish();
+
 }
 
 
 static void pragma48_hclib_async(void *____arg) {
     pragma48 *ctx = (pragma48 *)____arg;
-    long long x; x = ctx->x;
-    long long y; y = ctx->y;
     int n; n = ctx->n;
     hclib_start_finish();
-y = fib(n - 2) ;     ; hclib_end_finish();
+(*(ctx->y_ptr)) = fib(n - 2) ;     ; hclib_end_finish();
+
 }
 
 
@@ -108,20 +106,16 @@ static void main_entrypoint(void *____arg) {
     int n; n = ctx->n;
 {
 hclib_start_finish(); {
-#if defined(MANUAL_CUTOFF) || defined(IF_CUTOFF) || defined(FINAL_CUTOFF)
-                par_res = fib(n,0);
-#else
                 par_res = fib(n);
-#endif
             } ; hclib_end_finish(); 
     } ; }
 
 void fib0 (int n)
 {
-main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-ctx->n = n;
-hclib_launch(main_entrypoint, ctx);
-free(ctx);
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->n = n;
+hclib_launch(main_entrypoint, new_ctx);
+free(new_ctx);
 
     bots_message("Fibonacci result for %d is %lld\n",n,par_res);
 } 

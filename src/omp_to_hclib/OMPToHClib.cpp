@@ -35,8 +35,20 @@
  */
 
 extern clang::FunctionDecl *curr_func_decl;
+extern std::vector<clang::ValueDecl *> globals;
 
 #define ASYNC_SUFFIX "_hclib_async"
+
+static bool isGlobal(std::string varname) {
+    for (std::vector<clang::ValueDecl *>::iterator ii = globals.begin(),
+            ee = globals.end(); ii != ee; ii++) {
+        clang::ValueDecl *var = *ii;
+        if (var->getNameAsString() == varname) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void OMPToHClib::setParent(const clang::Stmt *child,
         const clang::Stmt *parent) {
@@ -49,13 +61,81 @@ const clang::Stmt *OMPToHClib::getParent(const clang::Stmt *s) {
     return parentMap.at(s);
 }
 
-std::string OMPToHClib::stmtToString(const clang::Stmt* stmt) {
+std::string OMPToHClib::stmtToString(const clang::Stmt *stmt) {
     // std::string s;
     // llvm::raw_string_ostream stream(s);
     // stmt->printPretty(stream, NULL, Context->getPrintingPolicy());
     // stream.flush();
     // return s;
     return rewriter->getRewrittenText(stmt->getSourceRange());
+}
+
+void OMPToHClib::replaceAllReferencesTo(const clang::Stmt *stmt,
+        std::vector<OMPVarInfo> *shared) {
+    if (const clang::DeclRefExpr *ref = clang::dyn_cast<clang::DeclRefExpr>(stmt)) {
+        for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
+                e = shared->end(); i != e; i++) {
+            OMPVarInfo info = *i;
+            if (info.getDecl() == ref->getDecl() && !info.checkIsGlobal()) {
+                clang::PresumedLoc presumedStart = SM->getPresumedLoc(ref->getLocation());
+                std::stringstream loc;
+                loc << std::string(presumedStart.getFilename()) <<
+                    ":" << presumedStart.getLine() << ":" <<
+                    presumedStart.getColumn();
+
+                const bool failed = rewriter->ReplaceText(ref->getSourceRange(),
+                        "(*(ctx->" + info.getDecl()->getNameAsString() +
+                        "_ptr))");
+                if (failed) {
+                    std::cerr << "Failed replacing \"" <<
+                        info.getDecl()->getNameAsString() << "\" at " <<
+                        loc.str() << ", likely inside of a macro." << std::endl;
+                    exit(1);
+                }
+                break;
+            }
+        }
+    } else {
+        std::vector<const clang::Stmt *> children;
+
+        for (clang::Stmt::const_child_iterator i = stmt->child_begin(),
+                e = stmt->child_end(); i != e; i++) {
+            const clang::Stmt *child = *i;
+            if (child != NULL) {
+                children.push_back(child);
+            }
+        }
+        for (std::vector<const clang::Stmt *>::reverse_iterator i =
+                children.rbegin(), e = children.rend(); i != e; i++) {
+            replaceAllReferencesTo(*i, shared);
+        }
+    }
+}
+
+std::string OMPToHClib::stmtToStringWithSharedVars(const clang::Stmt *stmt,
+        std::vector<OMPVarInfo> *shared) {
+    // std::stringstream ss;
+    // for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
+    //         e = shared->end(); i != e; i++) {
+    //     OMPVarInfo info = *i;
+    //     if (!info.checkIsGlobal()) {
+    //         ss << "#define " << info.getDecl()->getNameAsString() <<
+    //             " (*(ctx->" << info.getDecl()->getNameAsString() << "_ptr))" <<
+    //             std::endl;
+    //     }
+    // }
+    // ss << stmtToString(stmt) << std::endl;
+    // for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
+    //         e = shared->end(); i != e; i++) {
+    //     OMPVarInfo info = *i;
+    //     if (!info.checkIsGlobal()) {
+    //         ss << "#undef " << info.getDecl()->getNameAsString() << std::endl;
+    //     }
+    // }
+
+    replaceAllReferencesTo(stmt, shared);
+    return stmtToString(stmt);
+    // return ss.str();
 }
 
 std::string OMPToHClib::stringForAST(const clang::Stmt *stmt) {
@@ -104,7 +184,7 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
     } else if (const clang::PointerType *pointerType =
             type->getAs<clang::PointerType>()) {
         return getDeclarationTypeStr(pointerType->getPointeeType(), name,
-                soFarBefore + "*", soFarAfter);
+                soFarBefore + "(*", ")" + soFarAfter);
     } else if (const clang::BuiltinType *builtinType =
             type->getAs<clang::BuiltinType>()) {
         return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
@@ -206,17 +286,18 @@ std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
 
     if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
         std::string arraySizeExpr = getArraySizeExpr(decl->getType());
-        ss << "memcpy(ctx->" << decl->getNameAsString() << ", " <<
+        ss << "memcpy(new_ctx->" << decl->getNameAsString() << ", " <<
             decl->getNameAsString() << ", " << arraySizeExpr << "); ";
     } else if (type->getAs<clang::PointerType>() ||
             type->getAs<clang::BuiltinType>() ||
             type->getAs<clang::TypedefType>() ||
             type->getAs<clang::ElaboratedType>() ||
             type->getAs<clang::TagType>()) {
-        ss << "ctx->" << decl->getNameAsString() << " = " << decl->getNameAsString() <<
-            ";";
+        ss << "new_ctx->" << decl->getNameAsString() << " = " <<
+            decl->getNameAsString() << ";";
     } else {
-        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        std::cerr << "Unsupported type " <<
+            std::string(type->getTypeClassName()) << std::endl;
         exit(1);
     }
 
@@ -225,23 +306,50 @@ std::string OMPToHClib::getCaptureStr(clang::ValueDecl *decl) {
 }
 
 std::string OMPToHClib::getStructDef(std::string structName,
-        std::vector<clang::ValueDecl *> *captured, bool hasReductions) {
-    std::string struct_def = "typedef struct _" + structName + " {\n";
+        std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses) {
+    std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
-    for (std::vector<clang::ValueDecl *>::iterator ii =
-            captured->begin(), ee = captured->end();
-            ii != ee; ii++) {
-        clang::ValueDecl *curr = *ii;
-        struct_def += "    " + getDeclarationStr(curr) + "\n";
+    std::stringstream ss;
+    ss << "typedef struct _" << structName << " {" << std::endl;
+
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo var = *i;
+        clang::ValueDecl *decl = var.getDecl();
+
+        switch (var.getType()) {
+            case (CAPTURE_TYPE::SHARED):
+                if (!var.checkIsGlobal()) {
+                    ss << "    " << getDeclarationTypeStr(
+                            Context->getPointerType(decl->getType()),
+                            decl->getNameAsString() + "_ptr",
+                            "", "") << ";" << std::endl;
+                }
+                break;
+            case (CAPTURE_TYPE::PRIVATE):
+            case (CAPTURE_TYPE::FIRSTPRIVATE):
+                ss << "    " << getDeclarationStr(decl) << std::endl;
+                break;
+            case (CAPTURE_TYPE::LASTPRIVATE):
+                ss << "    " << getDeclarationStr(decl) << std::endl;
+                ss << "    " << getDeclarationTypeStr(
+                        Context->getPointerType(decl->getType()),
+                        decl->getNameAsString() + "_ptr", "", "") << ";" <<
+                    std::endl;
+                break;
+            default:
+                std::cerr << "Unsupported capture type" << std::endl;
+                exit(1);
+        }
     }
 
-    if (hasReductions) {
-        struct_def += "    pthread_mutex_t reduction_mutex;\n";
+    if (clauses->getReductions()->size() > 0) {
+        ss << "    pthread_mutex_t reduction_mutex;" << std::endl;
     }
 
-    struct_def += " } " + structName + ";\n\n";
+    ss << " } " << structName << ";" << std::endl << std::endl;
 
-    return struct_def;
+    return ss.str();
 }
 
 void OMPToHClib::preFunctionVisit(clang::FunctionDecl *func) {
@@ -422,9 +530,11 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, bool emulatesOmpDepends, std::vector<OMPReductionVar> *reductions,
-        std::vector<const clang::ValueDecl *> *condVars) {
+        std::string bodyStr, bool emulatesOmpDepends,
+        OMPClauses *clauses, std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
+    std::vector<OMPReductionVar> *reductions = clauses->getReductions();
+    std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
     ss << "\nstatic ";
@@ -441,11 +551,27 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
     ss << ") {\n";
 
-    ss << "    " << contextName << " *ctx = (" << contextName << " *)____arg;\n";
-    for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
-            ee = captured->end(); ii != ee; ii++) {
-        clang::ValueDecl *curr = *ii;
-        ss << "    " << getUnpackStr(curr) << "\n";
+    ss << "    " << contextName << " *ctx = (" << contextName <<
+        " *)____arg;\n";
+    
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo var = *i;
+        clang::ValueDecl *decl = var.getDecl();
+
+        switch (var.getType()) {
+            case (CAPTURE_TYPE::SHARED):
+                // Do nothing, should refer to the captured address in the body
+                break;
+            case (CAPTURE_TYPE::PRIVATE):
+            case (CAPTURE_TYPE::FIRSTPRIVATE):
+            case (CAPTURE_TYPE::LASTPRIVATE):
+                ss << "    " << getUnpackStr(decl) << std::endl;
+                break;
+            default:
+                std::cerr << "Unsupported capture type" << std::endl;
+                exit(1);
+        }
     }
 
     if (isAsyncClosure || isForasyncClosure) {
@@ -513,8 +639,35 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         }
     }
     if (isAsyncClosure || isForasyncClosure) {
-        ss << "    ; hclib_end_finish();\n";
+        ss << "    ; hclib_end_finish();\n\n";
     }
+
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo var = *i;
+        clang::ValueDecl *decl = var.getDecl();
+
+        switch (var.getType()) {
+            case (CAPTURE_TYPE::SHARED):
+            case (CAPTURE_TYPE::PRIVATE):
+            case (CAPTURE_TYPE::FIRSTPRIVATE):
+                break;
+            case (CAPTURE_TYPE::LASTPRIVATE):
+                /*
+                 * Unsupported at the moment, would need to check if this is the
+                 * last iteration.
+                 */
+                assert(false);
+                assert(isForasyncClosure);
+                ss << "    *(ctx->" << decl->getNameAsString() << "_ptr) = " <<
+                    decl->getNameAsString() << ";" << std::endl;
+                break;
+            default:
+                std::cerr << "Unsupported capture type" << std::endl;
+                exit(1);
+        }
+    }
+
     if (emulatesOmpDepends) {
         ss << "    return NULL;\n";
     }
@@ -522,28 +675,83 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     return ss.str();
 }
 
-std::string OMPToHClib::getContextSetup(std::string structName,
-        std::vector<clang::ValueDecl *> *captured,
-        std::vector<OMPReductionVar> *reductions) {
-    std::stringstream ss;
-    ss << structName << " *ctx = (" << structName << " *)malloc(sizeof(" <<
-        structName << "));\n";
-
-    for (std::vector<clang::ValueDecl *>::iterator ii = captured->begin(),
-            ee = captured->end(); ii != ee; ii++) {
-        clang::ValueDecl *curr = *ii;
-        ss << getCaptureStr(curr) << "\n";
+enum CAPTURE_TYPE OMPToHClib::getParentCaptureType(PragmaNode *curr,
+        std::string varname) {
+    if (curr == NULL || curr->getPragmaName() != "omp") {
+        return CAPTURE_TYPE::PRIVATE;
     }
 
-    if (reductions && !reductions->empty()) {
+    OMPClauses *clauses = getOMPClausesForMarker(curr->getMarker());
+    std::vector<OMPVarInfo> *vars = clauses->getVarInfo(curr->getCaptures());
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo info = *i;
+        if (info.getDecl()->getNameAsString() == varname) {
+            return info.getType();
+        }
+    }
+
+    return getParentCaptureType(curr->getParentAccountForFusing(), varname);
+}
+
+std::string OMPToHClib::getContextSetup(PragmaNode *node,
+        std::string structName, std::vector<clang::ValueDecl *> *captured,
+        OMPClauses *clauses) {
+    std::stringstream ss;
+    ss << structName << " *new_ctx = (" << structName << " *)malloc(sizeof(" <<
+        structName << "));\n";
+    std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
+
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo var = *i;
+        clang::ValueDecl *decl = var.getDecl();
+        enum CAPTURE_TYPE parentType = getParentCaptureType(
+                node->getParentAccountForFusing(), decl->getNameAsString());
+
+        switch (var.getType()) {
+            case (CAPTURE_TYPE::SHARED):
+                if (!var.checkIsGlobal()) {
+                    if (parentType == CAPTURE_TYPE::SHARED) {
+                        ss << "new_ctx->" << decl->getNameAsString() <<
+                            "_ptr = ctx->" << decl->getNameAsString() <<
+                            "_ptr;" << std::endl;
+                    } else {
+                        ss << "new_ctx->" << decl->getNameAsString() <<
+                            "_ptr = &(" << decl->getNameAsString() << ");" <<
+                            std::endl;
+                    }
+                }
+                break;
+            case (CAPTURE_TYPE::PRIVATE):
+            case (CAPTURE_TYPE::FIRSTPRIVATE):
+                if (parentType == CAPTURE_TYPE::SHARED) {
+                    ss << "new_ctx->" << decl->getNameAsString() <<
+                        " = *(ctx->" << decl->getNameAsString() << "_ptr);" <<
+                        std::endl;
+                } else {
+                    ss << getCaptureStr(decl) << std::endl;
+                }
+                break;
+            case (CAPTURE_TYPE::LASTPRIVATE):
+                assert(false);
+                break;
+            default:
+                std::cerr << "Unsupported capture type" << std::endl;
+                exit(1);
+        }
+    }
+
+    std::vector<OMPReductionVar> *reductions = clauses->getReductions();
+    if (!reductions->empty()) {
         for (std::vector<OMPReductionVar>::iterator i = reductions->begin(),
                 e = reductions->end(); i != e; i++) {
             OMPReductionVar red = *i;
             // Initialize the reduction target based on the reduction op
-            ss << "ctx->" << red.getVar() << " = " << red.getInitialValue() <<
+            ss << "new_ctx->" << red.getVar() << " = " << red.getInitialValue() <<
                 ";\n";
         }
-        ss << "const int init_err = pthread_mutex_init(&ctx->reduction_mutex, NULL);\n";
+        ss << "const int init_err = pthread_mutex_init(&new_ctx->reduction_mutex, NULL);\n";
         ss << "assert(init_err == 0);\n";
     }
 
@@ -571,7 +779,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
         for (std::vector<PragmaNode *>::iterator i = leaves->begin(),
                 e = leaves->end(); i != e; i++) {
             PragmaNode *node = *i;
-            std::string pragmaName = getPragmaNameForMarker(node->getMarker());
+            std::string pragmaName = node->getPragmaName();
 
             if (pragmaName == "omp_to_hclib") {
                 if (foundOmpToHclibLaunch) {
@@ -582,17 +790,26 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 }
                 foundOmpToHclibLaunch = true;
 
+                OMPClauses *generatedClauses = new OMPClauses();
+                std::vector<clang::ValueDecl *> *captures = node->getCaptures();
+                for (std::vector<clang::ValueDecl *>::iterator i =
+                        captures->begin(), e = captures->end(); i != e; i++) {
+                    generatedClauses->addClauseArg("private",
+                            (*i)->getNameAsString());
+                }
+
                 std::string launchBody = stmtToString(node->getBody());
                 std::string launchStruct = getStructDef(
-                        "main_entrypoint_ctx", node->getCaptures(), false);
+                        "main_entrypoint_ctx", captures, generatedClauses);
                 std::string closureFunction = getClosureDef(
                         "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        node->getCaptures(), launchBody, false);
-                std::string contextSetup = getContextSetup(
-                        "main_entrypoint_ctx", node->getCaptures(), NULL);
+                        captures, launchBody, false, generatedClauses);
+                std::string contextSetup = getContextSetup(node,
+                        "main_entrypoint_ctx", captures,
+                        generatedClauses);
                 std::string launchStr = contextSetup +
-                    "hclib_launch(main_entrypoint, ctx);\n" +
-                    "free(ctx);\n";
+                    "hclib_launch(main_entrypoint, new_ctx);\n" +
+                    "free(new_ctx);\n";
 
                 bool failed = rewriter->ReplaceText(
                         clang::SourceRange(node->getStartLoc(),
@@ -602,7 +819,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 accumulatedStructDefs += launchStruct;
                 accumulatedKernelDecls += closureFunction;
             } else if (pragmaName == "omp") {
-                std::string ompCmd = getOMPPragmaNameForMarker(node->getMarker());
+                std::string ompCmd = node->getPragmaCmd();
                 OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
 
                 if (ompCmd == "critical" || ompCmd == "atomic") {
@@ -635,10 +852,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     assert(!failed);
                 } else if (ompCmd == "single") {
                     assert(node->getParent()); // should not be root
-                    assert(getPragmaNameForMarker(node->getParent()->getMarker()) == "omp");
+                    assert(node->getParent()->getPragmaName() == "omp");
 
-                    std::string parentCmd = getOMPPragmaNameForMarker(
-                            node->getParent()->getMarker());
+                    std::string parentCmd = node->getParent()->getPragmaCmd();
                     if (parentCmd != "parallel") {
                         std::cerr << "It appears the \"single\" pragma " <<
                             "on line " << node->getStartLine() <<
@@ -674,15 +890,17 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     const clang::Stmt *body = node->getBody();
 
                     const bool failed = rewriter->ReplaceText(
-                            clang::SourceRange(node->getParent()->getStartLoc(), node->getParent()->getEndLoc()),
-                            "hclib_start_finish(); " + stmtToString(body) + " ; hclib_end_finish(); ");
+                            clang::SourceRange(node->getParent()->getStartLoc(),
+                                node->getParent()->getEndLoc()),
+                            "hclib_start_finish(); " + stmtToString(body) +
+                                " ; hclib_end_finish(); ");
                     assert(!failed);
                 } else if (ompCmd == "task") {
                     const clang::Stmt *body = node->getBody();
-                    std::string bodyStr = stmtToString(body);
-
                     OMPClauses *clauses = getOMPClausesForMarker(
                             node->getMarker());
+                    std::string bodyStr = stmtToStringWithSharedVars(body,
+                            clauses->getSharedVarInfo(node->getCaptures()));
 
                     accumulatedKernelDecls += getClosureDecl(
                             node->getLbl() + ASYNC_SUFFIX, false, -1,
@@ -691,24 +909,22 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
                             node->getLbl(), node->getCaptures(),
-                            bodyStr, clauses->hasClause("depend"), NULL, NULL);
+                            bodyStr, clauses->hasClause("depend"), clauses);
 
                     const std::string structDef = getStructDef(
-                            node->getLbl(), node->getCaptures(),
-                            false);
+                            node->getLbl(), node->getCaptures(), clauses);
                     accumulatedStructDefs += structDef;
 
                     std::stringstream contextCreation;
-                    contextCreation << "\n" <<
-                        getContextSetup(node->getLbl(), node->getCaptures(),
-                                NULL);
+                    contextCreation << "\n" << getContextSetup(node,
+                            node->getLbl(), node->getCaptures(), clauses);
 
                     if (clauses->hasClause("if")) {
                         // We have already asserted there is only one if arg
                         std::string ifArg = clauses->getSingleArg("if");
                         // If the if condition is false, just call the task body sequentially
                         contextCreation << "if (!(" << ifArg << ")) {\n";
-                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(ctx);\n";
+                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(new_ctx);\n";
                         contextCreation << "} else {\n";
                     }
 
@@ -721,7 +937,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             depends->getOutDependencies();
                         contextCreation << "hclib_emulate_omp_task(" <<
                             node->getLbl() << ASYNC_SUFFIX <<
-                            ", ctx, ANY_PLACE, " << in->size() << ", " <<
+                            ", new_ctx, ANY_PLACE, " << in->size() << ", " <<
                             out->size();
 
                         for (std::vector<OMPDependency>::iterator i =
@@ -740,7 +956,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                     } else {
                         contextCreation << "hclib_async(" << node->getLbl() <<
-                            ASYNC_SUFFIX << ", ctx, NO_FUTURE, ANY_PLACE);\n";
+                            ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, ANY_PLACE);\n";
                     }
 
                     if (clauses->hasClause("if")) {
@@ -770,27 +986,18 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         }
 
                         std::vector<OMPReductionVar> *reductions =
-                            getReductions(clauses);
-
-                        const std::string structDef = getStructDef(
-                                node->getLbl(), node->getCaptures(),
-                                !reductions->empty());
-                        accumulatedStructDefs += structDef;
-
-                        std::stringstream contextCreation;
-                        contextCreation << "\n" <<
-                            getContextSetup(node->getLbl(), node->getCaptures(),
-                                    reductions);
+                            clauses->getReductions();
 
                         std::string bodyStr;
                         std::vector<const clang::ValueDecl *> condVars;
                         const int nLoops = clauses->getNumCollapsedLoops();
-                        contextCreation << "hclib_loop_domain_t domain[" <<
-                            nLoops << "];\n";
 
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops, false);
 
+                        std::stringstream loopConfiguration;
+                        loopConfiguration << "hclib_loop_domain_t domain[" <<
+                            nLoops << "];\n";
                         const clang::ForStmt *currLoop = forLoop;
                         for (int l = 0; l < nLoops; l++) {
                             const clang::Stmt *init = currLoop->getInit();
@@ -808,15 +1015,20 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             std::string strideStr = getStrideFromIncr(inc,
                                     condVar);
 
-                            bodyStr = stmtToString(currLoop->getBody());
+                            clauses->addClauseArg("private",
+                                    condVar->getNameAsString());
 
-                            contextCreation << "domain["  << l << "].low = " <<
+                            bodyStr = stmtToStringWithSharedVars(
+                                    currLoop->getBody(),
+                                    clauses->getSharedVarInfo(node->getCaptures()));
+
+                            loopConfiguration << "domain["  << l << "].low = " <<
                                 lowStr << ";\n";
-                            contextCreation << "domain["  << l << "].high = " <<
+                            loopConfiguration << "domain["  << l << "].high = " <<
                                 highStr << ";\n";
-                            contextCreation << "domain["  << l <<
+                            loopConfiguration << "domain["  << l <<
                                 "].stride = " << strideStr << ";\n";
-                            contextCreation << "domain["  << l <<
+                            loopConfiguration << "domain["  << l <<
                                 "].tile = 1;\n";
 
                             currLoop = clang::dyn_cast<clang::ForStmt>(
@@ -824,24 +1036,34 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             assert(currLoop || l == nLoops - 1);
                         }
 
+                        std::stringstream contextCreation;
+                        contextCreation << "\n" <<
+                            getContextSetup(node, node->getLbl(),
+                                    node->getCaptures(), clauses);
+                        contextCreation << loopConfiguration.str();
+
+                        const std::string structDef = getStructDef(
+                                node->getLbl(), node->getCaptures(), clauses);
+                        accumulatedStructDefs += structDef;
+
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, false, reductions, &condVars);
+                                bodyStr, false, clauses, &condVars);
 
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<
-                            node->getLbl() << ASYNC_SUFFIX << ", ctx, NULL, " <<
+                            node->getLbl() << ASYNC_SUFFIX << ", new_ctx, NULL, " <<
                             nLoops << ", domain, FORASYNC_MODE_RECURSIVE);\n";
                         contextCreation << "hclib_future_wait(fut);\n";
-                        contextCreation << "free(ctx);\n";
+                        contextCreation << "free(new_ctx);\n";
 
                         for (std::vector<OMPReductionVar>::iterator i =
                                 reductions->begin(), e = reductions->end();
                                 i != e; i++) {
                             OMPReductionVar var = *i;
                             contextCreation << var.getVar() << " = " <<
-                                "ctx->" << var.getVar() << ";\n";
+                                "new_ctx->" << var.getVar() << ";\n";
                         }
 
                         // Add braces to ensure we don't change control flow
@@ -1029,23 +1251,6 @@ const clang::Stmt *OMPToHClib::getBodyForMarker(const clang::CallExpr *call) {
     }
 }
 
-std::string OMPToHClib::getOMPPragmaNameForMarker(const clang::CallExpr *call) {
-    std::string pragmaName = getPragmaNameForMarker(call);
-    assert(pragmaName == "omp");
-
-    std::string pragmaArgs = getPragmaArgumentsForMarker(call);
-    size_t ompPragmaNameEnd = pragmaArgs.find(' ');
-    std::string ompPragma;
-
-    if (ompPragmaNameEnd == std::string::npos) {
-        // No clauses
-        ompPragma = pragmaArgs;
-    } else {
-        ompPragma = pragmaArgs.substr(0, ompPragmaNameEnd);
-    }
-    return ompPragma;
-}
-
 OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
     std::string pragmaName = getPragmaNameForMarker(call);
     assert(pragmaName == "omp");
@@ -1113,25 +1318,6 @@ OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
     }
 
     return parsed;
-}
-
-std::vector<OMPReductionVar> *OMPToHClib::getReductions(OMPClauses *clauses) {
-    std::vector<OMPReductionVar> *reductions = new std::vector<OMPReductionVar>();
-    if (clauses->hasClause("reduction")) {
-        std::vector<SingleClauseArgs *> *args = clauses->getArgs("reduction");
-        for (std::vector<SingleClauseArgs *>::iterator i = args->begin(),
-                e = args->end(); i != e; i++) {
-            SingleClauseArgs *single_arg = *i;
-            std::vector<std::string> *raw_args = single_arg->getArgs();
-
-            std::string op = raw_args->at(0);
-            assert(op == "+");
-            for (int v = 1; v < raw_args->size(); v++) {
-                reductions->push_back(OMPReductionVar(op, raw_args->at(v)));
-            }
-        }
-    }
-    return reductions;
 }
 
 void OMPToHClib::VisitStmt(const clang::Stmt *s) {
