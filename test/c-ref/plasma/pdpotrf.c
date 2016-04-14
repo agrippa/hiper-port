@@ -220,6 +220,7 @@ static void *pragma59_hclib_async(void *____arg) {
             } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -235,6 +236,7 @@ cblas_dtrsm(
                         (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -251,6 +253,7 @@ static void *pragma82_hclib_async(void *____arg) {
                 } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -264,6 +267,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)Plasma
                             (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->A_ptr)).mb) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 

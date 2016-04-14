@@ -318,6 +318,7 @@ void floorplan_end (void)
 {
     /* write results */
     write_outputs();
+    exit(0);
 }
 
 int floorplan_verify (void)

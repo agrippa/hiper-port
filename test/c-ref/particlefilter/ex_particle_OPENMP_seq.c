@@ -1516,7 +1516,8 @@ static void main_entrypoint(void *____arg) {
     long long endVideoSequence; endVideoSequence = ctx->endVideoSequence;
     int argc; argc = ctx->argc;
     char (*(*argv)); argv = ctx->argv;
-particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) ; }
+particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) ;     free(____arg);
+}
 
 int main(int argc, char * argv[]){
 	

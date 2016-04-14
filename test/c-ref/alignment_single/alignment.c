@@ -510,7 +510,8 @@ hclib_async(pragma465_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
             } // end if (n == 0 || m == 0)
          } // for (j)
       } ; hclib_end_finish();  // end parallel
-   } ; }
+   } ;     free(____arg);
+}
 
 int pairalign()
 {
@@ -591,6 +592,7 @@ static void pragma465_hclib_async(void *____arg) {
                   bench_output[si*nseqs+sj] = (int) mm_score;
                } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

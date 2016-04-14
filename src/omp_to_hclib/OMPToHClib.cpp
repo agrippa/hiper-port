@@ -671,6 +671,11 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     if (emulatesOmpDepends) {
         ss << "    return NULL;\n";
     }
+
+    if (!isForasyncClosure) {
+        ss << "    free(____arg);\n";
+    }
+
     ss << "}\n\n";
     return ss.str();
 }
@@ -692,6 +697,25 @@ enum CAPTURE_TYPE OMPToHClib::getParentCaptureType(PragmaNode *curr,
     }
 
     return getParentCaptureType(curr->getParentAccountForFusing(), varname);
+}
+
+std::string OMPToHClib::getCriticalSectionLockStr(int criticalSectionId) {
+    std::stringstream lock_ss;
+    lock_ss << " { const int ____lock_" << criticalSectionId <<
+        "_err = pthread_mutex_lock(&critical_" <<
+        criticalSectionId << "_lock); assert(____lock_" <<
+        criticalSectionId << "_err == 0); ";
+    return lock_ss.str();
+}
+
+std::string OMPToHClib::getCriticalSectionUnlockStr(int criticalSectionId) {
+    std::stringstream unlock_ss;
+    unlock_ss << "; const int ____unlock_" <<
+        criticalSectionId << "_err = " <<
+        "pthread_mutex_unlock(&critical_" <<
+        criticalSectionId << "_lock); assert(____unlock_" <<
+        criticalSectionId << "_err == 0); } ";
+    return unlock_ss.str();
 }
 
 std::string OMPToHClib::getContextSetup(PragmaNode *node,
@@ -822,29 +846,49 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                 std::string ompCmd = node->getPragmaCmd();
                 OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
 
-                if (ompCmd == "critical" || ompCmd == "atomic") {
-                    // For now we implement atomic with rather heavyweight locks
+                if (ompCmd == "critical") {
                     const clang::Stmt *body = node->getBody();
 
-                    std::stringstream lock_ss;
-                    lock_ss << " { const int ____lock_" << criticalSectionId <<
-                        "_err = pthread_mutex_lock(&critical_" <<
-                        criticalSectionId << "_lock); assert(____lock_" <<
-                        criticalSectionId << "_err == 0); ";
-
-                    std::stringstream unlock_ss;
-                    unlock_ss << "; const int ____unlock_" <<
-                        criticalSectionId << "_err = " <<
-                        "pthread_mutex_unlock(&critical_" <<
-                        criticalSectionId << "_lock); assert(____unlock_" <<
-                        criticalSectionId << "_err); } ";
-
+                    std::string lock = getCriticalSectionLockStr(criticalSectionId);
+                    std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
                     criticalSectionId++;
 
                     const bool failed = rewriter->ReplaceText(
                             clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                            lock_ss.str() + stmtToString(body) + unlock_ss.str());
+                            lock + stmtToString(body) + unlock);
                     assert(!failed);
+                } else if (ompCmd == "atomic") {
+                    // For now we implement atomic with rather heavyweight locks
+                    const clang::Stmt *body = node->getBody();
+                    const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(body);
+                    assert(bin);
+                    clang::Expr *rhs = bin->getRHS();
+
+                    std::stringstream tmp_varname;
+                    tmp_varname << "____critical_section_tmp_" << criticalSectionId;
+
+                    clang::Expr *lhs = bin->getLHS();
+                    clang::DeclRefExpr *declRef = clang::dyn_cast<clang::DeclRefExpr>(lhs);
+                    assert(declRef);
+                    clang::ValueDecl *decl = declRef->getDecl();
+                    std::string typeStr = decl->getType().getAsString();
+
+                    std::string lock = getCriticalSectionLockStr(criticalSectionId);
+                    std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
+                    std::stringstream ss;
+                    ss << "const " << typeStr << " " << tmp_varname.str() << " = " << stmtToString(rhs) <<
+                        ";" << std::endl;
+                    criticalSectionId++;
+
+                    if (bin->getOpcode() == clang::BO_AddAssign) {
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                                ss.str() + lock + stmtToString(lhs) + " += " + tmp_varname.str() + " " + unlock);
+                        assert(!failed);
+                    } else {
+                        std::cerr << "Unsupported binary operator in atomic: " << bin->getOpcode() << std::endl;
+                        exit(1);
+                    }
                 } else if (ompCmd == "taskwait") {
                     const bool failed = rewriter->ReplaceText(
                             clang::SourceRange(node->getStartLoc(), node->getEndLoc()),

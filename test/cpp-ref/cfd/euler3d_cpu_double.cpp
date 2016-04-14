@@ -616,7 +616,8 @@ static void main_entrypoint(void *____arg) {
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
-    } ; }
+    } ;     free(____arg);
+}
 
 int main(int argc, char** argv)
 {

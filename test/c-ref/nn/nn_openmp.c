@@ -185,7 +185,8 @@ free(new_ctx);
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	} ; }
+	} ;     free(____arg);
+}
 
 int main(int argc, char* argv[]) {
 	long long time0 = clock();

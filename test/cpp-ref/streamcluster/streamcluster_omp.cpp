@@ -882,7 +882,8 @@ while(1) {
       { 
 	break;
       }
-  } ; }
+  } ;     free(____arg);
+}
 
 float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 	       int pid)

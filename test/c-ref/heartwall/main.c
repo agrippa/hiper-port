@@ -184,7 +184,8 @@ free(new_ctx);
 		printf("%d ", public.frame_no);
 		fflush(NULL);
 
-	} ; }
+	} ;     free(____arg);
+}
 
 int main(int argc, char *argv []){
 

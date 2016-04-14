@@ -352,7 +352,8 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 
-	} ; }
+	} ;     free(____arg);
+}
 
 int main(int argc, char* argv[])
 {   

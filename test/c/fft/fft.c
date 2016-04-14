@@ -4677,7 +4677,7 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
           #pragma omp taskwait
 
 	  for (k = 0; k < n; k += m) {
-               #pragma omp task untied
+               #pragma omp task untied firstprivate(k)
 	       fft_aux(m, out + k, in + k, factors + 1, W, nW);
 	  }
           #pragma omp taskwait

@@ -107,6 +107,7 @@ static void pragma26_hclib_async(void *____arg) {
     hclib_start_finish();
 copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->block_size_ptr))) ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -118,6 +119,7 @@ static void pragma36_hclib_async(void *____arg) {
 compute_estimate(block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->f__ptr)), (*(ctx->dx_ptr)), (*(ctx->dy_ptr)),
                                      (*(ctx->nx_ptr)), (*(ctx->ny_ptr)), (*(ctx->block_size_ptr))) ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

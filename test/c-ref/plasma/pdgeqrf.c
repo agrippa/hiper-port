@@ -228,6 +228,7 @@ static void *pragma46_hclib_async(void *____arg) {
         } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -245,6 +246,7 @@ static void *pragma58_hclib_async(void *____arg) {
             } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -261,6 +263,7 @@ static void *pragma75_hclib_async(void *____arg) {
             } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -278,6 +281,7 @@ static void *pragma91_hclib_async(void *____arg) {
                 } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 

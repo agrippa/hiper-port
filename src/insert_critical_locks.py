@@ -20,7 +20,7 @@ sys.stdout.write(line)
 index = start
 while index < stop:
     sys.stdout.write('pthread_mutex_t critical_' + str(index) +
-            '_lock = PTHREAD_MUTEX_INITIALIZER;\n')
+            '_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;\n')
     index += 1
 
 line = sys.stdin.readline()

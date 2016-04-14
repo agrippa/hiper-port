@@ -337,7 +337,8 @@ static void main_entrypoint(void *____arg) {
     float acc = accuracy(tempOut,answer,numRows*numCols*layers);
     printf("Time: %.3f (s)\n",time);
     printf("Accuracy: %e\n",acc);
-    } ; }
+    } ;     free(____arg);
+}
 
 int main(int argc, char** argv)
 {

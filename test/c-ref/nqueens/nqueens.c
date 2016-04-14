@@ -164,6 +164,7 @@ static void pragma128_hclib_async(void *____arg) {
        				nqueens(n, (*(ctx->j_ptr)) + 1, b,&(*(ctx->csols_ptr))[(*(ctx->i_ptr))],(*(ctx->depth_ptr))); //FIXME: depth or depth+1 ???
 		} ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -187,7 +188,8 @@ hclib_start_finish(); {
 			nqueens(size, 0, a, &total_count,0);
 		} ; hclib_end_finish(); 
 	bots_message(" completed!\n");
-    } ; }
+    } ;     free(____arg);
+}
 
 void find_queens (int size)
 {

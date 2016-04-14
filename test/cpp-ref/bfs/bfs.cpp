@@ -196,7 +196,8 @@ free(new_ctx);
             k++;
         }
 	while(stop);
-    } ; }
+    } ;     free(____arg);
+}
 
 void BFSGraph( int argc, char** argv) 
 {

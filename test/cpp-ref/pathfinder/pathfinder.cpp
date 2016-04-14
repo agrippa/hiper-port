@@ -135,7 +135,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma103_hclib_async, new_c
 hclib_future_wait(fut);
 free(new_ctx);
  } 
-    } ; }
+    } ;     free(____arg);
+}
 
 void run(int argc, char** argv)
 {

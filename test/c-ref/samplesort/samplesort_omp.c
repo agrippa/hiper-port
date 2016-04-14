@@ -205,6 +205,7 @@ static void pragma146_hclib_async(void *____arg) {
               par_sort((*(ctx->buf_ptr)));
           } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -215,6 +216,7 @@ static void pragma156_hclib_async(void *____arg) {
               par_sort((*(ctx->buf_ptr)));
           } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -282,7 +284,8 @@ static void main_entrypoint(void *____arg) {
     uint64_t (*Output); Output = ctx->Output;
     int argc; argc = ctx->argc;
     char (*(*argv)); argv = ctx->argv;
-sorting(InputData, NoofElements_Bloc) ; }
+sorting(InputData, NoofElements_Bloc) ;     free(____arg);
+}
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/

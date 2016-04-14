@@ -103,6 +103,7 @@ for (j = 0; j < ny; j++) {
                     ((*(ctx->u_ptr)))[i * ny + j] = ((*(ctx->unew_ptr)))[i * ny + j];
                 } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -125,6 +126,7 @@ for (j = 0; j < ny; j++) {
                     }
                 } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

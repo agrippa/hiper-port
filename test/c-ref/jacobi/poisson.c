@@ -231,6 +231,7 @@ for (jj=j; jj<j+(*(ctx->block_size_ptr)); ++jj) {
                     }
                 } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -323,6 +324,7 @@ for (jj=j; jj<j+block_size; ++jj)
                 }
             } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

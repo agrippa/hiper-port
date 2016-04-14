@@ -196,7 +196,8 @@ new_ctx->root_ptr = &(root);
 hclib_async(pragma188_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
            } ; hclib_end_finish(); 
-   } ; }
+   } ;     free(____arg);
+}
 
 unsigned long long parallel_uts ( Node *root )
 {
@@ -221,6 +222,7 @@ static void pragma188_hclib_async(void *____arg) {
     hclib_start_finish();
 (*(ctx->num_nodes_ptr)) = parTreeSearch( 0, (*(ctx->root_ptr)), (*(ctx->root_ptr))->numChildren ) ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -291,6 +293,7 @@ static void pragma220_hclib_async(void *____arg) {
     hclib_start_finish();
 (*(ctx->partialCount_ptr))[i] = parTreeSearch((*(ctx->depth_ptr))+1, nodePtr, nodePtr->numChildren) ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

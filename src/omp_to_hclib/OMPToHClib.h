@@ -108,6 +108,9 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         clang::Expr *unwrapCasts(clang::Expr *expr);
 
+        std::string getCriticalSectionLockStr(int criticalSectionId);
+        std::string getCriticalSectionUnlockStr(int criticalSectionId);
+
         /*
          * Map from line containing a OMP pragma to its immediate predessor. It
          * is safe to use a line here because no more than one pragma can appear

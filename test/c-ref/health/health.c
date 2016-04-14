@@ -455,6 +455,7 @@ static void pragma422_hclib_async(void *____arg) {
     hclib_start_finish();
 sim_village_par((*(ctx->vlist_ptr))) ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 
@@ -588,7 +589,8 @@ new_ctx->top_ptr = &(top);
 hclib_async(pragma558_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
-    } ; }
+    } ;     free(____arg);
+}
 
 void sim_village_main_par(struct Village *top)
 {
@@ -607,6 +609,7 @@ static void pragma558_hclib_async(void *____arg) {
                     for ((*(ctx->i_ptr)) = 0; (*(ctx->i_ptr)) < sim_time; (*(ctx->i_ptr))++) sim_village_par((*(ctx->top_ptr)));   
                 } ;     ; hclib_end_finish();
 
+    free(____arg);
 }
 
 

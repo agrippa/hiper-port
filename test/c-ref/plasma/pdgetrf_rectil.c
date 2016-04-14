@@ -400,6 +400,7 @@ static void *pragma58_hclib_async(void *____arg) {
         } ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -409,6 +410,7 @@ static void *pragma81_hclib_async(void *____arg) {
 CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -422,6 +424,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                         (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -435,6 +438,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                                 (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 
@@ -444,6 +448,7 @@ static void *pragma156_hclib_async(void *____arg) {
 CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish();
 
     return NULL;
+    free(____arg);
 }
 
 

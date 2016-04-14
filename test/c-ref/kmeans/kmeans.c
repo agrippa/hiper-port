@@ -154,7 +154,8 @@ for (i=0; i<nloops; i++) {
                 &cluster_centres   
                );
      
-    } ; }
+    } ;     free(____arg);
+}
 
 int main(int argc, char **argv) {
            int     opt;

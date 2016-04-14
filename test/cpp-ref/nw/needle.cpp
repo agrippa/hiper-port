@@ -312,7 +312,8 @@ static void main_entrypoint(void *____arg) {
     int argc; argc = ctx->argc;
     char (*(*argv)); argv = ctx->argv;
 nw_optimized( input_itemsets, output_itemsets, referrence,
-        max_rows, max_cols, penalty ) ; }
+        max_rows, max_cols, penalty ) ;     free(____arg);
+}
 
 void
 runTest( int argc, char** argv) 

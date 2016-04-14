@@ -193,7 +193,8 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma115_hclib_async, new_c
 hclib_future_wait(fut);
 free(new_ctx);
  }  // for l
-    } ; }
+    } ;     free(____arg);
+}
 
 void  kernel_cpu(	par_str par, 
 					dim_str dim,

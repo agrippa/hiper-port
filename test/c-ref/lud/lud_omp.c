@@ -118,7 +118,8 @@ free(new_ctx);
     }
 
     lud_diagonal_omp(a, size, offset);
-    } ; }
+    } ;     free(____arg);
+}
 
 void lud_omp(float *a, int size)
 {

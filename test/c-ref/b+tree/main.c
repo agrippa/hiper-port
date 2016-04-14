@@ -2283,7 +2283,8 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 		}
 		printf("> ");
 
-	} ; }
+	} ;     free(____arg);
+}
 
 int 
 main(	int argc, 
