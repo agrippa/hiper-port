@@ -144,6 +144,8 @@ int main(int argc, char* argv[])
 
 // get Number of thread if OpenMP is activated
 
+#pragma omp_to_hclib
+    {
     // warmup
     run(&params);
 
@@ -209,6 +211,7 @@ int main(int argc, char* argv[])
     if (params.string2display !=0)
       printf("%s", params.string2display);
     printf("\n");
+    }
 
     return 0;
 }
