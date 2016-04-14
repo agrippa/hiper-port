@@ -127,7 +127,7 @@ static void pragma21_hclib_async(void *____arg, const int ___iter0, const int __
     do {
     block_x = ___iter0;
     block_y = ___iter1;
-copy_block((*(ctx->nx_ptr))(ctx->nx_ptr)), (*(ctx->ny_ptr))(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr))(ctx->u__ptr)), (*(ctx->unew__ptr))x->unew__ptr)), (*(ctx->block_size_ptr))ock_size_ptr))) ;     } while (0);
+copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->block_size_ptr))) ;     } while (0);
     ; hclib_end_finish();
 
 }
@@ -142,8 +142,8 @@ static void pragma26_hclib_async(void *____arg, const int ___iter0, const int __
     do {
     block_x = ___iter0;
     block_y = ___iter1;
-compute_estimate(block_x, block_y, (*(ctx->u__ptr))(ctx->u__ptr)), (*(ctx->unew__ptr))x->unew__ptr)), (*(ctx->f__ptr))(ctx->f__ptr)), (*(ctx->dx_ptr))(ctx->dx_ptr)), (*(ctx->dy_ptr))(ctx->dy_ptr)),
-                                 (*(ctx->nx_ptr))(ctx->nx_ptr)), (*(ctx->ny_ptr))(ctx->ny_ptr)), (*(ctx->block_size_ptr))ock_size_ptr))) ;     } while (0);
+compute_estimate(block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->f__ptr)), (*(ctx->dx_ptr)), (*(ctx->dy_ptr)),
+                                 (*(ctx->nx_ptr)), (*(ctx->ny_ptr)), (*(ctx->block_size_ptr))) ;     } while (0);
     ; hclib_end_finish();
 
 }

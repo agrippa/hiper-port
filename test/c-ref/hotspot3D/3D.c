@@ -417,7 +417,6 @@ new_ctx->answer = answer;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
     writeoutput(tempOut,numRows, numCols, layers, ofile);
     free(tempIn);

@@ -633,7 +633,6 @@ new_ctx->data_file_name = data_file_name;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
 	std::cout << "Done..." << std::endl;

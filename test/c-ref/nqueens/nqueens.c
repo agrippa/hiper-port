@@ -196,7 +196,6 @@ void find_queens (int size)
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 new_ctx->size = size;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 } 
 

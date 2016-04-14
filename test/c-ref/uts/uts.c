@@ -210,7 +210,6 @@ main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypo
 new_ctx->num_nodes = num_nodes;
 new_ctx->root = root;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
    bots_message(" completed!");

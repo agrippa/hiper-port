@@ -539,7 +539,6 @@ new_ctx->mm_score = mm_score;
 new_ctx->mat_xref = mat_xref;
 new_ctx->matptr = matptr;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
    return 0;

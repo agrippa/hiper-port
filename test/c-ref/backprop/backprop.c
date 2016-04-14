@@ -488,7 +488,6 @@ new_ctx->net = net;
 new_ctx->eo = eo;
 new_ctx->eh = eh;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
 } 

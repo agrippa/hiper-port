@@ -286,7 +286,6 @@ new_ctx->jj = jj;
 new_ctx->kk = kk;
 new_ctx->BENCH = BENCH;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
    bots_message(" completed!\n");
 }  

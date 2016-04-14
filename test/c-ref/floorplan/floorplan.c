@@ -368,7 +368,6 @@ void compute_floorplan (void)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 } 
 

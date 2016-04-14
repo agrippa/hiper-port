@@ -296,7 +296,6 @@ new_ctx->rv = rv;
 new_ctx->qv = qv;
 new_ctx->fv = fv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
 	time4 = get_time();

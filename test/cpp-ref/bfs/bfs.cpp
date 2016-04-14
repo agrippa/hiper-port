@@ -295,7 +295,6 @@ new_ctx->h_cost = h_cost;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
 	//Store the result into a file

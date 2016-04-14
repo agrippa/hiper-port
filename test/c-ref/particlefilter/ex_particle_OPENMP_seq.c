@@ -1606,7 +1606,6 @@ new_ctx->endVideoSequence = endVideoSequence;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 ;
 
 	long long endParticleFilter = get_time();

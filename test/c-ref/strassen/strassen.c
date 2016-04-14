@@ -1536,7 +1536,6 @@ new_ctx->B = B;
 new_ctx->C = C;
 new_ctx->n = n;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 }  
 static void pragma824_hclib_async(void *____arg) {

@@ -599,7 +599,6 @@ main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypo
 new_ctx->i = i;
 new_ctx->top = top;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 }  
 static void pragma558_hclib_async(void *____arg) {

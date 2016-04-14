@@ -129,6 +129,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         bool foundOmpToHclibLaunch = false;
 
         std::vector<std::string> compatiblePthreadAPIs;
+
+        std::set<const clang::DeclRefExpr *> sharedVarsReplaced;
 };
 
 #endif

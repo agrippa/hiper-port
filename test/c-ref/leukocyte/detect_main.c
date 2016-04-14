@@ -378,7 +378,6 @@ new_ctx->grad_y = grad_y;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 	
 	// Report total program execution time

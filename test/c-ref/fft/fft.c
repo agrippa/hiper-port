@@ -6356,7 +6356,6 @@ new_ctx->n = n;
 new_ctx->in = in;
 new_ctx->out = out;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
      bots_message(" completed!\n");
 

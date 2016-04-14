@@ -268,7 +268,6 @@ new_ctx->z = z;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 //End while loop
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);

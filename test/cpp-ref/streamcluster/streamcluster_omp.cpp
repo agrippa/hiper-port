@@ -1015,7 +1015,6 @@ new_ctx->kmax = kmax;
 new_ctx->kfinal = kfinal;
 new_ctx->pid = pid;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
   //clean up...

@@ -161,7 +161,6 @@ new_ctx->min = min;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
 hclib_launch(main_entrypoint, new_ctx);
-free(new_ctx);
 
 
     pin_stats_pause(cycles);

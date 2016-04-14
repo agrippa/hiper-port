@@ -73,26 +73,29 @@ std::string OMPToHClib::stmtToString(const clang::Stmt *stmt) {
 void OMPToHClib::replaceAllReferencesTo(const clang::Stmt *stmt,
         std::vector<OMPVarInfo> *shared) {
     if (const clang::DeclRefExpr *ref = clang::dyn_cast<clang::DeclRefExpr>(stmt)) {
-        for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
-                e = shared->end(); i != e; i++) {
-            OMPVarInfo info = *i;
-            if (info.getDecl() == ref->getDecl() && !info.checkIsGlobal()) {
-                clang::PresumedLoc presumedStart = SM->getPresumedLoc(ref->getLocation());
-                std::stringstream loc;
-                loc << std::string(presumedStart.getFilename()) <<
-                    ":" << presumedStart.getLine() << ":" <<
-                    presumedStart.getColumn();
+        if (sharedVarsReplaced.find(ref) == sharedVarsReplaced.end()) {
+            for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
+                    e = shared->end(); i != e; i++) {
+                OMPVarInfo info = *i;
+                if (info.getDecl() == ref->getDecl() && !info.checkIsGlobal()) {
+                    clang::PresumedLoc presumedStart = SM->getPresumedLoc(ref->getLocation());
+                    std::stringstream loc;
+                    loc << std::string(presumedStart.getFilename()) <<
+                        ":" << presumedStart.getLine() << ":" <<
+                        presumedStart.getColumn();
 
-                const bool failed = rewriter->ReplaceText(ref->getSourceRange(),
-                        "(*(ctx->" + info.getDecl()->getNameAsString() +
-                        "_ptr))");
-                if (failed) {
-                    std::cerr << "Failed replacing \"" <<
-                        info.getDecl()->getNameAsString() << "\" at " <<
-                        loc.str() << ", likely inside of a macro." << std::endl;
-                    exit(1);
+                    const bool failed = rewriter->ReplaceText(ref->getSourceRange(),
+                            "(*(ctx->" + info.getDecl()->getNameAsString() +
+                            "_ptr))");
+                    if (failed) {
+                        std::cerr << "Failed replacing \"" <<
+                            info.getDecl()->getNameAsString() << "\" at " <<
+                            loc.str() << ", likely inside of a macro." << std::endl;
+                        exit(1);
+                    }
+                    sharedVarsReplaced.insert(ref);
+                    break;
                 }
-                break;
             }
         }
     } else {
@@ -114,28 +117,8 @@ void OMPToHClib::replaceAllReferencesTo(const clang::Stmt *stmt,
 
 std::string OMPToHClib::stmtToStringWithSharedVars(const clang::Stmt *stmt,
         std::vector<OMPVarInfo> *shared) {
-    // std::stringstream ss;
-    // for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
-    //         e = shared->end(); i != e; i++) {
-    //     OMPVarInfo info = *i;
-    //     if (!info.checkIsGlobal()) {
-    //         ss << "#define " << info.getDecl()->getNameAsString() <<
-    //             " (*(ctx->" << info.getDecl()->getNameAsString() << "_ptr))" <<
-    //             std::endl;
-    //     }
-    // }
-    // ss << stmtToString(stmt) << std::endl;
-    // for (std::vector<OMPVarInfo>::iterator i = shared->begin(),
-    //         e = shared->end(); i != e; i++) {
-    //     OMPVarInfo info = *i;
-    //     if (!info.checkIsGlobal()) {
-    //         ss << "#undef " << info.getDecl()->getNameAsString() << std::endl;
-    //     }
-    // }
-
     replaceAllReferencesTo(stmt, shared);
     return stmtToString(stmt);
-    // return ss.str();
 }
 
 std::string OMPToHClib::stringForAST(const clang::Stmt *stmt) {
@@ -832,8 +815,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", captures,
                         generatedClauses);
                 std::string launchStr = contextSetup +
-                    "hclib_launch(main_entrypoint, new_ctx);\n" +
-                    "free(new_ctx);\n";
+                    "hclib_launch(main_entrypoint, new_ctx);\n";
 
                 bool failed = rewriter->ReplaceText(
                         clang::SourceRange(node->getStartLoc(),
