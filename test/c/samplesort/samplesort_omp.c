@@ -85,7 +85,6 @@ static int compare(const void *i, const void *j)
   return (0);
 }
 
-#ifdef ASYNC_SHMEM
 int partition(TYPE* data, int left, int right) {
   int i = left;
   int j = right;
@@ -111,28 +110,6 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _pragma146 {
-    sort_data_t (*(*buf_ptr));
-    int (*index_ptr);
-    sort_data_t (*(*in_ptr));
-    uint64_t (*(*data_ptr));
-    int (*left_ptr);
-    int (*right_ptr);
-    void (*(*arg_ptr));
- } pragma146;
-
-typedef struct _pragma156 {
-    sort_data_t (*(*buf_ptr));
-    int (*index_ptr);
-    sort_data_t (*(*in_ptr));
-    uint64_t (*(*data_ptr));
-    int (*left_ptr);
-    int (*right_ptr);
-    void (*(*arg_ptr));
- } pragma156;
-
-static void pragma146_hclib_async(void *____arg);
-static void pragma156_hclib_async(void *____arg);
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
@@ -141,71 +118,39 @@ void par_sort(void* arg) {
 
   if (right - left + 1 > HC_GRANULARITY) {
     int index = partition(data, left, right);
-hclib_start_finish(); {
+#pragma omp parallel
+    {
+#pragma omp single nowait
+        {
         if (left < index - 1) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = left;
           buf->right = index - 1; 
- { 
-pragma146 *new_ctx = (pragma146 *)malloc(sizeof(pragma146));
-new_ctx->buf_ptr = &(buf);
-new_ctx->index_ptr = &(index);
-new_ctx->in_ptr = &(in);
-new_ctx->data_ptr = &(data);
-new_ctx->left_ptr = &(left);
-new_ctx->right_ptr = &(right);
-new_ctx->arg_ptr = &(arg);
-hclib_async(pragma146_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
- } 
+#pragma omp task
+          {
+              par_sort(buf);
+          }
         }
         if (index < right) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = index;
           buf->right = right; 
- { 
-pragma156 *new_ctx = (pragma156 *)malloc(sizeof(pragma156));
-new_ctx->buf_ptr = &(buf);
-new_ctx->index_ptr = &(index);
-new_ctx->in_ptr = &(in);
-new_ctx->data_ptr = &(data);
-new_ctx->left_ptr = &(left);
-new_ctx->right_ptr = &(right);
-new_ctx->arg_ptr = &(arg);
-hclib_async(pragma156_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
- } 
+#pragma omp task
+          {
+              par_sort(buf);
+          }
         }
-        } ; hclib_end_finish(); 
+        }
+    }
   }
   else {
     //  quicksort in C library
     qsort(data+left, right - left + 1, sizeof(TYPE), compare);
   }
   free(arg);
-} 
-static void pragma146_hclib_async(void *____arg) {
-    pragma146 *ctx = (pragma146 *)____arg;
-    hclib_start_finish();
-{
-              par_sort((*(ctx->buf_ptr)));
-          } ;     ; hclib_end_finish();
-
-    free(____arg);
 }
-
-
-static void pragma156_hclib_async(void *____arg) {
-    pragma156 *ctx = (pragma156 *)____arg;
-    hclib_start_finish();
-{
-              par_sort((*(ctx->buf_ptr)));
-          } ;     ; hclib_end_finish();
-
-    free(____arg);
-}
-
-
 
 void sorting(TYPE* buffer, int size) {
   sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
@@ -214,67 +159,11 @@ void sorting(TYPE* buffer, int size) {
   buf->right = size - 1; 
   par_sort(buf);
 }
-#else
-void sorting(TYPE* buffer, int size) {
-  qsort(buffer, size, sizeof(TYPE), compare);
-}
-#endif
-
-typedef struct _main_entrypoint_ctx {
-    int Numprocs;
-    int MyRank;
-    int Root;
-    int i;
-    int j;
-    int k;
-    int NoofElements;
-    int NoofElements_Bloc;
-    int NoElementsToSort;
-    int count;
-    int temp;
-    uint64_t (*Input);
-    uint64_t (*InputData);
-    uint64_t (*Splitter);
-    uint64_t (*AllSplitter);
-    uint64_t (*Buckets);
-    uint64_t (*BucketBuffer);
-    uint64_t (*LocalBucket);
-    uint64_t (*OutputBuffer);
-    uint64_t (*Output);
-    int argc;
-    char (*(*argv));
- } main_entrypoint_ctx;
-
-
-static void main_entrypoint(void *____arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int Numprocs; Numprocs = ctx->Numprocs;
-    int MyRank; MyRank = ctx->MyRank;
-    int Root; Root = ctx->Root;
-    int i; i = ctx->i;
-    int j; j = ctx->j;
-    int k; k = ctx->k;
-    int NoofElements; NoofElements = ctx->NoofElements;
-    int NoofElements_Bloc; NoofElements_Bloc = ctx->NoofElements_Bloc;
-    int NoElementsToSort; NoElementsToSort = ctx->NoElementsToSort;
-    int count; count = ctx->count;
-    int temp; temp = ctx->temp;
-    uint64_t (*Input); Input = ctx->Input;
-    uint64_t (*InputData); InputData = ctx->InputData;
-    uint64_t (*Splitter); Splitter = ctx->Splitter;
-    uint64_t (*AllSplitter); AllSplitter = ctx->AllSplitter;
-    uint64_t (*Buckets); Buckets = ctx->Buckets;
-    uint64_t (*BucketBuffer); BucketBuffer = ctx->BucketBuffer;
-    uint64_t (*LocalBucket); LocalBucket = ctx->LocalBucket;
-    uint64_t (*OutputBuffer); OutputBuffer = ctx->OutputBuffer;
-    uint64_t (*Output); Output = ctx->Output;
-    int argc; argc = ctx->argc;
-    char (*(*argv)); argv = ctx->argv;
-sorting(InputData, NoofElements_Bloc) ;     free(____arg);
-}
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
+#pragma omp_to_hclib
+  {
   shmem_init (); 
   /* Variable Declarations */
 
@@ -306,13 +195,11 @@ int main (int argc, char *argv[]) {
 
   if (MyRank == Root){
     /* Initialise random number generator  */ 
-    fprintf (stderr, "Generating input Array for Sorting %d uint64_t numbers\n",SIZE);
+    printf ("Generating input Array for Sorting %d uint64_t numbers\n",SIZE);
     srand48((TYPE)NoofElements);
     for(i=0; i< NoofElements; i++) {
-        fprintf(stderr, "i=%d Input=%p\n",i, Input);
       Input[i] = rand();
     }
-    fprintf(stderr, "Done generating input array\n");
   }
 
   /**** Sending Data ****/
@@ -334,31 +221,8 @@ int main (int argc, char *argv[]) {
   }
   shmem_barrier_all();
 
-main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-new_ctx->Numprocs = Numprocs;
-new_ctx->MyRank = MyRank;
-new_ctx->Root = Root;
-new_ctx->i = i;
-new_ctx->j = j;
-new_ctx->k = k;
-new_ctx->NoofElements = NoofElements;
-new_ctx->NoofElements_Bloc = NoofElements_Bloc;
-new_ctx->NoElementsToSort = NoElementsToSort;
-new_ctx->count = count;
-new_ctx->temp = temp;
-new_ctx->Input = Input;
-new_ctx->InputData = InputData;
-new_ctx->Splitter = Splitter;
-new_ctx->AllSplitter = AllSplitter;
-new_ctx->Buckets = Buckets;
-new_ctx->BucketBuffer = BucketBuffer;
-new_ctx->LocalBucket = LocalBucket;
-new_ctx->OutputBuffer = OutputBuffer;
-new_ctx->Output = Output;
-new_ctx->argc = argc;
-new_ctx->argv = argv;
-hclib_launch(main_entrypoint, new_ctx);
-;
+  /**** Sorting Locally ****/
+  sorting(InputData, NoofElements_Bloc);
 
   /**** Choosing Local Splitters ****/
   Splitter = (TYPE *) shmem_malloc (sizeof (TYPE) * (Numprocs-1));
@@ -393,7 +257,6 @@ hclib_launch(main_entrypoint, new_ctx);
   //MPI_Bcast (Splitter, Numprocs-1, TYPE_MPI, 0, MPI_COMM_WORLD);
   { int _i; for(_i=0; _i<_SHMEM_BCAST_SYNC_SIZE; _i++) { pSync[_i] = _SHMEM_SYNC_VALUE; } shmem_barrier_all(); }
   shmem_broadcast64(Splitter, Splitter, Numprocs-1, 0, 0, 0, Numprocs, pSync);
-
   shmem_barrier_all();
 
   /**** Creating Numprocs Buckets locally ****/
@@ -502,5 +365,6 @@ hclib_launch(main_entrypoint, new_ctx);
 
    /**** Finalize ****/
   shmem_finalize();
-} 
+  }
+}
 
