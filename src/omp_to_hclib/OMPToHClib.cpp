@@ -1388,13 +1388,30 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                         "translation" << std::endl;
                     exit(1);
                 }
-            }
-        }
 
-        if (const clang::CallExpr *call = clang::dyn_cast<clang::CallExpr>(s)) {
-            if (call->getDirectCallee()) {
-                const clang::FunctionDecl *callee = call->getDirectCallee();
-                std::string calleeName = callee->getNameAsString();
+                // Support for OpenSHMEM
+                if (calleeName.find("shmem_") == 0) {
+                    if (calleeName == "shmem_malloc" ||
+                            calleeName == "shmem_my_pe" ||
+                            calleeName == "shmem_n_pes") {
+                        // Translate to reference the equivalent OpenSHMEM API in the HClib namespace.
+                        const bool failed = rewriter->InsertText(start, "hclib::", true, true);
+                        assert(!failed);
+                    } else if (calleeName == "shmem_init" ||
+                            calleeName == "shmem_finalize") {
+                        /*
+                         * Assume that OpenSHMEM initialization and finalization
+                         * is taken care of by the HClib runtime, as part of the
+                         * OpenSHMEM module's duties during runtime
+                         * initialization and teardown.
+                         */
+                        const bool failed = rewriter->RemoveText(clang::SourceRange(start, end));
+                        assert(!failed);
+                    } else {
+                        std::cerr << "Found unsupported OpenSHMEM call \"" << calleeName << "\"" << std::endl;
+                        exit(1);
+                    }
+                }
 
                 if (calleeName == "hclib_pragma_marker") {
                     const clang::Stmt *body = getBodyForMarker(call);
