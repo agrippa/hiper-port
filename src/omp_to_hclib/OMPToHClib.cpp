@@ -1392,11 +1392,20 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                 // Support for OpenSHMEM
                 if (calleeName.find("shmem_") == 0) {
                     if (calleeName == "shmem_malloc" ||
+                            calleeName == "shmem_free" ||
                             calleeName == "shmem_my_pe" ||
-                            calleeName == "shmem_n_pes") {
+                            calleeName == "shmem_n_pes" ||
+                            calleeName == "shmem_barrier_all" ||
+                            calleeName == "shmem_put64" ||
+                            calleeName == "shmem_broadcast64") {
                         // Translate to reference the equivalent OpenSHMEM API in the HClib namespace.
                         const bool failed = rewriter->InsertText(start, "hclib::", true, true);
-                        assert(!failed);
+                        if (failed) {
+                            std::cerr << "Failed inserting at " << calleeName <<
+                                " at " << presumedStart.getLine() << ":" <<
+                                presumedStart.getColumn() << std::endl;
+                            exit(1);
+                        }
                     } else if (calleeName == "shmem_init" ||
                             calleeName == "shmem_finalize") {
                         /*
