@@ -43,7 +43,7 @@ extern "C" {
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma120 {
+typedef struct _pragma120_omp_parallel {
     long long (*time0_ptr);
     long long (*time1_ptr);
     long long (*time2_ptr);
@@ -76,9 +76,9 @@ typedef struct _pragma120 {
     FOUR_VECTOR (*(*rv_ptr));
     double (*(*qv_ptr));
     FOUR_VECTOR (*(*fv_ptr));
- } pragma120;
+ } pragma120_omp_parallel;
 
-static void pragma120_hclib_async(void *____arg, const int ___iter0);
+static void pragma120_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     long long time0;
     long long time1;
@@ -156,7 +156,7 @@ static void main_entrypoint(void *____arg) {
 	//======================================================================================================================================================150
 
  { 
-pragma120 *new_ctx = (pragma120 *)malloc(sizeof(pragma120));
+pragma120_omp_parallel *new_ctx = (pragma120_omp_parallel *)malloc(sizeof(pragma120_omp_parallel));
 new_ctx->time0_ptr = &(time0);
 new_ctx->time1_ptr = &(time1);
 new_ctx->time2_ptr = &(time2);
@@ -194,7 +194,7 @@ domain[0].low = 0;
 domain[0].high = dim.number_boxes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma120_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma120_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  }  // for l
@@ -320,8 +320,8 @@ hclib_launch(main_entrypoint, new_ctx);
 	printf("%.12f s\n", 												(float) (time4-time0) / 1000000);
 
 }  
-static void pragma120_hclib_async(void *____arg, const int ___iter0) {
-    pragma120 *ctx = (pragma120 *)____arg;
+static void pragma120_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma120_omp_parallel *ctx = (pragma120_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;

@@ -42,45 +42,45 @@ long long fib_seq (int n)
 }
 
 
-typedef struct _pragma51 {
+typedef struct _pragma51_omp_task {
     long long (*x_ptr);
     long long (*y_ptr);
     int n;
- } pragma51;
+ } pragma51_omp_task;
 
-typedef struct _pragma53 {
+typedef struct _pragma53_omp_task {
     long long (*x_ptr);
     long long (*y_ptr);
     int n;
- } pragma53;
+ } pragma53_omp_task;
 
-static void pragma51_hclib_async(void *____arg);
-static void pragma53_hclib_async(void *____arg);
+static void pragma51_omp_task_hclib_async(void *____arg);
+static void pragma53_omp_task_hclib_async(void *____arg);
 long long fib (int n)
 {
 	long long x, y;
 	if (n < 2) return n;
 
  { 
-pragma51 *new_ctx = (pragma51 *)malloc(sizeof(pragma51));
+pragma51_omp_task *new_ctx = (pragma51_omp_task *)malloc(sizeof(pragma51_omp_task));
 new_ctx->x_ptr = &(x);
 new_ctx->y_ptr = &(y);
 new_ctx->n = n;
-hclib_async(pragma51_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma51_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma53 *new_ctx = (pragma53 *)malloc(sizeof(pragma53));
+pragma53_omp_task *new_ctx = (pragma53_omp_task *)malloc(sizeof(pragma53_omp_task));
 new_ctx->x_ptr = &(x);
 new_ctx->y_ptr = &(y);
 new_ctx->n = n;
-hclib_async(pragma53_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma53_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
 } 
-static void pragma51_hclib_async(void *____arg) {
-    pragma51 *ctx = (pragma51 *)____arg;
+static void pragma51_omp_task_hclib_async(void *____arg) {
+    pragma51_omp_task *ctx = (pragma51_omp_task *)____arg;
     int n; n = ctx->n;
     hclib_start_finish();
 (*(ctx->x_ptr)) = fib(n - 1) ;     ; hclib_end_finish();
@@ -89,8 +89,8 @@ static void pragma51_hclib_async(void *____arg) {
 }
 
 
-static void pragma53_hclib_async(void *____arg) {
-    pragma53 *ctx = (pragma53 *)____arg;
+static void pragma53_omp_task_hclib_async(void *____arg) {
+    pragma53_omp_task *ctx = (pragma53_omp_task *)____arg;
     int n; n = ctx->n;
     hclib_start_finish();
 (*(ctx->y_ptr)) = fib(n - 2) ;     ; hclib_end_finish();

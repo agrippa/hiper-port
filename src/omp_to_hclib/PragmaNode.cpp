@@ -101,7 +101,8 @@ void PragmaNode::setParent(PragmaNode *setParent) {
 
 std::string PragmaNode::getLbl() {
     std::stringstream lbl;
-    lbl << "pragma" << getStartLine() << std::flush;
+    lbl << "pragma" << getStartLine() << "_" << getPragmaName() << "_" <<
+        getPragmaCmd() << std::flush;
     return lbl.str();
 }
 

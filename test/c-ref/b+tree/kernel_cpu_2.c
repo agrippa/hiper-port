@@ -41,7 +41,7 @@
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma98 {
+typedef struct _pragma98_omp_parallel {
     int thid;
     int bid;
     long long (*time0_ptr);
@@ -63,9 +63,9 @@ typedef struct _pragma98 {
     int (*(*end_ptr));
     int (*(*recstart_ptr));
     int (*(*reclength_ptr));
- } pragma98;
+ } pragma98_omp_parallel;
 
-static void pragma98_hclib_async(void *____arg, const int ___iter0);
+static void pragma98_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 void 
 kernel_cpu_2(	int cores_arg,
 
@@ -120,7 +120,7 @@ kernel_cpu_2(	int cores_arg,
 
 	// process number of querries
  { 
-pragma98 *new_ctx = (pragma98 *)malloc(sizeof(pragma98));
+pragma98_omp_parallel *new_ctx = (pragma98_omp_parallel *)malloc(sizeof(pragma98_omp_parallel));
 new_ctx->thid = thid;
 new_ctx->bid = bid;
 new_ctx->time0_ptr = &(time0);
@@ -147,7 +147,7 @@ domain[0].low = 0;
 domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma98_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma98_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -168,8 +168,8 @@ free(new_ctx);
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
 } 
-static void pragma98_hclib_async(void *____arg, const int ___iter0) {
-    pragma98 *ctx = (pragma98 *)____arg;
+static void pragma98_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma98_omp_parallel *ctx = (pragma98_omp_parallel *)____arg;
     int thid; thid = ctx->thid;
     int bid; bid = ctx->bid;
     int i; i = ctx->i;

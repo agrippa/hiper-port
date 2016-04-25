@@ -489,10 +489,10 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 }
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
-        bool isForasyncClosure, int forasyncDim, bool emulatesOmpDepends) {
+        bool isForasyncClosure, int forasyncDim, bool isFuture) {
     std::stringstream ss;
     ss << "static ";
-    if (emulatesOmpDepends) {
+    if (isFuture) {
         ss << "void *";
     } else {
         ss << "void ";
@@ -513,7 +513,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, bool emulatesOmpDepends,
+        std::string bodyStr, bool isFuture,
         OMPClauses *clauses, std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
     std::vector<OMPReductionVar> *reductions = clauses->getReductions();
@@ -521,7 +521,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
 
     std::stringstream ss;
     ss << "\nstatic ";
-    if (emulatesOmpDepends) {
+    if (isFuture) {
         ss << "void *";
     } else {
         ss << "void ";
@@ -651,7 +651,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         }
     }
 
-    if (emulatesOmpDepends) {
+    if (isFuture) {
         ss << "    return NULL;\n";
     }
 
@@ -920,13 +920,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 clauses->getSharedVarInfo(node->getCaptures()));
 
                         accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, false, -1,
-                                clauses->hasClause("depend"));
+                                node->getLbl() + ASYNC_SUFFIX, false, -1, true);
 
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, false, true,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, clauses->hasClause("depend"), clauses);
+                                bodyStr, true, clauses);
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(), node->getCaptures(), clauses);

@@ -18,15 +18,15 @@ typedef float FP_NUMBER;
 #define GET_RAND_FP ((FP_NUMBER)rand()/((FP_NUMBER)(RAND_MAX)+(FP_NUMBER)(1)))
 char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
-typedef struct _pragma73 {
+typedef struct _pragma73_omp_parallel {
     int i;
     int j;
     int (*MatrixDim_ptr);
     FP_NUMBER (*(*(*L_ptr)));
     FP_NUMBER (*(*(*U_ptr)));
- } pragma73;
+ } pragma73_omp_parallel;
 
-typedef struct _pragma89 {
+typedef struct _pragma89_omp_parallel {
     int i;
     int j;
     int k;
@@ -35,10 +35,10 @@ typedef struct _pragma89 {
     FP_NUMBER (*(*(*L_ptr)));
     FP_NUMBER (*(*(*U_ptr)));
     FP_NUMBER (*(*(*A_ptr)));
- } pragma89;
+ } pragma89_omp_parallel;
 
-static void pragma73_hclib_async(void *____arg, const int ___iter0);
-static void pragma89_hclib_async(void *____arg, const int ___iter0);
+static void pragma73_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma89_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
     FP_NUMBER sum, **L, **U, **A;
@@ -91,7 +91,7 @@ int main (int argc, char **argv){
         A[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
     }
  { 
-pragma73 *new_ctx = (pragma73 *)malloc(sizeof(pragma73));
+pragma73_omp_parallel *new_ctx = (pragma73_omp_parallel *)malloc(sizeof(pragma73_omp_parallel));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->MatrixDim_ptr = &(MatrixDim);
@@ -102,13 +102,13 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma73_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma73_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
 
  { 
-pragma89 *new_ctx = (pragma89 *)malloc(sizeof(pragma89));
+pragma89_omp_parallel *new_ctx = (pragma89_omp_parallel *)malloc(sizeof(pragma89_omp_parallel));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->k = k;
@@ -122,7 +122,7 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma89_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma89_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -160,8 +160,8 @@ free(new_ctx);
 
     return 0;
 } 
-static void pragma73_hclib_async(void *____arg, const int ___iter0) {
-    pragma73 *ctx = (pragma73 *)____arg;
+static void pragma73_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma73_omp_parallel *ctx = (pragma73_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     hclib_start_finish();
@@ -186,8 +186,8 @@ static void pragma73_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma89_hclib_async(void *____arg, const int ___iter0) {
-    pragma89 *ctx = (pragma89 *)____arg;
+static void pragma89_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma89_omp_parallel *ctx = (pragma89_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;

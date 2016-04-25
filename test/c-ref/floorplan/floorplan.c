@@ -208,7 +208,7 @@ static void write_outputs() {
     }  
 }
 
-typedef struct _pragma227 {
+typedef struct _pragma227_omp_task {
     int i;
     int j;
     int nn;
@@ -223,9 +223,9 @@ typedef struct _pragma227 {
     char (*(*BOARD_ptr));
     struct cell (*(*CELLS_ptr));
     int (*dummy_level_ptr);
- } pragma227;
+ } pragma227_omp_task;
 
-static void pragma227_hclib_async(void *____arg);
+static void pragma227_omp_task_hclib_async(void *____arg);
 static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int dummy_level) {
   int  i, j, nn, area, nnc,nnl;
 
@@ -242,7 +242,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
  { 
-pragma227 *new_ctx = (pragma227 *)malloc(sizeof(pragma227));
+pragma227_omp_task *new_ctx = (pragma227_omp_task *)malloc(sizeof(pragma227_omp_task));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->nn = nn;
@@ -257,15 +257,15 @@ new_ctx->FOOTPRINT_ptr = &(FOOTPRINT);
 new_ctx->BOARD_ptr = &(BOARD);
 new_ctx->CELLS_ptr = &(CELLS);
 new_ctx->dummy_level_ptr = &(dummy_level);
-hclib_async(pragma227_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma227_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
       }
 }
  hclib_end_finish(); hclib_start_finish(); ;
 return nnc+nnl;
 } 
-static void pragma227_hclib_async(void *____arg) {
-    pragma227 *ctx = (pragma227 *)____arg;
+static void pragma227_omp_task_hclib_async(void *____arg) {
+    pragma227_omp_task *ctx = (pragma227_omp_task *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nn; nn = ctx->nn;

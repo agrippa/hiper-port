@@ -522,7 +522,7 @@ void initRootNode(Node * root, int type)
  * details depend on tree type, node type and shape function
  *
  */
-typedef struct _pragma576 {
+typedef struct _pragma576_omp_task {
     Node parent;
     int (*made_available_for_stealing_ptr);
     int (*i_ptr);
@@ -533,9 +533,9 @@ typedef struct _pragma576 {
     int (*numChildren_ptr);
     int (*childType_ptr);
     Node (*(*child_ptr));
- } pragma576;
+ } pragma576_omp_task;
 
-static void pragma576_hclib_async(void *____arg);
+static void pragma576_omp_task_hclib_async(void *____arg);
 void genChildren(Node * parent, Node * child) {
   int parentHeight = parent->height;
   int numChildren, childType;
@@ -589,7 +589,7 @@ const int ____critical_section_tmp_0 = 1;
       }
       if (!made_available_for_stealing) {
  { 
-pragma576 *new_ctx = (pragma576 *)malloc(sizeof(pragma576));
+pragma576_omp_task *new_ctx = (pragma576_omp_task *)malloc(sizeof(pragma576_omp_task));
 new_ctx->parent = parent;
 new_ctx->made_available_for_stealing_ptr = &(made_available_for_stealing);
 new_ctx->i_ptr = &(i);
@@ -601,9 +601,9 @@ new_ctx->numChildren_ptr = &(numChildren);
 new_ctx->childType_ptr = &(childType);
 new_ctx->child_ptr = &(child);
 if (!(parent.height < 9)) {
-    pragma576_hclib_async(new_ctx);
+    pragma576_omp_task_hclib_async(new_ctx);
 } else {
-hclib_async(pragma576_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma576_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 }
  } 
       }
@@ -613,8 +613,8 @@ const int ____critical_section_tmp_1 = 1;
  { const int ____lock_1_err = pthread_mutex_lock(&critical_1_lock); assert(____lock_1_err == 0); n_leaves += ____critical_section_tmp_1 ; const int ____unlock_1_err = pthread_mutex_unlock(&critical_1_lock); assert(____unlock_1_err == 0); } ;
   }
 } 
-static void pragma576_hclib_async(void *____arg) {
-    pragma576 *ctx = (pragma576 *)____arg;
+static void pragma576_omp_task_hclib_async(void *____arg) {
+    pragma576_omp_task *ctx = (pragma576_omp_task *)____arg;
     Node parent; parent = ctx->parent;
     hclib_start_finish();
 {
@@ -748,23 +748,29 @@ void showStats(double elapsedSecs) {
  *     - UPC is SPMD starting with main, OpenMP goes SPMD after
  *       parsing parameters
  */
-typedef struct _pragma791 {
-    Node (*root_ptr);
+typedef struct _pragma794_omp_master {
     double (*t1_ptr);
     double (*t2_ptr);
     double (*et_ptr);
+    Node (*root_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma791;
+ } pragma794_omp_master;
 
-static void pragma791_hclib_async(void *____arg);
-int main(int argc, char *argv[]) {
-  Node root;
+static void *pragma794_omp_master_hclib_async(void *____arg);
+typedef struct _main_entrypoint_ctx {
+    Node root;
+    int argc;
+    char (*(*argv));
+ } main_entrypoint_ctx;
 
-#ifdef THREAD_METADATA
-  memset(t_metadata, 0x00, MAX_OMP_THREADS * sizeof(thread_metadata));
-#endif
-  memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    Node root; root = ctx->root;
+    int argc; argc = ctx->argc;
+    char (*(*argv)); argv = ctx->argv;
+{
 
   ;
 
@@ -796,14 +802,14 @@ int main(int argc, char *argv[]) {
 
 /********** SPMD Parallel Region **********/
  { 
-pragma791 *new_ctx = (pragma791 *)malloc(sizeof(pragma791));
-new_ctx->root_ptr = ctx->root_ptr;
+pragma794_omp_master *new_ctx = (pragma794_omp_master *)malloc(sizeof(pragma794_omp_master));
 new_ctx->t1_ptr = ctx->t1_ptr;
 new_ctx->t2_ptr = ctx->t2_ptr;
 new_ctx->et_ptr = ctx->et_ptr;
+new_ctx->root_ptr = ctx->root_ptr;
 new_ctx->argc_ptr = ctx->argc_ptr;
 new_ctx->argv_ptr = ctx->argv_ptr;
-hclib_future_t *fut = hclib_async_future(pragma791_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
+hclib_future_t *fut = hclib_async_future(pragma794_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
 hclib_future_wait(fut);
  } 
 
@@ -833,12 +839,29 @@ hclib_future_wait(fut);
       shmem_barrier_all();
   }
 #endif
+  } ;     free(____arg);
+}
+
+int main(int argc, char *argv[]) {
+  Node root;
+
+#ifdef THREAD_METADATA
+  memset(t_metadata, 0x00, MAX_OMP_THREADS * sizeof(thread_metadata));
+#endif
+  memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
+
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->root = root;
+new_ctx->argc = argc;
+new_ctx->argv = argv;
+hclib_launch(main_entrypoint, new_ctx);
+
 
   ;
   return 0;
-} 
-static void pragma791_hclib_async(void *____arg) {
-    pragma791 *ctx = (pragma791 *)____arg;
+}  
+static void *pragma794_omp_master_hclib_async(void *____arg) {
+    pragma794_omp_master *ctx = (pragma794_omp_master *)____arg;
     hclib_start_finish();
 {
           int first = 1;
@@ -876,6 +899,7 @@ retry:
           }
       } ;     ; hclib_end_finish();
 
+    return NULL;
     free(____arg);
 }
 

@@ -708,6 +708,9 @@ int main(int argc, char *argv[]) {
 #endif
   memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
 
+#pragma omp_to_hclib
+  {
+
   shmem_init();
 
   pe = shmem_my_pe();
@@ -803,6 +806,7 @@ retry:
       shmem_barrier_all();
   }
 #endif
+  }
 
   shmem_finalize();
   return 0;

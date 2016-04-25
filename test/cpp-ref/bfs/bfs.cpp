@@ -42,7 +42,7 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 //Apply BFS on a Graph using CUDA
 ////////////////////////////////////////////////////////////////////////////////
-typedef struct _pragma133 {
+typedef struct _pragma133_omp_parallel {
     int (*k_ptr);
     _Bool (*stop_ptr);
     int (*no_of_nodes_ptr);
@@ -62,9 +62,9 @@ typedef struct _pragma133 {
     int (*(*h_cost_ptr));
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma133;
+ } pragma133_omp_parallel;
 
-typedef struct _pragma150 {
+typedef struct _pragma150_omp_parallel {
     int (*k_ptr);
     _Bool (*stop_ptr);
     int (*no_of_nodes_ptr);
@@ -84,10 +84,10 @@ typedef struct _pragma150 {
     int (*(*h_cost_ptr));
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma150;
+ } pragma150_omp_parallel;
 
-static void pragma133_hclib_async(void *____arg, const int ___iter0);
-static void pragma150_hclib_async(void *____arg, const int ___iter0);
+static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int no_of_nodes;
     int edge_list_size;
@@ -138,7 +138,7 @@ static void main_entrypoint(void *____arg) {
 
             //omp_set_num_threads(num_omp_threads);
  { 
-pragma133 *new_ctx = (pragma133 *)malloc(sizeof(pragma133));
+pragma133_omp_parallel *new_ctx = (pragma133_omp_parallel *)malloc(sizeof(pragma133_omp_parallel));
 new_ctx->k_ptr = &(k);
 new_ctx->stop_ptr = &(stop);
 new_ctx->no_of_nodes_ptr = &(no_of_nodes);
@@ -163,13 +163,13 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma133_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma133_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
 
  { 
-pragma150 *new_ctx = (pragma150 *)malloc(sizeof(pragma150));
+pragma150_omp_parallel *new_ctx = (pragma150_omp_parallel *)malloc(sizeof(pragma150_omp_parallel));
 new_ctx->k_ptr = &(k);
 new_ctx->stop_ptr = &(stop);
 new_ctx->no_of_nodes_ptr = &(no_of_nodes);
@@ -194,7 +194,7 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma150_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma150_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -319,8 +319,8 @@ hclib_launch(main_entrypoint, new_ctx);
 	free( h_cost);
 
 }  
-static void pragma133_hclib_async(void *____arg, const int ___iter0) {
-    pragma133 *ctx = (pragma133 *)____arg;
+static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma133_omp_parallel *ctx = (pragma133_omp_parallel *)____arg;
     hclib_start_finish();
     do {
     int tid;     tid = ___iter0;
@@ -343,8 +343,8 @@ static void pragma133_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma150_hclib_async(void *____arg, const int ___iter0) {
-    pragma150 *ctx = (pragma150 *)____arg;
+static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma150_omp_parallel *ctx = (pragma150_omp_parallel *)____arg;
     hclib_start_finish();
     do {
     int tid;     tid = ___iter0;

@@ -7,7 +7,7 @@
 #include "track_ellipse.h"
 
 
-typedef struct _pragma90 {
+typedef struct _pragma90_omp_parallel {
     MAT (*(*I_ptr));
     int (*Ih_ptr);
     int (*Iw_ptr);
@@ -31,9 +31,9 @@ typedef struct _pragma90 {
     int (*R_ptr);
     int (*Np_ptr);
     int (*Nf_ptr);
- } pragma90;
+ } pragma90_omp_parallel;
 
-static void pragma90_hclib_async(void *____arg, const int ___iter0);
+static void pragma90_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
 	/*
 	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
@@ -114,7 +114,7 @@ void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np,
 		
 		// Split the work among multiple threads, if OPEN is defined
  { 
-pragma90 *new_ctx = (pragma90 *)malloc(sizeof(pragma90));
+pragma90_omp_parallel *new_ctx = (pragma90_omp_parallel *)malloc(sizeof(pragma90_omp_parallel));
 new_ctx->I_ptr = &(I);
 new_ctx->Ih_ptr = &(Ih);
 new_ctx->Iw_ptr = &(Iw);
@@ -143,7 +143,7 @@ domain[0].low = 0;
 domain[0].high = Nc;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma90_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma90_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -182,8 +182,8 @@ free(new_ctx);
 	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
 	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
 } 
-static void pragma90_hclib_async(void *____arg, const int ___iter0) {
-    pragma90 *ctx = (pragma90 *)____arg;
+static void pragma90_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma90_omp_parallel *ctx = (pragma90_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int cell_num; cell_num = ctx->cell_num;
