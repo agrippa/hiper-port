@@ -79,7 +79,7 @@ std::string PragmaNode::getPragmaCmd() {
 
 PragmaNode *PragmaNode::getParentAccountForFusing() {
     if (getParent()->getPragmaName() == "omp" &&
-            getParent()->getPragmaCmd() == "single" &&
+            (getParent()->getPragmaCmd() == "single" || getParent()->getPragmaCmd() == "master") &&
             getParent()->getParent()->getPragmaCmd() == "parallel") {
         return getParent()->getParent()->getParent();
     } else {

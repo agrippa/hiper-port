@@ -876,7 +876,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
                             " hclib_end_finish(); hclib_start_finish(); ");
                     assert(!failed);
-                } else if (ompCmd == "single") {
+                } else if (ompCmd == "single" || ompCmd == "master") {
                     assert(node->getParent()); // should not be root
                     assert(node->getParent()->getPragmaName() == "omp");
 
@@ -915,12 +915,45 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     // Insert finish
                     const clang::Stmt *body = node->getBody();
 
-                    const bool failed = rewriter->ReplaceText(
-                            clang::SourceRange(node->getParent()->getStartLoc(),
-                                node->getParent()->getEndLoc()),
-                            "hclib_start_finish(); " + stmtToString(body) +
-                                " ; hclib_end_finish(); ");
-                    assert(!failed);
+                    if (ompCmd == "master") {
+                        std::string bodyStr = stmtToStringWithSharedVars(body,
+                                clauses->getSharedVarInfo(node->getCaptures()));
+
+                        accumulatedKernelDecls += getClosureDecl(
+                                node->getLbl() + ASYNC_SUFFIX, false, -1,
+                                clauses->hasClause("depend"));
+
+                        accumulatedKernelDefs += getClosureDef(
+                                node->getLbl() + ASYNC_SUFFIX, false, true,
+                                node->getLbl(), node->getCaptures(),
+                                bodyStr, clauses->hasClause("depend"), clauses);
+
+                        const std::string structDef = getStructDef(
+                                node->getLbl(), node->getCaptures(), clauses);
+                        accumulatedStructDefs += structDef;
+
+                        std::stringstream contextCreation;
+                        contextCreation << "\n" << getContextSetup(node,
+                                node->getLbl(), node->getCaptures(), clauses);
+                        contextCreation << "hclib_future_t *fut = " <<
+                            "hclib_async_future(" << node->getLbl() <<
+                            ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, " <<
+                            "hclib_get_master_place());\n";
+                        contextCreation << "hclib_future_wait(fut);\n";
+                        // Add braces to ensure we don't change control flow
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getParent()->getStartLoc(),
+                                    node->getParent()->getEndLoc()),
+                                " { " + contextCreation.str() + " } ");
+                        assert(!failed);
+                    } else { // single
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getParent()->getStartLoc(),
+                                    node->getParent()->getEndLoc()),
+                                "hclib_start_finish(); " + stmtToString(body) +
+                                    " ; hclib_end_finish(); ");
+                        assert(!failed);
+                    }
                 } else if (ompCmd == "task") {
                     const clang::Stmt *body = node->getBody();
                     OMPClauses *clauses = getOMPClausesForMarker(
@@ -1262,7 +1295,8 @@ const clang::Stmt *OMPToHClib::getBodyForMarker(const clang::CallExpr *call) {
             return NULL;
         } else if (ompPragma == "task" || ompPragma == "critical" ||
                 ompPragma == "atomic" || ompPragma == "parallel" ||
-                ompPragma == "single" || ompPragma == "simd") {
+                ompPragma == "single" || ompPragma == "simd" ||
+                ompPragma == "master") {
             return getBodyFrom(call, ompPragma);
         } else {
             std::cerr << "Unhandled OMP pragma \"" << ompPragma << "\"" << std::endl;
@@ -1320,10 +1354,9 @@ OMPClauses *OMPToHClib::getOMPClausesForMarker(const clang::CallExpr *call) {
                 handledClause = true;
             }
         } else if (ompPragma == "task") {
-            //TODO support depend
             if (clauseName == "firstprivate" || clauseName == "private" ||
                     clauseName == "shared" || clauseName == "untied" ||
-                    clauseName == "default") {
+                    clauseName == "default" || clauseName == "if") {
                 // Do nothing
                 handledClause = true;
             } else if (clauseName == "depend") {
@@ -1397,7 +1430,14 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                             calleeName == "shmem_n_pes" ||
                             calleeName == "shmem_barrier_all" ||
                             calleeName == "shmem_put64" ||
-                            calleeName == "shmem_broadcast64") {
+                            calleeName == "shmem_broadcast64" ||
+                            calleeName == "shmem_set_lock" ||
+                            calleeName == "shmem_clear_lock" ||
+                            calleeName == "shmem_int_get" ||
+                            calleeName == "shmem_int_put" ||
+                            calleeName == "shmem_getmem" ||
+                            calleeName == "shmem_int_add" ||
+                            calleeName == "shmem_int_fadd") {
                         // Translate to reference the equivalent OpenSHMEM API in the HClib namespace.
                         const bool failed = rewriter->InsertText(start, "hclib::", true, true);
                         if (failed) {

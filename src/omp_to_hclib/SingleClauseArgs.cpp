@@ -30,17 +30,26 @@ SingleClauseArgs::SingleClauseArgs(std::string setClause, std::string argsStr) {
 
     int index = skipWhiteSpace(argsStr, 0);
 
-    while (index < argsStr.size()) {
-        int start = index;
-        int end = seekPastToken(argsStr, index);
-        std::string token = argsStr.substr(start, end - start);
-        args.push_back(token);
+    if (clause == "if") { // Single argument always
+        args.push_back(argsStr);
+    } else {
+        while (index < argsStr.size()) {
+            int start = index;
+            int end = seekPastToken(argsStr, index);
+            std::string token = argsStr.substr(start, end - start);
+            args.push_back(token);
 
-        const int delimiterIndex = skipWhiteSpace(argsStr, end);
-        assert(delimiterIndex == argsStr.size() ||
-                argsStr.at(delimiterIndex) == ',' ||
-                argsStr.at(delimiterIndex) == ':');
-        index = skipWhiteSpace(argsStr, delimiterIndex + 1);
+            const int delimiterIndex = skipWhiteSpace(argsStr, end);
+            if (!(delimiterIndex == argsStr.size() ||
+                    argsStr.at(delimiterIndex) == ',' ||
+                    argsStr.at(delimiterIndex) == ':')) {
+                std::cerr << "Unexpected delimiter '" <<
+                    argsStr.at(delimiterIndex) << "' in args '" << argsStr << "'" <<
+                    std::endl;
+                exit(1);
+            }
+            index = skipWhiteSpace(argsStr, delimiterIndex + 1);
+        }
     }
 }
 

@@ -20,8 +20,9 @@ OUTPUT_PATH=
 KEEP=0
 VERBOSE=0
 USER_INCLUDES=
+USER_DEFINES=
 
-while getopts "i:o:kvhI:" opt; do
+while getopts "i:o:kvhI:D:" opt; do
     case $opt in 
         i)
             INPUT_PATH=$OPTARG
@@ -37,6 +38,9 @@ while getopts "i:o:kvhI:" opt; do
             ;;
         I)
             USER_INCLUDES="$USER_INCLUDES -I$OPTARG"
+            ;;
+        D)
+            USER_DEFINES="$USER_DEFINES -D$OPTARG"
             ;;
         h)
             echo 'usage: omp_to_hclib.sh <-i input-file> <-o output-file> [-k] [-v] [-h] [-I include-path]'
@@ -67,6 +71,7 @@ if [[ $VERBOSE == 1 ]]; then
     echo INPUT_PATH = $INPUT_PATH
     echo OUTPUT_PATH = $OUTPUT_PATH
     echo KEEP = $KEEP
+    echo USER_DEFINES = $USER_DEFINES
     echo VERBOSE = $VERBOSE
 fi
 
@@ -97,7 +102,7 @@ fi
 # from /usr/include/secure/_string.h. While this is fine at compile time, it
 # breaks tests that assert the generated code is identical to the reference
 # output.
-DEFINES=-D_FORTIFY_SOURCE=0
+DEFINES="-D_FORTIFY_SOURCE=0 $USER_DEFINES"
 
 WITH_HEADER=$DIRNAME/$FILE_PREFIX.$NAME.header.$EXTENSION
 WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION

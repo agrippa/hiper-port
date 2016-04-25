@@ -17,6 +17,9 @@ if [[ $# == 1 ]]; then
     FILES=$1
 fi
 
+declare -A defines
+defines['cpp/uts-shmem-omp/uts_omp_task_shmem.cpp']='BRG_RNG _OPENMP'
+
 for FILE in $FILES; do
     DIRNAME=$(dirname $FILE)
     FILENAME=$(basename $FILE)
@@ -28,6 +31,13 @@ for FILE in $FILES; do
     REFERENCE=$(dirname $DIRNAME)-ref/$TESTNAME/$FILENAME
 
     CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v"
+    for P in "${!defines[@]}"; do
+        if [[ "$(stat -c '%d:%i' $P)" == "$(stat -c '%d:%i' $FILE)" ]]; then
+            for DEF in ${defines[$P]}; do
+                CMD="$CMD -D $DEF"
+            done
+        fi
+    done
     $CMD &> transform.log
 
     if [[ ! -f $REFERENCE ]]; then
