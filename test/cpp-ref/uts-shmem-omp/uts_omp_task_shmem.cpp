@@ -803,12 +803,12 @@ static void main_entrypoint(void *____arg) {
 /********** SPMD Parallel Region **********/
  { 
 pragma794_omp_master *new_ctx = (pragma794_omp_master *)malloc(sizeof(pragma794_omp_master));
-new_ctx->t1_ptr = ctx->t1_ptr;
-new_ctx->t2_ptr = ctx->t2_ptr;
-new_ctx->et_ptr = ctx->et_ptr;
-new_ctx->root_ptr = ctx->root_ptr;
-new_ctx->argc_ptr = ctx->argc_ptr;
-new_ctx->argv_ptr = ctx->argv_ptr;
+new_ctx->t1_ptr = &(t1);
+new_ctx->t2_ptr = &(t2);
+new_ctx->et_ptr = &(et);
+new_ctx->root_ptr = &(root);
+new_ctx->argc_ptr = &(argc);
+new_ctx->argv_ptr = &(argv);
 hclib_future_t *fut = hclib_async_future(pragma794_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
 hclib_future_wait(fut);
  } 

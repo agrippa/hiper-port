@@ -82,6 +82,10 @@ PragmaNode *PragmaNode::getParentAccountForFusing() {
             (getParent()->getPragmaCmd() == "single" || getParent()->getPragmaCmd() == "master") &&
             getParent()->getParent()->getPragmaCmd() == "parallel") {
         return getParent()->getParent()->getParent();
+    } else if (getPragmaName() == "omp" &&
+            (getPragmaCmd() == "single" || getPragmaCmd() == "master") &&
+            getParent()->getPragmaCmd() == "parallel") {
+        return getParent()->getParent();
     } else {
         return getParent();
     }
