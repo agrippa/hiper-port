@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv) {
     ;
-    int MyRank = hclib::shmem_my_pe ();
+    int MyRank = hclib::pe_for_locale(hclib::shmem_my_pe());
     int Numprocs = hclib::shmem_n_pes ();
     printf("rank = %d size = %d\n", MyRank, Numprocs);
 

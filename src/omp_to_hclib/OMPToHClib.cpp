@@ -1426,7 +1426,6 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                 if (calleeName.find("shmem_") == 0) {
                     if (calleeName == "shmem_malloc" ||
                             calleeName == "shmem_free" ||
-                            calleeName == "shmem_my_pe" ||
                             calleeName == "shmem_n_pes" ||
                             calleeName == "shmem_barrier_all" ||
                             calleeName == "shmem_put64" ||
@@ -1446,6 +1445,11 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                                 presumedStart.getColumn() << std::endl;
                             exit(1);
                         }
+                    } else if (calleeName == "shmem_my_pe") {
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(start, end),
+                                "hclib::pe_for_locale(hclib::shmem_my_pe())");
+                        assert(!failed);
                     } else if (calleeName == "shmem_init" ||
                             calleeName == "shmem_finalize") {
                         /*

@@ -768,7 +768,7 @@ int main(int argc, char *argv[]) {
 
   ;
 
-  pe = hclib::shmem_my_pe();
+  pe = hclib::pe_for_locale(hclib::shmem_my_pe());
   npes = hclib::shmem_n_pes();
 
   /* determine benchmark parameters (all PEs) */

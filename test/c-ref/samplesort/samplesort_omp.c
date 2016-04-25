@@ -243,7 +243,7 @@ static void main_entrypoint(void *____arg) {
   TYPE 	     *Buckets, *BucketBuffer, *LocalBucket;
   TYPE 	     *OutputBuffer, *Output;
   
-  MyRank = hclib::shmem_my_pe ();
+  MyRank = hclib::pe_for_locale(hclib::shmem_my_pe());
   Numprocs = hclib::shmem_n_pes ();
   NoofElements = SIZE;
 
