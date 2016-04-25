@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /***********************************************
 	streamcluster_omp.cpp
 	: parallelized code of streamcluster using OpenMP
@@ -302,7 +307,7 @@ float pspeedy(Points *points, float z, long *kcenter, int pid)
 /* z is the facility cost, x is the number of this point in the array 
    points */
 
-typedef struct _pragma391 {
+typedef struct _pragma396 {
     double (*t0_ptr);
     long (*bsize_ptr);
     long (*k1_ptr);
@@ -326,9 +331,9 @@ typedef struct _pragma391 {
     long (*(*numcenters_ptr));
     int (*pid_ptr);
     pthread_mutex_t reduction_mutex;
- } pragma391;
+ } pragma396;
 
-typedef struct _pragma467 {
+typedef struct _pragma472 {
     double (*t0_ptr);
     long (*bsize_ptr);
     long (*k1_ptr);
@@ -352,10 +357,10 @@ typedef struct _pragma467 {
     double (*z_ptr);
     long (*(*numcenters_ptr));
     int (*pid_ptr);
- } pragma467;
+ } pragma472;
 
-static void pragma391_hclib_async(void *____arg, const int ___iter0);
-static void pragma467_hclib_async(void *____arg, const int ___iter0);
+static void pragma396_hclib_async(void *____arg, const int ___iter0);
+static void pragma472_hclib_async(void *____arg, const int ___iter0);
 double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
@@ -442,7 +447,7 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	// OpenMP parallelization
 //	#pragma omp parallel for 
  { 
-pragma391 *new_ctx = (pragma391 *)malloc(sizeof(pragma391));
+pragma396 *new_ctx = (pragma396 *)malloc(sizeof(pragma396));
 new_ctx->t0_ptr = &(t0);
 new_ctx->bsize_ptr = &(bsize);
 new_ctx->k1_ptr = &(k1);
@@ -473,7 +478,7 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma391_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma396_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
 cost_of_opening_x = new_ctx->cost_of_opening_x;
@@ -529,7 +534,7 @@ cost_of_opening_x = new_ctx->cost_of_opening_x;
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
  { 
-pragma467 *new_ctx = (pragma467 *)malloc(sizeof(pragma467));
+pragma472 *new_ctx = (pragma472 *)malloc(sizeof(pragma472));
 new_ctx->t0_ptr = &(t0);
 new_ctx->bsize_ptr = &(bsize);
 new_ctx->k1_ptr = &(k1);
@@ -558,7 +563,7 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma467_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma472_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -596,8 +601,8 @@ free(new_ctx);
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
 } 
-static void pragma391_hclib_async(void *____arg, const int ___iter0) {
-    pragma391 *ctx = (pragma391 *)____arg;
+static void pragma396_hclib_async(void *____arg, const int ___iter0) {
+    pragma396 *ctx = (pragma396 *)____arg;
     int i; i = ctx->i;
     double cost_of_opening_x; cost_of_opening_x = ctx->cost_of_opening_x;
     hclib_start_finish();
@@ -638,8 +643,8 @@ static void pragma391_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma467_hclib_async(void *____arg, const int ___iter0) {
-    pragma467 *ctx = (pragma467 *)____arg;
+static void pragma472_hclib_async(void *____arg, const int ___iter0) {
+    pragma472 *ctx = (pragma472 *)____arg;
     int i; i = ctx->i;
     hclib_start_finish();
     do {

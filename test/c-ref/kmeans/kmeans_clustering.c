@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /*****************************************************************************/
 /*IMPORTANT:  READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.         */
 /*By downloading, copying, installing or using the software you agree        */
@@ -114,7 +119,7 @@ float euclid_dist_2(float *pt1,
 
 
 /*----< kmeans_clustering() >---------------------------------------------*/
-typedef struct _pragma185 {
+typedef struct _pragma190 {
     int i;
     int j;
     int (*k_ptr);
@@ -136,9 +141,9 @@ typedef struct _pragma185 {
     float (*threshold_ptr);
     int (*(*membership_ptr));
     pthread_mutex_t reduction_mutex;
- } pragma185;
+ } pragma190;
 
-static void pragma185_hclib_async(void *____arg, const int ___iter0);
+static void pragma190_hclib_async(void *____arg, const int ___iter0);
 float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
                           int     nfeatures,
                           int     npoints,
@@ -207,7 +212,7 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
         delta = 0.0;
         {
  { 
-pragma185 *new_ctx = (pragma185 *)malloc(sizeof(pragma185));
+pragma190 *new_ctx = (pragma190 *)malloc(sizeof(pragma190));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->k_ptr = &(k);
@@ -236,7 +241,7 @@ domain[0].low = 0;
 domain[0].high = npoints;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma185_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma190_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
 delta = new_ctx->delta;
@@ -274,8 +279,8 @@ delta = new_ctx->delta;
 
     return clusters;
 } 
-static void pragma185_hclib_async(void *____arg, const int ___iter0) {
-    pragma185 *ctx = (pragma185 *)____arg;
+static void pragma190_hclib_async(void *____arg, const int ___iter0) {
+    pragma190 *ctx = (pragma190 *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int index; index = ctx->index;

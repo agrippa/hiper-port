@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 // srad.cpp : Defines the entry point for the console application.
 //
 
@@ -31,7 +36,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _pragma127 {
+typedef struct _pragma132 {
     int (*rows_ptr);
     int (*cols_ptr);
     int (*size_I_ptr);
@@ -77,9 +82,9 @@ typedef struct _pragma127 {
     int (*nthreads_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma127;
+ } pragma132;
 
-typedef struct _pragma160 {
+typedef struct _pragma165 {
     int (*rows_ptr);
     int (*cols_ptr);
     int (*size_I_ptr);
@@ -125,10 +130,10 @@ typedef struct _pragma160 {
     int (*nthreads_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma160;
+ } pragma165;
 
-static void pragma127_hclib_async(void *____arg, const int ___iter0);
-static void pragma160_hclib_async(void *____arg, const int ___iter0);
+static void pragma132_hclib_async(void *____arg, const int ___iter0);
+static void pragma165_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     int rows;
     int cols;
@@ -240,7 +245,7 @@ for (iter=0; iter< niter; iter++){
 		
 
  { 
-pragma127 *new_ctx = (pragma127 *)malloc(sizeof(pragma127));
+pragma132 *new_ctx = (pragma132 *)malloc(sizeof(pragma132));
 new_ctx->rows_ptr = &(rows);
 new_ctx->cols_ptr = &(cols);
 new_ctx->size_I_ptr = &(size_I);
@@ -291,12 +296,12 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma127_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma132_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
  { 
-pragma160 *new_ctx = (pragma160 *)malloc(sizeof(pragma160));
+pragma165 *new_ctx = (pragma165 *)malloc(sizeof(pragma165));
 new_ctx->rows_ptr = &(rows);
 new_ctx->cols_ptr = &(cols);
 new_ctx->size_I_ptr = &(size_I);
@@ -347,7 +352,7 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma160_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma165_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -503,8 +508,8 @@ hclib_launch(main_entrypoint, new_ctx);
 	free(c);
 	return 0;
 }  
-static void pragma127_hclib_async(void *____arg, const int ___iter0) {
-    pragma127 *ctx = (pragma127 *)____arg;
+static void pragma132_hclib_async(void *____arg, const int ___iter0) {
+    pragma132 *ctx = (pragma132 *)____arg;
     int k; k = ctx->k;
     float Jc; Jc = ctx->Jc;
     float G2; G2 = ctx->G2;
@@ -554,8 +559,8 @@ static void pragma127_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma160_hclib_async(void *____arg, const int ___iter0) {
-    pragma160 *ctx = (pragma160 *)____arg;
+static void pragma165_hclib_async(void *____arg, const int ___iter0) {
+    pragma165 *ctx = (pragma165 *)____arg;
     int k; k = ctx->k;
     float cN; cN = ctx->cN;
     float cS; cS = ctx->cS;

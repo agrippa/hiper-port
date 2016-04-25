@@ -9,13 +9,19 @@ if len(sys.argv) != 3:
 start = int(sys.argv[1])
 stop = int(sys.argv[2])
 
-line = sys.stdin.readline()
-assert line.strip() == '#include "hclib.h"'
-sys.stdout.write(line)
+expected_header = ['#include "hclib.h"',
+                   '#ifdef __cplusplus',
+                   '#include "hclib_cpp.h"',
+                   '#include "hclib_system.h"',
+                   '#include "hclib_openshmem.h"',
+                   '#endif',
+                   'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);']
 
-line = sys.stdin.readline()
-assert line.strip() == 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);'
-sys.stdout.write(line)
+
+for expected in expected_header:
+    line = sys.stdin.readline()
+    assert line.strip() == expected
+    sys.stdout.write(line)
 
 index = start
 while index < stop:

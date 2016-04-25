@@ -1,25 +1,12 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 # include "poisson.h"
 
 /* #pragma omp task/taskwait version of SWEEP. */
-typedef struct _pragma21 {
-    int it;
-    int block_x;
-    int block_y;
-    int (*max_blocks_x_ptr);
-    int (*max_blocks_y_ptr);
-    int (*nx_ptr);
-    int (*ny_ptr);
-    double (*dx_ptr);
-    double (*dy_ptr);
-    double (*(*f__ptr));
-    int (*itold_ptr);
-    int (*itnew_ptr);
-    double (*(*u__ptr));
-    double (*(*unew__ptr));
-    int (*block_size_ptr);
- } pragma21;
-
 typedef struct _pragma26 {
     int it;
     int block_x;
@@ -38,8 +25,26 @@ typedef struct _pragma26 {
     int (*block_size_ptr);
  } pragma26;
 
-static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
+typedef struct _pragma31 {
+    int it;
+    int block_x;
+    int block_y;
+    int (*max_blocks_x_ptr);
+    int (*max_blocks_y_ptr);
+    int (*nx_ptr);
+    int (*ny_ptr);
+    double (*dx_ptr);
+    double (*dy_ptr);
+    double (*(*f__ptr));
+    int (*itold_ptr);
+    int (*itnew_ptr);
+    double (*(*u__ptr));
+    double (*(*unew__ptr));
+    int (*block_size_ptr);
+ } pragma31;
+
 static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
+static void pragma31_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
 void sweep (int nx, int ny, double dx, double dy, double *f_,
         int itold, int itnew, double *u_, double *unew_, int block_size)
 {
@@ -55,37 +60,6 @@ void sweep (int nx, int ny, double dx, double dy, double *f_,
     for (it = itold + 1; it <= itnew; it++)
     {
         // Save the current estimate.
- { 
-pragma21 *new_ctx = (pragma21 *)malloc(sizeof(pragma21));
-new_ctx->it = it;
-new_ctx->block_x = block_x;
-new_ctx->block_y = block_y;
-new_ctx->max_blocks_x_ptr = &(max_blocks_x);
-new_ctx->max_blocks_y_ptr = &(max_blocks_y);
-new_ctx->nx_ptr = &(nx);
-new_ctx->ny_ptr = &(ny);
-new_ctx->dx_ptr = &(dx);
-new_ctx->dy_ptr = &(dy);
-new_ctx->f__ptr = &(f_);
-new_ctx->itold_ptr = &(itold);
-new_ctx->itnew_ptr = &(itnew);
-new_ctx->u__ptr = &(u_);
-new_ctx->unew__ptr = &(unew_);
-new_ctx->block_size_ptr = &(block_size);
-hclib_loop_domain_t domain[2];
-domain[0].low = 0;
-domain[0].high = max_blocks_x;
-domain[0].stride = 1;
-domain[0].tile = 1;
-domain[1].low = 0;
-domain[1].high = max_blocks_y;
-domain[1].stride = 1;
-domain[1].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma21_hclib_async, new_ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
-hclib_future_wait(fut);
-free(new_ctx);
- } ;
-
  { 
 pragma26 *new_ctx = (pragma26 *)malloc(sizeof(pragma26));
 new_ctx->it = it;
@@ -116,10 +90,41 @@ hclib_future_t *fut = hclib_forasync_future((void *)pragma26_hclib_async, new_ct
 hclib_future_wait(fut);
 free(new_ctx);
  } ;
+
+ { 
+pragma31 *new_ctx = (pragma31 *)malloc(sizeof(pragma31));
+new_ctx->it = it;
+new_ctx->block_x = block_x;
+new_ctx->block_y = block_y;
+new_ctx->max_blocks_x_ptr = &(max_blocks_x);
+new_ctx->max_blocks_y_ptr = &(max_blocks_y);
+new_ctx->nx_ptr = &(nx);
+new_ctx->ny_ptr = &(ny);
+new_ctx->dx_ptr = &(dx);
+new_ctx->dy_ptr = &(dy);
+new_ctx->f__ptr = &(f_);
+new_ctx->itold_ptr = &(itold);
+new_ctx->itnew_ptr = &(itnew);
+new_ctx->u__ptr = &(u_);
+new_ctx->unew__ptr = &(unew_);
+new_ctx->block_size_ptr = &(block_size);
+hclib_loop_domain_t domain[2];
+domain[0].low = 0;
+domain[0].high = max_blocks_x;
+domain[0].stride = 1;
+domain[0].tile = 1;
+domain[1].low = 0;
+domain[1].high = max_blocks_y;
+domain[1].stride = 1;
+domain[1].tile = 1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma31_hclib_async, new_ctx, NULL, 2, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_wait(fut);
+free(new_ctx);
+ } ;
     }
 } 
-static void pragma21_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
-    pragma21 *ctx = (pragma21 *)____arg;
+static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
+    pragma26 *ctx = (pragma26 *)____arg;
     int it; it = ctx->it;
     int block_x; block_x = ctx->block_x;
     int block_y; block_y = ctx->block_y;
@@ -133,8 +138,8 @@ copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)
 }
 
 
-static void pragma26_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
-    pragma26 *ctx = (pragma26 *)____arg;
+static void pragma31_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
+    pragma31 *ctx = (pragma31 *)____arg;
     int it; it = ctx->it;
     int block_x; block_x = ctx->block_x;
     int block_y; block_y = ctx->block_y;

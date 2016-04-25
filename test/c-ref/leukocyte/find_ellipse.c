@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 #include "find_ellipse.h"
 #include <sys/time.h>
 
@@ -82,7 +87,7 @@ MAT * chop_flip_image(unsigned char *image, int height, int width, int top, int 
 
 // Given x- and y-gradients of a video frame, computes the GICOV
 //  score for each sample ellipse at every pixel in the frame
-typedef struct _pragma114 {
+typedef struct _pragma119 {
     int i;
     int (*n_ptr);
     int (*k_ptr);
@@ -97,9 +102,9 @@ typedef struct _pragma114 {
     MAT (*(*gicov_ptr));
     MAT (*(*grad_x_ptr));
     MAT (*(*grad_y_ptr));
- } pragma114;
+ } pragma119;
 
-static void pragma114_hclib_async(void *____arg, const int ___iter0);
+static void pragma119_hclib_async(void *____arg, const int ___iter0);
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
@@ -129,7 +134,7 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	
 	// Split the work among multiple threads, if OPEN is defined
  { 
-pragma114 *new_ctx = (pragma114 *)malloc(sizeof(pragma114));
+pragma119 *new_ctx = (pragma119 *)malloc(sizeof(pragma119));
 new_ctx->i = i;
 new_ctx->n_ptr = &(n);
 new_ctx->k_ptr = &(k);
@@ -149,15 +154,15 @@ domain[0].low = MaxR;
 domain[0].high = width - MaxR;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma114_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma119_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
 	
 	return gicov;
 } 
-static void pragma114_hclib_async(void *____arg, const int ___iter0) {
-    pragma114 *ctx = (pragma114 *)____arg;
+static void pragma119_hclib_async(void *____arg, const int ___iter0) {
+    pragma119 *ctx = (pragma119 *)____arg;
     int i; i = ctx->i;
     hclib_start_finish();
     do {
@@ -230,16 +235,16 @@ MAT * structuring_element(int radius) {
 
 // Performs an image dilation on the specified matrix
 //  using the specified structuring element
-typedef struct _pragma189 {
+typedef struct _pragma194 {
     MAT (*(*dilated_ptr));
     int (*el_center_i_ptr);
     int (*el_center_j_ptr);
     int i;
     MAT (*(*img_in_ptr));
     MAT (*(*strel_ptr));
- } pragma189;
+ } pragma194;
 
-static void pragma189_hclib_async(void *____arg, const int ___iter0);
+static void pragma194_hclib_async(void *____arg, const int ___iter0);
 MAT * dilate_f(MAT * img_in, MAT * strel) {
 	MAT * dilated = m_get(img_in->m, img_in->n);
 	
@@ -248,7 +253,7 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	
 	// Split the work among multiple threads, if OPEN is defined
  { 
-pragma189 *new_ctx = (pragma189 *)malloc(sizeof(pragma189));
+pragma194 *new_ctx = (pragma194 *)malloc(sizeof(pragma194));
 new_ctx->dilated_ptr = &(dilated);
 new_ctx->el_center_i_ptr = &(el_center_i);
 new_ctx->el_center_j_ptr = &(el_center_j);
@@ -260,15 +265,15 @@ domain[0].low = 0;
 domain[0].high = img_in->m;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma189_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma194_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
 
 	return dilated;
 } 
-static void pragma189_hclib_async(void *____arg, const int ___iter0) {
-    pragma189 *ctx = (pragma189 *)____arg;
+static void pragma194_hclib_async(void *____arg, const int ___iter0) {
+    pragma194 *ctx = (pragma194 *)____arg;
     int i; i = ctx->i;
     hclib_start_finish();
     do {

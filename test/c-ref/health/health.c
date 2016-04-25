@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /**********************************************************************************************/
 /*  This program is part of the Barcelona OpenMP Tasks Suite                                  */
 /*  Copyright (C) 2009 Barcelona Supercomputing Center - Centro Nacional de Supercomputacion  */
@@ -405,12 +410,12 @@ void put_in_hosp(struct Hosp *hosp, struct Patient *patient)
    }
 }
 /**********************************************************************/
-typedef struct _pragma422 {
+typedef struct _pragma427 {
     struct Village (*(*vlist_ptr));
     struct Village (*(*village_ptr));
- } pragma422;
+ } pragma427;
 
-static void pragma422_hclib_async(void *____arg);
+static void pragma427_hclib_async(void *____arg);
 void sim_village_par(struct Village *village)
 {
    struct Village *vlist;
@@ -425,10 +430,10 @@ void sim_village_par(struct Village *village)
    while(vlist)
    {
  { 
-pragma422 *new_ctx = (pragma422 *)malloc(sizeof(pragma422));
+pragma427 *new_ctx = (pragma427 *)malloc(sizeof(pragma427));
 new_ctx->vlist_ptr = &(vlist);
 new_ctx->village_ptr = &(village);
-hclib_async(pragma422_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma427_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
       vlist = vlist->next;
    }
@@ -450,8 +455,8 @@ hclib_async(pragma422_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    /* Uses list v->population, v->hosp->asses and v->h->waiting */
    check_patients_population(village);
 } 
-static void pragma422_hclib_async(void *____arg) {
-    pragma422 *ctx = (pragma422 *)____arg;
+static void pragma427_hclib_async(void *____arg) {
+    pragma427 *ctx = (pragma427 *)____arg;
     hclib_start_finish();
 sim_village_par((*(ctx->vlist_ptr))) ;     ; hclib_end_finish();
 
@@ -564,12 +569,12 @@ int check_village(struct Village *top)
    return answer;
 }
 /**********************************************************************/
-typedef struct _pragma558 {
+typedef struct _pragma563 {
     long (*i_ptr);
     struct Village (*(*top_ptr));
- } pragma558;
+ } pragma563;
 
-static void pragma558_hclib_async(void *____arg);
+static void pragma563_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
     long i;
     struct Village (*top);
@@ -583,10 +588,10 @@ static void main_entrypoint(void *____arg) {
 {
 hclib_start_finish(); {
  { 
-pragma558 *new_ctx = (pragma558 *)malloc(sizeof(pragma558));
+pragma563 *new_ctx = (pragma563 *)malloc(sizeof(pragma563));
 new_ctx->i_ptr = &(i);
 new_ctx->top_ptr = &(top);
-hclib_async(pragma558_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma563_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
             } ; hclib_end_finish(); 
     } ;     free(____arg);
@@ -601,8 +606,8 @@ new_ctx->top = top;
 hclib_launch(main_entrypoint, new_ctx);
 
 }  
-static void pragma558_hclib_async(void *____arg) {
-    pragma558 *ctx = (pragma558 *)____arg;
+static void pragma563_hclib_async(void *____arg) {
+    pragma563 *ctx = (pragma563 *)____arg;
     hclib_start_finish();
 {
                     for ((*(ctx->i_ptr)) = 0; (*(ctx->i_ptr)) < sim_time; (*(ctx->i_ptr))++) sim_village_par((*(ctx->top_ptr)));   

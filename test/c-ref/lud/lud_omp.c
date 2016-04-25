@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 #include <stdio.h>
 #include <omp.h>
 
@@ -32,26 +37,26 @@ void lud_diagonal_omp (float* a, int size, int offset)
 }
 
 // implements block LU factorization 
-typedef struct _pragma53 {
+typedef struct _pragma58 {
     int (*offset_ptr);
     int chunk_idx;
     int (*chunks_in_inter_row_ptr);
     int (*chunks_per_inter_ptr);
     float (*a);
     int size;
- } pragma53;
+ } pragma58;
 
-typedef struct _pragma105 {
+typedef struct _pragma110 {
     int (*offset_ptr);
     int chunk_idx;
     int (*chunks_in_inter_row_ptr);
     int (*chunks_per_inter_ptr);
     float (*a);
     int size;
- } pragma105;
+ } pragma110;
 
-static void pragma53_hclib_async(void *____arg, const int ___iter0);
-static void pragma105_hclib_async(void *____arg, const int ___iter0);
+static void pragma58_hclib_async(void *____arg, const int ___iter0);
+static void pragma110_hclib_async(void *____arg, const int ___iter0);
 typedef struct _main_entrypoint_ctx {
     float (*a);
     int size;
@@ -77,7 +82,7 @@ static void main_entrypoint(void *____arg) {
         // calculate perimeter block matrices
         // 
  { 
-pragma53 *new_ctx = (pragma53 *)malloc(sizeof(pragma53));
+pragma58 *new_ctx = (pragma58 *)malloc(sizeof(pragma58));
 new_ctx->offset_ptr = &(offset);
 new_ctx->chunk_idx = chunk_idx;
 new_ctx->chunks_in_inter_row_ptr = &(chunks_in_inter_row);
@@ -89,7 +94,7 @@ domain[0].low = 0;
 domain[0].high = chunks_in_inter_row;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma53_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma58_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -99,7 +104,7 @@ free(new_ctx);
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
  { 
-pragma105 *new_ctx = (pragma105 *)malloc(sizeof(pragma105));
+pragma110 *new_ctx = (pragma110 *)malloc(sizeof(pragma110));
 new_ctx->offset_ptr = &(offset);
 new_ctx->chunk_idx = chunk_idx;
 new_ctx->chunks_in_inter_row_ptr = &(chunks_in_inter_row);
@@ -111,7 +116,7 @@ domain[0].low = 0;
 domain[0].high = chunks_per_inter;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma105_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma110_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -129,8 +134,8 @@ new_ctx->size = size;
 hclib_launch(main_entrypoint, new_ctx);
 
 }  
-static void pragma53_hclib_async(void *____arg, const int ___iter0) {
-    pragma53 *ctx = (pragma53 *)____arg;
+static void pragma58_hclib_async(void *____arg, const int ___iter0) {
+    pragma58 *ctx = (pragma58 *)____arg;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     float (*a); a = ctx->a;
     int size; size = ctx->size;
@@ -187,8 +192,8 @@ for (j =0; j < BS; j++){
 }
 
 
-static void pragma105_hclib_async(void *____arg, const int ___iter0) {
-    pragma105 *ctx = (pragma105 *)____arg;
+static void pragma110_hclib_async(void *____arg, const int ___iter0) {
+    pragma110 *ctx = (pragma110 *)____arg;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     float (*a); a = ctx->a;
     int size; size = ctx->size;

@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /**
  *
  * @file pdgeqrf.c
@@ -26,7 +31,7 @@
 /***************************************************************************//**
  *  Parallel tile QR factorization - dynamic scheduling
  **/
-typedef struct _pragma46 {
+typedef struct _pragma51 {
     double (*(*dA_ptr));
     double (*(*dT_ptr));
     int (*k_ptr);
@@ -41,9 +46,9 @@ typedef struct _pragma46 {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma46;
+ } pragma51;
 
-typedef struct _pragma58 {
+typedef struct _pragma63 {
     double (*(*dA_ptr));
     double (*(*dT_ptr));
     double (*(*dC_ptr));
@@ -59,9 +64,9 @@ typedef struct _pragma58 {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma58;
+ } pragma63;
 
-typedef struct _pragma75 {
+typedef struct _pragma80 {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dT_ptr));
@@ -77,9 +82,9 @@ typedef struct _pragma75 {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma75;
+ } pragma80;
 
-typedef struct _pragma91 {
+typedef struct _pragma96 {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dV_ptr));
@@ -96,12 +101,12 @@ typedef struct _pragma91 {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma91;
+ } pragma96;
 
-static void *pragma46_hclib_async(void *____arg);
-static void *pragma58_hclib_async(void *____arg);
-static void *pragma75_hclib_async(void *____arg);
-static void *pragma91_hclib_async(void *____arg);
+static void *pragma51_hclib_async(void *____arg);
+static void *pragma63_hclib_async(void *____arg);
+static void *pragma80_hclib_async(void *____arg);
+static void *pragma96_hclib_async(void *____arg);
 void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 {
 
@@ -119,7 +124,7 @@ void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 omp_set_task_priority(1);
 #endif
  { 
-pragma46 *new_ctx = (pragma46 *)malloc(sizeof(pragma46));
+pragma51 *new_ctx = (pragma51 *)malloc(sizeof(pragma51));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dT_ptr = &(dT);
 new_ctx->k_ptr = &(k);
@@ -134,7 +139,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma46_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
+hclib_emulate_omp_task(pragma51_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
  } 
 
         for (n = k+1; n < A.nt; n++) {
@@ -143,7 +148,7 @@ hclib_emulate_omp_task(pragma46_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0
             double *dT = T(k, k);
             double *dC = A(k, n);
  { 
-pragma58 *new_ctx = (pragma58 *)malloc(sizeof(pragma58));
+pragma63 *new_ctx = (pragma63 *)malloc(sizeof(pragma63));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dT_ptr = &(dT);
 new_ctx->dC_ptr = &(dC);
@@ -159,7 +164,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma58_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dC) + (0), T.nb*T.nb, (dC) + (0), T.nb*T.nb);
+hclib_emulate_omp_task(pragma63_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dC) + (0), T.nb*T.nb, (dC) + (0), T.nb*T.nb);
  } 
         }
         for (m = k+1; m < A.mt; m++) {
@@ -169,7 +174,7 @@ hclib_emulate_omp_task(pragma58_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0
             double *dB = A(m, k);
             double *dT = T(m, k);
  { 
-pragma75 *new_ctx = (pragma75 *)malloc(sizeof(pragma75));
+pragma80 *new_ctx = (pragma80 *)malloc(sizeof(pragma80));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dT_ptr = &(dT);
@@ -185,7 +190,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma75_hclib_async, new_ctx, ANY_PLACE, 2, 3, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
+hclib_emulate_omp_task(pragma80_hclib_async, new_ctx, ANY_PLACE, 2, 3, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
  } 
 
             for (n = k+1; n < A.nt; n++) {
@@ -195,7 +200,7 @@ hclib_emulate_omp_task(pragma75_hclib_async, new_ctx, ANY_PLACE, 2, 3, (dA) + (0
                 double *dV = A(m, k);
                 double *dT = T(m, k);
  { 
-pragma91 *new_ctx = (pragma91 *)malloc(sizeof(pragma91));
+pragma96 *new_ctx = (pragma96 *)malloc(sizeof(pragma96));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dV_ptr = &(dV);
@@ -212,14 +217,14 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma91_hclib_async, new_ctx, ANY_PLACE, 4, 2, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dV) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb);
+hclib_emulate_omp_task(pragma96_hclib_async, new_ctx, ANY_PLACE, 4, 2, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dV) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb);
  } 
             }
         }
     }
 } 
-static void *pragma46_hclib_async(void *____arg) {
-    pragma46 *ctx = (pragma46 *)____arg;
+static void *pragma51_hclib_async(void *____arg) {
+    pragma51 *ctx = (pragma51 *)____arg;
     hclib_start_finish();
 {
             double tau[(*(ctx->T_ptr)).nb];
@@ -232,8 +237,8 @@ static void *pragma46_hclib_async(void *____arg) {
 }
 
 
-static void *pragma58_hclib_async(void *____arg) {
-    pragma58 *ctx = (pragma58 *)____arg;
+static void *pragma63_hclib_async(void *____arg) {
+    pragma63 *ctx = (pragma63 *)____arg;
     hclib_start_finish();
 {
                 double work[(*(ctx->T_ptr)).nb * (*(ctx->ib_ptr))];
@@ -250,8 +255,8 @@ static void *pragma58_hclib_async(void *____arg) {
 }
 
 
-static void *pragma75_hclib_async(void *____arg) {
-    pragma75 *ctx = (pragma75 *)____arg;
+static void *pragma80_hclib_async(void *____arg) {
+    pragma80 *ctx = (pragma80 *)____arg;
     hclib_start_finish();
 {
                 double tau[(*(ctx->T_ptr)).nb];
@@ -267,8 +272,8 @@ static void *pragma75_hclib_async(void *____arg) {
 }
 
 
-static void *pragma91_hclib_async(void *____arg) {
-    pragma91 *ctx = (pragma91 *)____arg;
+static void *pragma96_hclib_async(void *____arg) {
+    pragma96 *ctx = (pragma96 *)____arg;
     hclib_start_finish();
 {
                     double work[(*(ctx->ib_ptr)) * (*(ctx->T_ptr)).nb];

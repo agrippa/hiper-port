@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /**
  *
  * @file pdgetrf_rectil.c
@@ -29,7 +34,7 @@ void CORE_dgetrf_rectil_init(void);
 /***************************************************************************//**
  *  Parallel tile LU factorization - dynamic scheduling - Right looking
  **/
-typedef struct _pragma58 {
+typedef struct _pragma63 {
     double (*(*dA_ptr));
     int (*(*dB_ptr));
     PLASMA_desc (*pDesc_ptr);
@@ -49,9 +54,9 @@ typedef struct _pragma58 {
     void (*(*fakedep_ptr));
     PLASMA_desc (*A_ptr);
     int (*(*IPIV_ptr));
- } pragma58;
+ } pragma63;
 
-typedef struct _pragma81 {
+typedef struct _pragma86 {
     PLASMA_desc (*descA_ptr);
     double (*(*dA_ptr));
     double (*(*dB_ptr));
@@ -73,9 +78,9 @@ typedef struct _pragma81 {
     void (*(*fakedep_ptr));
     PLASMA_desc (*A_ptr);
     int (*(*IPIV_ptr));
- } pragma81;
+ } pragma86;
 
-typedef struct _pragma92 {
+typedef struct _pragma97 {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dC_ptr));
@@ -98,9 +103,9 @@ typedef struct _pragma92 {
     void (*(*fakedep_ptr));
     PLASMA_desc (*A_ptr);
     int (*(*IPIV_ptr));
- } pragma92;
+ } pragma97;
 
-typedef struct _pragma118 {
+typedef struct _pragma123 {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dC_ptr));
@@ -125,9 +130,9 @@ typedef struct _pragma118 {
     void (*(*fakedep_ptr));
     PLASMA_desc (*A_ptr);
     int (*(*IPIV_ptr));
- } pragma118;
+ } pragma123;
 
-typedef struct _pragma156 {
+typedef struct _pragma161 {
     double (*(*Aij_ptr));
     double (*(*prevSwap_ptr));
     int (*(*dipiv_ptr));
@@ -149,13 +154,13 @@ typedef struct _pragma156 {
     void (*(*fakedep_ptr));
     PLASMA_desc (*A_ptr);
     int (*(*IPIV_ptr));
- } pragma156;
+ } pragma161;
 
-static void *pragma58_hclib_async(void *____arg);
-static void *pragma81_hclib_async(void *____arg);
-static void *pragma92_hclib_async(void *____arg);
-static void *pragma118_hclib_async(void *____arg);
-static void *pragma156_hclib_async(void *____arg);
+static void *pragma63_hclib_async(void *____arg);
+static void *pragma86_hclib_async(void *____arg);
+static void *pragma97_hclib_async(void *____arg);
+static void *pragma123_hclib_async(void *____arg);
+static void *pragma161_hclib_async(void *____arg);
 void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
 {
     int k, m, n;
@@ -182,7 +187,7 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
         int *dB = IPIV(k);
         PLASMA_desc pDesc = plasma_desc_submatrix(A, tempk, k*A.nb, tempm, tempkn);
  { 
-pragma58 *new_ctx = (pragma58 *)malloc(sizeof(pragma58));
+pragma63 *new_ctx = (pragma63 *)malloc(sizeof(pragma63));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->pDesc_ptr = &(pDesc);
@@ -202,7 +207,7 @@ new_ctx->mzone_ptr = &(mzone);
 new_ctx->fakedep_ptr = &(fakedep);
 new_ctx->A_ptr = &(A);
 new_ctx->IPIV_ptr = &(IPIV);
-hclib_emulate_omp_task(pragma58_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), A.mb*A.nb, (dA) + (0), A.mb*A.nb, (dB) + (0), pDesc.n);
+hclib_emulate_omp_task(pragma63_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), A.mb*A.nb, (dA) + (0), A.mb*A.nb, (dB) + (0), pDesc.n);
  } 
 
         /*
@@ -220,7 +225,7 @@ hclib_emulate_omp_task(pragma58_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0
             double *dB = A(k, k);
             int *dipiv = IPIV(k);
  { 
-pragma81 *new_ctx = (pragma81 *)malloc(sizeof(pragma81));
+pragma86 *new_ctx = (pragma86 *)malloc(sizeof(pragma86));
 new_ctx->descA_ptr = &(descA);
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
@@ -242,7 +247,7 @@ new_ctx->mzone_ptr = &(mzone);
 new_ctx->fakedep_ptr = &(fakedep);
 new_ctx->A_ptr = &(A);
 new_ctx->IPIV_ptr = &(IPIV);
-hclib_emulate_omp_task(pragma81_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), 1, (dB) + (0), ldak, (dipiv) + (0), tempkm, (dA) + (0), 1);
+hclib_emulate_omp_task(pragma86_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), 1, (dB) + (0), ldak, (dipiv) + (0), tempkm, (dA) + (0), 1);
  } ;
 
             m = k+1;
@@ -254,7 +259,7 @@ hclib_emulate_omp_task(pragma81_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0
                 double *dB = A(k , n);
                 double *dC = A(m , n);
  { 
-pragma92 *new_ctx = (pragma92 *)malloc(sizeof(pragma92));
+pragma97 *new_ctx = (pragma97 *)malloc(sizeof(pragma97));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dC_ptr = &(dC);
@@ -277,7 +282,7 @@ new_ctx->mzone_ptr = &(mzone);
 new_ctx->fakedep_ptr = &(fakedep);
 new_ctx->A_ptr = &(A);
 new_ctx->IPIV_ptr = &(IPIV);
-hclib_emulate_omp_task(pragma92_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb);
+hclib_emulate_omp_task(pragma97_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb, (dC) + (0), A.mb*A.mb);
  } ;
 
                 for (m = k+2; m < A.mt; m++)
@@ -300,7 +305,7 @@ hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fak
                                 zone, dC, ldam);
 #else
  { 
-pragma118 *new_ctx = (pragma118 *)malloc(sizeof(pragma118));
+pragma123 *new_ctx = (pragma123 *)malloc(sizeof(pragma123));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dC_ptr = &(dC);
@@ -325,7 +330,7 @@ new_ctx->mzone_ptr = &(mzone);
 new_ctx->fakedep_ptr = &(fakedep);
 new_ctx->A_ptr = &(A);
 new_ctx->IPIV_ptr = &(IPIV);
-hclib_emulate_omp_task(pragma118_hclib_async, new_ctx, ANY_PLACE, 5, 2, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (fake2) + (0), 1, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb);
+hclib_emulate_omp_task(pragma123_hclib_async, new_ctx, ANY_PLACE, 5, 2, (dA) + (0), A.mb*A.mb, (dB) + (0), A.mb*A.mb, (fake2) + (0), 1, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb, (dC) + (0), A.mb*A.mb, (fake1) + (0), A.mb*A.nb);
  } ;
 #endif
                 }
@@ -360,7 +365,7 @@ hclib_pragma_marker("omp", "task depend(inout:Aij[0:1]) depend(cw:fakedep) depen
             CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
 #else
  { 
-pragma156 *new_ctx = (pragma156 *)malloc(sizeof(pragma156));
+pragma161 *new_ctx = (pragma161 *)malloc(sizeof(pragma161));
 new_ctx->Aij_ptr = &(Aij);
 new_ctx->prevSwap_ptr = &(prevSwap);
 new_ctx->dipiv_ptr = &(dipiv);
@@ -382,14 +387,14 @@ new_ctx->mzone_ptr = &(mzone);
 new_ctx->fakedep_ptr = &(fakedep);
 new_ctx->A_ptr = &(A);
 new_ctx->IPIV_ptr = &(IPIV);
-hclib_emulate_omp_task(pragma156_hclib_async, new_ctx, ANY_PLACE, 4, 2, (Aij) + (0), 1, fakedep, 0, (dipiv) + (0), mintmp, (prevSwap) + (0), A.lm*A.nb, (Aij) + (0), 1, fakedep, 0);
+hclib_emulate_omp_task(pragma161_hclib_async, new_ctx, ANY_PLACE, 4, 2, (Aij) + (0), 1, fakedep, 0, (dipiv) + (0), mintmp, (prevSwap) + (0), A.lm*A.nb, (Aij) + (0), 1, fakedep, 0);
  } ;
 #endif
         }
     }
 } 
-static void *pragma58_hclib_async(void *____arg) {
-    pragma58 *ctx = (pragma58 *)____arg;
+static void *pragma63_hclib_async(void *____arg) {
+    pragma63 *ctx = (pragma63 *)____arg;
     hclib_start_finish();
 {
             int info[3];
@@ -404,8 +409,8 @@ static void *pragma58_hclib_async(void *____arg) {
 }
 
 
-static void *pragma81_hclib_async(void *____arg) {
-    pragma81 *ctx = (pragma81 *)____arg;
+static void *pragma86_hclib_async(void *____arg) {
+    pragma86 *ctx = (pragma86 *)____arg;
     hclib_start_finish();
 CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
 
@@ -414,8 +419,8 @@ CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_p
 }
 
 
-static void *pragma92_hclib_async(void *____arg) {
-    pragma92 *ctx = (pragma92 *)____arg;
+static void *pragma97_hclib_async(void *____arg) {
+    pragma97 *ctx = (pragma97 *)____arg;
     hclib_start_finish();
 cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                         (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
@@ -428,8 +433,8 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
 }
 
 
-static void *pragma118_hclib_async(void *____arg) {
-    pragma118 *ctx = (pragma118 *)____arg;
+static void *pragma123_hclib_async(void *____arg) {
+    pragma123 *ctx = (pragma123 *)____arg;
     hclib_start_finish();
 cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                                 (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
@@ -442,8 +447,8 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
 }
 
 
-static void *pragma156_hclib_async(void *____arg) {
-    pragma156 *ctx = (pragma156 *)____arg;
+static void *pragma161_hclib_async(void *____arg) {
+    pragma161 *ctx = (pragma161 *)____arg;
     hclib_start_finish();
 CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish();
 

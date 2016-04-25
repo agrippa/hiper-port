@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /**
  * @file ex_particle_OPENMP_seq.c
  * @author Michael Trotter & Matt Goodrum
@@ -341,7 +346,7 @@ int findIndexBin(double * CDF, int beginIndex, int endIndex, double value){
 * @param seed The seed array used for random number generation
 * @param Nparticles The number of particles to be used
 */
-typedef struct _pragma373 {
+typedef struct _pragma378 {
     int (*max_size_ptr);
     long long (*start_ptr);
     double (*xe_ptr);
@@ -361,9 +366,9 @@ typedef struct _pragma373 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma373;
+ } pragma378;
 
-typedef struct _pragma388 {
+typedef struct _pragma393 {
     int (*max_size_ptr);
     long long (*start_ptr);
     double (*xe_ptr);
@@ -392,9 +397,9 @@ typedef struct _pragma388 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma388;
+ } pragma393;
 
-typedef struct _pragma402 {
+typedef struct _pragma407 {
     long long (*set_arrays_ptr);
     int (*max_size_ptr);
     long long (*start_ptr);
@@ -427,9 +432,9 @@ typedef struct _pragma402 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma402;
+ } pragma407;
 
-typedef struct _pragma410 {
+typedef struct _pragma415 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     int (*max_size_ptr);
@@ -463,9 +468,9 @@ typedef struct _pragma410 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma410;
+ } pragma415;
 
-typedef struct _pragma433 {
+typedef struct _pragma438 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -500,9 +505,9 @@ typedef struct _pragma433 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma433;
+ } pragma438;
 
-typedef struct _pragma440 {
+typedef struct _pragma445 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -540,9 +545,9 @@ typedef struct _pragma440 {
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
     pthread_mutex_t reduction_mutex;
- } pragma440;
+ } pragma445;
 
-typedef struct _pragma446 {
+typedef struct _pragma451 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -580,9 +585,9 @@ typedef struct _pragma446 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma446;
+ } pragma451;
 
-typedef struct _pragma455 {
+typedef struct _pragma460 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -622,9 +627,9 @@ typedef struct _pragma455 {
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
     pthread_mutex_t reduction_mutex;
- } pragma455;
+ } pragma460;
 
-typedef struct _pragma480 {
+typedef struct _pragma485 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -667,9 +672,9 @@ typedef struct _pragma480 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma480;
+ } pragma485;
 
-typedef struct _pragma488 {
+typedef struct _pragma493 {
     long long (*set_arrays_ptr);
     long long (*error_ptr);
     long long (*likelihood_time_ptr);
@@ -715,18 +720,18 @@ typedef struct _pragma488 {
     int (*Nfr_ptr);
     int (*(*seed_ptr));
     int (*Nparticles_ptr);
- } pragma488;
+ } pragma493;
 
-static void pragma373_hclib_async(void *____arg, const int ___iter0);
-static void pragma388_hclib_async(void *____arg, const int ___iter0);
-static void pragma402_hclib_async(void *____arg, const int ___iter0);
-static void pragma410_hclib_async(void *____arg, const int ___iter0);
-static void pragma433_hclib_async(void *____arg, const int ___iter0);
-static void pragma440_hclib_async(void *____arg, const int ___iter0);
-static void pragma446_hclib_async(void *____arg, const int ___iter0);
-static void pragma455_hclib_async(void *____arg, const int ___iter0);
-static void pragma480_hclib_async(void *____arg, const int ___iter0);
-static void pragma488_hclib_async(void *____arg, const int ___iter0);
+static void pragma378_hclib_async(void *____arg, const int ___iter0);
+static void pragma393_hclib_async(void *____arg, const int ___iter0);
+static void pragma407_hclib_async(void *____arg, const int ___iter0);
+static void pragma415_hclib_async(void *____arg, const int ___iter0);
+static void pragma438_hclib_async(void *____arg, const int ___iter0);
+static void pragma445_hclib_async(void *____arg, const int ___iter0);
+static void pragma451_hclib_async(void *____arg, const int ___iter0);
+static void pragma460_hclib_async(void *____arg, const int ___iter0);
+static void pragma485_hclib_async(void *____arg, const int ___iter0);
+static void pragma493_hclib_async(void *____arg, const int ___iter0);
 void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
 	
 	int max_size = IszX*IszY*Nfr;
@@ -756,7 +761,7 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 	//initial weights are all equal (1/Nparticles)
 	double * weights = (double *)malloc(sizeof(double)*Nparticles);
  { 
-pragma373 *new_ctx = (pragma373 *)malloc(sizeof(pragma373));
+pragma378 *new_ctx = (pragma378 *)malloc(sizeof(pragma378));
 new_ctx->max_size_ptr = &(max_size);
 new_ctx->start_ptr = &(start);
 new_ctx->xe_ptr = &(xe);
@@ -781,7 +786,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma373_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma378_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -797,7 +802,7 @@ free(new_ctx);
 	double * u = (double *)malloc(sizeof(double)*Nparticles);
 	int * ind = (int*)malloc(sizeof(int)*countOnes*Nparticles);
  { 
-pragma388 *new_ctx = (pragma388 *)malloc(sizeof(pragma388));
+pragma393 *new_ctx = (pragma393 *)malloc(sizeof(pragma393));
 new_ctx->max_size_ptr = &(max_size);
 new_ctx->start_ptr = &(start);
 new_ctx->xe_ptr = &(xe);
@@ -831,7 +836,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma388_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma393_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -845,7 +850,7 @@ free(new_ctx);
 		//draws sample from motion model (random walk). The only prior information
 		//is that the object moves 2x as fast as in the y direction
  { 
-pragma402 *new_ctx = (pragma402 *)malloc(sizeof(pragma402));
+pragma407 *new_ctx = (pragma407 *)malloc(sizeof(pragma407));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->max_size_ptr = &(max_size);
 new_ctx->start_ptr = &(start);
@@ -883,7 +888,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma402_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma407_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -891,7 +896,7 @@ free(new_ctx);
 		printf("TIME TO SET ERROR TOOK: %f\n", elapsed_time(set_arrays, error));
 		//particle filter likelihood
  { 
-pragma410 *new_ctx = (pragma410 *)malloc(sizeof(pragma410));
+pragma415 *new_ctx = (pragma415 *)malloc(sizeof(pragma415));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->max_size_ptr = &(max_size);
@@ -930,7 +935,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma410_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma415_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -939,7 +944,7 @@ free(new_ctx);
 		// update & normalize weights
 		// using equation (63) of Arulampalam Tutorial
  { 
-pragma433 *new_ctx = (pragma433 *)malloc(sizeof(pragma433));
+pragma438 *new_ctx = (pragma438 *)malloc(sizeof(pragma438));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -979,7 +984,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma433_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma438_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -987,7 +992,7 @@ free(new_ctx);
 		printf("TIME TO GET EXP TOOK: %f\n", elapsed_time(likelihood_time, exponential));
 		double sumWeights = 0;
  { 
-pragma440 *new_ctx = (pragma440 *)malloc(sizeof(pragma440));
+pragma445 *new_ctx = (pragma445 *)malloc(sizeof(pragma445));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -1032,7 +1037,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma440_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma445_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
 sumWeights = new_ctx->sumWeights;
@@ -1040,7 +1045,7 @@ sumWeights = new_ctx->sumWeights;
 		long long sum_time = get_time();
 		printf("TIME TO SUM WEIGHTS TOOK: %f\n", elapsed_time(exponential, sum_time));
  { 
-pragma446 *new_ctx = (pragma446 *)malloc(sizeof(pragma446));
+pragma451 *new_ctx = (pragma451 *)malloc(sizeof(pragma451));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -1083,7 +1088,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma446_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma451_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -1093,7 +1098,7 @@ free(new_ctx);
 		ye = 0;
 		// estimate the object location by expected values
  { 
-pragma455 *new_ctx = (pragma455 *)malloc(sizeof(pragma455));
+pragma460 *new_ctx = (pragma460 *)malloc(sizeof(pragma460));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -1141,7 +1146,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma455_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma460_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
 xe = new_ctx->xe;
@@ -1168,7 +1173,7 @@ ye = new_ctx->ye;
 		printf("TIME TO CALC CUM SUM TOOK: %f\n", elapsed_time(move_time, cum_sum));
 		double u1 = (1/((double)(Nparticles)))*randu(seed, 0);
  { 
-pragma480 *new_ctx = (pragma480 *)malloc(sizeof(pragma480));
+pragma485 *new_ctx = (pragma485 *)malloc(sizeof(pragma485));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -1216,7 +1221,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma480_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma485_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -1225,7 +1230,7 @@ free(new_ctx);
 		int j, i;
 		
  { 
-pragma488 *new_ctx = (pragma488 *)malloc(sizeof(pragma488));
+pragma493 *new_ctx = (pragma493 *)malloc(sizeof(pragma493));
 new_ctx->set_arrays_ptr = &(set_arrays);
 new_ctx->error_ptr = &(error);
 new_ctx->likelihood_time_ptr = &(likelihood_time);
@@ -1276,7 +1281,7 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma488_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma493_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -1305,8 +1310,8 @@ free(new_ctx);
 	free(u);
 	free(ind);
 } 
-static void pragma373_hclib_async(void *____arg, const int ___iter0) {
-    pragma373 *ctx = (pragma373 *)____arg;
+static void pragma378_hclib_async(void *____arg, const int ___iter0) {
+    pragma378 *ctx = (pragma378 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1319,8 +1324,8 @@ static void pragma373_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma388_hclib_async(void *____arg, const int ___iter0) {
-    pragma388 *ctx = (pragma388 *)____arg;
+static void pragma393_hclib_async(void *____arg, const int ___iter0) {
+    pragma393 *ctx = (pragma393 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1334,8 +1339,8 @@ static void pragma388_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma402_hclib_async(void *____arg, const int ___iter0) {
-    pragma402 *ctx = (pragma402 *)____arg;
+static void pragma407_hclib_async(void *____arg, const int ___iter0) {
+    pragma407 *ctx = (pragma407 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1349,8 +1354,8 @@ static void pragma402_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma410_hclib_async(void *____arg, const int ___iter0) {
-    pragma410 *ctx = (pragma410 *)____arg;
+static void pragma415_hclib_async(void *____arg, const int ___iter0) {
+    pragma415 *ctx = (pragma415 *)____arg;
     int x; x = ctx->x;
     int y; y = ctx->y;
     int indX; indX = ctx->indX;
@@ -1381,8 +1386,8 @@ static void pragma410_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma433_hclib_async(void *____arg, const int ___iter0) {
-    pragma433 *ctx = (pragma433 *)____arg;
+static void pragma438_hclib_async(void *____arg, const int ___iter0) {
+    pragma438 *ctx = (pragma438 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1395,8 +1400,8 @@ static void pragma433_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma440_hclib_async(void *____arg, const int ___iter0) {
-    pragma440 *ctx = (pragma440 *)____arg;
+static void pragma445_hclib_async(void *____arg, const int ___iter0) {
+    pragma445 *ctx = (pragma445 *)____arg;
     double sumWeights; sumWeights = ctx->sumWeights;
     int x; x = ctx->x;
     hclib_start_finish();
@@ -1415,8 +1420,8 @@ static void pragma440_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma446_hclib_async(void *____arg, const int ___iter0) {
-    pragma446 *ctx = (pragma446 *)____arg;
+static void pragma451_hclib_async(void *____arg, const int ___iter0) {
+    pragma451 *ctx = (pragma451 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1429,8 +1434,8 @@ static void pragma446_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma455_hclib_async(void *____arg, const int ___iter0) {
-    pragma455 *ctx = (pragma455 *)____arg;
+static void pragma460_hclib_async(void *____arg, const int ___iter0) {
+    pragma460 *ctx = (pragma460 *)____arg;
     double xe; xe = ctx->xe;
     double ye; ye = ctx->ye;
     int x; x = ctx->x;
@@ -1452,8 +1457,8 @@ static void pragma455_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma480_hclib_async(void *____arg, const int ___iter0) {
-    pragma480 *ctx = (pragma480 *)____arg;
+static void pragma485_hclib_async(void *____arg, const int ___iter0) {
+    pragma485 *ctx = (pragma485 *)____arg;
     int x; x = ctx->x;
     hclib_start_finish();
     do {
@@ -1466,8 +1471,8 @@ static void pragma480_hclib_async(void *____arg, const int ___iter0) {
 }
 
 
-static void pragma488_hclib_async(void *____arg, const int ___iter0) {
-    pragma488 *ctx = (pragma488 *)____arg;
+static void pragma493_hclib_async(void *____arg, const int ___iter0) {
+    pragma493 *ctx = (pragma493 *)____arg;
     int j; j = ctx->j;
     int i; i = ctx->i;
     hclib_start_finish();

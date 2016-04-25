@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 pthread_mutex_t critical_0_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 pthread_mutex_t critical_1_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 /*
@@ -36,36 +41,15 @@ pthread_mutex_t critical_1_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
  *                                                         *
  ***********************************************************/
 
-#if defined(_OPENMP)
-/**** OpenMP Definitions ****/
 #include <omp.h>
-#define PARALLEL         1
-#define COMPILER_TYPE    1
-#define SHARED 
-#define SHARED_INDEF
-#define VOLATILE         volatile
 #define MAX_OMP_THREADS       32
 #define MAX_SHMEM_THREADS     64
-#define LOCK_T           omp_lock_t
-#define SET_LOCK(zlk)    omp_set_lock(zlk)
-#define UNSET_LOCK(zlk)  omp_unset_lock(zlk)
-#define SMEMCPY          memcpy
-#define ALLOC            malloc
-#define BARRIER          
 // OpenMP helper function to match UPC lock allocation semantics
-
-
-#else
-#error Only supports OMP
-#endif /* END Par. Model Definitions */
-
 
 /***********************************************************
  *  Parallel execution parameters                          *
  ***********************************************************/
 
-int doSteal   = PARALLEL; // 1 => use work stealing
-int chunkSize = 20;       // number of nodes to move to/from shared area
 int cbint     = 1;        // Cancellable barrier polling interval
 int pollint   = 1;        // BUPC Polling interval
 
@@ -150,9 +134,6 @@ const int     local_cb_cancel = 1;
 
 /* Check that we are not being asked to compile parallel with stats.
  * Parallel stats collection is presently not supported.  */
-#if PARALLEL
-#error "ERROR: Parallel stats collection is not supported!"
-#endif
 
 #define MAXHISTSIZE      2000  // max tree depth in histogram
 int    stats     = 1;
@@ -229,8 +210,7 @@ char debug_str[1000];
 
 // Return a string describing this implementation
 char * impl_getName() {
-  char * name[] = {"Sequential C", "C/OpenMP", "UPC", "SHMEM", "PThreads"};
-  return name[COMPILER_TYPE];
+    return "HCLIB";
 }
 
 
@@ -246,20 +226,6 @@ int impl_paramsToStr(char *strBuf, int ind) {
 //     }
 
   ind += sprintf(strBuf+ind, "Execution strategy:  ");
-  if (PARALLEL) {
-    // ind += sprintf(strBuf+ind, "Parallel search using %d threads total (%d "
-    //         "SHMEM PEs, %d OMP threads per PE)\n", npes * n_omp_threads,
-    //         npes, n_omp_threads);
-    if (doSteal) {
-      ind += sprintf(strBuf+ind, "   Load balance by work stealing, chunk size = %d nodes\n",chunkSize);
-      ind += sprintf(strBuf+ind, "  CBarrier Interval: %d\n", cbint);
-      ind += sprintf(strBuf+ind, "   Polling Interval: %d\n", pollint);
-    }
-    else
-      ind += sprintf(strBuf+ind, "   No load balancing.\n");
-  }
-  else
-    ind += sprintf(strBuf+ind, "Iterative sequential search\n");
       
   return ind;
 }
@@ -269,35 +235,8 @@ int impl_parseParam(char *param, char *value) {
   int err = 0;  // Return 0 on a match, nonzero on an error
 
   switch (param[1]) {
-#if (PARALLEL == 1)
-    case 'c':
-      chunkSize = atoi(value); break;
-    case 's':
-      doSteal = atoi(value); 
-      if (doSteal != 1 && doSteal != 0) 
-	err = 1;
-      break;
     case 'i':
       cbint = atoi(value); break;
-#ifdef __BERKELEY_UPC__
-    case 'I':
-      pollint = atoi(value); break;
-#endif
-#else /* !PARALLEL */
-#ifdef UTS_STAT
-    case 'u':
-      unbType = atoi(value); 
-      if (unbType > 2) {
-        err = 1;
-        break;
-      }
-      if (unbType < 0)
-        stats = 0;
-      else
-        stats = 1;
-      break;
-#endif
-#endif /* PARALLEL */
     default:
       err = 1;
       break;
@@ -307,35 +246,10 @@ int impl_parseParam(char *param, char *value) {
 }
 
 void impl_helpMessage() {
-  if (PARALLEL) {
-    printf("   -s  int   zero/nonzero to disable/enable work stealing\n");
-    printf("   -c  int   chunksize for work stealing\n");
-    printf("   -i  int   set cancellable barrier polling interval\n");
-#ifdef __BERKELEY_UPC__
-    printf("   -I  int   set working bupc_poll() interval\n");
-#endif
-#ifdef __PTHREADS__
-    printf("   -T  int   set number of threads\n");
-#endif
-  } else {
-#ifdef UTS_STAT
-    printf("   -u  int   unbalance measure (-1: none; 0: min/size; 1: min/n; 2: max/n)\n");
-#else
-    printf("   none.\n");
-#endif
-  }
 }
 
 void impl_abort(int err) {
-#if defined(__UPC__)
-  upc_global_exit(err);
-#elif defined(_OPENMP)
   exit(err);
-#elif defined(_SHMEM)
-  exit(err);
-#else
-  exit(err);
-#endif
 }
 
 
@@ -608,7 +522,7 @@ void initRootNode(Node * root, int type)
  * details depend on tree type, node type and shape function
  *
  */
-typedef struct _pragma662 {
+typedef struct _pragma576 {
     Node parent;
     int (*made_available_for_stealing_ptr);
     int (*i_ptr);
@@ -619,9 +533,9 @@ typedef struct _pragma662 {
     int (*numChildren_ptr);
     int (*childType_ptr);
     Node (*(*child_ptr));
- } pragma662;
+ } pragma576;
 
-static void pragma662_hclib_async(void *____arg);
+static void pragma576_hclib_async(void *____arg);
 void genChildren(Node * parent, Node * child) {
   int parentHeight = parent->height;
   int numChildren, childType;
@@ -675,7 +589,7 @@ const int ____critical_section_tmp_0 = 1;
       }
       if (!made_available_for_stealing) {
  { 
-pragma662 *new_ctx = (pragma662 *)malloc(sizeof(pragma662));
+pragma576 *new_ctx = (pragma576 *)malloc(sizeof(pragma576));
 new_ctx->parent = parent;
 new_ctx->made_available_for_stealing_ptr = &(made_available_for_stealing);
 new_ctx->i_ptr = &(i);
@@ -687,9 +601,9 @@ new_ctx->numChildren_ptr = &(numChildren);
 new_ctx->childType_ptr = &(childType);
 new_ctx->child_ptr = &(child);
 if (!(parent.height < 9)) {
-    pragma662_hclib_async(new_ctx);
+    pragma576_hclib_async(new_ctx);
 } else {
-hclib_async(pragma662_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma576_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 }
  } 
       }
@@ -699,8 +613,8 @@ const int ____critical_section_tmp_1 = 1;
  { const int ____lock_1_err = pthread_mutex_lock(&critical_1_lock); assert(____lock_1_err == 0); n_leaves += ____critical_section_tmp_1 ; const int ____unlock_1_err = pthread_mutex_unlock(&critical_1_lock); assert(____unlock_1_err == 0); } ;
   }
 } 
-static void pragma662_hclib_async(void *____arg) {
-    pragma662 *ctx = (pragma662 *)____arg;
+static void pragma576_hclib_async(void *____arg) {
+    pragma576 *ctx = (pragma576 *)____arg;
     Node parent; parent = ctx->parent;
     hclib_start_finish();
 {
@@ -744,7 +658,7 @@ void showStats(double elapsedSecs) {
 //     printf("*** error! total released != total acquired + total stolen\n");
 //   }
 //     
-  uts_showStats(hclib_num_workers(), chunkSize, elapsedSecs, n_nodes, n_leaves, mheight);
+  uts_showStats(hclib_num_workers(), 0, elapsedSecs, n_nodes, n_leaves, mheight);
 // 
 //   if (verbose > 1) {
 //     if (doSteal) {
@@ -834,16 +748,16 @@ void showStats(double elapsedSecs) {
  *     - UPC is SPMD starting with main, OpenMP goes SPMD after
  *       parsing parameters
  */
-typedef struct _pragma877 {
+typedef struct _pragma791 {
     Node (*root_ptr);
     double (*t1_ptr);
     double (*t2_ptr);
     double (*et_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma877;
+ } pragma791;
 
-static void pragma877_hclib_async(void *____arg);
+static void pragma791_hclib_async(void *____arg);
 int main(int argc, char *argv[]) {
   Node root;
 
@@ -882,14 +796,14 @@ int main(int argc, char *argv[]) {
 
 /********** SPMD Parallel Region **********/
  { 
-pragma877 *new_ctx = (pragma877 *)malloc(sizeof(pragma877));
+pragma791 *new_ctx = (pragma791 *)malloc(sizeof(pragma791));
 new_ctx->root_ptr = ctx->root_ptr;
 new_ctx->t1_ptr = ctx->t1_ptr;
 new_ctx->t2_ptr = ctx->t2_ptr;
 new_ctx->et_ptr = ctx->et_ptr;
 new_ctx->argc_ptr = ctx->argc_ptr;
 new_ctx->argv_ptr = ctx->argv_ptr;
-hclib_future_t *fut = hclib_async_future(pragma877_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
+hclib_future_t *fut = hclib_async_future(pragma791_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
 hclib_future_wait(fut);
  } 
 
@@ -923,8 +837,8 @@ hclib_future_wait(fut);
   ;
   return 0;
 } 
-static void pragma877_hclib_async(void *____arg) {
-    pragma877 *ctx = (pragma877 *)____arg;
+static void pragma791_hclib_async(void *____arg) {
+    pragma791 *ctx = (pragma791 *)____arg;
     hclib_start_finish();
 {
           int first = 1;

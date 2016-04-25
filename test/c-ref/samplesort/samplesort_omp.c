@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 #include "shmem.h"
 
 /*********************************************************************
@@ -111,7 +116,7 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _pragma132 {
+typedef struct _pragma137 {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
@@ -119,9 +124,9 @@ typedef struct _pragma132 {
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
- } pragma132;
+ } pragma137;
 
-typedef struct _pragma142 {
+typedef struct _pragma147 {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
@@ -129,10 +134,10 @@ typedef struct _pragma142 {
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
- } pragma142;
+ } pragma147;
 
-static void pragma132_hclib_async(void *____arg);
-static void pragma142_hclib_async(void *____arg);
+static void pragma137_hclib_async(void *____arg);
+static void pragma147_hclib_async(void *____arg);
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
@@ -148,7 +153,7 @@ hclib_start_finish(); {
           buf->left = left;
           buf->right = index - 1; 
  { 
-pragma132 *new_ctx = (pragma132 *)malloc(sizeof(pragma132));
+pragma137 *new_ctx = (pragma137 *)malloc(sizeof(pragma137));
 new_ctx->buf_ptr = &(buf);
 new_ctx->index_ptr = &(index);
 new_ctx->in_ptr = &(in);
@@ -156,7 +161,7 @@ new_ctx->data_ptr = &(data);
 new_ctx->left_ptr = &(left);
 new_ctx->right_ptr = &(right);
 new_ctx->arg_ptr = &(arg);
-hclib_async(pragma132_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma137_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -165,7 +170,7 @@ hclib_async(pragma132_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
           buf->left = index;
           buf->right = right; 
  { 
-pragma142 *new_ctx = (pragma142 *)malloc(sizeof(pragma142));
+pragma147 *new_ctx = (pragma147 *)malloc(sizeof(pragma147));
 new_ctx->buf_ptr = &(buf);
 new_ctx->index_ptr = &(index);
 new_ctx->in_ptr = &(in);
@@ -173,7 +178,7 @@ new_ctx->data_ptr = &(data);
 new_ctx->left_ptr = &(left);
 new_ctx->right_ptr = &(right);
 new_ctx->arg_ptr = &(arg);
-hclib_async(pragma142_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma147_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         } ; hclib_end_finish(); 
@@ -184,8 +189,8 @@ hclib_async(pragma142_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   }
   free(arg);
 } 
-static void pragma132_hclib_async(void *____arg) {
-    pragma132 *ctx = (pragma132 *)____arg;
+static void pragma137_hclib_async(void *____arg) {
+    pragma137 *ctx = (pragma137 *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));
@@ -195,8 +200,8 @@ static void pragma132_hclib_async(void *____arg) {
 }
 
 
-static void pragma142_hclib_async(void *____arg) {
-    pragma142 *ctx = (pragma142 *)____arg;
+static void pragma147_hclib_async(void *____arg) {
+    pragma147 *ctx = (pragma147 *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));

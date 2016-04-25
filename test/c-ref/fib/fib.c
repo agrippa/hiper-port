@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 /**********************************************************************************************/
 /*  This program is part of the Barcelona OpenMP Tasks Suite                                  */
 /*  Copyright (C) 2009 Barcelona Supercomputing Center - Centro Nacional de Supercomputacion  */
@@ -37,45 +42,45 @@ long long fib_seq (int n)
 }
 
 
-typedef struct _pragma46 {
+typedef struct _pragma51 {
     long long (*x_ptr);
     long long (*y_ptr);
     int n;
- } pragma46;
+ } pragma51;
 
-typedef struct _pragma48 {
+typedef struct _pragma53 {
     long long (*x_ptr);
     long long (*y_ptr);
     int n;
- } pragma48;
+ } pragma53;
 
-static void pragma46_hclib_async(void *____arg);
-static void pragma48_hclib_async(void *____arg);
+static void pragma51_hclib_async(void *____arg);
+static void pragma53_hclib_async(void *____arg);
 long long fib (int n)
 {
 	long long x, y;
 	if (n < 2) return n;
 
  { 
-pragma46 *new_ctx = (pragma46 *)malloc(sizeof(pragma46));
+pragma51 *new_ctx = (pragma51 *)malloc(sizeof(pragma51));
 new_ctx->x_ptr = &(x);
 new_ctx->y_ptr = &(y);
 new_ctx->n = n;
-hclib_async(pragma46_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma51_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
  { 
-pragma48 *new_ctx = (pragma48 *)malloc(sizeof(pragma48));
+pragma53 *new_ctx = (pragma53 *)malloc(sizeof(pragma53));
 new_ctx->x_ptr = &(x);
 new_ctx->y_ptr = &(y);
 new_ctx->n = n;
-hclib_async(pragma48_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma53_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
 
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
 } 
-static void pragma46_hclib_async(void *____arg) {
-    pragma46 *ctx = (pragma46 *)____arg;
+static void pragma51_hclib_async(void *____arg) {
+    pragma51 *ctx = (pragma51 *)____arg;
     int n; n = ctx->n;
     hclib_start_finish();
 (*(ctx->x_ptr)) = fib(n - 1) ;     ; hclib_end_finish();
@@ -84,8 +89,8 @@ static void pragma46_hclib_async(void *____arg) {
 }
 
 
-static void pragma48_hclib_async(void *____arg) {
-    pragma48 *ctx = (pragma48 *)____arg;
+static void pragma53_hclib_async(void *____arg) {
+    pragma53 *ctx = (pragma53 *)____arg;
     int n; n = ctx->n;
     hclib_start_finish();
 (*(ctx->y_ptr)) = fib(n - 2) ;     ; hclib_end_finish();

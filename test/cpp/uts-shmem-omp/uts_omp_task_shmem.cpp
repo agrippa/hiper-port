@@ -33,36 +33,15 @@
  *                                                         *
  ***********************************************************/
 
-#if defined(_OPENMP)
-/**** OpenMP Definitions ****/
 #include <omp.h>
-#define PARALLEL         1
-#define COMPILER_TYPE    1
-#define SHARED 
-#define SHARED_INDEF
-#define VOLATILE         volatile
 #define MAX_OMP_THREADS       32
 #define MAX_SHMEM_THREADS     64
-#define LOCK_T           omp_lock_t
-#define SET_LOCK(zlk)    omp_set_lock(zlk)
-#define UNSET_LOCK(zlk)  omp_unset_lock(zlk)
-#define SMEMCPY          memcpy
-#define ALLOC            malloc
-#define BARRIER          
 // OpenMP helper function to match UPC lock allocation semantics
-
-
-#else
-#error Only supports OMP
-#endif /* END Par. Model Definitions */
-
 
 /***********************************************************
  *  Parallel execution parameters                          *
  ***********************************************************/
 
-int doSteal   = PARALLEL; // 1 => use work stealing
-int chunkSize = 20;       // number of nodes to move to/from shared area
 int cbint     = 1;        // Cancellable barrier polling interval
 int pollint   = 1;        // BUPC Polling interval
 
@@ -147,9 +126,6 @@ const int     local_cb_cancel = 1;
 
 /* Check that we are not being asked to compile parallel with stats.
  * Parallel stats collection is presently not supported.  */
-#if PARALLEL
-#error "ERROR: Parallel stats collection is not supported!"
-#endif
 
 #define MAXHISTSIZE      2000  // max tree depth in histogram
 int    stats     = 1;
@@ -226,8 +202,7 @@ char debug_str[1000];
 
 // Return a string describing this implementation
 char * impl_getName() {
-  char * name[] = {"Sequential C", "C/OpenMP", "UPC", "SHMEM", "PThreads"};
-  return name[COMPILER_TYPE];
+    return "HCLIB";
 }
 
 
@@ -243,20 +218,6 @@ int impl_paramsToStr(char *strBuf, int ind) {
 //     }
 
   ind += sprintf(strBuf+ind, "Execution strategy:  ");
-  if (PARALLEL) {
-    // ind += sprintf(strBuf+ind, "Parallel search using %d threads total (%d "
-    //         "SHMEM PEs, %d OMP threads per PE)\n", npes * n_omp_threads,
-    //         npes, n_omp_threads);
-    if (doSteal) {
-      ind += sprintf(strBuf+ind, "   Load balance by work stealing, chunk size = %d nodes\n",chunkSize);
-      ind += sprintf(strBuf+ind, "  CBarrier Interval: %d\n", cbint);
-      ind += sprintf(strBuf+ind, "   Polling Interval: %d\n", pollint);
-    }
-    else
-      ind += sprintf(strBuf+ind, "   No load balancing.\n");
-  }
-  else
-    ind += sprintf(strBuf+ind, "Iterative sequential search\n");
       
   return ind;
 }
@@ -266,35 +227,8 @@ int impl_parseParam(char *param, char *value) {
   int err = 0;  // Return 0 on a match, nonzero on an error
 
   switch (param[1]) {
-#if (PARALLEL == 1)
-    case 'c':
-      chunkSize = atoi(value); break;
-    case 's':
-      doSteal = atoi(value); 
-      if (doSteal != 1 && doSteal != 0) 
-	err = 1;
-      break;
     case 'i':
       cbint = atoi(value); break;
-#ifdef __BERKELEY_UPC__
-    case 'I':
-      pollint = atoi(value); break;
-#endif
-#else /* !PARALLEL */
-#ifdef UTS_STAT
-    case 'u':
-      unbType = atoi(value); 
-      if (unbType > 2) {
-        err = 1;
-        break;
-      }
-      if (unbType < 0)
-        stats = 0;
-      else
-        stats = 1;
-      break;
-#endif
-#endif /* PARALLEL */
     default:
       err = 1;
       break;
@@ -304,35 +238,10 @@ int impl_parseParam(char *param, char *value) {
 }
 
 void impl_helpMessage() {
-  if (PARALLEL) {
-    printf("   -s  int   zero/nonzero to disable/enable work stealing\n");
-    printf("   -c  int   chunksize for work stealing\n");
-    printf("   -i  int   set cancellable barrier polling interval\n");
-#ifdef __BERKELEY_UPC__
-    printf("   -I  int   set working bupc_poll() interval\n");
-#endif
-#ifdef __PTHREADS__
-    printf("   -T  int   set number of threads\n");
-#endif
-  } else {
-#ifdef UTS_STAT
-    printf("   -u  int   unbalance measure (-1: none; 0: min/size; 1: min/n; 2: max/n)\n");
-#else
-    printf("   none.\n");
-#endif
-  }
 }
 
 void impl_abort(int err) {
-#if defined(__UPC__)
-  upc_global_exit(err);
-#elif defined(_OPENMP)
   exit(err);
-#elif defined(_SHMEM)
-  exit(err);
-#else
-  exit(err);
-#endif
 }
 
 
@@ -701,7 +610,7 @@ void showStats(double elapsedSecs) {
 //     printf("*** error! total released != total acquired + total stolen\n");
 //   }
 //     
-  uts_showStats(hclib_num_workers(), chunkSize, elapsedSecs, n_nodes, n_leaves, mheight);
+  uts_showStats(hclib_num_workers(), 0, elapsedSecs, n_nodes, n_leaves, mheight);
 // 
 //   if (verbose > 1) {
 //     if (doSteal) {

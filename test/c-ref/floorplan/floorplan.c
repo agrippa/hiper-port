@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 pthread_mutex_t critical_0_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 pthread_mutex_t critical_1_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 /**********************************************************************************************/
@@ -203,7 +208,7 @@ static void write_outputs() {
     }  
 }
 
-typedef struct _pragma222 {
+typedef struct _pragma227 {
     int i;
     int j;
     int nn;
@@ -218,9 +223,9 @@ typedef struct _pragma222 {
     char (*(*BOARD_ptr));
     struct cell (*(*CELLS_ptr));
     int (*dummy_level_ptr);
- } pragma222;
+ } pragma227;
 
-static void pragma222_hclib_async(void *____arg);
+static void pragma227_hclib_async(void *____arg);
 static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int dummy_level) {
   int  i, j, nn, area, nnc,nnl;
 
@@ -237,7 +242,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
  { 
-pragma222 *new_ctx = (pragma222 *)malloc(sizeof(pragma222));
+pragma227 *new_ctx = (pragma227 *)malloc(sizeof(pragma227));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->nn = nn;
@@ -252,15 +257,15 @@ new_ctx->FOOTPRINT_ptr = &(FOOTPRINT);
 new_ctx->BOARD_ptr = &(BOARD);
 new_ctx->CELLS_ptr = &(CELLS);
 new_ctx->dummy_level_ptr = &(dummy_level);
-hclib_async(pragma222_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma227_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
       }
 }
  hclib_end_finish(); hclib_start_finish(); ;
 return nnc+nnl;
 } 
-static void pragma222_hclib_async(void *____arg) {
-    pragma222 *ctx = (pragma222 *)____arg;
+static void pragma227_hclib_async(void *____arg) {
+    pragma227 *ctx = (pragma227 *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int nn; nn = ctx->nn;

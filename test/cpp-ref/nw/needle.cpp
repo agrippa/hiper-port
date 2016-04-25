@@ -1,4 +1,9 @@
 #include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#include "hclib_openshmem.h"
+#endif
 #define LIMIT -999
 //#define TRACE
 #include <stdlib.h>
@@ -93,7 +98,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-typedef struct _pragma102 {
+typedef struct _pragma107 {
     int blk;
     int (*(*input_itemsets_ptr));
     int (*(*output_itemsets_ptr));
@@ -101,9 +106,9 @@ typedef struct _pragma102 {
     int max_rows;
     int max_cols;
     int penalty;
- } pragma102;
+ } pragma107;
 
-typedef struct _pragma154 {
+typedef struct _pragma159 {
     int blk;
     int (*(*input_itemsets_ptr));
     int (*(*output_itemsets_ptr));
@@ -111,17 +116,17 @@ typedef struct _pragma154 {
     int max_rows;
     int max_cols;
     int penalty;
- } pragma154;
+ } pragma159;
 
-static void pragma102_hclib_async(void *____arg, const int ___iter0);
-static void pragma154_hclib_async(void *____arg, const int ___iter0);
+static void pragma107_hclib_async(void *____arg, const int ___iter0);
+static void pragma159_hclib_async(void *____arg, const int ___iter0);
 void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
         int max_rows, int max_cols, int penalty)
 {
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma102 *new_ctx = (pragma102 *)malloc(sizeof(pragma102));
+pragma107 *new_ctx = (pragma107 *)malloc(sizeof(pragma107));
 new_ctx->blk = blk;
 new_ctx->input_itemsets_ptr = &(input_itemsets);
 new_ctx->output_itemsets_ptr = &(output_itemsets);
@@ -134,7 +139,7 @@ domain[0].low = 0;
 domain[0].high = blk;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma102_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma107_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -145,7 +150,7 @@ free(new_ctx);
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { 
-pragma154 *new_ctx = (pragma154 *)malloc(sizeof(pragma154));
+pragma159 *new_ctx = (pragma159 *)malloc(sizeof(pragma159));
 new_ctx->blk = blk;
 new_ctx->input_itemsets_ptr = &(input_itemsets);
 new_ctx->output_itemsets_ptr = &(output_itemsets);
@@ -158,15 +163,15 @@ domain[0].low = blk - 1;
 domain[0].high = (max_cols - 1) / 16;
 domain[0].stride = 1;
 domain[0].tile = 1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma154_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma159_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
     }
 
 } 
-static void pragma102_hclib_async(void *____arg, const int ___iter0) {
-    pragma102 *ctx = (pragma102 *)____arg;
+static void pragma107_hclib_async(void *____arg, const int ___iter0) {
+    pragma107 *ctx = (pragma107 *)____arg;
     int blk; blk = ctx->blk;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
@@ -223,8 +228,8 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 }
 
 
-static void pragma154_hclib_async(void *____arg, const int ___iter0) {
-    pragma154 *ctx = (pragma154 *)____arg;
+static void pragma159_hclib_async(void *____arg, const int ___iter0) {
+    pragma159 *ctx = (pragma159 *)____arg;
     int blk; blk = ctx->blk;
     int max_rows; max_rows = ctx->max_rows;
     int max_cols; max_cols = ctx->max_cols;
