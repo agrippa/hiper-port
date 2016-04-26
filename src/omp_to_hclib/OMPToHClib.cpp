@@ -841,6 +841,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     assert(!failed);
                 } else if (ompCmd == "atomic") {
                     // For now we implement atomic with rather heavyweight locks
+                    // TODO, use actual atomic instructions
                     const clang::Stmt *body = node->getBody();
                     const clang::BinaryOperator *bin = clang::dyn_cast<clang::BinaryOperator>(body);
                     assert(bin);
@@ -855,17 +856,21 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     clang::ValueDecl *decl = declRef->getDecl();
                     std::string typeStr = decl->getType().getAsString();
 
-                    std::string lock = getCriticalSectionLockStr(criticalSectionId);
-                    std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
-                    std::stringstream ss;
-                    ss << "const " << typeStr << " " << tmp_varname.str() << " = " << stmtToString(rhs) <<
-                        ";" << std::endl;
-                    criticalSectionId++;
+                    // std::string lock = getCriticalSectionLockStr(criticalSectionId);
+                    // std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
+                    // std::stringstream ss;
+                    // ss << "const " << typeStr << " " << tmp_varname.str() << " = " << stmtToString(rhs) <<
+                    //     ";" << std::endl;
+                    // criticalSectionId++;
 
                     if (bin->getOpcode() == clang::BO_AddAssign) {
-                        const bool failed = rewriter->ReplaceText(
-                                clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                                ss.str() + lock + stmtToString(lhs) + " += " + tmp_varname.str() + " " + unlock);
+                        std::stringstream ss;
+                        ss << "__sync_fetch_and_add(&(" << stmtToString(lhs) << "), " << stmtToString(rhs) << "); ";
+                        const bool failed = rewriter->ReplaceText(clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                                ss.str());
+                        // const bool failed = rewriter->ReplaceText(
+                        //         clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                        //         ss.str() + lock + stmtToString(lhs) + " += " + tmp_varname.str() + " " + unlock);
                         assert(!failed);
                     } else {
                         std::cerr << "Unsupported binary operator in atomic: " << bin->getOpcode() << std::endl;
