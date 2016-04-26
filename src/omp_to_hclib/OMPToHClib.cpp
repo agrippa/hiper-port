@@ -651,12 +651,12 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         }
     }
 
-    if (isFuture) {
-        ss << "    return NULL;\n";
-    }
-
     if (!isForasyncClosure) {
         ss << "    free(____arg);\n";
+    }
+
+    if (isFuture) {
+        ss << "    return NULL;\n";
     }
 
     ss << "}\n\n";

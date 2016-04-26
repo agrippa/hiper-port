@@ -78,8 +78,8 @@ static void *pragma48_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 CORE_dplgsy( (*(ctx->bump_ptr)), (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)), (*(ctx->A_ptr)).m, (*(ctx->m_ptr))*(*(ctx->A_ptr)).mb, (*(ctx->n_ptr))*(*(ctx->A_ptr)).nb, (*(ctx->seed_ptr)) ) ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 

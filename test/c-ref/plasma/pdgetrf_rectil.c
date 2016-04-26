@@ -404,8 +404,8 @@ static void *pragma63_omp_task_hclib_async(void *____arg) {
             CORE_dgetrf_rectil( (*(ctx->pDesc_ptr)), (*(ctx->dB_ptr)), info );
         } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -414,8 +414,8 @@ static void *pragma86_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -428,8 +428,8 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                         (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
                         (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -442,8 +442,8 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                                 (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
                                 (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -452,8 +452,8 @@ static void *pragma161_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 

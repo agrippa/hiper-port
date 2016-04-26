@@ -899,8 +899,8 @@ retry:
           }
       } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 

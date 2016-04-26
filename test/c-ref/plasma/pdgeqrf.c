@@ -232,8 +232,8 @@ static void *pragma51_omp_task_hclib_async(void *____arg) {
             CORE_dgeqrt((*(ctx->tempkm_ptr)), (*(ctx->tempkn_ptr)), (*(ctx->ib_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldak_ptr)), (*(ctx->dT_ptr)), (*(ctx->T_ptr)).mb, &tau[0], &work[0]);
         } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -250,8 +250,8 @@ static void *pragma63_omp_task_hclib_async(void *____arg) {
                         &work[0], (*(ctx->T_ptr)).nb);
             } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -267,8 +267,8 @@ static void *pragma80_omp_task_hclib_async(void *____arg) {
                         (*(ctx->dT_ptr)), (*(ctx->T_ptr)).mb, &tau[0], &work[0]);
             } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
@@ -285,8 +285,8 @@ static void *pragma96_omp_task_hclib_async(void *____arg) {
                             (*(ctx->dT_ptr)), (*(ctx->T_ptr)).mb, &work[0], (*(ctx->ib_ptr)));
                 } ;     ; hclib_end_finish();
 
-    return NULL;
     free(____arg);
+    return NULL;
 }
 
 
