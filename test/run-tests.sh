@@ -19,6 +19,7 @@ fi
 
 declare -A defines
 defines['cpp/uts-shmem-omp/uts_omp_task_shmem.cpp']='BRG_RNG _OPENMP'
+defines['cpp/uts-omp/uts_omp_task.cpp']='BRG_RNG _OPENMP'
 
 for FILE in $FILES; do
     DIRNAME=$(dirname $FILE)
