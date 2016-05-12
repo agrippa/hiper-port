@@ -25,6 +25,7 @@ static llvm::cl::opt<std::string> outputFile("o");
 static llvm::cl::opt<std::string> checkForPthread("n");
 static llvm::cl::opt<std::string> startingCriticalSectionId("c");
 static llvm::cl::opt<std::string> outputCriticalSectionIdFile("r");
+static llvm::cl::opt<std::string> outputUsesShmemFile("s");
 
 static OMPToHClib *transform = NULL;
 FunctionDecl *curr_func_decl = NULL;
@@ -171,6 +172,7 @@ int main(int argc, const char **argv) {
   check_opt(checkForPthread, "Check for pthread calls");
   check_opt(startingCriticalSectionId, "Starting critical section ID");
   check_opt(outputCriticalSectionIdFile, "Output critical section ID file");
+  check_opt(outputUsesShmemFile, "Output uses SHMEM file");
 
   assert(op.getSourcePathList().size() == 1);
 
@@ -198,6 +200,31 @@ int main(int argc, const char **argv) {
   out.open(outputCriticalSectionIdFile);
   assert(out.is_open());
   out << transform->getCriticalSectionId() << std::flush;
+  out.close();
+
+  // Check if we already know this application uses OpenSHMEM
+  std::ifstream in;
+  in.open(outputUsesShmemFile);
+  bool already_using_shmem = false;
+  if (in.is_open()) {
+      std::string line;
+      bool got_line = getline(in, line);
+      assert(got_line);
+      if (line[0] == '1') {
+          already_using_shmem = true;
+      }
+      in.close();
+  }
+
+  already_using_shmem = already_using_shmem || transform->hasShmemCalls();
+
+  out.open(outputUsesShmemFile);
+  assert(out.is_open());
+  if (already_using_shmem) {
+      out << "1" << std::flush;
+  } else {
+      out << "0" << std::flush;
+  }
   out.close();
 
   return 0;

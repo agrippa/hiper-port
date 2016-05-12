@@ -74,7 +74,9 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string getPragmaArgumentsForMarker(const clang::CallExpr *call);
         OMPClauses *getOMPClausesForMarker(const clang::CallExpr *call);
         std::string getOMPPragmaNameForMarker(const clang::CallExpr *call);
+
         int getCriticalSectionId() { return criticalSectionId; }
+        bool hasShmemCalls() { return anyShmemCalls; }
 
     protected:
         clang::ASTContext *Context;
@@ -125,6 +127,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         PragmaNode *pragmaTree;
 
         int criticalSectionId;
+
+        bool anyShmemCalls = false;
 
         bool foundOmpToHclibLaunch = false;
 

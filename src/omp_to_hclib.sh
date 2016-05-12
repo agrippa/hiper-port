@@ -125,6 +125,7 @@ CHANGED=1
 PREV=$WITH_PRAGMA_MARKERS
 CHECK_FOR_PTHREAD=true
 CRITICAL_SECTION_ID=0
+USES_SHMEM_FILE=$DIRNAME/$FILE_PREFIX.$NAME.uses_shmem.info
 until [[ $CHANGED -eq 0 ]]; do
     OMP_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp.$COUNT.info
     OMP_TO_HCLIB_INFO=$DIRNAME/$FILE_PREFIX.$NAME.omp_to_hclib.$COUNT.info
@@ -138,8 +139,8 @@ until [[ $CHANGED -eq 0 ]]; do
     # Translate OMP pragmas detected into HClib constructs.
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
     $OMP_TO_HCLIB -o $TMP_OUTPUT -c $CRITICAL_SECTION_ID \
-        -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD $PREV -- $INCLUDE \
-        $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
+        -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD -s $USES_SHMEM_FILE \
+        $PREV -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
 
     PREV_CRITICAL_SECTION_ID=$CRITICAL_SECTION_ID
     CRITICAL_SECTION_ID=$(cat $CRITICAL_SECTION_ID_FILE)
@@ -166,8 +167,13 @@ if [[ $N_PRAGMA_MARKERS -ne 1 ]]; then
     exit 1
 fi
 
+USES_SHMEM=$(cat $USES_SHMEM_FILE)
 [[ $VERBOSE == 1 ]] && echo "DEBUG >>> Producing final output file at $OUTPUT_PATH from $PREV"
-cat $PREV | grep -v "extern void hclib_pragma_marker" > $OUTPUT_PATH
+if [[ $USES_SHMEM -eq 0 ]]; then
+    cat $PREV | grep -v "extern void hclib_pragma_marker" | grep -v "hclib_openshmem" > $OUTPUT_PATH
+else
+    cat $PREV | grep -v "extern void hclib_pragma_marker" > $OUTPUT_PATH
+fi
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'

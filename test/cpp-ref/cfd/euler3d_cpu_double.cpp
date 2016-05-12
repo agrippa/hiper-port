@@ -2,7 +2,6 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
-#include "hclib_openshmem.h"
 #endif
 // Copyright 2009, Andrew Corrigan, acorriga@gmu.edu
 // This code is from the AIAA-2009-4001 paper

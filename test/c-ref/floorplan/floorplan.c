@@ -2,7 +2,6 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
-#include "hclib_openshmem.h"
 #endif
 pthread_mutex_t critical_0_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 /**********************************************************************************************/

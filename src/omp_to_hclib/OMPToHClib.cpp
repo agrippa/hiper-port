@@ -1468,6 +1468,8 @@ void OMPToHClib::VisitStmt(const clang::Stmt *s) {
                         std::cerr << "Found unsupported OpenSHMEM call \"" << calleeName << "\"" << std::endl;
                         exit(1);
                     }
+
+                    anyShmemCalls = true;
                 }
 
                 if (calleeName == "hclib_pragma_marker") {

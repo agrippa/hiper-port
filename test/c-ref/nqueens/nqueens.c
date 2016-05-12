@@ -2,7 +2,6 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
-#include "hclib_openshmem.h"
 #endif
 /**********************************************************************************************/
 /*  This program is part of the Barcelona OpenMP Tasks Suite                                  */
