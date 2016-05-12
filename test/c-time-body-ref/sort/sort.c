@@ -479,7 +479,7 @@ void sort_par ( void )
                 }
             }
         }
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 	bots_message(" completed!\n");
 }
 

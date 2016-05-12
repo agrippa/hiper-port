@@ -107,7 +107,7 @@ void run(int argc, char** argv)
             min = MIN(min, src[n+1]);
           dst[n] = wall[t+1][n]+min;
         }
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);

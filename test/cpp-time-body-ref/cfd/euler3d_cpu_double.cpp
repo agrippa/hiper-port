@@ -456,7 +456,7 @@ int main(int argc, char** argv)
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 
 	std::cout << "Done..." << std::endl;
 

@@ -790,7 +790,7 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
       { 
 	break;
       }
-  } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+  } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 
   //clean up...
   if( pid==0 ) {

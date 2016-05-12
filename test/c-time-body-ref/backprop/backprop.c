@@ -372,7 +372,7 @@ float *eo, *eh;
       net->hidden_weights, net->hidden_prev_weights);
   bpnn_adjust_weights(net->hidden_delta, hid, net->input_units, in,
       net->input_weights, net->input_prev_weights);
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 
 }
 

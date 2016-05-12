@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	} unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);//End while loop
+	} unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);//End while loop
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {

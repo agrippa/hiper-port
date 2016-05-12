@@ -292,7 +292,7 @@ void sparselu_par_call(float **BENCH)
    }
    }
    bots_message(" completed!\n");
-   } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+   } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 }
 
 void sparselu_fini (float **BENCH, char *pass)

@@ -824,7 +824,7 @@ void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
             }
         }
 	bots_message(" completed!\n");
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 }
 
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n)

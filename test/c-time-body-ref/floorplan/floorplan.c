@@ -311,7 +311,7 @@ void compute_floorplan (void)
             bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
         }
         bots_message(" completed!\n");
-    } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 }
 
 void floorplan_end (void)

@@ -150,7 +150,7 @@ void TimeBodyPass::VisitStmt(const clang::Stmt *s) {
                         std::stringstream ss;
                         ss << "unsigned long long start_time = hclib_current_time_ns(); ";
                         ss << launchBody;
-                        ss << " unsigned long long end_time = hclib_current__time_ns(); ";
+                        ss << " unsigned long long end_time = hclib_current_time_ns(); ";
                         ss << "printf(\"\\nHCLIB TIME \%llu ns\\n\", end_time - start_time);";
                         bool failed = rewriter->ReplaceText(body->getSourceRange(), ss.str());
                         assert(!failed);

@@ -806,7 +806,7 @@ retry:
       shmem_barrier_all();
   }
 #endif
-  } unsigned long long end_time = hclib_current__time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+  } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
 
   shmem_finalize();
   return 0;
