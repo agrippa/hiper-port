@@ -223,7 +223,6 @@ static void pragma126_omp_task_hclib_async(void *____arg) {
     int i; i = ctx->i;
     int jj; jj = ctx->jj;
     int j; j = ctx->j;
-    hclib_start_finish();
 for (jj=j; jj<j+(*(ctx->block_size_ptr)); ++jj) {
                     for (ii=i; ii<i+(*(ctx->block_size_ptr)); ++ii)
                     {
@@ -233,9 +232,7 @@ for (jj=j; jj<j+(*(ctx->block_size_ptr)); ++jj) {
                             ((*(ctx->unew_ptr)))[ii * (*(ctx->ny_ptr)) + jj] = 0.0;
                         }
                     }
-                } ;     ; hclib_end_finish();
-
-    free(____arg);
+                } ;     free(____arg);
 }
 
 

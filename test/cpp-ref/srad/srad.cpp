@@ -518,7 +518,6 @@ static void pragma132_omp_parallel_hclib_async(void *____arg, const int ___iter0
     float qsqr; qsqr = ctx->qsqr;
     int i; i = ctx->i;
     int j; j = ctx->j;
-    hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
@@ -553,8 +552,6 @@ static void pragma132_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		}
   
     } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -568,7 +565,6 @@ static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0
     float D; D = ctx->D;
     int i; i = ctx->i;
     int j; j = ctx->j;
-    hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
@@ -596,8 +592,6 @@ static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0
                 //printf("\n"); 
                 #endif //output
 	     } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

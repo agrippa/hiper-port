@@ -58,6 +58,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::string contextName,
                 std::vector<clang::ValueDecl *> *captured, std::string bodyStr,
                 bool isFuture, OMPClauses *clauses,
+                bool wrapBodyInFinish,
                 std::vector<const clang::ValueDecl *> *condVars = NULL);
         std::string getStructDef(std::string structName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);
@@ -93,6 +94,8 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string getCaptureStr(clang::ValueDecl *decl);
         std::string getUnpackStr(clang::ValueDecl *decl);
         std::string getArraySizeExpr(clang::QualType qualType);
+
+        bool canLaunchTasks(const clang::Stmt *body);
 
         bool isScopeCreatingStmt(const clang::Stmt *s);
         int getCurrentLexicalDepth();

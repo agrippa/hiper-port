@@ -138,7 +138,6 @@ static void pragma58_omp_parallel_hclib_async(void *____arg, const int ___iter0)
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     float (*a); a = ctx->a;
     int size; size = ctx->size;
-    hclib_start_finish();
     do {
     chunk_idx = ___iter0;
 {
@@ -186,8 +185,6 @@ for (j =0; j < BS; j++){
             }
 
         } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -196,7 +193,6 @@ static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0
     int chunk_idx; chunk_idx = ctx->chunk_idx;
     float (*a); a = ctx->a;
     int size; size = ctx->size;
-    hclib_start_finish();
     do {
     chunk_idx = ___iter0;
 {
@@ -228,8 +224,6 @@ for (j = 0; j < BS; j++) {
                 }
             }
         } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

@@ -191,7 +191,6 @@ static void pragma89_omp_parallel_hclib_async(void *____arg, const int ___iter0)
     int j; j = ctx->j;
     int k; k = ctx->k;
     FP_NUMBER sum; sum = ctx->sum;
-    hclib_start_finish();
     do {
     i = ___iter0;
 {
@@ -202,8 +201,6 @@ static void pragma89_omp_parallel_hclib_async(void *____arg, const int ___iter0)
             (*(ctx->A_ptr))[i][j] = sum;
         }
     } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

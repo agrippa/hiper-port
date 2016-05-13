@@ -1314,29 +1314,23 @@ free(new_ctx);
 static void pragma380_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma380_omp_parallel *ctx = (pragma380_omp_parallel *)____arg;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
 		(*(ctx->weights_ptr))[x] = 1/((double)((*(ctx->Nparticles_ptr))));
 	} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
 static void pragma395_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma395_omp_parallel *ctx = (pragma395_omp_parallel *)____arg;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
 		(*(ctx->arrayX_ptr))[x] = (*(ctx->xe_ptr));
 		(*(ctx->arrayY_ptr))[x] = (*(ctx->ye_ptr));
 	} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -1405,7 +1399,6 @@ static void pragma447_omp_parallel_hclib_async(void *____arg, const int ___iter0
     pragma447_omp_parallel *ctx = (pragma447_omp_parallel *)____arg;
     double sumWeights; sumWeights = ctx->sumWeights;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
@@ -1416,22 +1409,17 @@ static void pragma447_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ctx->sumWeights += sumWeights;
     const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
     assert(unlock_err == 0);
-    ; hclib_end_finish();
-
 }
 
 
 static void pragma453_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma453_omp_parallel *ctx = (pragma453_omp_parallel *)____arg;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
 			(*(ctx->weights_ptr))[x] = (*(ctx->weights_ptr))[x]/(*(ctx->sumWeights_ptr));
 		} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -1440,7 +1428,6 @@ static void pragma462_omp_parallel_hclib_async(void *____arg, const int ___iter0
     double xe; xe = ctx->xe;
     double ye; ye = ctx->ye;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
@@ -1453,22 +1440,17 @@ static void pragma462_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ctx->ye += ye;
     const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
     assert(unlock_err == 0);
-    ; hclib_end_finish();
-
 }
 
 
 static void pragma487_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma487_omp_parallel *ctx = (pragma487_omp_parallel *)____arg;
     int x; x = ctx->x;
-    hclib_start_finish();
     do {
     x = ___iter0;
 {
 			(*(ctx->u_ptr))[x] = (*(ctx->u1_ptr)) + x/((double)((*(ctx->Nparticles_ptr))));
 		} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

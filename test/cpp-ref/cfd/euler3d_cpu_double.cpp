@@ -79,14 +79,11 @@ free(new_ctx);
 } 
 static void pragma60_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma60_omp_parallel *ctx = (pragma60_omp_parallel *)____arg;
-    hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
 		(*(ctx->dst_ptr))[i] = (*(ctx->src_ptr))[i];
 	} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -155,14 +152,11 @@ free(new_ctx);
 } 
 static void pragma109_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma109_omp_parallel *ctx = (pragma109_omp_parallel *)____arg;
-    hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
 		for(int j = 0; j < NVAR; j++) (*(ctx->variables_ptr))[i*NVAR + j] = ff_variable[j];
 	} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 
@@ -471,7 +465,6 @@ free(new_ctx);
 } 
 static void pragma324_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma324_omp_parallel *ctx = (pragma324_omp_parallel *)____arg;
-    hclib_start_finish();
     do {
     int i;     i = ___iter0;
 {
@@ -483,8 +476,6 @@ static void pragma324_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		(*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)] = (*(ctx->old_variables_ptr))[NVAR*i + (VAR_MOMENTUM+1)] + factor*(*(ctx->fluxes_ptr))[NVAR*i + (VAR_MOMENTUM+1)];
 		(*(ctx->variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)] = (*(ctx->old_variables_ptr))[NVAR*i + (VAR_MOMENTUM+2)] + factor*(*(ctx->fluxes_ptr))[NVAR*i + (VAR_MOMENTUM+2)];
 	} ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

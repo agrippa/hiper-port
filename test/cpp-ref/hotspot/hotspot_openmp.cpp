@@ -124,7 +124,6 @@ static void pragma69_omp_parallel_hclib_async(void *____arg, const int ___iter0)
     int chunks_in_row; chunks_in_row = ctx->chunks_in_row;
     int row; row = ctx->row;
     int col; col = ctx->col;
-    hclib_start_finish();
     do {
     chunk = ___iter0;
 {
@@ -203,8 +202,6 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
             }
         }
     } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

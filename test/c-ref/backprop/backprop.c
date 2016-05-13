@@ -406,7 +406,6 @@ static void pragma318_omp_parallel_hclib_async(void *____arg, const int ___iter0
     int j; j = ctx->j;
     int ndelta; ndelta = ctx->ndelta;
     int nly; nly = ctx->nly;
-    hclib_start_finish();
     do {
     j = ___iter0;
 {
@@ -416,8 +415,6 @@ static void pragma318_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	  (*(ctx->oldw_ptr))[k][j] = new_dw;
     }
   } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
 

@@ -233,7 +233,6 @@ free(new_ctx);
 static void pragma164_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma164_omp_parallel *ctx = (pragma164_omp_parallel *)____arg;
     int z; z = ctx->z;
-    hclib_start_finish();
     do {
     z = ___iter0;
 {
@@ -254,8 +253,6 @@ static void pragma164_omp_parallel_hclib_async(void *____arg, const int ___iter0
                     }
                 }
             } ;     } while (0);
-    ; hclib_end_finish();
-
 }
 
  

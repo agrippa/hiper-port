@@ -510,11 +510,31 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
     return ss.str();
 }
 
+bool OMPToHClib::canLaunchTasks(const clang::Stmt *body) {
+    if (const clang::CallExpr *call = clang::dyn_cast<clang::CallExpr>(body)) {
+        /*
+         * For now, if there are any function calls assume they may result in
+         * task creation. This is a very conservative decision. TODO improve.
+         */
+        return true;
+    }
+
+    for (clang::Stmt::const_child_iterator i = body->child_begin(),
+            e = body->child_end(); i != e; i++) {
+        const clang::Stmt *child = *i;
+        if (child != NULL && canLaunchTasks(child)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
         std::string bodyStr, bool isFuture,
-        OMPClauses *clauses, std::vector<const clang::ValueDecl *> *condVars) {
+        OMPClauses *clauses,
+        bool wrapBodyInFinish, std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
     std::vector<OMPReductionVar> *reductions = clauses->getReductions();
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
@@ -557,7 +577,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         }
     }
 
-    if (isAsyncClosure || isForasyncClosure) {
+    if (wrapBodyInFinish) {
         /*
          * In OMP's task model you can use taskwait to wait on all previously
          * created child tasks of the currently executing task. To model this in
@@ -621,7 +641,8 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
             ss << "    assert(unlock_err == 0);\n";
         }
     }
-    if (isAsyncClosure || isForasyncClosure) {
+
+    if (wrapBodyInFinish) {
         ss << "    ; hclib_end_finish();\n\n";
     }
 
@@ -810,7 +831,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", captures, generatedClauses);
                 std::string closureFunction = getClosureDef(
                         "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        captures, launchBody, false, generatedClauses);
+                        captures, launchBody, false, generatedClauses, false);
                 std::string contextSetup = getContextSetup(node,
                         "main_entrypoint_ctx", captures,
                         generatedClauses);
@@ -930,7 +951,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, false, true,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, true, clauses);
+                                bodyStr, true, clauses, canLaunchTasks(body));
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(), node->getCaptures(), clauses);
@@ -972,7 +993,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
                             node->getLbl(), node->getCaptures(),
-                            bodyStr, clauses->hasClause("depend"), clauses);
+                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body));
 
                     const std::string structDef = getStructDef(
                             node->getLbl(), node->getCaptures(), clauses);
@@ -1112,7 +1133,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, false, clauses, &condVars);
+                                bodyStr, false, clauses, canLaunchTasks(forLoop), &condVars);
 
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<
