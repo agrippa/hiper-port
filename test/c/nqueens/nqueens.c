@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory.h>
-#include <alloca.h>
 #include "bots.h"
 #include "app-desc.h"
 #include <omp.h>
@@ -118,15 +117,16 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 
 	*solutions = 0;
-	csols = (int *)alloca(n*sizeof(int));
+	csols = (int *)malloc(n*sizeof(int));
 	memset(csols,0,n*sizeof(int));
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
- 		#pragma omp task untied firstprivate(n)
+
+ 		#pragma omp task untied firstprivate(n, csols, i, j, a, depth, solutions)
 		{
 	  		/* allocate a temporary array and copy <a> into it */
-	  		char * b = (char *)alloca(n * sizeof(char));
+	  		char * b = (char *)malloc(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
@@ -136,6 +136,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
+    free(csols);
 }
 
 void find_queens (int size)
@@ -151,7 +152,7 @@ void find_queens (int size)
 		{
 			char *a;
 
-			a = (char *)alloca(size * sizeof(char));
+			a = (char *)malloc(size * sizeof(char));
 			nqueens(size, 0, a, &total_count,0);
 		}
 	}
