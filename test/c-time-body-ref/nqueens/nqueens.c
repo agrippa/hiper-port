@@ -124,7 +124,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
- 		#pragma omp task untied private(n)
+ 		#pragma omp task untied firstprivate(n)
 		{
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = (char *)alloca(n * sizeof(char));
