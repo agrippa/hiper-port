@@ -410,8 +410,8 @@ void put_in_hosp(struct Hosp *hosp, struct Patient *patient)
 }
 /**********************************************************************/
 typedef struct _pragma427_omp_task {
-    struct Village (*(*vlist_ptr));
-    struct Village (*(*village_ptr));
+    struct Village (*vlist);
+    struct Village (*village);
  } pragma427_omp_task;
 
 static void pragma427_omp_task_hclib_async(void *____arg);
@@ -430,8 +430,8 @@ void sim_village_par(struct Village *village)
    {
  { 
 pragma427_omp_task *new_ctx = (pragma427_omp_task *)malloc(sizeof(pragma427_omp_task));
-new_ctx->vlist_ptr = &(vlist);
-new_ctx->village_ptr = &(village);
+new_ctx->vlist = vlist;
+new_ctx->village = village;
 hclib_async(pragma427_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } ;
       vlist = vlist->next;
@@ -456,8 +456,10 @@ hclib_async(pragma427_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 } 
 static void pragma427_omp_task_hclib_async(void *____arg) {
     pragma427_omp_task *ctx = (pragma427_omp_task *)____arg;
+    struct Village (*vlist); vlist = ctx->vlist;
+    struct Village (*village); village = ctx->village;
     hclib_start_finish();
-sim_village_par((*(ctx->vlist_ptr))) ;     ; hclib_end_finish();
+sim_village_par(vlist) ;     ; hclib_end_finish();
 
     free(____arg);
 }

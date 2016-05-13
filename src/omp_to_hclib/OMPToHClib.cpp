@@ -1113,7 +1113,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             loopConfiguration << "domain["  << l <<
                                 "].stride = " << strideStr << ";\n";
                             loopConfiguration << "domain["  << l <<
-                                "].tile = 1;\n";
+                                "].tile = -1;\n";
 
                             currLoop = clang::dyn_cast<clang::ForStmt>(
                                     currLoop->getBody());

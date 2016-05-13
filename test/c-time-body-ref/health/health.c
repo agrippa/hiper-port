@@ -418,7 +418,7 @@ void sim_village_par(struct Village *village)
    vlist = village->forward;
    while(vlist)
    {
-#pragma omp task untied
+#pragma omp task untied private(vlist, village)
       sim_village_par(vlist);
       vlist = vlist->next;
    }
