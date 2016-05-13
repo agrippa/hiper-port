@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
    
 	printf("Start the SRAD main loop\n");
 
-	unsigned long long start_time = hclib_current_time_ns(); for (iter=0; iter< niter; iter++){
+	unsigned long long ____hclib_start_time = hclib_current_time_ns(); for (iter=0; iter< niter; iter++){
 		sum=0; sum2=0;     
 		for (i=r1; i<=r2; i++) {
             for (j=c1; j<=c2; j++) {
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
                 #endif //output
 	     }
 
-	} unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 
 #ifdef OUTPUT

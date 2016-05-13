@@ -593,7 +593,7 @@ int main(int argc, char * argv[]){
 	long long endVideoSequence = get_time();
 	printf("VIDEO SEQUENCE TOOK %f\n", elapsed_time(start, endVideoSequence));
 	//call particle filter
-	unsigned long long start_time = hclib_current_time_ns(); particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);;
+	unsigned long long ____hclib_start_time = hclib_current_time_ns(); particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);;
 
 	long long endParticleFilter = get_time();
 	printf("PARTICLE FILTER TOOK %f\n", elapsed_time(endVideoSequence, endParticleFilter));

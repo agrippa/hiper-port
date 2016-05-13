@@ -814,7 +814,7 @@ REAL *alloc_matrix(int n)
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
 {
 	bots_message("Computing parallel Strassen algorithm (n=%d) ", n);
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 	#pragma omp parallel
         {
 	#pragma omp single
@@ -824,7 +824,7 @@ void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
             }
         }
 	bots_message(" completed!\n");
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n)

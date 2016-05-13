@@ -114,7 +114,7 @@ void BFSGraph( int argc, char** argv)
 	
 	printf("Start traversing the tree\n");
 
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 	int k=0;
 	bool stop;
 	do
@@ -153,7 +153,7 @@ void BFSGraph( int argc, char** argv)
             k++;
         }
 	while(stop);
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 	//Store the result into a file
 	FILE *fpo = fopen("result.txt","w");

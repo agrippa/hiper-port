@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 	
     long long start_time = get_time();
 
-    unsigned long long start_time = hclib_current_time_ns(); compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);;
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);;
 
     long long end_time = get_time();
 

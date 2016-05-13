@@ -203,7 +203,7 @@ int main(int argc, char **argv) {
 
 	memcpy(attributes[0], buf, numObjects*numAttributes*sizeof(float));
 
-    unsigned long long start_time = hclib_current_time_ns(); for (i=0; i<nloops; i++) {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); for (i=0; i<nloops; i++) {
         
         cluster_centres = NULL;
         cluster(numObjects,
@@ -214,7 +214,7 @@ int main(int argc, char **argv) {
                 &cluster_centres   
                );
      
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 	
 
 	printf("number of Clusters %d\n",nclusters); 

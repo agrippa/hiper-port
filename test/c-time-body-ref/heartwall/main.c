@@ -527,7 +527,7 @@ int main(int argc, char *argv []){
 	//	KERNEL
 	//======================================================================================================================================================
 
-	unsigned long long start_time = hclib_current_time_ns(); for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
+	unsigned long long ____hclib_start_time = hclib_current_time_ns(); for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 
 	//====================================================================================================
 	//	GETTING FRAME
@@ -564,7 +564,7 @@ int main(int argc, char *argv []){
 		printf("%d ", public.frame_no);
 		fflush(NULL);
 
-	} unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 	//======================================================================================================================================================
 	//	PRINT FRAME PROGRESS END

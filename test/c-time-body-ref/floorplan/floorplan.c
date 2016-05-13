@@ -299,7 +299,7 @@ void floorplan_init (char *filename)
 
 void compute_floorplan (void)
 {
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
         coor footprint;
         /* footprint of initial board is zero */
         footprint[0] = 0;
@@ -311,7 +311,7 @@ void compute_floorplan (void)
             bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
         }
         bots_message(" completed!\n");
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 void floorplan_end (void)

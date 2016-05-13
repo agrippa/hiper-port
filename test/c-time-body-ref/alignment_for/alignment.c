@@ -443,7 +443,7 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-   unsigned long long start_time = hclib_current_time_ns(); {
+   unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 
    #pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
   for (si = 0; si < nseqs; si++) {
@@ -500,7 +500,7 @@ int pairalign()
         } // end if (n == 0 || m == 0)
      } // for (j)
   } // end parallel for (i)
-   } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+   } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
    return 0;
 }
 

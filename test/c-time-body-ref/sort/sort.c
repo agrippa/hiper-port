@@ -468,7 +468,7 @@ void sort_init ( void )
 void sort_par ( void )
 {
 	bots_message("Computing multisort algorithm (n=%d) ", bots_arg_size);
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 	#pragma omp parallel
         {
 #pragma omp single nowait
@@ -479,7 +479,7 @@ void sort_par ( void )
                 }
             }
         }
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 	bots_message(" completed!\n");
 }
 

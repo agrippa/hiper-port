@@ -94,7 +94,7 @@ void run(int argc, char** argv)
 
     pin_stats_reset();
 
-    unsigned long long start_time = hclib_current_time_ns(); for (int t = 0; t < rows-1; t++) {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
@@ -107,7 +107,7 @@ void run(int argc, char** argv)
             min = MIN(min, src[n+1]);
           dst[n] = wall[t+1][n]+min;
         }
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);

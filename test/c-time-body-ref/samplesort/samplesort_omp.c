@@ -163,7 +163,7 @@ void sorting(TYPE* buffer, int size) {
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
-  unsigned long long start_time = hclib_current_time_ns(); {
+  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
   shmem_init (); 
   /* Variable Declarations */
 
@@ -365,6 +365,6 @@ int main (int argc, char *argv[]) {
 
    /**** Finalize ****/
   shmem_finalize();
-  } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 

@@ -219,7 +219,7 @@ void sparselu_par_call(float **BENCH)
 
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-   unsigned long long start_time = hclib_current_time_ns(); {
+   unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 #pragma omp parallel
        {
 #pragma omp single nowait
@@ -264,7 +264,7 @@ void sparselu_par_call(float **BENCH)
 
            }
        }
-   } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+   } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
    bots_message(" completed!\n");
 }
 

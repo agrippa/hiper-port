@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
 // get Number of thread if OpenMP is activated
 
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
     // warmup
     run(&params);
 
@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
     if (params.string2display !=0)
       printf("%s", params.string2display);
     printf("\n");
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
     return 0;
 }

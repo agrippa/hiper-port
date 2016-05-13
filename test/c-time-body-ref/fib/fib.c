@@ -56,7 +56,7 @@ static long long par_res, seq_res;
 
 void fib0 (int n)
 {
-    unsigned long long start_time = hclib_current_time_ns(); {
+    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
 #pragma omp parallel
         {
 #pragma omp single
@@ -64,7 +64,7 @@ void fib0 (int n)
                 par_res = fib(n);
             }
         }
-    } unsigned long long end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", end_time - start_time);
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
     bots_message("Fibonacci result for %d is %lld\n",n,par_res);
 }
 
