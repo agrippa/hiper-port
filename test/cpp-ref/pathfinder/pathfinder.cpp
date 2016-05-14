@@ -198,7 +198,7 @@ static void pragma108_omp_parallel_hclib_async(void *____arg, const int ___iter0
             min = MIN(min, (*(ctx->src_ptr))[n+1]);
           (*(ctx->dst_ptr))[n] = wall[(*(ctx->t_ptr))+1][n]+min;
         } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

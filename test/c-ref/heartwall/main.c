@@ -721,7 +721,7 @@ static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			kernel(	(*(ctx->public_ptr)),
 						(*(ctx->private_ptr))[i]);
 		} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

@@ -637,7 +637,7 @@ static void pragma396_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ctx->cost_of_opening_x += cost_of_opening_x;
     const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
     assert(unlock_err == 0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -658,7 +658,7 @@ static void pragma472_omp_parallel_hclib_async(void *____arg, const int ___iter0
 				(*(ctx->points_ptr))->p[i].assign = (*(ctx->x_ptr));
       }
     } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

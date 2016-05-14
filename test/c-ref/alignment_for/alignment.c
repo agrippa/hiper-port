@@ -596,7 +596,7 @@ hclib_async(pragma468_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
         } // end if (n == 0 || m == 0)
      } // for (j)
   } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -648,7 +648,7 @@ static void pragma468_omp_task_hclib_async(void *____arg) {
               else                        mm_score /= (double) MIN(len1,len2);
 
               bench_output[si*nseqs+sj] = (int) mm_score;
-           } ;     ; hclib_end_finish();
+           } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }

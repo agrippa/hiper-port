@@ -58,7 +58,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::string contextName,
                 std::vector<clang::ValueDecl *> *captured, std::string bodyStr,
                 bool isFuture, OMPClauses *clauses,
-                bool wrapBodyInFinish,
+                bool wrapBodyInFinish, bool waitAtEnd,
                 std::vector<const clang::ValueDecl *> *condVars = NULL);
         std::string getStructDef(std::string structName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);

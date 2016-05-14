@@ -423,7 +423,7 @@ static void pragma120_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		} // for k
 
 	} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

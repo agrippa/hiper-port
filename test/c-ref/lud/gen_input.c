@@ -180,7 +180,7 @@ static void pragma73_omp_parallel_hclib_async(void *____arg, const int ___iter0)
             }
         }
     } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

@@ -221,7 +221,7 @@ static void *pragma64_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 {
                 LAPACKE_dpotrf_work(LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), (*(ctx->tempkm_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldak_ptr)));
-            } ;     ; hclib_end_finish();
+            } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -237,7 +237,7 @@ cblas_dtrsm(
                         (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_DIAG)PlasmaNonUnit,
                         (*(ctx->A_ptr)).mb, (*(ctx->tempmm_ptr)),
                         (*(ctx->zone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldak_ptr)),
-                        (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
+                        (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -254,7 +254,7 @@ static void *pragma87_omp_task_hclib_async(void *____arg) {
                             (*(ctx->tempmm_ptr)), (*(ctx->A_ptr)).mb,
                             (-1.0), (*(ctx->dA_ptr)), (*(ctx->ldak_ptr)),
                             (1.0), (*(ctx->dB_ptr)), (*(ctx->ldam_ptr)));
-                } ;     ; hclib_end_finish();
+                } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -268,7 +268,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)Plasma
                             (*(ctx->A_ptr)).mb, (*(ctx->tempmm_ptr)), (*(ctx->A_ptr)).mb,
                             (*(ctx->mzone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldak_ptr)),
                             (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
-                            (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->A_ptr)).mb) ;     ; hclib_end_finish();
+                            (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->A_ptr)).mb) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;

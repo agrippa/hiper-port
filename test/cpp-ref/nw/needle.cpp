@@ -222,7 +222,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             }
             
         } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -280,7 +280,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
                 }
             }
         } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

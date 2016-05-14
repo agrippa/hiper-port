@@ -253,7 +253,7 @@ static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
 		(*(ctx->step_factors_ptr))[i] = double(0.5) / (std::sqrt((*(ctx->areas_ptr))[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
 	} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -427,7 +427,7 @@ static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		(*(ctx->fluxes_ptr))[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
 		(*(ctx->fluxes_ptr))[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
 	} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

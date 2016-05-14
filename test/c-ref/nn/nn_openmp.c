@@ -301,7 +301,7 @@ static void pragma124_omp_parallel_hclib_async(void *____arg, const int ___iter0
             float tmp_long = atof(rec_iter+5);
 			(*(ctx->z_ptr))[i] = sqrt(( (tmp_lat-(*(ctx->target_lat_ptr))) * (tmp_lat-(*(ctx->target_lat_ptr))) )+( (tmp_long-(*(ctx->target_long_ptr))) * (tmp_long-(*(ctx->target_long_ptr))) ));
         } ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

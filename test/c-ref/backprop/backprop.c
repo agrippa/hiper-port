@@ -305,7 +305,7 @@ static void pragma251_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ctx->sum += sum;
     const int unlock_err = pthread_mutex_unlock(&ctx->reduction_mutex);
     assert(unlock_err == 0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

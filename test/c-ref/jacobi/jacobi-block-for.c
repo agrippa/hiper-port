@@ -132,7 +132,7 @@ static void pragma26_omp_parallel_hclib_async(void *____arg, const int ___iter0,
     block_x = ___iter0;
     block_y = ___iter1;
 copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->block_size_ptr))) ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -148,7 +148,7 @@ static void pragma31_omp_parallel_hclib_async(void *____arg, const int ___iter0,
     block_y = ___iter1;
 compute_estimate(block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx->f__ptr)), (*(ctx->dx_ptr)), (*(ctx->dy_ptr)),
                                  (*(ctx->nx_ptr)), (*(ctx->ny_ptr)), (*(ctx->block_size_ptr))) ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

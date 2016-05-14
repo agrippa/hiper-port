@@ -534,7 +534,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
         std::string bodyStr, bool isFuture,
         OMPClauses *clauses,
-        bool wrapBodyInFinish, std::vector<const clang::ValueDecl *> *condVars) {
+        bool wrapBodyInFinish, bool waitAtEnd, std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
     std::vector<OMPReductionVar> *reductions = clauses->getReductions();
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
@@ -643,7 +643,19 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     if (wrapBodyInFinish) {
-        ss << "    ; hclib_end_finish();\n\n";
+        /*
+         * We wrap the body of this task with a finish scope to support internal
+         * taskwait calls. However, a call to hclib_end_finish can be very
+         * expensive because of lightweight context switching. Therefore, when
+         * possible we simply close the finish scope and do not block on it.
+         * This is mainly useful at the end of a task block or inside the body
+         * of a parallel for, because there is no implicit barrier there.
+         */
+        if (waitAtEnd) {
+            ss << "    ; hclib_end_finish();\n\n";
+        } else {
+            ss << "    ; hclib_end_finish_nonblocking();\n\n";
+        }
     }
 
     for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
@@ -831,7 +843,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", captures, generatedClauses);
                 std::string closureFunction = getClosureDef(
                         "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        captures, launchBody, false, generatedClauses, false);
+                        captures, launchBody, false, generatedClauses, false, false);
                 std::string contextSetup = getContextSetup(node,
                         "main_entrypoint_ctx", captures,
                         generatedClauses);
@@ -951,7 +963,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, false, true,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, true, clauses, canLaunchTasks(body));
+                                bodyStr, true, clauses, canLaunchTasks(body), true);
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(), node->getCaptures(), clauses);
@@ -993,7 +1005,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
                             node->getLbl(), node->getCaptures(),
-                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body));
+                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body), false);
 
                     const std::string structDef = getStructDef(
                             node->getLbl(), node->getCaptures(), clauses);
@@ -1133,7 +1145,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, false, clauses, canLaunchTasks(forLoop), &condVars);
+                                bodyStr, false, clauses, canLaunchTasks(forLoop), false, &condVars);
 
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<

@@ -323,7 +323,7 @@ for (jj=j; jj<j+block_size; ++jj)
                     else
                         ((*(ctx->f_ptr)))[ii * ny + jj] = - uxxyy_exact(x, y);
                 }
-            } ;     ; hclib_end_finish();
+            } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }

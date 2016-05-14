@@ -401,7 +401,7 @@ static void *pragma63_omp_task_hclib_async(void *____arg) {
             info[2] = 1;
 
             CORE_dgetrf_rectil( (*(ctx->pDesc_ptr)), (*(ctx->dB_ptr)), info );
-        } ;     ; hclib_end_finish();
+        } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -411,7 +411,7 @@ static void *pragma63_omp_task_hclib_async(void *____arg) {
 static void *pragma86_omp_task_hclib_async(void *____arg) {
     pragma86_omp_task *ctx = (pragma86_omp_task *)____arg;
     hclib_start_finish();
-CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish();
+CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_ptr)), 1, (*(ctx->dB_ptr)), (*(ctx->ldak_ptr))) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -425,7 +425,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                         (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
                         (*(ctx->mzone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)),
                         (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
-                        (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
+                        (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -439,7 +439,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                                 (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->A_ptr)).nb,
                                 (*(ctx->mzone_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)),
                                 (*(ctx->dB_ptr)), (*(ctx->ldak_ptr)),
-                                (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish();
+                                (*(ctx->zone_ptr)), (*(ctx->dC_ptr)), (*(ctx->ldam_ptr))) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;
@@ -449,7 +449,7 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
 static void *pragma161_omp_task_hclib_async(void *____arg) {
     pragma161_omp_task *ctx = (pragma161_omp_task *)____arg;
     hclib_start_finish();
-CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish();
+CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_ptr)), 1) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
     return NULL;

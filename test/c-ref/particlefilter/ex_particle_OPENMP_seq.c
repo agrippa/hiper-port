@@ -1344,7 +1344,7 @@ static void pragma409_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			(*(ctx->arrayX_ptr))[x] += 1 + 5*randn((*(ctx->seed_ptr)), x);
 			(*(ctx->arrayY_ptr))[x] += -2 + 2*randn((*(ctx->seed_ptr)), x);
 		} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -1376,7 +1376,7 @@ static void pragma417_omp_parallel_hclib_async(void *____arg, const int ___iter0
 				(*(ctx->likelihood_ptr))[x] += (pow(((*(ctx->I_ptr))[(*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y]] - 100),2) - pow(((*(ctx->I_ptr))[(*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y]]-228),2))/50.0;
 			(*(ctx->likelihood_ptr))[x] = (*(ctx->likelihood_ptr))[x]/((double) (*(ctx->countOnes_ptr)));
 		} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -1390,7 +1390,7 @@ static void pragma440_omp_parallel_hclib_async(void *____arg, const int ___iter0
 {
 			(*(ctx->weights_ptr))[x] = (*(ctx->weights_ptr))[x] * exp((*(ctx->likelihood_ptr))[x]);
 		} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -1469,7 +1469,7 @@ static void pragma495_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			(*(ctx->yj_ptr))[j] = (*(ctx->arrayY_ptr))[i];
 			
 		} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

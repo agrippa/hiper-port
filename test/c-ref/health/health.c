@@ -459,7 +459,7 @@ static void pragma427_omp_task_hclib_async(void *____arg) {
     struct Village (*vlist); vlist = ctx->vlist;
     struct Village (*village); village = ctx->village;
     hclib_start_finish();
-sim_village_par(vlist) ;     ; hclib_end_finish();
+sim_village_par(vlist) ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }
@@ -612,7 +612,7 @@ static void pragma563_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 {
                     for ((*(ctx->i_ptr)) = 0; (*(ctx->i_ptr)) < sim_time; (*(ctx->i_ptr))++) sim_village_par((*(ctx->top_ptr)));   
-                } ;     ; hclib_end_finish();
+                } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }

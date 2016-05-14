@@ -173,7 +173,7 @@ static void pragma133_omp_task_hclib_async(void *____arg) {
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
        				nqueens(n, j + 1, b,&csols[i],depth); //FIXME: depth or depth+1 ???
-		} ;     ; hclib_end_finish();
+		} ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }

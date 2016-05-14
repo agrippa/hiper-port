@@ -194,7 +194,7 @@ static void pragma137_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));
-          } ;     ; hclib_end_finish();
+          } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }
@@ -205,7 +205,7 @@ static void pragma147_omp_task_hclib_async(void *____arg) {
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));
-          } ;     ; hclib_end_finish();
+          } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }

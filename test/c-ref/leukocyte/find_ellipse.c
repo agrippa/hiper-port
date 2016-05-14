@@ -207,7 +207,7 @@ static void pragma119_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			}
 		}
 	} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 
@@ -298,7 +298,7 @@ static void pragma194_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			m_set_val((*(ctx->dilated_ptr)), i, j, max);
 		}
 	} ;     } while (0);
-    ; hclib_end_finish();
+    ; hclib_end_finish_nonblocking();
 
 }
 

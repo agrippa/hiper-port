@@ -620,7 +620,7 @@ static void pragma576_omp_task_hclib_async(void *____arg) {
               if (parent.numChildren < 0) {
                   genChildren(&parent, &child);
               }
-          } ;     ; hclib_end_finish();
+          } ;     ; hclib_end_finish_nonblocking();
 
     free(____arg);
 }
