@@ -193,7 +193,7 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
 
         return tagName + " " + soFarBefore + name + soFarAfter;
     } else {
-        std::cerr << "Unsupported type " <<
+        std::cerr << "getDeclarationTypeStr: Unsupported type " <<
             std::string(type->getTypeClassName()) << std::endl;
         exit(1);
     }
@@ -224,7 +224,7 @@ std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
     } else if (const clang::TypedefType *typedefType = type->getAs<clang::TypedefType>()) {
         return "sizeof(" + qualType.getAsString() + ")";
     } else {
-        std::cerr << "Unsupported type while getting array size expression " <<
+        std::cerr << "getArraySizeExpr: Unsupported type while getting array size expression " <<
             std::string(type->getTypeClassName()) << std::endl;
         exit(1);
     }
@@ -249,7 +249,7 @@ std::string OMPToHClib::getUnpackStr(clang::ValueDecl *decl) {
             type->getAs<clang::TagType>()) {
         ss << decl->getNameAsString() << " = ctx->" << decl->getNameAsString() << ";";
     } else {
-        std::cerr << "Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
+        std::cerr << "getUnpackStr: Unsupported type " << std::string(type->getTypeClassName()) << std::endl;
         exit(1);
     }
 

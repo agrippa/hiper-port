@@ -60,7 +60,7 @@ typedef struct _pragma60_omp_parallel {
  } pragma60_omp_parallel;
 
 static void pragma60_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-template <typename T> void copy(T* dst, T* src, int N)
+void copy(double *dst, double *src, int N)
 {
  { 
 pragma60_omp_parallel *new_ctx = (pragma60_omp_parallel *)malloc(sizeof(pragma60_omp_parallel));
@@ -585,7 +585,7 @@ static void main_entrypoint(void *____arg) {
 	// Begin iterations
 	for(int i = 0; i < iterations; i++)
 	{
-		copy<double>(old_variables, variables, nelr*NVAR);
+		copy(old_variables, variables, nelr*NVAR);
 
 		// for the first iteration we compute the time step
 		compute_step_factor(nelr, variables, areas, step_factors);

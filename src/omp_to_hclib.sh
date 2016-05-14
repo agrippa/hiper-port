@@ -140,7 +140,7 @@ until [[ $CHANGED -eq 0 ]]; do
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
     $OMP_TO_HCLIB -o $TMP_OUTPUT -c $CRITICAL_SECTION_ID \
         -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD -s $USES_SHMEM_FILE \
-        $PREV -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
+        $PREV -- $INCLUDE $USER_INCLUDES $DEFINES
 
     PREV_CRITICAL_SECTION_ID=$CRITICAL_SECTION_ID
     CRITICAL_SECTION_ID=$(cat $CRITICAL_SECTION_ID_FILE)
@@ -154,6 +154,7 @@ until [[ $CHANGED -eq 0 ]]; do
     diff $WITH_LOCKS $PREV > /dev/null
     CHANGED=$?
     set -e
+    [[ $VERBOSE == 1 ]] && echo "DEBUG >>> Any change from $PREV to $WITH_LOCKS? $CHANGED"
 
     COUNT=$(($COUNT + 1))
     PREV=$WITH_LOCKS

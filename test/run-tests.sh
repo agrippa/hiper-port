@@ -4,6 +4,16 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+PLATFORM=$(uname)
+
+function stat_file() {
+    if [[ $PLATFORM == Darwin ]]; then
+        stat -f '%d:%i' $1
+    else
+        stat -c '%d:%i' $1
+    fi
+}
+
 function compare_outputs() {
     REFERENCE=$1
     FILE=$2
@@ -64,7 +74,7 @@ for FILE in $FILES; do
     CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v"
     TIME_BODY_CMD="$SCRIPT_DIR/../src/time_body.sh -i $FILE -o $TIME_BODY_OUTPUT -I $DIRNAME -v"
     for P in "${!defines[@]}"; do
-        if [[ "$(stat -c '%d:%i' $P)" == "$(stat -c '%d:%i' $FILE)" ]]; then
+        if [[ "$(stat_file $P)" == "$(stat_file $FILE)" ]]; then
             for DEF in ${defines[$P]}; do
                 CMD="$CMD -D $DEF"
                 TIME_BODY_CMD="$TIME_BODY_CMD -D $DEF"

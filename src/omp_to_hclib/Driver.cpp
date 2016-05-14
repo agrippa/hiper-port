@@ -95,6 +95,8 @@ public:
 
         if (FunctionDecl *fdecl = clang::dyn_cast<FunctionDecl>(toplevel)) {
             handleFunctionDecl(fdecl);
+        } else if (FunctionTemplateDecl *tdecl = clang::dyn_cast<FunctionTemplateDecl>(toplevel)) {
+            handleFunctionDecl(tdecl->getTemplatedDecl());
         } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(
                     toplevel)) {
             for (DeclContext::decl_iterator di = ldecl->decls_begin(),
@@ -105,6 +107,10 @@ public:
                     handleFunctionDecl(fdecl);
                 }
             }
+        } else {
+            clang::SourceLocation start = toplevel->getLocStart();
+            clang::PresumedLoc presumedStart = R.getSourceMgr().getPresumedLoc(start);
+            std::cerr << "Decl at " << std::string(presumedStart.getFilename()) << ":" << presumedStart.getLine() << " " << clang::isa<FunctionTemplateDecl>(toplevel) << std::endl;
         }
     }
 
