@@ -107,10 +107,6 @@ public:
                     handleFunctionDecl(fdecl);
                 }
             }
-        } else {
-            clang::SourceLocation start = toplevel->getLocStart();
-            clang::PresumedLoc presumedStart = R.getSourceMgr().getPresumedLoc(start);
-            std::cerr << "Decl at " << std::string(presumedStart.getFilename()) << ":" << presumedStart.getLine() << " " << clang::isa<FunctionTemplateDecl>(toplevel) << std::endl;
         }
     }
 
