@@ -135,7 +135,7 @@ domain[0].low = 0;
 domain[0].high = cols;
 domain[0].stride = 1;
 domain[0].tile = -1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma108_omp_parallel_hclib_async, new_ctx, NULL, 1, domain, FORASYNC_MODE_RECURSIVE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma108_omp_parallel_hclib_async, new_ctx, 1, domain, FORASYNC_MODE_RECURSIVE);
 hclib_future_wait(fut);
 free(new_ctx);
  } 
@@ -187,19 +187,18 @@ hclib_launch(main_entrypoint, new_ctx);
 static void pragma108_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma108_omp_parallel *ctx = (pragma108_omp_parallel *)____arg;
     int min; min = ctx->min;
-    hclib_start_finish();
     do {
     int n;     n = ___iter0;
 {
           min = (*(ctx->src_ptr))[n];
-          if (n > 0)
-            min = MIN(min, (*(ctx->src_ptr))[n-1]);
-          if (n < cols-1)
-            min = MIN(min, (*(ctx->src_ptr))[n+1]);
+          if (n > 0) {
+              min = (*(ctx->src_ptr))[n - 1] < min ? (*(ctx->src_ptr))[n - 1] : min;
+          }
+          if (n < cols-1) {
+              min = (*(ctx->src_ptr))[n + 1] < min ? (*(ctx->src_ptr))[n + 1] : min;
+          }
           (*(ctx->dst_ptr))[n] = wall[(*(ctx->t_ptr))+1][n]+min;
         } ;     } while (0);
-    ; hclib_end_finish_nonblocking();
-
 }
 
 

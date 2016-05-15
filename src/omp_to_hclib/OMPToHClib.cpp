@@ -1149,7 +1149,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<
-                            node->getLbl() << ASYNC_SUFFIX << ", new_ctx, NULL, " <<
+                            node->getLbl() << ASYNC_SUFFIX << ", new_ctx, " <<
                             nLoops << ", domain, FORASYNC_MODE_RECURSIVE);\n";
                         contextCreation << "hclib_future_wait(fut);\n";
                         contextCreation << "free(new_ctx);\n";
