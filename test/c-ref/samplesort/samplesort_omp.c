@@ -76,7 +76,7 @@
 #define _SHMEM_BCAST_SYNC_SIZE          SHMEM_BCAST_SYNC_SIZE
 
 #define SIZE 100000
-#define TYPE uint64_t
+#define TYPE unsigned long
 long pSync[_SHMEM_BCAST_SYNC_SIZE];
 #define ASYNC_SHMEM
 #define VERIFY
