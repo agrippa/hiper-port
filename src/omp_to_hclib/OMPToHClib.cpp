@@ -170,9 +170,12 @@ std::string OMPToHClib::getDeclarationTypeStr(clang::QualType qualType,
                 soFarBefore + "(*", ")" + soFarAfter);
     } else if (const clang::BuiltinType *builtinType =
             type->getAs<clang::BuiltinType>()) {
-        return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
+        std::cerr << "built in type for " << name << std::endl;
+        return builtinType->getName(Context->getPrintingPolicy()).str() + " " + soFarBefore + name + soFarAfter;
+        // return qualType.getAsString() + " " + soFarBefore + name + soFarAfter;
     } else if (const clang::TypedefType *typedefType =
             type->getAs<clang::TypedefType>()) {
+        std::cerr << "typedef type for " << name << std::endl;
         return typedefType->getDecl()->getNameAsString() + " " + soFarBefore +
             name + soFarAfter;
     } else if (const clang::ElaboratedType *elaboratedType =

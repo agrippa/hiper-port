@@ -45,7 +45,7 @@ typedef struct _pragma64_omp_task {
     int (*tempmm_ptr);
     double (*zone_ptr);
     double (*mzone_ptr);
-    PLASMA_enum (*uplo_ptr);
+    int (*uplo_ptr);
     PLASMA_desc (*A_ptr);
  } pragma64_omp_task;
 
@@ -61,7 +61,7 @@ typedef struct _pragma73_omp_task {
     int (*tempmm_ptr);
     double (*zone_ptr);
     double (*mzone_ptr);
-    PLASMA_enum (*uplo_ptr);
+    int (*uplo_ptr);
     PLASMA_desc (*A_ptr);
  } pragma73_omp_task;
 
@@ -77,7 +77,7 @@ typedef struct _pragma87_omp_task {
     int (*tempmm_ptr);
     double (*zone_ptr);
     double (*mzone_ptr);
-    PLASMA_enum (*uplo_ptr);
+    int (*uplo_ptr);
     PLASMA_desc (*A_ptr);
  } pragma87_omp_task;
 
@@ -94,7 +94,7 @@ typedef struct _pragma101_omp_task {
     int (*tempmm_ptr);
     double (*zone_ptr);
     double (*mzone_ptr);
-    PLASMA_enum (*uplo_ptr);
+    int (*uplo_ptr);
     PLASMA_desc (*A_ptr);
  } pragma101_omp_task;
 

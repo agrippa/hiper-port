@@ -120,7 +120,7 @@ typedef struct _pragma137_omp_task {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
-    uint64_t (*(*data_ptr));
+    unsigned long (*(*data_ptr));
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
@@ -130,7 +130,7 @@ typedef struct _pragma147_omp_task {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
-    uint64_t (*(*data_ptr));
+    unsigned long (*(*data_ptr));
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
