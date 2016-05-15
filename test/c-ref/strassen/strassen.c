@@ -588,7 +588,7 @@ typedef struct _pragma684_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -632,7 +632,7 @@ typedef struct _pragma688_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -676,7 +676,7 @@ typedef struct _pragma692_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -720,7 +720,7 @@ typedef struct _pragma696_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -764,7 +764,7 @@ typedef struct _pragma700_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -808,7 +808,7 @@ typedef struct _pragma704_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);
@@ -852,7 +852,7 @@ typedef struct _pragma708_omp_task {
     double (*(*M2_ptr));
     double (*(*M5_ptr));
     double (*(*T1sMULT_ptr));
-    int (*NumberOfVariables_ptr);
+    const int (*NumberOfVariables_ptr);
     unsigned long (*TempMatrixOffset_ptr);
     unsigned long (*MatrixOffsetA_ptr);
     unsigned long (*MatrixOffsetB_ptr);

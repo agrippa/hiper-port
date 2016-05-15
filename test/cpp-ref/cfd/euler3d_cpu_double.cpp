@@ -483,7 +483,7 @@ static void pragma324_omp_parallel_hclib_async(void *____arg, const int ___iter0
  * Main function
  */
 typedef struct _main_entrypoint_ctx {
-    char (*data_file_name);
+    const char (*data_file_name);
     int argc;
     char (*(*argv));
  } main_entrypoint_ctx;
@@ -491,7 +491,7 @@ typedef struct _main_entrypoint_ctx {
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    char (*data_file_name); data_file_name = ctx->data_file_name;
+    const char (*data_file_name); data_file_name = ctx->data_file_name;
     int argc; argc = ctx->argc;
     char (*(*argv)); argv = ctx->argv;
 {
