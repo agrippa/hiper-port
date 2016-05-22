@@ -4,9 +4,9 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-FILE_PREFIX=____time_body
+FILE_PREFIX=____measure_load_balance
 
-TIME_BODY=$SCRIPT_DIR/time_body/time_body
+MEASURE_LOAD_BALANCE=$SCRIPT_DIR/measure_load_balance/measure_load_balance
 REPLACE_PRAGMAS_WITH_FUNCTIONS=$SCRIPT_DIR/replace_pragmas_with_functions.py
 MAKE_UNTIED_CONFIGURABLE=$SCRIPT_DIR/make_untied_configurable.py
 
@@ -43,7 +43,7 @@ while getopts "i:o:kvhI:D:" opt; do
             USER_DEFINES="$USER_DEFINES -D$OPTARG"
             ;;
         h)
-            echo 'usage: time_body.sh <-i input-file> <-o output-file> [-k] [-v] [-h] [-I include-path]'
+            echo 'usage: measure_load_balance.sh <-i input-file> <-o output-file> [-k] [-v] [-h] [-I include-path]'
             exit 1
             ;;
         \?)
@@ -110,15 +110,36 @@ WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
 echo '#include "hclib.h"' > $WITH_HEADER
 echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_HEADER
+INIT_STR='{ 0'
+for I in $(seq 31); do
+    INIT_STR="$INIT_STR, 0"
+done
+echo "int ____num_tasks[32] = $INIT_STR };" >> $WITH_HEADER
 cat $INPUT_PATH >> $WITH_HEADER
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
-cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS true > $WITH_PRAGMA_MARKERS
+cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS false > $WITH_PRAGMA_MARKERS
 
-TRANSFORMED=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$EXTENSION
-$TIME_BODY -o $TRANSFORMED $WITH_PRAGMA_MARKERS -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
+PREV=$WITH_PRAGMA_MARKERS
+CHANGED=1
+COUNT=1
+until [[ $CHANGED -eq 0 ]]; do
+    TRANSFORMED=$DIRNAME/$FILE_PREFIX.$NAME.$COUNT.hclib.$EXTENSION
 
-cat $TRANSFORMED | python $MAKE_UNTIED_CONFIGURABLE | grep -v "hclib_pragma_marker" > $OUTPUT_PATH
+    [[ $VERBOSE == 1 ]] && echo "DEBUG >>> Transforming $PREV -> $TRANSFORMED"
+    $MEASURE_LOAD_BALANCE -o $TRANSFORMED $PREV -- $INCLUDE \
+        $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
+
+    set +e
+    diff $TRANSFORMED $PREV > /dev/null
+    CHANGED=$?
+    set -e
+
+    COUNT=$(($COUNT + 1))
+    PREV=$TRANSFORMED
+done
+
+cat $PREV | python $MAKE_UNTIED_CONFIGURABLE | grep -v 'extern void hclib_pragma_marker' > $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'
