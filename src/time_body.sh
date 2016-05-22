@@ -109,6 +109,11 @@ WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
 echo '#include "hclib.h"' > $WITH_HEADER
 echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_HEADER
+# INIT_STR='{ 0'
+# for I in $(seq 31); do
+#     INIT_STR="$INIT_STR, 0"
+# done
+# echo "int ____num_tasks[32] = $INIT_STR };" >> $WITH_HEADER
 cat $INPUT_PATH >> $WITH_HEADER
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
