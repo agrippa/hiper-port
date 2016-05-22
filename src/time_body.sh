@@ -8,6 +8,7 @@ FILE_PREFIX=____time_body
 
 TIME_BODY=$SCRIPT_DIR/time_body/time_body
 REPLACE_PRAGMAS_WITH_FUNCTIONS=$SCRIPT_DIR/replace_pragmas_with_functions.py
+MAKE_UNTIED_CONFIGURABLE=$SCRIPT_DIR/make_untied_configurable.py
 
 GXX="$GXX"
 if [[ -z "$GXX" ]]; then
@@ -121,7 +122,8 @@ cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS true > $WITH_PRAGMA_MA
 
 TRANSFORMED=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$EXTENSION
 $TIME_BODY -o $TRANSFORMED $WITH_PRAGMA_MARKERS -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include
-cat $TRANSFORMED | grep -v "hclib_pragma_marker" > $OUTPUT_PATH
+
+cat $TRANSFORMED | python $MAKE_UNTIED_CONFIGURABLE | grep -v "hclib_pragma_marker" > $OUTPUT_PATH
 
 if [[ $KEEP == 0 ]]; then
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Cleaning up'

@@ -39,7 +39,11 @@ void plasma_pdplgsy_quark( double bump, PLASMA_desc A, unsigned long long int se
 #if defined(USE_OMPEXT)
 omp_set_task_affinity( (n%4)*6+(m%6) );
 #endif
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task depend(out:dA[0:ldam*tempnn]) untied
+#else
 #pragma omp task depend(out:dA[0:ldam*tempnn])
+#endif
             CORE_dplgsy( bump, tempmm, tempnn, dA, ldam, A.m, m*A.mb, n*A.nb, seed );
         }
     }

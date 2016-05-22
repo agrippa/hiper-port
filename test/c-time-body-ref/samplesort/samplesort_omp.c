@@ -128,7 +128,11 @@ void par_sort(void* arg) {
           buf->buffer = data;
           buf->left = left;
           buf->right = index - 1; 
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task untied
+#else
 #pragma omp task
+#endif
           {
               par_sort(buf);
           }
@@ -138,7 +142,11 @@ void par_sort(void* arg) {
           buf->buffer = data;
           buf->left = index;
           buf->right = right; 
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task untied
+#else
 #pragma omp task
+#endif
           {
               par_sort(buf);
           }

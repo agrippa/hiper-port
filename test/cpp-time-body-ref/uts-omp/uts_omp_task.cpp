@@ -512,7 +512,11 @@ void genChildren(Node * parent, Node * child) {
 
       Node parent = *child;
 
-#pragma omp task untied firstprivate(parent) if(parent.height < 9)
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
+#else
+#pragma omp task  firstprivate(parent) if(parent.height < 9)
+#endif
       {
           Node child;
           initNode(&child);

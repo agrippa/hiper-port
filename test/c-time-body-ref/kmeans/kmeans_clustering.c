@@ -181,11 +181,7 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     do {
         delta = 0.0;
         {
-            #pragma omp parallel for shared(feature,clusters,membership,partial_new_centers,partial_new_centers_len) \
-                        private(i,j,index) \
-                        firstprivate(npoints,nclusters,nfeatures) \
-                        schedule(static) \
-                        reduction(+:delta)
+            #pragma omp parallel for shared(feature,clusters,membership,partial_new_centers,partial_new_centers_len)                          private(i,j,index)                          firstprivate(npoints,nclusters,nfeatures)                          schedule(static)                          reduction(+:delta)
             for (i=0; i<npoints; i++) {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				

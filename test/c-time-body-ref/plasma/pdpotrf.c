@@ -55,7 +55,11 @@ void plasma_pdpotrf_quark(PLASMA_enum uplo, PLASMA_desc A)
 #if defined(USE_OMPEXT)
 omp_set_task_priority(1);
 #endif
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task depend(inout:dA[0:A.mb*A.mb]) untied
+#else
 #pragma omp task depend(inout:dA[0:A.mb*A.mb])
+#endif
             {
                 LAPACKE_dpotrf_work(LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), tempkm, dA, ldak);
             }
@@ -64,7 +68,11 @@ omp_set_task_priority(1);
                 tempmm = m == A.nt-1 ? A.n-m*A.nb : A.nb;
                 double *dA = A(k, k);
                 double *dB = A(k, m);
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
+#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
+#endif
                 cblas_dtrsm(
                         CblasColMajor,
                         (CBLAS_SIDE)PlasmaLeft, (CBLAS_UPLO)PlasmaUpper,
@@ -78,7 +86,11 @@ omp_set_task_priority(1);
                 ldam = BLKLDD(A, m);
                 double *dA = A(k, m);
                 double *dB = A(m, m);
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
+#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
+#endif
                 {
                     cblas_dsyrk(
                             CblasColMajor,
@@ -92,7 +104,11 @@ omp_set_task_priority(1);
                     double *dA = A(k , n);
                     double *dB = A(k , m);
                     double *dC = A(n , m);
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb]) untied
+#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])
+#endif
                     cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                             A.mb, tempmm, A.mb,
                             mzone, dA, ldak,

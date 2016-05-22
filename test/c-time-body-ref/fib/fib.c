@@ -42,9 +42,17 @@ long long fib (int n)
 	long long x, y;
 	if (n < 2) return n;
 
-	#pragma omp task untied shared(x) firstprivate(n)
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task  shared(x) firstprivate(n) untied
+#else
+#pragma omp task  shared(x) firstprivate(n)
+#endif
 	x = fib(n - 1);
-	#pragma omp task untied shared(y) firstprivate(n)
+#ifdef HCLIB_TASK_UNTIED
+#pragma omp task  shared(y) firstprivate(n) untied
+#else
+#pragma omp task  shared(y) firstprivate(n)
+#endif
 	y = fib(n - 2);
 
 	#pragma omp taskwait
