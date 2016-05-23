@@ -355,8 +355,7 @@ int main(int argc, char** argv)
 	}
 	const char* data_file_name = argv[1];
 
-;
-    {
+{
 	// set far field conditions
 	{
 		const double angle_of_attack = double(3.1415926535897931 / 180.0) * double(deg_angle_of_attack);
@@ -473,7 +472,14 @@ int main(int argc, char** argv)
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
 	std::cout << "Done..." << std::endl;
 

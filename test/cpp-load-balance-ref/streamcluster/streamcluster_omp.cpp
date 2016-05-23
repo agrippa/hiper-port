@@ -747,8 +747,7 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
     }
 
 
-;
-  while(1) {
+while(1) {
 		d++;
 #ifdef PRINTINFO
     if( pid==0 )
@@ -798,7 +797,14 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
       { 
 	break;
       }
-  }
+  } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 
   //clean up...
   if( pid==0 ) {

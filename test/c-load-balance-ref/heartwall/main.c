@@ -528,8 +528,7 @@ int main(int argc, char *argv []){
 	//	KERNEL
 	//======================================================================================================================================================
 
-;
-	for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
+for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 
 	//====================================================================================================
 	//	GETTING FRAME
@@ -569,7 +568,14 @@ int main(int argc, char *argv []){
 		printf("%d ", public.frame_no);
 		fflush(NULL);
 
-	}
+	} ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 
 	//======================================================================================================================================================
 	//	PRINT FRAME PROGRESS END

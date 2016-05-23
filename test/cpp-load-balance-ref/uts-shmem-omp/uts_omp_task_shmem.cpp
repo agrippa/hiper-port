@@ -719,8 +719,7 @@ int main(int argc, char *argv[]) {
 #endif
   memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
 
-;
-  {
+{
 
   shmem_init();
 
@@ -820,7 +819,14 @@ retry:
       shmem_barrier_all();
   }
 #endif
-  }
+  } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 
   shmem_finalize();
   return 0;

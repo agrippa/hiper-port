@@ -294,8 +294,14 @@ int main(int argc, char **argv)
 	
     long long start_time = get_time();
 
+compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
 ;
-    compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
 
     long long end_time = get_time();
 

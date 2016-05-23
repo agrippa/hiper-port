@@ -253,8 +253,7 @@ int main(int argc, char** argv)
 
     memcpy(tempCopy,tempIn, size * sizeof(float));
 
-;
-    {
+{
     struct timeval start, stop;
     float time;
     gettimeofday(&start,NULL);
@@ -266,7 +265,14 @@ int main(int argc, char** argv)
     float acc = accuracy(tempOut,answer,numRows*numCols*layers);
     printf("Time: %.3f (s)\n",time);
     printf("Accuracy: %e\n",acc);
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
     writeoutput(tempOut,numRows, numCols, layers, ofile);
     free(tempIn);
     free(tempOut); free(powerIn);

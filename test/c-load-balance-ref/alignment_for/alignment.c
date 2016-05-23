@@ -444,8 +444,7 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-;
-   {
+{
 
 #pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
 ;
@@ -510,7 +509,14 @@ int pairalign()
      } // for (j)
   } ; }
  // end parallel for (i)
-   }
+   } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
    return 0;
 }
 

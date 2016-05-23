@@ -304,8 +304,7 @@ void floorplan_init (char *filename)
 
 void compute_floorplan (void)
 {
-;
-    {
+{
         coor footprint;
         /* footprint of initial board is zero */
         footprint[0] = 0;
@@ -319,7 +318,14 @@ void compute_floorplan (void)
             bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
         }
         bots_message(" completed!\n");
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 }
 
 void floorplan_end (void)

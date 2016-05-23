@@ -516,8 +516,7 @@ void sort_init ( void )
 void sort_par ( void )
 {
 	bots_message("Computing multisort algorithm (n=%d) ", bots_arg_size);
-;
-    {
+{
 #pragma omp parallel
 ;
         {
@@ -537,7 +536,14 @@ void sort_par ( void )
 
             }
         }
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 	bots_message(" completed!\n");
 }
 

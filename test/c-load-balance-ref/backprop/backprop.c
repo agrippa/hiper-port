@@ -341,8 +341,7 @@ void bpnn_train(net, eo, eh)
 BPNN *net;
 float *eo, *eh;
 {
-;
-    {
+{
   int in, hid, out;
   float out_err, hid_err;
 
@@ -369,7 +368,14 @@ float *eo, *eh;
       net->hidden_weights, net->hidden_prev_weights);
   bpnn_adjust_weights(net->hidden_delta, hid, net->input_units, in,
       net->input_weights, net->input_prev_weights);
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
 }
 

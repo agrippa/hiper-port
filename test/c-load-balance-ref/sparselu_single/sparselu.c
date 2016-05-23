@@ -220,8 +220,7 @@ void sparselu_par_call(float **BENCH)
 
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-;
-   {
+{
 #pragma omp parallel
 ;
        {
@@ -298,7 +297,14 @@ for (kk=0; kk<bots_arg_size; kk++)
 
            }
        }
-   }
+   } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
    bots_message(" completed!\n");
 }
 

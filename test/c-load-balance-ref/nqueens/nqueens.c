@@ -151,8 +151,7 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 
 void find_queens (int size)
 {
-;
-    {
+{
 	total_count=0;
 
         bots_message("Computing N-Queens algorithm (n=%d) ", size);
@@ -169,7 +168,14 @@ void find_queens (int size)
 		}
 	}
 	bots_message(" completed!\n");
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 }
 
 

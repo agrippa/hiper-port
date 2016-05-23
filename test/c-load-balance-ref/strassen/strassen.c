@@ -865,8 +865,7 @@ REAL *alloc_matrix(int n)
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
 {
 	bots_message("Computing parallel Strassen algorithm (n=%d) ", n);
-;
-    {
+{
 #pragma omp parallel
 ;
         {
@@ -885,7 +884,14 @@ OptimizedStrassenMultiply_par(C, A, B, n, n, n, n, 1) ; }
             }
         }
 	bots_message(" completed!\n");
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 }
 
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n)

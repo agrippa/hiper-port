@@ -85,8 +85,7 @@ int main(int argc, char* argv[]) {
 	float *z;
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
-;
-	while(!done) {
+while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
 		if( rec_count != REC_WINDOW ) {
@@ -145,7 +144,14 @@ int main(int argc, char* argv[]) {
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	}//End while loop
+	} ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+//End while loop
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {

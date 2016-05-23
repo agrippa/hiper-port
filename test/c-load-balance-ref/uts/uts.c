@@ -179,8 +179,7 @@ unsigned long long parallel_uts ( Node *root )
 
    bots_message("Computing Unbalance Tree Search algorithm ");
 
-;
-   {
+{
 #pragma omp parallel
 ;
        {
@@ -198,7 +197,14 @@ num_nodes = parTreeSearch( 0, root, root->numChildren ) ; }
 ;
            }
        }
-   }
+   } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 
    bots_message(" completed!");
 

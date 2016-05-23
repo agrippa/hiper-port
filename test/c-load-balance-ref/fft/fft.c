@@ -5078,8 +5078,7 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 
 
      bots_message("Computing coefficients ");
-;
-     {
+{
      W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
 #pragma omp parallel
 ;
@@ -5134,7 +5133,14 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      }
 
      free(W);
-     }
+     } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
      bots_message(" completed!\n");
 
      return;

@@ -204,8 +204,7 @@ int main(int argc, char **argv) {
 
 	memcpy(attributes[0], buf, numObjects*numAttributes*sizeof(float));
 
-;
-    for (i=0; i<nloops; i++) {
+for (i=0; i<nloops; i++) {
         
         cluster_centres = NULL;
         cluster(numObjects,
@@ -216,7 +215,14 @@ int main(int argc, char **argv) {
                 &cluster_centres   
                );
      
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 	
 
 	printf("number of Clusters %d\n",nclusters); 

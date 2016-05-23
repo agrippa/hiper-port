@@ -146,8 +146,7 @@ int main(int argc, char* argv[])
 
 // get Number of thread if OpenMP is activated
 
-;
-    {
+{
     // warmup
     run(&params);
 
@@ -213,7 +212,14 @@ int main(int argc, char* argv[])
     if (params.string2display !=0)
       printf("%s", params.string2display);
     printf("\n");
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
     return 0;
 }

@@ -95,8 +95,7 @@ void run(int argc, char** argv)
 
     pin_stats_reset();
 
-;
-    for (int t = 0; t < rows-1; t++) {
+for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
@@ -114,7 +113,14 @@ void run(int argc, char** argv)
           dst[n] = wall[t+1][n]+min;
         } ; }
 
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);

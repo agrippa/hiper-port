@@ -239,7 +239,21 @@ void MeasureLoadBalancePass::VisitStmt(const clang::Stmt *s) {
 
                         handledAPragma = true;
                     } else {
-                        bool failed = rewriter->RemoveText(clang::SourceRange(call->getLocStart(), call->getLocEnd()));
+                        const clang::Stmt *body = getBodyForMarker(call);
+                        assert(body);
+                        std::string bodyStr = stmtToString(body);
+                        std::stringstream ss;
+                        ss << bodyStr << " ; {\n";
+                        ss << "    int __i;\n";
+                        ss << "    assert(omp_get_max_threads() <= 32);\n";
+                        ss << "    for (__i = 0; __i < omp_get_max_threads(); __i++) {\n";
+                        ss << "        fprintf(stderr, \"Thread %d: %d\\n\", __i, ____num_tasks[__i]);\n";
+                        ss << "    }\n";
+                        ss << "}\n";
+
+                        bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(call->getLocStart(),
+                                    body->getLocEnd()), ss.str());
                         assert(!failed);
                         handledAPragma = true;
                     }

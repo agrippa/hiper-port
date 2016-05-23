@@ -105,8 +105,7 @@ void  kernel_cpu(	par_str par,
 
 	time3 = get_time();
 
-;
-    {
+{
 
 	//======================================================================================================================================================150
 	//	PROCESS INTERACTIONS
@@ -196,7 +195,14 @@ void  kernel_cpu(	par_str par,
 
 	} ; }
  // for l
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
 	time4 = get_time();
 

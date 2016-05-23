@@ -109,8 +109,7 @@ int main(int argc, char* argv[])
    
 	printf("Start the SRAD main loop\n");
 
-;
-	for (iter=0; iter< niter; iter++){
+for (iter=0; iter< niter; iter++){
 		sum=0; sum2=0;     
 		for (i=r1; i<=r2; i++) {
             for (j=c1; j<=c2; j++) {
@@ -190,7 +189,14 @@ int main(int argc, char* argv[])
 	     } ; }
 
 
-	}
+	} ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 
 
 #ifdef OUTPUT

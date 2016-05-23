@@ -180,8 +180,7 @@ void sorting(TYPE* buffer, int size) {
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
-;
-  {
+{
   shmem_init (); 
   /* Variable Declarations */
 
@@ -383,6 +382,13 @@ int main (int argc, char *argv[]) {
 
    /**** Finalize ****/
   shmem_finalize();
-  }
+  } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 }
 

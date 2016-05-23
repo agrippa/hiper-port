@@ -557,8 +557,7 @@ int check_village(struct Village *top)
 void sim_village_main_par(struct Village *top)
 {
     long i;
-;
-    {
+{
 #pragma omp parallel
 ;
         {
@@ -578,6 +577,13 @@ void sim_village_main_par(struct Village *top)
 
             }
         }
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 }
 

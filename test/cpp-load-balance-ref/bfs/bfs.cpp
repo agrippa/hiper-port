@@ -115,8 +115,7 @@ void BFSGraph( int argc, char** argv)
 	
 	printf("Start traversing the tree\n");
 
-;
-    {
+{
 	int k=0;
 	bool stop;
 	do
@@ -161,7 +160,14 @@ void BFSGraph( int argc, char** argv)
             k++;
         }
 	while(stop);
+    } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
+}
+
 
 	//Store the result into a file
 	FILE *fpo = fopen("result.txt","w");

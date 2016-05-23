@@ -290,9 +290,15 @@ runTest( int argc, char** argv)
    
     long long start_time = get_time();
 
+nw_optimized( input_itemsets, output_itemsets, referrence,
+        max_rows, max_cols, penalty ) ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
 ;
-    nw_optimized( input_itemsets, output_itemsets, referrence,
-        max_rows, max_cols, penalty );
 
     long long end_time = get_time();
 

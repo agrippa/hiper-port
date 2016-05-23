@@ -711,8 +711,7 @@ int main(int argc, char *argv[]) {
     initHist();
 #endif  
 
-;
-  {
+{
   /* cancellable barrier initialization (single threaded under OMP) */
 
   double t1, t2, et;
@@ -740,7 +739,14 @@ int main(int argc, char *argv[]) {
   t2 = uts_wctime();
   et = t2 - t1;
   showStats(et);
-  }
+  } ; {
+    int __i;
+    assert(omp_get_max_threads() <= 32);
+    for (__i = 0; __i < omp_get_max_threads(); __i++) {
+        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+    }
+}
+
 /********** End Parallel Region **********/
 
   return 0;
