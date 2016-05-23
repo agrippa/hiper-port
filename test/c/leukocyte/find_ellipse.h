@@ -16,7 +16,6 @@
 #define TOP 110
 #define BOTTOM 328
 
-extern int omp_num_threads;
 extern long long get_time();
 
 extern MAT * get_frame(avi_t *cell_file, int frame_num, int cropped, int scaled);

@@ -3,8 +3,6 @@ int ____num_tasks[32] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 #include "find_ellipse.h"
 #include "track_ellipse.h"
 
-int omp_num_threads = 1;
-
 int main(int argc, char ** argv) {
 
 	// Keep track of the start time of the program
@@ -20,9 +18,8 @@ int main(int argc, char ** argv) {
 	
 	if (argc > 1){
 		num_frames = atoi(argv[1]);
-		omp_num_threads = atoi(argv[2]);
+		int omp_num_threads = atoi(argv[2]);
 		}
-	printf("Num of threads: %d\n", omp_num_threads);
 	// Open video file
 	char *video_file_name;
 	video_file_name = argv[3];
