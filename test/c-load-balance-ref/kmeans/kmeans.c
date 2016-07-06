@@ -84,7 +84,7 @@ int ____num_tasks[32] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 extern double wtime(void);
 
-int num_omp_threads = 12;
+int num_omp_threads = 24;
 
 /*---< usage() >------------------------------------------------------------*/
 void usage(char *argv0) {
