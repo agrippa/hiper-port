@@ -497,6 +497,12 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture) {
     std::stringstream ss;
+
+    if (isForasyncClosure) {
+        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
+        ss << "class " << closureName << ";\n";
+        ss << "#else\n";
+    }
     ss << "static ";
     if (isFuture) {
         ss << "void *";
@@ -513,6 +519,10 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
         assert(forasyncDim == -1);
     }
     ss << ");\n";
+
+    if (isForasyncClosure) {
+        ss << "#endif\n";
+    }
     return ss.str();
 }
 
@@ -546,6 +556,17 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
+    if (isForasyncClosure) {
+        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
+        ss << "class " << closureName << " {\n";
+        ss << "    private:\n";
+        ss << "\n";
+        ss << "    public:\n";
+        ss << "        __host__ __device__ void operator()(int idx) {\n";
+        ss << "        }\n";
+        ss << "};\n\n";
+        ss << "#else\n";
+    }
     ss << "\nstatic ";
     if (isFuture) {
         ss << "void *";
@@ -699,6 +720,10 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     ss << "}\n\n";
+    if (isForasyncClosure) {
+        ss << "#endif\n\n";
+    }
+
     return ss.str();
 }
 
@@ -1098,6 +1123,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops, false);
 
+                        std::vector<std::string> accumulated_low;
+                        std::vector<std::string> accumulated_high;
+                        std::vector<std::string> accumulated_stride;
+                        std::vector<const clang::ValueDecl *> accumulated_cond;
+
                         std::stringstream loopConfiguration;
                         loopConfiguration << "hclib_loop_domain_t domain[" <<
                             nLoops << "];\n";
@@ -1117,6 +1147,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     cond, condVar);
                             std::string strideStr = getStrideFromIncr(inc,
                                     condVar);
+
+                            accumulated_low.push_back(lowStr);
+                            accumulated_high.push_back(highStr);
+                            accumulated_stride.push_back(strideStr);
+                            accumulated_cond.push_back(condVar);
 
                             clauses->addClauseArg("private",
                                     condVar->getNameAsString());
@@ -1154,11 +1189,26 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 node->getLbl(), node->getCaptures(),
                                 bodyStr, false, clauses, canLaunchTasks(forLoop), false, &condVars);
 
+                        // For now only support offload of 1D parallel loops
+                        if (nLoops == 1 && accumulated_stride.at(0) == "1") {
+                            contextCreation << "#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
+                            contextCreation << "hclib::future_t *fut = " <<
+                                "hclib::forasync_cuda((" <<
+                                accumulated_high.at(0) << ") - (" <<
+                                accumulated_low.at(0) << "), " <<
+                                node->getLbl() << ASYNC_SUFFIX <<
+                                "(), hclib::get_closest_gpu_locale(), NULL);\n";
+                            contextCreation << "fut->wait();\n";
+                            contextCreation << "#else\n";
+                        }
                         contextCreation << "hclib_future_t *fut = " <<
                             "hclib_forasync_future((void *)" <<
                             node->getLbl() << ASYNC_SUFFIX << ", new_ctx, " <<
                             nLoops << ", domain, HCLIB_FORASYNC_MODE);\n";
                         contextCreation << "hclib_future_wait(fut);\n";
+                        if (nLoops == 1) {
+                            contextCreation << "#endif\n";
+                        }
                         contextCreation << "free(new_ctx);\n";
 
                         for (std::vector<OMPReductionVar>::iterator i =

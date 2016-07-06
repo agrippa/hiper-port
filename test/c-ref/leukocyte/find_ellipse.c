@@ -103,7 +103,12 @@ typedef struct _pragma119_omp_parallel {
     MAT (*(*grad_y_ptr));
  } pragma119_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma119_omp_parallel_hclib_async;
+#else
 static void pragma119_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
@@ -153,13 +158,30 @@ domain[0].low = MaxR;
 domain[0].high = width - MaxR;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((width - MaxR) - (MaxR), pragma119_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma119_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 	
 	return gicov;
 } 
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma119_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma119_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma119_omp_parallel *ctx = (pragma119_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -211,6 +233,8 @@ static void pragma119_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
+
 
 
 
@@ -243,7 +267,12 @@ typedef struct _pragma194_omp_parallel {
     MAT (*(*strel_ptr));
  } pragma194_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma194_omp_parallel_hclib_async;
+#else
 static void pragma194_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 MAT * dilate_f(MAT * img_in, MAT * strel) {
 	MAT * dilated = m_get(img_in->m, img_in->n);
 	
@@ -264,13 +293,30 @@ domain[0].low = 0;
 domain[0].high = img_in->m;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((img_in->m) - (0), pragma194_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma194_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 
 	return dilated;
 } 
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma194_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma194_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma194_omp_parallel *ctx = (pragma194_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -301,6 +347,8 @@ static void pragma194_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ; hclib_end_finish_nonblocking();
 
 }
+
+#endif
 
 
 

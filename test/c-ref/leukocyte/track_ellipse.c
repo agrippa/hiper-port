@@ -32,7 +32,12 @@ typedef struct _pragma90_omp_parallel {
     int (*Nf_ptr);
  } pragma90_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma90_omp_parallel_hclib_async;
+#else
 static void pragma90_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np, int Nf) {
 	/*
 	% ELLIPSETRACK tracks cells in the movie specified by 'video', at
@@ -142,8 +147,13 @@ domain[0].low = 0;
 domain[0].high = Nc;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nc) - (0), pragma90_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma90_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 
@@ -181,6 +191,18 @@ free(new_ctx);
 	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
 	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
 } 
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma90_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma90_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma90_omp_parallel *ctx = (pragma90_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -272,6 +294,8 @@ static void pragma90_omp_parallel_hclib_async(void *____arg, const int ___iter0)
     ; hclib_end_finish_nonblocking();
 
 }
+
+#endif
 
 
 

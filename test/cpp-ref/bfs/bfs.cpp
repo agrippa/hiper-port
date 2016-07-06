@@ -85,8 +85,18 @@ typedef struct _pragma150_omp_parallel {
     char (*(*(*argv_ptr)));
  } pragma150_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma133_omp_parallel_hclib_async;
+#else
 static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma150_omp_parallel_hclib_async;
+#else
 static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 typedef struct _main_entrypoint_ctx {
     int no_of_nodes;
     int edge_list_size;
@@ -162,8 +172,13 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma133_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma133_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 
@@ -193,8 +208,13 @@ domain[0].low = 0;
 domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma150_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma150_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
             k++;
@@ -319,6 +339,18 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free( h_cost);
 
 }  
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma133_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma133_omp_parallel *ctx = (pragma133_omp_parallel *)____arg;
     Node (*h_graph_nodes); h_graph_nodes = ctx->h_graph_nodes;
@@ -345,6 +377,20 @@ static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0
             } ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma150_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma150_omp_parallel *ctx = (pragma150_omp_parallel *)____arg;
@@ -362,6 +408,8 @@ static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0
                 }
             } ;     } while (0);
 }
+
+#endif
 
 
 

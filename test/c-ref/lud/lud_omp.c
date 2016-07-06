@@ -54,8 +54,18 @@ typedef struct _pragma110_omp_parallel {
     int size;
  } pragma110_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma58_omp_parallel_hclib_async;
+#else
 static void pragma58_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma110_omp_parallel_hclib_async;
+#else
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 typedef struct _main_entrypoint_ctx {
     float (*a);
     int size;
@@ -93,8 +103,13 @@ domain[0].low = 0;
 domain[0].high = chunks_in_inter_row;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((chunks_in_inter_row) - (0), pragma58_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma58_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
         
@@ -115,8 +130,13 @@ domain[0].low = 0;
 domain[0].high = chunks_per_inter;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((chunks_per_inter) - (0), pragma110_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma110_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
     }
@@ -134,6 +154,18 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma58_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma58_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma58_omp_parallel *ctx = (pragma58_omp_parallel *)____arg;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
@@ -188,6 +220,20 @@ for (j =0; j < BS; j++){
         } ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma110_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma110_omp_parallel *ctx = (pragma110_omp_parallel *)____arg;
@@ -226,5 +272,7 @@ for (j = 0; j < BS; j++) {
             }
         } ;     } while (0);
 }
+
+#endif
 
 

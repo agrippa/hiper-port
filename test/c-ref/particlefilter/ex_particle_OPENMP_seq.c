@@ -723,16 +723,66 @@ typedef struct _pragma495_omp_parallel {
     int (*Nparticles_ptr);
  } pragma495_omp_parallel;
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma380_omp_parallel_hclib_async;
+#else
 static void pragma380_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma395_omp_parallel_hclib_async;
+#else
 static void pragma395_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma409_omp_parallel_hclib_async;
+#else
 static void pragma409_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma417_omp_parallel_hclib_async;
+#else
 static void pragma417_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma440_omp_parallel_hclib_async;
+#else
 static void pragma440_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma447_omp_parallel_hclib_async;
+#else
 static void pragma447_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma453_omp_parallel_hclib_async;
+#else
 static void pragma453_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma462_omp_parallel_hclib_async;
+#else
 static void pragma462_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma487_omp_parallel_hclib_async;
+#else
 static void pragma487_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+class pragma495_omp_parallel_hclib_async;
+#else
 static void pragma495_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+#endif
 void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
 	
 	int max_size = IszX*IszY*Nfr;
@@ -787,8 +837,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma380_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma380_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 	long long get_weights = get_time();
@@ -837,8 +892,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma395_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma395_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 	int k;
@@ -889,8 +949,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma409_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma409_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long error = get_time();
@@ -936,8 +1001,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma417_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma417_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long likelihood_time = get_time();
@@ -985,8 +1055,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma440_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma440_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long exponential = get_time();
@@ -1038,8 +1113,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma447_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma447_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
 sumWeights = new_ctx->sumWeights;
  } 
@@ -1089,8 +1169,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma453_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma453_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long normalize = get_time();
@@ -1147,8 +1232,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma462_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma462_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
 xe = new_ctx->xe;
 ye = new_ctx->ye;
@@ -1222,8 +1312,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma487_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma487_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long u_time = get_time();
@@ -1282,8 +1377,13 @@ domain[0].low = 0;
 domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma495_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+fut->wait();
+#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma495_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
+#endif
 free(new_ctx);
  } 
 		long long xyj_time = get_time();
@@ -1311,6 +1411,18 @@ free(new_ctx);
 	free(u);
 	free(ind);
 } 
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma380_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
+
 static void pragma380_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma380_omp_parallel *ctx = (pragma380_omp_parallel *)____arg;
     int x; x = ctx->x;
@@ -1321,6 +1433,20 @@ static void pragma380_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma395_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma395_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma395_omp_parallel *ctx = (pragma395_omp_parallel *)____arg;
@@ -1333,6 +1459,20 @@ static void pragma395_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma409_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma409_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma409_omp_parallel *ctx = (pragma409_omp_parallel *)____arg;
@@ -1348,6 +1488,20 @@ static void pragma409_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma417_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma417_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma417_omp_parallel *ctx = (pragma417_omp_parallel *)____arg;
@@ -1380,6 +1534,20 @@ static void pragma417_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma440_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma440_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma440_omp_parallel *ctx = (pragma440_omp_parallel *)____arg;
@@ -1394,6 +1562,20 @@ static void pragma440_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma447_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma447_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma447_omp_parallel *ctx = (pragma447_omp_parallel *)____arg;
@@ -1411,6 +1593,20 @@ static void pragma447_omp_parallel_hclib_async(void *____arg, const int ___iter0
     assert(unlock_err == 0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma453_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma453_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma453_omp_parallel *ctx = (pragma453_omp_parallel *)____arg;
@@ -1422,6 +1618,20 @@ static void pragma453_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		} ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma462_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma462_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma462_omp_parallel *ctx = (pragma462_omp_parallel *)____arg;
@@ -1442,6 +1652,20 @@ static void pragma462_omp_parallel_hclib_async(void *____arg, const int ___iter0
     assert(unlock_err == 0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma487_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma487_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma487_omp_parallel *ctx = (pragma487_omp_parallel *)____arg;
@@ -1453,6 +1677,20 @@ static void pragma487_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		} ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
+class pragma495_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
+#else
 
 static void pragma495_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma495_omp_parallel *ctx = (pragma495_omp_parallel *)____arg;
@@ -1472,6 +1710,8 @@ static void pragma495_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ; hclib_end_finish_nonblocking();
 
 }
+
+#endif
 
 
 typedef struct _main_entrypoint_ctx {
