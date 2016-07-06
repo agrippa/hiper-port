@@ -2,18 +2,17 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
-#include "hclib_openshmem.h"
 #endif
 #include "shmem.h"
 #include <assert.h>
 
 int main(int argc, char **argv) {
-    ;
-    int MyRank = hclib::pe_for_locale(hclib::shmem_my_pe());
-    int Numprocs = hclib::shmem_n_pes ();
+    shmem_init();
+    int MyRank = shmem_my_pe ();
+    int Numprocs = shmem_n_pes ();
     printf("rank = %d size = %d\n", MyRank, Numprocs);
 
-    int *shared_arr = (int *)hclib::shmem_malloc(10 * sizeof(int));
+    int *shared_arr = (int *)shmem_malloc(10 * sizeof(int));
     assert(shared_arr);
 
     int i;
@@ -21,6 +20,6 @@ int main(int argc, char **argv) {
         shared_arr[i] = 3;
     }
 
-    ;
+    shmem_finalize();
     return 0;
 }

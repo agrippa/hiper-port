@@ -854,7 +854,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", captures,
                         generatedClauses);
                 std::string launchStr = contextSetup +
-                    "hclib_launch(main_entrypoint, new_ctx);\n";
+                    "const char *deps[] = { \"system\" };\n" +
+                    "hclib_launch(main_entrypoint, new_ctx, deps, 1);\n";
 
                 bool failed = rewriter->ReplaceText(
                         clang::SourceRange(node->getStartLoc(),

@@ -251,7 +251,7 @@ static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0
 		double speed_of_sound = compute_speed_of_sound(density, pressure);
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
-		(*(ctx->step_factors_ptr))[i] = double(0.5) / (std::sqrt((*(ctx->areas_ptr))[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
+		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
 	} ;     } while (0);
     ; hclib_end_finish_nonblocking();
 
@@ -360,7 +360,7 @@ static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0
 													compute_flux_contribution(density_nb, momentum_nb, density_energy_nb, pressure_nb, velocity_nb, flux_contribution_nb_momentum_x, flux_contribution_nb_momentum_y, flux_contribution_nb_momentum_z, flux_contribution_nb_density_energy);
 
 				// artificial viscosity
-				factor = -normal_len*(*(ctx->smoothing_coefficient_ptr))*double(0.5)*(speed_i + std::sqrt(speed_sqd_nb) + speed_of_sound_i + speed_of_sound_nb);
+				factor = -normal_len*smoothing_coefficient*double(0.5)*(speed_i + std::sqrt(speed_sqd_nb) + speed_of_sound_i + speed_of_sound_nb);
 				flux_i_density += factor*(density_i-density_nb);
 				flux_i_density_energy += factor*(density_energy_i-density_energy_nb);
 				flux_i_momentum.x += factor*(momentum_i.x-momentum_nb.x);
@@ -627,7 +627,8 @@ main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypo
 new_ctx->data_file_name = data_file_name;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
-hclib_launch(main_entrypoint, new_ctx);
+const char *deps[] = { "system" };
+hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 
 	std::cout << "Done..." << std::endl;

@@ -2,7 +2,6 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
-#include "hclib_openshmem.h"
 #endif
 /*
  *         ---- The Unbalanced Tree Search (UTS) Benchmark ----
@@ -73,19 +72,19 @@ static int pe, npes;
 static int steal_from(int target_pe, Node *stolen_out) {
     int remote_buffered_steals;
 
-    hclib::shmem_set_lock(&steal_buffer_locks[target_pe]);
+    shmem_set_lock(&steal_buffer_locks[target_pe]);
     shmem_int_get(&remote_buffered_steals, &n_buffered_steals, 1, target_pe);
 
     int stole_something = 0;
     if (remote_buffered_steals > 0) {
         remote_buffered_steals--;
-        hclib::shmem_getmem(stolen_out, &steal_buffer[remote_buffered_steals],
+        shmem_getmem(stolen_out, &steal_buffer[remote_buffered_steals],
                 sizeof(Node), target_pe);
         shmem_int_put(&n_buffered_steals, &remote_buffered_steals, 1, target_pe);
         stole_something = 1;
     }
 
-    hclib::shmem_clear_lock(&steal_buffer_locks[target_pe]);
+    shmem_clear_lock(&steal_buffer_locks[target_pe]);
     return stole_something;
 }
 
@@ -94,14 +93,14 @@ static int remote_steal(Node *stolen_out) {
     int pe_below = pe - 1;
     if (pe_below < 0) pe_below = npes - 1;
 
-    hclib::shmem_int_add(&complete_pes, 1, 0);
+    shmem_int_add(&complete_pes, 1, 0);
 
-    int ndone = hclib::shmem_int_fadd(&complete_pes, 0, 0);
+    int ndone = shmem_int_fadd(&complete_pes, 0, 0);
     while (ndone != npes) {
         // Try to remote steal
 
         if (steal_from(pe_above, stolen_out) || steal_from(pe_below, stolen_out)) {
-            hclib::shmem_int_add(&complete_pes, -1, 0);
+            shmem_int_add(&complete_pes, -1, 0);
             return 1;
         }
 
@@ -109,7 +108,7 @@ static int remote_steal(Node *stolen_out) {
         pe_below = pe_below - 1;
         if (pe_below < 0) pe_below = npes - 1;
 
-        ndone = hclib::shmem_int_fadd(&complete_pes, 0, 0);
+        ndone = shmem_int_fadd(&complete_pes, 0, 0);
     }
 
     assert(ndone == npes);
@@ -577,12 +576,12 @@ __sync_fetch_and_add(&(n_nodes), 1); ;
       int made_available_for_stealing = 0;
       // if (omp_get_thread_num() == 0 && n_buffered_steals < N_BUFFERED_STEALS) {
       if (hclib_get_current_worker() == 0 && n_buffered_steals < N_BUFFERED_STEALS) {
-          hclib::shmem_set_lock(&steal_buffer_locks[pe]);
+          shmem_set_lock(&steal_buffer_locks[pe]);
           if (n_buffered_steals < N_BUFFERED_STEALS) {
               steal_buffer[n_buffered_steals++] = parent;
               made_available_for_stealing = 1;
           }
-          hclib::shmem_clear_lock(&steal_buffer_locks[pe]);
+          shmem_clear_lock(&steal_buffer_locks[pe]);
       }
       if (!made_available_for_stealing) {
  { 
@@ -768,10 +767,10 @@ static void main_entrypoint(void *____arg) {
     char (*(*argv)); argv = ctx->argv;
 {
 
-  ;
+  shmem_init();
 
-  pe = hclib::pe_for_locale(hclib::shmem_my_pe());
-  npes = hclib::shmem_n_pes();
+  pe = shmem_my_pe();
+  npes = shmem_n_pes();
 
   /* determine benchmark parameters (all PEs) */
   uts_parseParams(argc, argv);
@@ -791,7 +790,7 @@ static void main_entrypoint(void *____arg) {
 
   initRootNode(&root, type);
 
-  hclib::shmem_barrier_all();
+  shmem_barrier_all();
 
   /* time parallel search */
   t1 = uts_wctime();
@@ -810,11 +809,11 @@ hclib_future_wait(fut);
  } 
 
   if (pe != 0) {
-      hclib::shmem_int_add(&n_nodes, n_nodes, 0);
-      hclib::shmem_int_add(&n_leaves, n_leaves, 0);
+      shmem_int_add(&n_nodes, n_nodes, 0);
+      shmem_int_add(&n_leaves, n_leaves, 0);
   }
 
-  hclib::shmem_barrier_all();
+  shmem_barrier_all();
 
   t2 = uts_wctime();
   et = t2 - t1;
@@ -850,10 +849,11 @@ main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypo
 new_ctx->root = root;
 new_ctx->argc = argc;
 new_ctx->argv = argv;
-hclib_launch(main_entrypoint, new_ctx);
+const char *deps[] = { "system" };
+hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 
-  ;
+  shmem_finalize();
   return 0;
 }  
 static void *pragma790_omp_master_hclib_async(void *____arg) {
@@ -878,14 +878,14 @@ retry:
  hclib_end_finish(); hclib_start_finish(); ;
 
           if (n_buffered_steals > 0) {
-              hclib::shmem_set_lock(&steal_buffer_locks[pe]);
+              shmem_set_lock(&steal_buffer_locks[pe]);
               if (n_buffered_steals > 0) {
                   n_buffered_steals--;
                   memcpy(&(*(ctx->root_ptr)), &steal_buffer[n_buffered_steals], sizeof((*(ctx->root_ptr))));
-                  hclib::shmem_clear_lock(&steal_buffer_locks[pe]);
+                  shmem_clear_lock(&steal_buffer_locks[pe]);
                   goto retry;
               } else {
-                  hclib::shmem_clear_lock(&steal_buffer_locks[pe]);
+                  shmem_clear_lock(&steal_buffer_locks[pe]);
               }
           }
 

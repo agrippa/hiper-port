@@ -163,8 +163,8 @@ done
 
 N_PRAGMA_MARKERS=$(cat $PREV | grep "extern void hclib_pragma_marker" | wc -l)
 if [[ $N_PRAGMA_MARKERS -ne 1 ]]; then
-    echo Unexpected number of leftover pragma markers, should only be the \
-        top-level declaration
+    echo Unexpected number of leftover pragma markers \($N_PRAGMA_MARKERS\) in \
+        $PREV, should only be the top-level declaration
     exit 1
 fi
 

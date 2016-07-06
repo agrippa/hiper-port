@@ -78,13 +78,13 @@ private:
 template <class c> class NumDebugFrontendAction : public ASTFrontendAction {
 public:
   NumDebugFrontendAction() {
-#ifdef OLD_LLVM
-      std::string code;
-      out = new llvm::raw_fd_ostream(outputFile.c_str(), code,
-              llvm::sys::fs::OpenFlags::F_None);
-#else
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR == 8
       std::error_code EC;
       out = new llvm::raw_fd_ostream(outputFile.c_str(), EC,
+              llvm::sys::fs::OpenFlags::F_None);
+#else
+      std::string code;
+      out = new llvm::raw_fd_ostream(outputFile.c_str(), code,
               llvm::sys::fs::OpenFlags::F_None);
 #endif
   }
@@ -95,19 +95,19 @@ public:
     out->close();
   }
 
-#ifdef OLD_LLVM
-  clang::ASTConsumer *CreateASTConsumer(
-#else
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR == 8
   std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+#else
+  clang::ASTConsumer *CreateASTConsumer(
 #endif
       CompilerInstance &CI, StringRef file) override {
     rewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
     clang::ASTConsumer *result = new TransformASTConsumer(rewriter,
         CI.getASTContext());
-#ifdef OLD_LLVM
-    return result;
-#else
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR == 8
     return std::unique_ptr<clang::ASTConsumer>(result);
+#else
+    return result;
 #endif
   }
 
