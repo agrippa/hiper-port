@@ -477,6 +477,37 @@ class pragma474_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int si) {
+            {
+     n = seqlen_array[si+1];
+     for (i = 1, len1 = 0; i <= n; i++) {
+        char c = seq_array[si+1][i];
+        if ((c != gap_pos1) && (c != gap_pos2)) len1++;
+     }
+     for (sj = si + 1; sj < nseqs; sj++) 
+     {
+        m = seqlen_array[sj+1];
+        if ( n == 0 || m == 0 ) {
+           bench_output[si*nseqs+sj] = (int) 1.0;
+        } else {
+ { 
+pragma471_omp_task *new_ctx = (pragma471_omp_task *)malloc(sizeof(pragma471_omp_task));
+new_ctx->i = i;
+new_ctx->n = n;
+new_ctx->m = m;
+new_ctx->si = si;
+new_ctx->sj = sj;
+new_ctx->len1 = len1;
+new_ctx->len2 = *(ctx->len2_ptr);
+new_ctx->maxres_ptr = ctx->maxres_ptr;
+new_ctx->gg = *(ctx->gg_ptr);
+new_ctx->mm_score = *(ctx->mm_score_ptr);
+new_ctx->mat_xref_ptr = ctx->mat_xref_ptr;
+new_ctx->matptr_ptr = ctx->matptr_ptr;
+hclib_async(pragma471_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+ }  // end task
+        } // end if (n == 0 || m == 0)
+     } // for (j)
+  }
         }
 };
 

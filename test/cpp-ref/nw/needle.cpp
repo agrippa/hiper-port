@@ -128,6 +128,50 @@ class pragma110_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int b_index_x) {
+            {
+            int b_index_y = blk - 1 - b_index_x;
+            int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
+            int reference_l[BLOCK_SIZE * BLOCK_SIZE] __attribute__ ((aligned (64)));
+
+            // Copy referrence to local memory
+            for ( int i = 0; i < BLOCK_SIZE; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE; ++j)
+                {
+                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
+                }
+            }
+
+            // Copy input_itemsets to local memory
+            for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
+                {
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
+                }
+            }
+
+            // Compute
+            for ( int i = 1; i < BLOCK_SIZE + 1; ++i )
+            {
+                for ( int j = 1; j < BLOCK_SIZE + 1; ++j)
+                {
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = maximum( input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j - 1] + reference_l[(i - 1)*BLOCK_SIZE + j - 1],
+                            input_itemsets_l[i*(BLOCK_SIZE + 1) + j - 1] - penalty,
+                            input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j] - penalty);
+                }
+            }
+
+            // Copy results to global memory
+            for ( int i = 0; i < BLOCK_SIZE; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE; ++j)
+                {
+                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j + 1];
+                }
+            }
+            
+        }
         }
 };
 
@@ -142,6 +186,50 @@ class pragma162_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int b_index_x) {
+            {
+            int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
+
+            int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
+            int reference_l[BLOCK_SIZE * BLOCK_SIZE] __attribute__ ((aligned (64)));
+ 
+            // Copy referrence to local memory
+            for ( int i = 0; i < BLOCK_SIZE; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE; ++j)
+                {
+                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
+                }
+            }
+
+            // Copy input_itemsets to local memory
+            for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
+                {
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
+                }
+            }
+
+            // Compute
+            for ( int i = 1; i < BLOCK_SIZE + 1; ++i )
+            {
+                for ( int j = 1; j < BLOCK_SIZE + 1; ++j)
+                {
+                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = maximum( input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j - 1] + reference_l[(i - 1)*BLOCK_SIZE + j - 1],
+                            input_itemsets_l[i*(BLOCK_SIZE + 1) + j - 1] - penalty,
+                            input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j] - penalty);
+                }
+            }
+
+            // Copy results to global memory
+            for ( int i = 0; i < BLOCK_SIZE; ++i )
+            {
+for ( int j = 0; j < BLOCK_SIZE; ++j)
+                {
+                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
+                }
+            }
+        }
         }
 };
 

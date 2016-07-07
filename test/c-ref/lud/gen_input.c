@@ -47,6 +47,20 @@ class pragma76_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+        for (j=0; j < MatrixDim; j++){
+            if ( i == j) {
+                L[i][j] = 1.0;
+                U[i][j] = GET_RAND_FP;
+            } else if (i < j){
+                L[i][j] = 0;
+                U[i][j] = GET_RAND_FP;
+            } else { // i > j
+                L[i][j] = GET_RAND_FP;
+                U[i][j] = 0;
+            }
+        }
+    }
         }
 };
 
@@ -61,6 +75,14 @@ class pragma92_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+        for (j=0; j < MatrixDim; j++){
+            sum = 0;
+            for(k=0; k < MatrixDim; k++)
+                sum += L[i][k]*U[k][j];
+            A[i][j] = sum;
+        }
+    }
         }
 };
 

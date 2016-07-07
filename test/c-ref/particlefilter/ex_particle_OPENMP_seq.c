@@ -734,6 +734,9 @@ class pragma383_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+		weights[x] = 1/((double)(Nparticles));
+	}
         }
 };
 
@@ -748,6 +751,10 @@ class pragma398_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+		arrayX[x] = xe;
+		arrayY[x] = ye;
+	}
         }
 };
 
@@ -762,6 +769,10 @@ class pragma412_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			arrayX[x] += 1 + 5*randn(seed, x);
+			arrayY[x] += -2 + 2*randn(seed, x);
+		}
         }
 };
 
@@ -776,6 +787,24 @@ class pragma420_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			//compute the likelihood: remember our assumption is that you know
+			// foreground and the background image intensity distribution.
+			// Notice that we consider here a likelihood ratio, instead of
+			// p(z|x). It is possible in this case. why? a hometask for you.		
+			//calc ind
+			for(y = 0; y < countOnes; y++){
+				indX = roundDouble(arrayX[x]) + objxy[y*2 + 1];
+				indY = roundDouble(arrayY[x]) + objxy[y*2];
+				ind[x*countOnes + y] = fabs(indX*IszY*Nfr + indY*Nfr + k);
+				if(ind[x*countOnes + y] >= max_size)
+					ind[x*countOnes + y] = 0;
+			}
+			likelihood[x] = 0;
+			for(y = 0; y < countOnes; y++)
+				likelihood[x] += (pow((I[ind[x*countOnes + y]] - 100),2) - pow((I[ind[x*countOnes + y]]-228),2))/50.0;
+			likelihood[x] = likelihood[x]/((double) countOnes);
+		}
         }
 };
 
@@ -790,6 +819,9 @@ class pragma443_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			weights[x] = weights[x] * exp(likelihood[x]);
+		}
         }
 };
 
@@ -804,6 +836,9 @@ class pragma450_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			sumWeights += weights[x];
+		}
         }
 };
 
@@ -818,6 +853,9 @@ class pragma456_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			weights[x] = weights[x]/sumWeights;
+		}
         }
 };
 
@@ -832,6 +870,10 @@ class pragma465_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			xe += arrayX[x] * weights[x];
+			ye += arrayY[x] * weights[x];
+		}
         }
 };
 
@@ -846,6 +888,9 @@ class pragma490_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int x) {
+            {
+			u[x] = u1 + x/((double)(Nparticles));
+		}
         }
 };
 
@@ -860,6 +905,14 @@ class pragma498_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int j) {
+            {
+			i = findIndex(CDF, Nparticles, u[j]);
+			if(i == -1)
+				i = Nparticles-1;
+			xj[j] = arrayX[i];
+			yj[j] = arrayY[i];
+			
+		}
         }
 };
 

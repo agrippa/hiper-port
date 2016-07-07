@@ -122,6 +122,10 @@ class pragma556_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+			kernel(	public_s,
+						private_s[i]);
+		}
         }
 };
 

@@ -65,6 +65,51 @@ class pragma61_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int chunk_idx) {
+            {
+            int i, j, k, i_global, j_global, i_here, j_here;
+            float sum;           
+            float temp[BS*BS] __attribute__ ((aligned (64)));
+
+            for (i = 0; i < BS; i++) {
+for (j =0; j < BS; j++){
+                    temp[i*BS + j] = a[size*(i + offset) + offset + j ];
+                }
+            }
+            i_global = offset;
+            j_global = offset;
+            
+            // processing top perimeter
+            //
+            j_global += BS * (chunk_idx+1);
+            for (j = 0; j < BS; j++) {
+                for (i = 0; i < BS; i++) {
+                    sum = 0.f;
+                    for (k=0; k < i; k++) {
+                        sum += temp[BS*i +k] * BB((i_global+k),(j_global+j));
+                    }
+                    i_here = i_global + i;
+                    j_here = j_global + j;
+                    BB(i_here, j_here) = BB(i_here,j_here) - sum;
+                }
+            }
+
+            // processing left perimeter
+            //
+            j_global = offset;
+            i_global += BS * (chunk_idx + 1);
+            for (i = 0; i < BS; i++) {
+                for (j = 0; j < BS; j++) {
+                    sum = 0.f;
+                    for (k=0; k < j; k++) {
+                        sum += BB((i_global+i),(j_global+k)) * temp[BS*k + j];
+                    }
+                    i_here = i_global + i;
+                    j_here = j_global + j;
+                    a[size*i_here + j_here] = ( a[size*i_here+j_here] - sum ) / a[size*(offset+j) + offset+j];
+                }
+            }
+
+        }
         }
 };
 
@@ -79,6 +124,35 @@ class pragma113_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int chunk_idx) {
+            {
+            int i, j, k, i_global, j_global;
+            float temp_top[BS*BS] __attribute__ ((aligned (64)));
+            float temp_left[BS*BS] __attribute__ ((aligned (64)));
+            float sum[BS] __attribute__ ((aligned (64))) = {0.f};
+            
+            i_global = offset + BS * (1 +  chunk_idx/chunks_in_inter_row);
+            j_global = offset + BS * (1 + chunk_idx%chunks_in_inter_row);
+
+            for (i = 0; i < BS; i++) {
+for (j =0; j < BS; j++){
+                    temp_top[i*BS + j]  = a[size*(i + offset) + j + j_global ];
+                    temp_left[i*BS + j] = a[size*(i + i_global) + offset + j];
+                }
+            }
+
+            for (i = 0; i < BS; i++)
+            {
+                for (k=0; k < BS; k++) {
+for (j = 0; j < BS; j++) {
+                        sum[j] += temp_left[BS*i + k] * temp_top[BS*k + j];
+                    }
+                }
+for (j = 0; j < BS; j++) {
+                    BB((i+i_global),(j+j_global)) -= sum[j];
+                    sum[j] = 0.f;
+                }
+            }
+        }
         }
 };
 

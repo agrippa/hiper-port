@@ -496,7 +496,7 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
-        bool isAcceleratable, std::string iterator) {
+        bool isAcceleratable, std::string iterator, std::string body) {
     std::stringstream ss;
 
     if (isAcceleratable) {
@@ -506,6 +506,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
         ss << "\n";
         ss << "    public:\n";
         ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
+        ss << "            " << body << "\n";
         ss << "        }\n";
         ss << "};\n\n";
         ss << "#else\n";
@@ -1129,6 +1130,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         loopConfiguration << "hclib_loop_domain_t domain[" <<
                             nLoops << "];\n";
                         const clang::ForStmt *currLoop = forLoop;
+                        std::string originalBodyStr;
                         for (int l = 0; l < nLoops; l++) {
                             const clang::Stmt *init = currLoop->getInit();
                             const clang::Stmt *cond = currLoop->getCond();
@@ -1153,6 +1155,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             clauses->addClauseArg("private",
                                     condVar->getNameAsString());
 
+                            originalBodyStr = stmtToString(currLoop->getBody());
                             bodyStr = stmtToStringWithSharedVars(
                                     currLoop->getBody(),
                                     clauses->getSharedVarInfo(node->getCaptures()));
@@ -1175,7 +1178,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
-                                false, isAcceleratable, accumulated_cond.at(0)->getNameAsString());
+                                false, isAcceleratable, accumulated_cond.at(0)->getNameAsString(), originalBodyStr);
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<

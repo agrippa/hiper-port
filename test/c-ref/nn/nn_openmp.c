@@ -68,6 +68,12 @@ class pragma127_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
+            float tmp_lat = atof(rec_iter);
+            float tmp_long = atof(rec_iter+5);
+			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
+        }
         }
 };
 

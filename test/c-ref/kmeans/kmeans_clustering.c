@@ -153,6 +153,25 @@ class pragma193_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+	        /* find the index of nestest cluster centers */					
+            int tid = hclib_get_current_worker();				
+	        index = find_nearest_point(feature[i],
+		             nfeatures,
+		             clusters,
+		             nclusters);				
+	        /* if membership changes, increase delta by 1 */
+	        if (membership[i] != index) delta += 1.0;
+
+	        /* assign the membership to object i */
+	        membership[i] = index;
+				
+	        /* update new cluster centers : sum of all objects located
+		       within */
+	        partial_new_centers_len[tid][index]++;				
+	        for (j=0; j<nfeatures; j++)
+		       partial_new_centers[tid][index][j] += feature[i][j];
+            }
         }
 };
 

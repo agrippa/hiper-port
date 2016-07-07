@@ -142,6 +142,38 @@ class pragma135_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+            for (int j = 0; j < cols; j++) { 
+		
+				k = i * cols + j;
+				Jc = J[k];
+ 
+				// directional derivates
+                dN[k] = J[iN[i] * cols + j] - Jc;
+                dS[k] = J[iS[i] * cols + j] - Jc;
+                dW[k] = J[i * cols + jW[j]] - Jc;
+                dE[k] = J[i * cols + jE[j]] - Jc;
+			
+                G2 = (dN[k]*dN[k] + dS[k]*dS[k] 
+                    + dW[k]*dW[k] + dE[k]*dE[k]) / (Jc*Jc);
+
+   		        L = (dN[k] + dS[k] + dW[k] + dE[k]) / Jc;
+
+				num  = (0.5*G2) - ((1.0/16.0)*(L*L)) ;
+                den  = 1 + (.25*L);
+                qsqr = num/(den*den);
+ 
+                // diffusion coefficent (equ 33)
+                den = (qsqr-q0sqr) / (q0sqr * (1+q0sqr)) ;
+                c[k] = 1.0 / (1.0+den) ;
+                
+                // saturate diffusion coefficent
+                if (c[k] < 0) {c[k] = 0;}
+                else if (c[k] > 1) {c[k] = 1;}
+   
+		}
+  
+    }
         }
 };
 
@@ -156,6 +188,31 @@ class pragma168_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+            for (int j = 0; j < cols; j++) {        
+
+                // current index
+                k = i * cols + j;
+                
+                // diffusion coefficent
+					cN = c[k];
+					cS = c[iS[i] * cols + j];
+					cW = c[k];
+					cE = c[i * cols + jE[j]];
+
+                // divergence (equ 58)
+                D = cN * dN[k] + cS * dS[k] + cW * dW[k] + cE * dE[k];
+                
+                // image update (equ 61)
+                J[k] = J[k] + 0.25*lambda*D;
+                #ifdef OUTPUT
+                //printf("%.5f ", J[k]); 
+                #endif //output
+            }
+	            #ifdef OUTPUT
+                //printf("\n"); 
+                #endif //output
+	     }
         }
 };
 

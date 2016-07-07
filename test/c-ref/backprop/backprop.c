@@ -250,6 +250,15 @@ class pragma242_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int j) {
+            {
+
+    /*** Compute weighted sum of its inputs ***/
+    sum = 0.0;
+    for (k = 0; k <= n1; k++) {	
+      sum += conn[k][j] * l1[k]; 
+    }
+    l2[j] = squash(sum);
+  }
         }
 };
 
@@ -385,6 +394,13 @@ class pragma304_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int j) {
+            {
+    for (k = 0; k <= nly; k++) {
+      new_dw = ((ETA * delta[j] * ly[k]) + (MOMENTUM * oldw[k][j]));
+	  w[k][j] += new_dw;
+	  oldw[k][j] = new_dw;
+    }
+  }
         }
 };
 

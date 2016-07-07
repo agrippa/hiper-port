@@ -96,6 +96,20 @@ class pragma136_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int tid) {
+            {
+                if (h_graph_mask[tid] == true){ 
+                    h_graph_mask[tid]=false;
+                    for(int i=h_graph_nodes[tid].starting; i<(h_graph_nodes[tid].no_of_edges + h_graph_nodes[tid].starting); i++)
+                    {
+                        int id = h_graph_edges[i];
+                        if(!h_graph_visited[id])
+                        {
+                            h_cost[id]=h_cost[tid]+1;
+                            h_updating_graph_mask[id]=true;
+                        }
+                    }
+                }
+            }
         }
 };
 
@@ -110,6 +124,14 @@ class pragma153_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int tid) {
+            {
+                if (h_updating_graph_mask[tid] == true){
+                    h_graph_mask[tid]=true;
+                    h_graph_visited[tid]=true;
+                    stop=true;
+                    h_updating_graph_mask[tid]=false;
+                }
+            }
         }
 };
 

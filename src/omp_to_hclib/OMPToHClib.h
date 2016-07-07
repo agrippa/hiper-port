@@ -52,7 +52,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         std::string getClosureDecl(std::string closureName,
                 bool isForasyncClosure, int forasyncDim,
-                bool isFuture, bool isAcceleratable, std::string iterator = "");
+                bool isFuture, bool isAcceleratable, std::string iterator = "", std::string body = "");
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName,

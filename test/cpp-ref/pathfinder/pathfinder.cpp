@@ -106,6 +106,16 @@ class pragma111_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int n) {
+            {
+          min = src[n];
+          if (n > 0) {
+              min = src[n - 1] < min ? src[n - 1] : min;
+          }
+          if (n < cols-1) {
+              min = src[n + 1] < min ? src[n + 1] : min;
+          }
+          dst[n] = wall[t+1][n]+min;
+        }
         }
 };
 

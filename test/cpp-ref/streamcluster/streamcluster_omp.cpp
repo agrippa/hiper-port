@@ -369,6 +369,31 @@ class pragma399_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+    float x_cost = dist(points->p[i], points->p[x], points->dim) 
+      * points->p[i].weight;
+    float current_cost = points->p[i].cost;
+		
+    if ( x_cost < current_cost ) {
+
+      // point i would save cost just by switching to x
+      // (note that i cannot be a median, 
+      // or else dist(p[i], p[x]) would be 0)			
+      switch_membership[i] = 1;
+      cost_of_opening_x += x_cost - current_cost;			
+    } else {
+
+      // cost of assigning i to x is at least current assignment cost of i
+
+      // consider the savings that i's **current** median would realize
+      // if we reassigned that median and all its members to x;
+      // note we've already accounted for the fact that the median
+      // would save z by closing; now we have to subtract from the savings
+      // the extra cost of reassigning that median and its members 
+      int assign = points->p[i].assign;
+      lower[center_table[assign]] += current_cost - x_cost;			
+    }
+  }
         }
 };
 
@@ -383,6 +408,16 @@ class pragma475_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int i) {
+            {
+      bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
+      if ( switch_membership[i] || close_center ) {
+				// Either i's median (which may be i itself) is closing,
+				// or i is closer to x than to its current median
+				points->p[i].cost = points->p[i].weight *
+					dist(points->p[i], points->p[x], points->dim);
+				points->p[i].assign = x;
+      }
+    }
         }
 };
 

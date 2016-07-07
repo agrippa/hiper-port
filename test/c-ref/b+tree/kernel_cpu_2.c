@@ -77,6 +77,60 @@ class pragma103_omp_parallel_hclib_async {
 
     public:
         __host__ __device__ void operator()(int bid) {
+            {
+
+		// process levels of the tree
+		for(i = 0; i < maxheight; i++){
+
+			// process all leaves at each level
+			for(thid = 0; thid < threadsPerBlock; thid++){
+
+				if((knodes[currKnode[bid]].keys[thid] <= start[bid]) && (knodes[currKnode[bid]].keys[thid+1] > start[bid])){
+					// this conditional statement is inserted to avoid crush due to but in original code
+					// "offset[bid]" calculated below that later addresses part of knodes goes outside of its bounds cause segmentation fault
+					// more specifically, values saved into knodes->indices in the main function are out of bounds of knodes that they address
+					if(knodes[currKnode[bid]].indices[thid] < knodes_elem){
+						offset[bid] = knodes[currKnode[bid]].indices[thid];
+					}
+				}
+				if((knodes[lastKnode[bid]].keys[thid] <= end[bid]) && (knodes[lastKnode[bid]].keys[thid+1] > end[bid])){
+					// this conditional statement is inserted to avoid crush due to but in original code
+					// "offset_2[bid]" calculated below that later addresses part of knodes goes outside of its bounds cause segmentation fault
+					// more specifically, values saved into knodes->indices in the main function are out of bounds of knodes that they address
+					if(knodes[lastKnode[bid]].indices[thid] < knodes_elem){
+						offset_2[bid] = knodes[lastKnode[bid]].indices[thid];
+					}
+				}
+
+			}
+
+			// set for next tree level
+			currKnode[bid] = offset[bid];
+			lastKnode[bid] = offset_2[bid];
+
+		}
+
+		// process leaves
+		for(thid = 0; thid < threadsPerBlock; thid++){
+
+			// Find the index of the starting record
+			if(knodes[currKnode[bid]].keys[thid] == start[bid]){
+				recstart[bid] = knodes[currKnode[bid]].indices[thid];
+			}
+
+		}
+
+		// process leaves
+		for(thid = 0; thid < threadsPerBlock; thid++){
+
+			// Find the index of the ending record
+			if(knodes[lastKnode[bid]].keys[thid] == end[bid]){
+				reclength[bid] = knodes[lastKnode[bid]].indices[thid] - recstart[bid]+1;
+			}
+
+		}
+
+	}
         }
 };
 
