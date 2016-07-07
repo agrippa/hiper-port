@@ -2,6 +2,9 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 /**
  *
@@ -30,7 +33,7 @@
 /***************************************************************************//**
  *  Parallel tile QR factorization - dynamic scheduling
  **/
-typedef struct _pragma51_omp_task {
+typedef struct _pragma54_omp_task {
     double (*(*dA_ptr));
     double (*(*dT_ptr));
     int (*k_ptr);
@@ -45,9 +48,9 @@ typedef struct _pragma51_omp_task {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma51_omp_task;
+ } pragma54_omp_task;
 
-typedef struct _pragma63_omp_task {
+typedef struct _pragma66_omp_task {
     double (*(*dA_ptr));
     double (*(*dT_ptr));
     double (*(*dC_ptr));
@@ -63,9 +66,9 @@ typedef struct _pragma63_omp_task {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma63_omp_task;
+ } pragma66_omp_task;
 
-typedef struct _pragma80_omp_task {
+typedef struct _pragma83_omp_task {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dT_ptr));
@@ -81,9 +84,9 @@ typedef struct _pragma80_omp_task {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma80_omp_task;
+ } pragma83_omp_task;
 
-typedef struct _pragma96_omp_task {
+typedef struct _pragma99_omp_task {
     double (*(*dA_ptr));
     double (*(*dB_ptr));
     double (*(*dV_ptr));
@@ -100,12 +103,12 @@ typedef struct _pragma96_omp_task {
     PLASMA_desc (*A_ptr);
     PLASMA_desc (*T_ptr);
     int (*ib_ptr);
- } pragma96_omp_task;
+ } pragma99_omp_task;
 
-static void *pragma51_omp_task_hclib_async(void *____arg);
-static void *pragma63_omp_task_hclib_async(void *____arg);
-static void *pragma80_omp_task_hclib_async(void *____arg);
-static void *pragma96_omp_task_hclib_async(void *____arg);
+static void *pragma54_omp_task_hclib_async(void *____arg);
+static void *pragma66_omp_task_hclib_async(void *____arg);
+static void *pragma83_omp_task_hclib_async(void *____arg);
+static void *pragma99_omp_task_hclib_async(void *____arg);
 void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 {
 
@@ -123,7 +126,7 @@ void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 omp_set_task_priority(1);
 #endif
  { 
-pragma51_omp_task *new_ctx = (pragma51_omp_task *)malloc(sizeof(pragma51_omp_task));
+pragma54_omp_task *new_ctx = (pragma54_omp_task *)malloc(sizeof(pragma54_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dT_ptr = &(dT);
 new_ctx->k_ptr = &(k);
@@ -138,7 +141,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma51_omp_task_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
+hclib_emulate_omp_task(pragma54_omp_task_hclib_async, new_ctx, ANY_PLACE, 1, 2, (dA) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
  } 
 
         for (n = k+1; n < A.nt; n++) {
@@ -147,7 +150,7 @@ hclib_emulate_omp_task(pragma51_omp_task_hclib_async, new_ctx, ANY_PLACE, 1, 2, 
             double *dT = T(k, k);
             double *dC = A(k, n);
  { 
-pragma63_omp_task *new_ctx = (pragma63_omp_task *)malloc(sizeof(pragma63_omp_task));
+pragma66_omp_task *new_ctx = (pragma66_omp_task *)malloc(sizeof(pragma66_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dT_ptr = &(dT);
 new_ctx->dC_ptr = &(dC);
@@ -163,7 +166,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma63_omp_task_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dC) + (0), T.nb*T.nb, (dC) + (0), T.nb*T.nb);
+hclib_emulate_omp_task(pragma66_omp_task_hclib_async, new_ctx, ANY_PLACE, 3, 1, (dA) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dC) + (0), T.nb*T.nb, (dC) + (0), T.nb*T.nb);
  } 
         }
         for (m = k+1; m < A.mt; m++) {
@@ -173,7 +176,7 @@ hclib_emulate_omp_task(pragma63_omp_task_hclib_async, new_ctx, ANY_PLACE, 3, 1, 
             double *dB = A(m, k);
             double *dT = T(m, k);
  { 
-pragma80_omp_task *new_ctx = (pragma80_omp_task *)malloc(sizeof(pragma80_omp_task));
+pragma83_omp_task *new_ctx = (pragma83_omp_task *)malloc(sizeof(pragma83_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dT_ptr = &(dT);
@@ -189,7 +192,7 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma80_omp_task_hclib_async, new_ctx, ANY_PLACE, 2, 3, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
+hclib_emulate_omp_task(pragma83_omp_task_hclib_async, new_ctx, ANY_PLACE, 2, 3, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb);
  } 
 
             for (n = k+1; n < A.nt; n++) {
@@ -199,7 +202,7 @@ hclib_emulate_omp_task(pragma80_omp_task_hclib_async, new_ctx, ANY_PLACE, 2, 3, 
                 double *dV = A(m, k);
                 double *dT = T(m, k);
  { 
-pragma96_omp_task *new_ctx = (pragma96_omp_task *)malloc(sizeof(pragma96_omp_task));
+pragma99_omp_task *new_ctx = (pragma99_omp_task *)malloc(sizeof(pragma99_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->dB_ptr = &(dB);
 new_ctx->dV_ptr = &(dV);
@@ -216,14 +219,14 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->A_ptr = &(A);
 new_ctx->T_ptr = &(T);
 new_ctx->ib_ptr = &(ib);
-hclib_emulate_omp_task(pragma96_omp_task_hclib_async, new_ctx, ANY_PLACE, 4, 2, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dV) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb);
+hclib_emulate_omp_task(pragma99_omp_task_hclib_async, new_ctx, ANY_PLACE, 4, 2, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb, (dV) + (0), T.nb*T.nb, (dT) + (0), ib*T.nb, (dA) + (0), T.nb*T.nb, (dB) + (0), T.nb*T.nb);
  } 
             }
         }
     }
 } 
-static void *pragma51_omp_task_hclib_async(void *____arg) {
-    pragma51_omp_task *ctx = (pragma51_omp_task *)____arg;
+static void *pragma54_omp_task_hclib_async(void *____arg) {
+    pragma54_omp_task *ctx = (pragma54_omp_task *)____arg;
     hclib_start_finish();
 {
             double tau[(*(ctx->T_ptr)).nb];
@@ -236,8 +239,8 @@ static void *pragma51_omp_task_hclib_async(void *____arg) {
 }
 
 
-static void *pragma63_omp_task_hclib_async(void *____arg) {
-    pragma63_omp_task *ctx = (pragma63_omp_task *)____arg;
+static void *pragma66_omp_task_hclib_async(void *____arg) {
+    pragma66_omp_task *ctx = (pragma66_omp_task *)____arg;
     hclib_start_finish();
 {
                 double work[(*(ctx->T_ptr)).nb * (*(ctx->ib_ptr))];
@@ -254,8 +257,8 @@ static void *pragma63_omp_task_hclib_async(void *____arg) {
 }
 
 
-static void *pragma80_omp_task_hclib_async(void *____arg) {
-    pragma80_omp_task *ctx = (pragma80_omp_task *)____arg;
+static void *pragma83_omp_task_hclib_async(void *____arg) {
+    pragma83_omp_task *ctx = (pragma83_omp_task *)____arg;
     hclib_start_finish();
 {
                 double tau[(*(ctx->T_ptr)).nb];
@@ -271,8 +274,8 @@ static void *pragma80_omp_task_hclib_async(void *____arg) {
 }
 
 
-static void *pragma96_omp_task_hclib_async(void *____arg) {
-    pragma96_omp_task *ctx = (pragma96_omp_task *)____arg;
+static void *pragma99_omp_task_hclib_async(void *____arg) {
+    pragma99_omp_task *ctx = (pragma99_omp_task *)____arg;
     hclib_start_finish();
 {
                     double work[(*(ctx->ib_ptr)) * (*(ctx->T_ptr)).nb];

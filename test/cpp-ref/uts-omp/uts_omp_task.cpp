@@ -2,6 +2,9 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 /*
  *         ---- The Unbalanced Tree Search (UTS) Benchmark ----
@@ -473,7 +476,7 @@ void initRootNode(Node * root, int type)
  * details depend on tree type, node type and shape function
  *
  */
-typedef struct _pragma521_omp_task {
+typedef struct _pragma524_omp_task {
     Node parent;
     int (*i_ptr);
     int (*j_ptr);
@@ -483,9 +486,9 @@ typedef struct _pragma521_omp_task {
     int (*numChildren_ptr);
     int (*childType_ptr);
     Node (*(*child_ptr));
- } pragma521_omp_task;
+ } pragma524_omp_task;
 
-static void pragma521_omp_task_hclib_async(void *____arg);
+static void pragma524_omp_task_hclib_async(void *____arg);
 void genChildren(Node * parent, Node * child) {
   int parentHeight = parent->height;
   int numChildren, childType;
@@ -529,7 +532,7 @@ __sync_fetch_and_add(&(n_nodes), 1); ;
       Node parent = *child;
 
  { 
-pragma521_omp_task *new_ctx = (pragma521_omp_task *)malloc(sizeof(pragma521_omp_task));
+pragma524_omp_task *new_ctx = (pragma524_omp_task *)malloc(sizeof(pragma524_omp_task));
 new_ctx->parent = parent;
 new_ctx->i_ptr = &(i);
 new_ctx->j_ptr = &(j);
@@ -540,9 +543,9 @@ new_ctx->numChildren_ptr = &(numChildren);
 new_ctx->childType_ptr = &(childType);
 new_ctx->child_ptr = &(child);
 if (!(parent.height < 9)) {
-    pragma521_omp_task_hclib_async(new_ctx);
+    pragma524_omp_task_hclib_async(new_ctx);
 } else {
-hclib_async(pragma521_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma524_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 }
  } 
     }
@@ -550,8 +553,8 @@ hclib_async(pragma521_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 __sync_fetch_and_add(&(n_leaves), 1); ;
   }
 } 
-static void pragma521_omp_task_hclib_async(void *____arg) {
-    pragma521_omp_task *ctx = (pragma521_omp_task *)____arg;
+static void pragma524_omp_task_hclib_async(void *____arg) {
+    pragma524_omp_task *ctx = (pragma524_omp_task *)____arg;
     Node parent; parent = ctx->parent;
     hclib_start_finish();
 {

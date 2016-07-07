@@ -113,6 +113,9 @@ echo '#ifdef __cplusplus' >> $WITH_HEADER
 echo '#include "hclib_cpp.h"' >> $WITH_HEADER
 echo '#include "hclib_system.h"' >> $WITH_HEADER
 echo '#include "hclib_openshmem.h"' >> $WITH_HEADER
+echo '#ifdef __CUDACC__' >> $WITH_HEADER
+echo '#include "hclib_cuda.h"' >> $WITH_HEADER
+echo '#endif' >> $WITH_HEADER
 echo '#endif' >> $WITH_HEADER
 echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_HEADER
 cat $INPUT_PATH >> $WITH_HEADER

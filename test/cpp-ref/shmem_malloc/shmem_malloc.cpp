@@ -3,6 +3,9 @@
 #include "hclib_cpp.h"
 #include "hclib_system.h"
 #include "hclib_openshmem.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 #include "shmem.h"
 #include <assert.h>

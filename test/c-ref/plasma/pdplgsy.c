@@ -2,6 +2,9 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 /**
  *
@@ -27,7 +30,7 @@
 /***************************************************************************//**
  *  Parallel tile Cholesky factorization - dynamic scheduling
  **/
-typedef struct _pragma48_omp_task {
+typedef struct _pragma51_omp_task {
     double (*(*dA_ptr));
     int (*m_ptr);
     int (*n_ptr);
@@ -37,9 +40,9 @@ typedef struct _pragma48_omp_task {
     double (*bump_ptr);
     PLASMA_desc (*A_ptr);
     unsigned long long (*seed_ptr);
- } pragma48_omp_task;
+ } pragma51_omp_task;
 
-static void *pragma48_omp_task_hclib_async(void *____arg);
+static void *pragma51_omp_task_hclib_async(void *____arg);
 void plasma_pdplgsy_quark( double bump, PLASMA_desc A, unsigned long long int seed)
 {
     int m, n;
@@ -57,7 +60,7 @@ void plasma_pdplgsy_quark( double bump, PLASMA_desc A, unsigned long long int se
 omp_set_task_affinity( (n%4)*6+(m%6) );
 #endif
  { 
-pragma48_omp_task *new_ctx = (pragma48_omp_task *)malloc(sizeof(pragma48_omp_task));
+pragma51_omp_task *new_ctx = (pragma51_omp_task *)malloc(sizeof(pragma51_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->m_ptr = &(m);
 new_ctx->n_ptr = &(n);
@@ -67,13 +70,13 @@ new_ctx->tempnn_ptr = &(tempnn);
 new_ctx->bump_ptr = &(bump);
 new_ctx->A_ptr = &(A);
 new_ctx->seed_ptr = &(seed);
-hclib_emulate_omp_task(pragma48_omp_task_hclib_async, new_ctx, ANY_PLACE, 0, 1, (dA) + (0), ldam*tempnn);
+hclib_emulate_omp_task(pragma51_omp_task_hclib_async, new_ctx, ANY_PLACE, 0, 1, (dA) + (0), ldam*tempnn);
  } ;
         }
     }
 } 
-static void *pragma48_omp_task_hclib_async(void *____arg) {
-    pragma48_omp_task *ctx = (pragma48_omp_task *)____arg;
+static void *pragma51_omp_task_hclib_async(void *____arg) {
+    pragma51_omp_task *ctx = (pragma51_omp_task *)____arg;
     hclib_start_finish();
 CORE_dplgsy( (*(ctx->bump_ptr)), (*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)), (*(ctx->A_ptr)).m, (*(ctx->m_ptr))*(*(ctx->A_ptr)).mb, (*(ctx->n_ptr))*(*(ctx->A_ptr)).nb, (*(ctx->seed_ptr)) ) ;     ; hclib_end_finish_nonblocking();
 

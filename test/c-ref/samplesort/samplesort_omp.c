@@ -3,6 +3,9 @@
 #include "hclib_cpp.h"
 #include "hclib_system.h"
 #include "hclib_openshmem.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 #include "shmem.h"
 
@@ -116,7 +119,7 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
-typedef struct _pragma137_omp_task {
+typedef struct _pragma140_omp_task {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
@@ -124,9 +127,9 @@ typedef struct _pragma137_omp_task {
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
- } pragma137_omp_task;
+ } pragma140_omp_task;
 
-typedef struct _pragma147_omp_task {
+typedef struct _pragma150_omp_task {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
     sort_data_t (*(*in_ptr));
@@ -134,10 +137,10 @@ typedef struct _pragma147_omp_task {
     int (*left_ptr);
     int (*right_ptr);
     void (*(*arg_ptr));
- } pragma147_omp_task;
+ } pragma150_omp_task;
 
-static void pragma137_omp_task_hclib_async(void *____arg);
-static void pragma147_omp_task_hclib_async(void *____arg);
+static void pragma140_omp_task_hclib_async(void *____arg);
+static void pragma150_omp_task_hclib_async(void *____arg);
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
@@ -153,7 +156,7 @@ hclib_start_finish(); {
           buf->left = left;
           buf->right = index - 1; 
  { 
-pragma137_omp_task *new_ctx = (pragma137_omp_task *)malloc(sizeof(pragma137_omp_task));
+pragma140_omp_task *new_ctx = (pragma140_omp_task *)malloc(sizeof(pragma140_omp_task));
 new_ctx->buf_ptr = &(buf);
 new_ctx->index_ptr = &(index);
 new_ctx->in_ptr = &(in);
@@ -161,7 +164,7 @@ new_ctx->data_ptr = &(data);
 new_ctx->left_ptr = &(left);
 new_ctx->right_ptr = &(right);
 new_ctx->arg_ptr = &(arg);
-hclib_async(pragma137_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma140_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         if (index < right) {
@@ -170,7 +173,7 @@ hclib_async(pragma137_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
           buf->left = index;
           buf->right = right; 
  { 
-pragma147_omp_task *new_ctx = (pragma147_omp_task *)malloc(sizeof(pragma147_omp_task));
+pragma150_omp_task *new_ctx = (pragma150_omp_task *)malloc(sizeof(pragma150_omp_task));
 new_ctx->buf_ptr = &(buf);
 new_ctx->index_ptr = &(index);
 new_ctx->in_ptr = &(in);
@@ -178,7 +181,7 @@ new_ctx->data_ptr = &(data);
 new_ctx->left_ptr = &(left);
 new_ctx->right_ptr = &(right);
 new_ctx->arg_ptr = &(arg);
-hclib_async(pragma147_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma150_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
         } ; hclib_end_finish(); 
@@ -189,8 +192,8 @@ hclib_async(pragma147_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   }
   free(arg);
 } 
-static void pragma137_omp_task_hclib_async(void *____arg) {
-    pragma137_omp_task *ctx = (pragma137_omp_task *)____arg;
+static void pragma140_omp_task_hclib_async(void *____arg) {
+    pragma140_omp_task *ctx = (pragma140_omp_task *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));
@@ -200,8 +203,8 @@ static void pragma137_omp_task_hclib_async(void *____arg) {
 }
 
 
-static void pragma147_omp_task_hclib_async(void *____arg) {
-    pragma147_omp_task *ctx = (pragma147_omp_task *)____arg;
+static void pragma150_omp_task_hclib_async(void *____arg) {
+    pragma150_omp_task *ctx = (pragma150_omp_task *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));

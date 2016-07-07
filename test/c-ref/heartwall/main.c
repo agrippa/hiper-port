@@ -2,6 +2,9 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 //===============================================================================================================================================================================================================
 //===============================================================================================================================================================================================================
@@ -99,7 +102,7 @@ void write_data(	char* filename,
 //===============================================================================================================================================================================================================
 //===============================================================================================================================================================================================================
 
-typedef struct _pragma554_omp_parallel {
+typedef struct _pragma557_omp_parallel {
     int i;
     int (*frames_processed_ptr);
     public_struct (*public_ptr);
@@ -109,13 +112,21 @@ typedef struct _pragma554_omp_parallel {
     int (*omp_num_threads_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma554_omp_parallel;
+ } pragma557_omp_parallel;
 
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-class pragma554_omp_parallel_hclib_async;
+
+class pragma557_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
 #else
-static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma557_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 typedef struct _main_entrypoint_ctx {
     int i;
@@ -159,7 +170,7 @@ for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
 	//====================================================================================================
 
  { 
-pragma554_omp_parallel *new_ctx = (pragma554_omp_parallel *)malloc(sizeof(pragma554_omp_parallel));
+pragma557_omp_parallel *new_ctx = (pragma557_omp_parallel *)malloc(sizeof(pragma557_omp_parallel));
 new_ctx->i = i;
 new_ctx->frames_processed_ptr = &(frames_processed);
 new_ctx->public_ptr = &(public);
@@ -175,10 +186,10 @@ domain[0].high = public.allPoints;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((public.allPoints) - (0), pragma554_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((public.allPoints) - (0), pragma557_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma554_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma557_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -722,20 +733,8 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
     return 0;
 }  
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma554_omp_parallel_hclib_async {
-    private:
-
-    public:
-        __host__ __device__ void operator()(int idx) {
-        }
-};
-
-#else
-
-static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma554_omp_parallel *ctx = (pragma554_omp_parallel *)____arg;
+static void pragma557_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma557_omp_parallel *ctx = (pragma557_omp_parallel *)____arg;
     int i; i = ctx->i;
     hclib_start_finish();
     do {
@@ -747,8 +746,6 @@ static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0
     ; hclib_end_finish_nonblocking();
 
 }
-
-#endif
 
 
 

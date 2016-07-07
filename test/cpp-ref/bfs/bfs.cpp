@@ -2,6 +2,9 @@
 #ifdef __cplusplus
 #include "hclib_cpp.h"
 #include "hclib_system.h"
+#ifdef __CUDACC__
+#include "hclib_cuda.h"
+#endif
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +44,7 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 //Apply BFS on a Graph using CUDA
 ////////////////////////////////////////////////////////////////////////////////
-typedef struct _pragma133_omp_parallel {
+typedef struct _pragma136_omp_parallel {
     int (*k_ptr);
     bool (*stop_ptr);
     int (*no_of_nodes_ptr);
@@ -61,9 +64,9 @@ typedef struct _pragma133_omp_parallel {
     int (*h_cost);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma133_omp_parallel;
+ } pragma136_omp_parallel;
 
-typedef struct _pragma150_omp_parallel {
+typedef struct _pragma153_omp_parallel {
     int (*k_ptr);
     bool (*stop_ptr);
     int (*no_of_nodes_ptr);
@@ -83,19 +86,35 @@ typedef struct _pragma150_omp_parallel {
     int (*(*h_cost_ptr));
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma150_omp_parallel;
+ } pragma153_omp_parallel;
 
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-class pragma133_omp_parallel_hclib_async;
+
+class pragma136_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
 #else
-static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-class pragma150_omp_parallel_hclib_async;
+
+class pragma153_omp_parallel_hclib_async {
+    private:
+
+    public:
+        __host__ __device__ void operator()(int idx) {
+        }
+};
+
 #else
-static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma153_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 typedef struct _main_entrypoint_ctx {
     int no_of_nodes;
@@ -147,7 +166,7 @@ static void main_entrypoint(void *____arg) {
 
             //omp_set_num_threads(num_omp_threads);
  { 
-pragma133_omp_parallel *new_ctx = (pragma133_omp_parallel *)malloc(sizeof(pragma133_omp_parallel));
+pragma136_omp_parallel *new_ctx = (pragma136_omp_parallel *)malloc(sizeof(pragma136_omp_parallel));
 new_ctx->k_ptr = &(k);
 new_ctx->stop_ptr = &(stop);
 new_ctx->no_of_nodes_ptr = &(no_of_nodes);
@@ -173,17 +192,17 @@ domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma133_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma136_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma133_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma136_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
  } 
 
  { 
-pragma150_omp_parallel *new_ctx = (pragma150_omp_parallel *)malloc(sizeof(pragma150_omp_parallel));
+pragma153_omp_parallel *new_ctx = (pragma153_omp_parallel *)malloc(sizeof(pragma153_omp_parallel));
 new_ctx->k_ptr = &(k);
 new_ctx->stop_ptr = &(stop);
 new_ctx->no_of_nodes_ptr = &(no_of_nodes);
@@ -209,10 +228,10 @@ domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma150_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma153_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma150_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma153_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -339,20 +358,8 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free( h_cost);
 
 }  
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma133_omp_parallel_hclib_async {
-    private:
-
-    public:
-        __host__ __device__ void operator()(int idx) {
-        }
-};
-
-#else
-
-static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma133_omp_parallel *ctx = (pragma133_omp_parallel *)____arg;
+static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma136_omp_parallel *ctx = (pragma136_omp_parallel *)____arg;
     Node (*h_graph_nodes); h_graph_nodes = ctx->h_graph_nodes;
     bool (*h_graph_mask); h_graph_mask = ctx->h_graph_mask;
     bool (*h_updating_graph_mask); h_updating_graph_mask = ctx->h_updating_graph_mask;
@@ -377,23 +384,9 @@ static void pragma133_omp_parallel_hclib_async(void *____arg, const int ___iter0
             } ;     } while (0);
 }
 
-#endif
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma150_omp_parallel_hclib_async {
-    private:
-
-    public:
-        __host__ __device__ void operator()(int idx) {
-        }
-};
-
-#else
-
-static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma150_omp_parallel *ctx = (pragma150_omp_parallel *)____arg;
+static void pragma153_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma153_omp_parallel *ctx = (pragma153_omp_parallel *)____arg;
     bool (*h_graph_mask); h_graph_mask = ctx->h_graph_mask;
     bool (*h_updating_graph_mask); h_updating_graph_mask = ctx->h_updating_graph_mask;
     bool (*h_graph_visited); h_graph_visited = ctx->h_graph_visited;
@@ -408,8 +401,6 @@ static void pragma150_omp_parallel_hclib_async(void *____arg, const int ___iter0
                 }
             } ;     } while (0);
 }
-
-#endif
 
 
 

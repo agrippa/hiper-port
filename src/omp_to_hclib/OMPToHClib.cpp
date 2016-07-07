@@ -499,8 +499,14 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
     std::stringstream ss;
 
     if (isForasyncClosure) {
-        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
-        ss << "class " << closureName << ";\n";
+        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
+        ss << "class " << closureName << " {\n";
+        ss << "    private:\n";
+        ss << "\n";
+        ss << "    public:\n";
+        ss << "        __host__ __device__ void operator()(int idx) {\n";
+        ss << "        }\n";
+        ss << "};\n\n";
         ss << "#else\n";
     }
     ss << "static ";
@@ -556,17 +562,6 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
-    if (isForasyncClosure) {
-        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
-        ss << "class " << closureName << " {\n";
-        ss << "    private:\n";
-        ss << "\n";
-        ss << "    public:\n";
-        ss << "        __host__ __device__ void operator()(int idx) {\n";
-        ss << "        }\n";
-        ss << "};\n\n";
-        ss << "#else\n";
-    }
     ss << "\nstatic ";
     if (isFuture) {
         ss << "void *";
@@ -720,9 +715,6 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     ss << "}\n\n";
-    if (isForasyncClosure) {
-        ss << "#endif\n\n";
-    }
 
     return ss.str();
 }
