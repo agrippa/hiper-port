@@ -553,6 +553,9 @@ hclib_async(pragma524_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 __sync_fetch_and_add(&(n_leaves), 1); ;
   }
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma524_omp_task_hclib_async(void *____arg) {
     pragma524_omp_task *ctx = (pragma524_omp_task *)____arg;
     Node parent; parent = ctx->parent;
@@ -569,6 +572,7 @@ static void pragma524_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
 
 
 
@@ -736,6 +740,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     Node root; root = ctx->root;
@@ -766,6 +773,7 @@ hclib_start_finish(); {
   } ;     free(____arg);
 }
 
+#endif
 int main(int argc, char *argv[]) {
   Node root;
 

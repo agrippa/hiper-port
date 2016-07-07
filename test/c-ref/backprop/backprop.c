@@ -292,6 +292,9 @@ free(new_ctx);
 sum = new_ctx->sum;
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma242_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma242_omp_parallel *ctx = (pragma242_omp_parallel *)____arg;
     float sum; sum = ctx->sum;
@@ -318,6 +321,7 @@ static void pragma242_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
 
 
 //extern "C"
@@ -421,6 +425,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma304_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma304_omp_parallel *ctx = (pragma304_omp_parallel *)____arg;
     float new_dw; new_dw = ctx->new_dw;
@@ -439,6 +446,7 @@ static void pragma304_omp_parallel_hclib_async(void *____arg, const int ___iter0
   } ;     } while (0);
 }
 
+#endif
 
 
 
@@ -465,6 +473,9 @@ typedef struct _main_entrypoint_ctx {
     float (*eh);
  } main_entrypoint_ctx;
 
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -501,6 +512,7 @@ static void main_entrypoint(void *____arg) {
     } ;     free(____arg);
 }
 
+#endif
 void bpnn_train(BPNN *net, float *eo, float *eh)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));

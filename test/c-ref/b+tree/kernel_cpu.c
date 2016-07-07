@@ -173,6 +173,9 @@ free(new_ctx);
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma92_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma92_omp_parallel *ctx = (pragma92_omp_parallel *)____arg;
     int thid; thid = ctx->thid;
@@ -219,6 +222,7 @@ static void pragma92_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 	} ;     } while (0);
 }
 
+#endif
 
 
 //========================================================================================================================================================================================================200

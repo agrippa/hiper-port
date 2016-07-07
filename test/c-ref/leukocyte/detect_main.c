@@ -48,6 +48,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     long long program_start_time; program_start_time = ctx->program_start_time;
@@ -304,6 +307,7 @@ static void main_entrypoint(void *____arg) {
     } ;     free(____arg);
 }
 
+#endif
 int main(int argc, char ** argv) {
 
 	// Keep track of the start time of the program

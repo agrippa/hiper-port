@@ -151,6 +151,9 @@ free(new_ctx);
  } ;
     }
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma29_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma29_omp_parallel *ctx = (pragma29_omp_parallel *)____arg;
     int it; it = ctx->it;
@@ -165,6 +168,10 @@ copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma34_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma34_omp_parallel *ctx = (pragma34_omp_parallel *)____arg;
@@ -181,4 +188,5 @@ compute_estimate(block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx
 
 }
 
+#endif
 

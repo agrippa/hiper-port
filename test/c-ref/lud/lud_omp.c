@@ -91,6 +91,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     float (*a); a = ctx->a;
@@ -164,6 +167,7 @@ free(new_ctx);
     } ;     free(____arg);
 }
 
+#endif
 void lud_omp(float *a, int size)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
@@ -173,6 +177,9 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma61_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma61_omp_parallel *ctx = (pragma61_omp_parallel *)____arg;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
@@ -227,6 +234,10 @@ for (j =0; j < BS; j++){
         } ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma113_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma113_omp_parallel *ctx = (pragma113_omp_parallel *)____arg;
@@ -266,4 +277,5 @@ for (j = 0; j < BS; j++) {
         } ;     } while (0);
 }
 
+#endif
 

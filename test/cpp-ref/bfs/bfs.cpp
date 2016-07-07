@@ -137,6 +137,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
@@ -242,6 +245,7 @@ free(new_ctx);
     } ;     free(____arg);
 }
 
+#endif
 void BFSGraph( int argc, char** argv) 
 {
         int no_of_nodes = 0;
@@ -358,6 +362,9 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free( h_cost);
 
 }  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma136_omp_parallel *ctx = (pragma136_omp_parallel *)____arg;
     Node (*h_graph_nodes); h_graph_nodes = ctx->h_graph_nodes;
@@ -384,6 +391,10 @@ static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0
             } ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma153_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma153_omp_parallel *ctx = (pragma153_omp_parallel *)____arg;
@@ -402,5 +413,6 @@ static void pragma153_omp_parallel_hclib_async(void *____arg, const int ___iter0
             } ;     } while (0);
 }
 
+#endif
 
 

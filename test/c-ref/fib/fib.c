@@ -81,6 +81,9 @@ hclib_async(pragma56_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
 	return x + y;
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma54_omp_task_hclib_async(void *____arg) {
     pragma54_omp_task *ctx = (pragma54_omp_task *)____arg;
     int n; n = ctx->n;
@@ -90,6 +93,10 @@ static void pragma54_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma56_omp_task_hclib_async(void *____arg) {
     pragma56_omp_task *ctx = (pragma56_omp_task *)____arg;
@@ -100,6 +107,7 @@ static void pragma56_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
 
 
 
@@ -109,6 +117,9 @@ typedef struct _main_entrypoint_ctx {
     int n;
  } main_entrypoint_ctx;
 
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -120,6 +131,7 @@ hclib_start_finish(); {
     } ;     free(____arg);
 }
 
+#endif
 void fib0 (int n)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));

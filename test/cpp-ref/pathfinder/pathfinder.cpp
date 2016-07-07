@@ -123,6 +123,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     unsigned long long cycles; cycles = ctx->cycles;
@@ -163,6 +166,7 @@ free(new_ctx);
     } ;     free(____arg);
 }
 
+#endif
 void run(int argc, char** argv)
 {
     init(argc, argv);
@@ -206,6 +210,9 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
     delete [] dst;
     delete [] src;
 }  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma111_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma111_omp_parallel *ctx = (pragma111_omp_parallel *)____arg;
     int min; min = ctx->min;
@@ -223,5 +230,6 @@ static void pragma111_omp_parallel_hclib_async(void *____arg, const int ___iter0
         } ;     } while (0);
 }
 
+#endif
 
 

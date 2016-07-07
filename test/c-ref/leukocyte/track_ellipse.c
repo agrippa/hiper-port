@@ -202,6 +202,9 @@ free(new_ctx);
 	printf("MGVF computation: %.5f seconds\n", ((float) (MGVF_time)) / (float) (1000*1000*Nf));
 	printf(" Snake evolution: %.5f seconds\n", ((float) (snake_time)) / (float) (1000*1000*Nf));
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma93_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma93_omp_parallel *ctx = (pragma93_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -294,6 +297,7 @@ static void pragma93_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 
 }
 
+#endif
 
 
 

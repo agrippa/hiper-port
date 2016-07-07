@@ -211,6 +211,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int rows; rows = ctx->rows;
@@ -398,6 +401,7 @@ free(new_ctx);
 	} ;     free(____arg);
 }
 
+#endif
 int main(int argc, char* argv[])
 {   
 	int rows, cols, size_I, size_R, niter = 10, iter, k;
@@ -547,6 +551,9 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free(c);
 	return 0;
 }  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma135_omp_parallel *ctx = (pragma135_omp_parallel *)____arg;
     int k; k = ctx->k;
@@ -594,6 +601,10 @@ static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0
     } ;     } while (0);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma168_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma168_omp_parallel *ctx = (pragma168_omp_parallel *)____arg;
@@ -634,6 +645,7 @@ static void pragma168_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	     } ;     } while (0);
 }
 
+#endif
 
 
 

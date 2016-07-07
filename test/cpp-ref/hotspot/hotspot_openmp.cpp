@@ -135,6 +135,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma72_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma72_omp_parallel *ctx = (pragma72_omp_parallel *)____arg;
     float delta; delta = ctx->delta;
@@ -225,6 +228,7 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
     } ;     } while (0);
 }
 
+#endif
 
 
 /* Transient solver driver routine: simply converts the heat 
@@ -357,6 +361,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int grid_rows; grid_rows = ctx->grid_rows;
@@ -375,6 +382,7 @@ static void main_entrypoint(void *____arg) {
 compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ;     free(____arg);
 }
 
+#endif
 int main(int argc, char **argv)
 {
 	int grid_rows, grid_cols, sim_time, i;

@@ -208,6 +208,9 @@ free(new_ctx);
     }
 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma110_omp_parallel *ctx = (pragma110_omp_parallel *)____arg;
     int blk; blk = ctx->blk;
@@ -265,6 +268,10 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma162_omp_parallel *ctx = (pragma162_omp_parallel *)____arg;
@@ -323,6 +330,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 
 }
 
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -342,6 +350,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int max_rows; max_rows = ctx->max_rows;
@@ -358,6 +369,7 @@ nw_optimized( input_itemsets, output_itemsets, referrence,
         max_rows, max_cols, penalty ) ;     free(____arg);
 }
 
+#endif
 void
 runTest( int argc, char** argv) 
 {

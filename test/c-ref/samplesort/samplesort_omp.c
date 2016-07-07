@@ -192,6 +192,9 @@ hclib_async(pragma150_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   }
   free(arg);
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma140_omp_task_hclib_async(void *____arg) {
     pragma140_omp_task *ctx = (pragma140_omp_task *)____arg;
     hclib_start_finish();
@@ -202,6 +205,10 @@ static void pragma140_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma150_omp_task_hclib_async(void *____arg) {
     pragma150_omp_task *ctx = (pragma150_omp_task *)____arg;
@@ -213,6 +220,7 @@ static void pragma150_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
 
 
 void sorting(TYPE* buffer, int size) {
@@ -228,6 +236,9 @@ typedef struct _main_entrypoint_ctx {
     char (*(*argv));
  } main_entrypoint_ctx;
 
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -438,6 +449,7 @@ static void main_entrypoint(void *____arg) {
   } ;     free(____arg);
 }
 
+#endif
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));

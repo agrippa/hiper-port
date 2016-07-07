@@ -1873,6 +1873,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int cur_arg; cur_arg = ctx->cur_arg;
@@ -2293,6 +2296,7 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 	} ;     free(____arg);
 }
 
+#endif
 int 
 main(	int argc, 
 		char** argv ) 

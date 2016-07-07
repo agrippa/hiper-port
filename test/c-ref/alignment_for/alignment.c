@@ -499,6 +499,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int i; i = ctx->i;
@@ -546,6 +549,7 @@ free(new_ctx);
    } ;     free(____arg);
 }
 
+#endif
 int pairalign()
 {
    int i, n, m, si, sj;
@@ -576,6 +580,9 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
    return 0;
 }  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma474_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma474_omp_parallel *ctx = (pragma474_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -622,7 +629,11 @@ hclib_async(pragma471_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 
 }
 
+#endif
  
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma471_omp_task_hclib_async(void *____arg) {
     pragma471_omp_task *ctx = (pragma471_omp_task *)____arg;
     int i; i = ctx->i;
@@ -675,6 +686,7 @@ static void pragma471_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
+#endif
 
 
 int pairalign_seq()

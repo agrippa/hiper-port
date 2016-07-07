@@ -395,6 +395,9 @@ hclib_emulate_omp_task(pragma164_omp_task_hclib_async, new_ctx, ANY_PLACE, 4, 2,
         }
     }
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void *pragma66_omp_task_hclib_async(void *____arg) {
     pragma66_omp_task *ctx = (pragma66_omp_task *)____arg;
     hclib_start_finish();
@@ -410,6 +413,10 @@ static void *pragma66_omp_task_hclib_async(void *____arg) {
     return NULL;
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma89_omp_task_hclib_async(void *____arg) {
     pragma89_omp_task *ctx = (pragma89_omp_task *)____arg;
@@ -420,6 +427,10 @@ CORE_dswptr_ontile((*(ctx->descA_ptr)), 1, (*(ctx->tempkm_ptr)), (*(ctx->dipiv_p
     return NULL;
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma100_omp_task_hclib_async(void *____arg) {
     pragma100_omp_task *ctx = (pragma100_omp_task *)____arg;
@@ -434,6 +445,10 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
     return NULL;
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma126_omp_task_hclib_async(void *____arg) {
     pragma126_omp_task *ctx = (pragma126_omp_task *)____arg;
@@ -448,6 +463,10 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
     return NULL;
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma164_omp_task_hclib_async(void *____arg) {
     pragma164_omp_task *ctx = (pragma164_omp_task *)____arg;
@@ -458,4 +477,5 @@ CORE_dlaswp_ontile((*(ctx->descA_ptr)), 1, (*(ctx->mintmp_ptr)), (*(ctx->dipiv_p
     return NULL;
 }
 
+#endif
 

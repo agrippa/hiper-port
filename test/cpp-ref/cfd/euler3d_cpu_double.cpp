@@ -98,6 +98,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma63_omp_parallel *ctx = (pragma63_omp_parallel *)____arg;
     do {
@@ -107,6 +110,7 @@ static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 	} ;     } while (0);
 }
 
+#endif
 
 
 
@@ -189,6 +193,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma112_omp_parallel *ctx = (pragma112_omp_parallel *)____arg;
     do {
@@ -198,6 +205,7 @@ static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
+#endif
 
 
 inline void compute_flux_contribution(double& density, double3& momentum, double& density_energy, double& pressure, double3& velocity, double3& fc_momentum_x, double3& fc_momentum_y, double3& fc_momentum_z, double3& fc_density_energy)
@@ -288,6 +296,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma165_omp_parallel *ctx = (pragma165_omp_parallel *)____arg;
     hclib_start_finish();
@@ -314,6 +325,7 @@ static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
 
 
 
@@ -372,6 +384,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma196_omp_parallel *ctx = (pragma196_omp_parallel *)____arg;
     hclib_start_finish();
@@ -506,6 +521,7 @@ static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
 
 
 typedef struct _pragma327_omp_parallel {
@@ -556,6 +572,9 @@ hclib_future_wait(fut);
 free(new_ctx);
  } 
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma327_omp_parallel *ctx = (pragma327_omp_parallel *)____arg;
     do {
@@ -571,6 +590,7 @@ static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
+#endif
 
 /*
  * Main function
@@ -581,6 +601,9 @@ typedef struct _main_entrypoint_ctx {
     char (*(*argv));
  } main_entrypoint_ctx;
 
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -707,6 +730,7 @@ static void main_entrypoint(void *____arg) {
     } ;     free(____arg);
 }
 
+#endif
 int main(int argc, char** argv)
 {
 	if (argc < 2)

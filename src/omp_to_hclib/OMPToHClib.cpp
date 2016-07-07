@@ -562,6 +562,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
+    ss << "\n\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
     ss << "\nstatic ";
     if (isFuture) {
         ss << "void *";
@@ -715,6 +716,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     ss << "}\n\n";
+    ss << "#endif\n";
 
     return ss.str();
 }

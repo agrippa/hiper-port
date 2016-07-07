@@ -639,6 +639,9 @@ free(new_ctx);
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
 } 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma399_omp_parallel *ctx = (pragma399_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -680,6 +683,10 @@ static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
+
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma475_omp_parallel *ctx = (pragma475_omp_parallel *)____arg;
@@ -701,6 +708,7 @@ static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
+#endif
 
 
 
@@ -852,6 +860,9 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
+
+#ifdef OMP_TO_HCLIB_ENABLE_GPU
+
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int i; i = ctx->i;
@@ -928,6 +939,7 @@ while(1) {
   } ;     free(____arg);
 }
 
+#endif
 float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 	       int pid)
 {
