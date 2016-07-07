@@ -159,7 +159,7 @@ domain[0].high = Nc;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((Nc) - (0), pragma93_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale());
+hclib::future_t *fut = hclib::forasync_cuda((Nc) - (0), pragma93_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma93_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
