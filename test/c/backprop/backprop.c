@@ -54,14 +54,14 @@ float squash(float x)
 
 float *alloc_1d_dbl(int n)
 {
-  float *new;
+  float *new_alloc;
 
-  new = (float *) malloc ((unsigned) (n * sizeof (float)));
-  if (new == NULL) {
+  new_alloc = (float *) malloc ((unsigned) (n * sizeof (float)));
+  if (new_alloc == NULL) {
     printf("ALLOC_1D_DBL: Couldn't allocate array of floats\n");
     return (NULL);
   }
-  return (new);
+  return (new_alloc);
 }
 
 
@@ -70,19 +70,19 @@ float *alloc_1d_dbl(int n)
 float **alloc_2d_dbl(int m, int n)
 {
   int i;
-  float **new;
+  float **new_alloc;
 
-  new = (float **) malloc ((unsigned) (m * sizeof (float *)));
-  if (new == NULL) {
+  new_alloc = (float **) malloc ((unsigned) (m * sizeof (float *)));
+  if (new_alloc == NULL) {
     printf("ALLOC_2D_DBL: Couldn't allocate array of dbl ptrs\n");
     return (NULL);
   }
 
   for (i = 0; i < m; i++) {
-    new[i] = alloc_1d_dbl(n);
+    new_alloc[i] = alloc_1d_dbl(n);
   }
 
-  return (new);
+  return (new_alloc);
 }
 
 
@@ -421,7 +421,7 @@ void bpnn_save(BPNN *net, char *filename)
 BPNN *bpnn_read(char *filename)
 {
   char *mem;
-  BPNN *new;
+  BPNN *new_alloc;
   int fd, n1, n2, n3, i, j, memcnt;
 
   if ((fd = open(filename, 0, 0644)) == -1) {
@@ -433,7 +433,7 @@ BPNN *bpnn_read(char *filename)
   read(fd, (char *) &n1, sizeof(int));
   read(fd, (char *) &n2, sizeof(int));
   read(fd, (char *) &n3, sizeof(int));
-  new = bpnn_internal_create(n1, n2, n3);
+  new_alloc = bpnn_internal_create(n1, n2, n3);
 
   printf("'%s' contains a %dx%dx%d network\n", filename, n1, n2, n3);
   printf("Reading input weights...");  //fflush(stdout);
@@ -443,7 +443,7 @@ BPNN *bpnn_read(char *filename)
   read(fd, mem, (n1+1) * (n2+1) * sizeof(float));
   for (i = 0; i <= n1; i++) {
     for (j = 0; j <= n2; j++) {
-      fastcopy(&(new->input_weights[i][j]), &mem[memcnt], sizeof(float));
+      fastcopy(&(new_alloc->input_weights[i][j]), &mem[memcnt], sizeof(float));
       memcnt += sizeof(float);
     }
   }
@@ -456,7 +456,7 @@ BPNN *bpnn_read(char *filename)
   read(fd, mem, (n2+1) * (n3+1) * sizeof(float));
   for (i = 0; i <= n2; i++) {
     for (j = 0; j <= n3; j++) {
-      fastcopy(&(new->hidden_weights[i][j]), &mem[memcnt], sizeof(float));
+      fastcopy(&(new_alloc->hidden_weights[i][j]), &mem[memcnt], sizeof(float));
       memcnt += sizeof(float);
     }
   }
@@ -465,8 +465,8 @@ BPNN *bpnn_read(char *filename)
 
   printf("Done\n");  //fflush(stdout);
 
-  bpnn_zero_weights(new->input_prev_weights, n1, n2);
-  bpnn_zero_weights(new->hidden_prev_weights, n2, n3);
+  bpnn_zero_weights(new_alloc->input_prev_weights, n1, n2);
+  bpnn_zero_weights(new_alloc->hidden_prev_weights, n2, n3);
 
-  return (new);
+  return (new_alloc);
 }
