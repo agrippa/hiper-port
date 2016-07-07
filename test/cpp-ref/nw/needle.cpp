@@ -209,7 +209,7 @@ free(new_ctx);
 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma110_omp_parallel *ctx = (pragma110_omp_parallel *)____arg;
@@ -271,7 +271,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma162_omp_parallel *ctx = (pragma162_omp_parallel *)____arg;

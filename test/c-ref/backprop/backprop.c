@@ -293,7 +293,7 @@ sum = new_ctx->sum;
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma242_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma242_omp_parallel *ctx = (pragma242_omp_parallel *)____arg;
@@ -426,7 +426,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma304_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma304_omp_parallel *ctx = (pragma304_omp_parallel *)____arg;

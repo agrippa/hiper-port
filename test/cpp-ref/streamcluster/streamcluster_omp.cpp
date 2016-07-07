@@ -640,7 +640,7 @@ free(new_ctx);
   return -gl_cost_of_opening_x;
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma399_omp_parallel *ctx = (pragma399_omp_parallel *)____arg;
@@ -686,7 +686,7 @@ static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma475_omp_parallel *ctx = (pragma475_omp_parallel *)____arg;

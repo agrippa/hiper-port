@@ -300,7 +300,7 @@ delta = new_ctx->delta;
     return clusters;
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma193_omp_parallel *ctx = (pragma193_omp_parallel *)____arg;

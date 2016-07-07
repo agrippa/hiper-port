@@ -1495,7 +1495,7 @@ free(new_ctx);
 	free(ind);
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma383_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma383_omp_parallel *ctx = (pragma383_omp_parallel *)____arg;
@@ -1510,7 +1510,7 @@ static void pragma383_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma398_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma398_omp_parallel *ctx = (pragma398_omp_parallel *)____arg;
@@ -1526,7 +1526,7 @@ static void pragma398_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma412_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma412_omp_parallel *ctx = (pragma412_omp_parallel *)____arg;
@@ -1545,7 +1545,7 @@ static void pragma412_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma420_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma420_omp_parallel *ctx = (pragma420_omp_parallel *)____arg;
@@ -1581,7 +1581,7 @@ static void pragma420_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma443_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma443_omp_parallel *ctx = (pragma443_omp_parallel *)____arg;
@@ -1599,7 +1599,7 @@ static void pragma443_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma450_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma450_omp_parallel *ctx = (pragma450_omp_parallel *)____arg;
@@ -1620,7 +1620,7 @@ static void pragma450_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma456_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma456_omp_parallel *ctx = (pragma456_omp_parallel *)____arg;
@@ -1635,7 +1635,7 @@ static void pragma456_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma465_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma465_omp_parallel *ctx = (pragma465_omp_parallel *)____arg;
@@ -1659,7 +1659,7 @@ static void pragma465_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma490_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma490_omp_parallel *ctx = (pragma490_omp_parallel *)____arg;
@@ -1674,7 +1674,7 @@ static void pragma490_omp_parallel_hclib_async(void *____arg, const int ___iter0
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma498_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma498_omp_parallel *ctx = (pragma498_omp_parallel *)____arg;

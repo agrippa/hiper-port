@@ -563,7 +563,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
 
     std::stringstream ss;
     if (isForasyncClosure) {
-        ss << "\n\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
+        ss << "\n\n#ifndef OMP_TO_HCLIB_ENABLE_GPU\n";
     }
     ss << "\nstatic ";
     if (isFuture) {

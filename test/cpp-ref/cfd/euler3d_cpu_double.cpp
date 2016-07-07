@@ -99,7 +99,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma63_omp_parallel *ctx = (pragma63_omp_parallel *)____arg;
@@ -194,7 +194,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma112_omp_parallel *ctx = (pragma112_omp_parallel *)____arg;
@@ -297,7 +297,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma165_omp_parallel *ctx = (pragma165_omp_parallel *)____arg;
@@ -385,7 +385,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma196_omp_parallel *ctx = (pragma196_omp_parallel *)____arg;
@@ -573,7 +573,7 @@ free(new_ctx);
  } 
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma327_omp_parallel *ctx = (pragma327_omp_parallel *)____arg;

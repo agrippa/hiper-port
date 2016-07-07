@@ -182,7 +182,7 @@ free(new_ctx);
 	return gicov;
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma122_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma122_omp_parallel *ctx = (pragma122_omp_parallel *)____arg;
@@ -315,7 +315,7 @@ free(new_ctx);
 	return dilated;
 } 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma197_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma197_omp_parallel *ctx = (pragma197_omp_parallel *)____arg;

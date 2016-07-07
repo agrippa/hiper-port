@@ -174,7 +174,7 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma61_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma61_omp_parallel *ctx = (pragma61_omp_parallel *)____arg;
@@ -233,7 +233,7 @@ for (j =0; j < BS; j++){
 #endif
 
 
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
+#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma113_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma113_omp_parallel *ctx = (pragma113_omp_parallel *)____arg;
