@@ -77,6 +77,7 @@
 #include <fcntl.h>
 #include <omp.h>
 #include "getopt.h"
+#include <unistd.h>
 
 #include "kmeans.h"
 

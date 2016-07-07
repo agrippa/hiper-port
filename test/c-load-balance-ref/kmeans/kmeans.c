@@ -79,6 +79,7 @@ int ____num_tasks[32] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 #include <fcntl.h>
 #include <omp.h>
 #include "getopt.h"
+#include <unistd.h>
 
 #include "kmeans.h"
 
