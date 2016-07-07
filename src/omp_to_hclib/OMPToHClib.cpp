@@ -496,7 +496,7 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
-        bool isAcceleratable) {
+        bool isAcceleratable, std::string iterator) {
     std::stringstream ss;
 
     if (isAcceleratable) {
@@ -505,7 +505,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
         ss << "    private:\n";
         ss << "\n";
         ss << "    public:\n";
-        ss << "        __host__ __device__ void operator()(int idx) {\n";
+        ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
         ss << "        }\n";
         ss << "};\n\n";
         ss << "#else\n";
@@ -1175,7 +1175,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
-                                false, isAcceleratable);
+                                false, isAcceleratable, accumulated_cond.at(0)->getNameAsString());
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<
