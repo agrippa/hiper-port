@@ -474,9 +474,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     BPNN (*net); net = ctx->net;
@@ -512,7 +509,6 @@ static void main_entrypoint(void *____arg) {
     } ;     free(____arg);
 }
 
-#endif
 void bpnn_train(BPNN *net, float *eo, float *eh)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));

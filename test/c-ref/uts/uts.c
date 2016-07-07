@@ -190,9 +190,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     unsigned long long num_nodes; num_nodes = ctx->num_nodes;
@@ -209,7 +206,6 @@ hclib_async(pragma196_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    } ;     free(____arg);
 }
 
-#endif
 unsigned long long parallel_uts ( Node *root )
 {
    unsigned long long num_nodes = 0 ;
@@ -228,9 +224,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
    return num_nodes;
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma196_omp_task_hclib_async(void *____arg) {
     pragma196_omp_task *ctx = (pragma196_omp_task *)____arg;
     hclib_start_finish();
@@ -239,7 +232,6 @@ static void pragma196_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 typedef struct _pragma228_omp_task {
@@ -301,9 +293,6 @@ hclib_async(pragma228_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   
   return subtreesize;
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma228_omp_task_hclib_async(void *____arg) {
     pragma228_omp_task *ctx = (pragma228_omp_task *)____arg;
     Node (*nodePtr); nodePtr = ctx->nodePtr;
@@ -314,7 +303,6 @@ static void pragma228_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 void uts_read_file ( char *filename )

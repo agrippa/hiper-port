@@ -361,9 +361,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int grid_rows; grid_rows = ctx->grid_rows;
@@ -382,7 +379,6 @@ static void main_entrypoint(void *____arg) {
 compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ;     free(____arg);
 }
 
-#endif
 int main(int argc, char **argv)
 {
 	int grid_rows, grid_cols, sim_time, i;

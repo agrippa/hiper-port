@@ -612,9 +612,6 @@ hclib_async(pragma579_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 __sync_fetch_and_add(&(n_leaves), 1); ;
   }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma579_omp_task_hclib_async(void *____arg) {
     pragma579_omp_task *ctx = (pragma579_omp_task *)____arg;
     Node parent; parent = ctx->parent;
@@ -631,7 +628,6 @@ static void pragma579_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 // display search statistics
@@ -751,25 +747,22 @@ void showStats(double elapsedSecs) {
  *     - UPC is SPMD starting with main, OpenMP goes SPMD after
  *       parsing parameters
  */
-typedef struct _pragma797_omp_master {
+typedef struct _pragma793_omp_master {
     double (*t1_ptr);
     double (*t2_ptr);
     double (*et_ptr);
     Node (*root_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma797_omp_master;
+ } pragma793_omp_master;
 
-static void *pragma797_omp_master_hclib_async(void *____arg);
+static void *pragma793_omp_master_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
     Node root;
     int argc;
     char (*(*argv));
  } main_entrypoint_ctx;
 
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -808,14 +801,14 @@ static void main_entrypoint(void *____arg) {
 
 /********** SPMD Parallel Region **********/
  { 
-pragma797_omp_master *new_ctx = (pragma797_omp_master *)malloc(sizeof(pragma797_omp_master));
+pragma793_omp_master *new_ctx = (pragma793_omp_master *)malloc(sizeof(pragma793_omp_master));
 new_ctx->t1_ptr = &(t1);
 new_ctx->t2_ptr = &(t2);
 new_ctx->et_ptr = &(et);
 new_ctx->root_ptr = &(root);
 new_ctx->argc_ptr = &(argc);
 new_ctx->argv_ptr = &(argv);
-hclib_future_t *fut = hclib_async_future(pragma797_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
+hclib_future_t *fut = hclib_async_future(pragma793_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
 hclib_future_wait(fut);
  } 
 
@@ -848,7 +841,6 @@ hclib_future_wait(fut);
   } ;     free(____arg);
 }
 
-#endif
 int main(int argc, char *argv[]) {
   Node root;
 
@@ -868,11 +860,8 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
   ;
   return 0;
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-static void *pragma797_omp_master_hclib_async(void *____arg) {
-    pragma797_omp_master *ctx = (pragma797_omp_master *)____arg;
+static void *pragma793_omp_master_hclib_async(void *____arg) {
+    pragma793_omp_master *ctx = (pragma793_omp_master *)____arg;
     hclib_start_finish();
 {
           int first = 1;
@@ -914,5 +903,4 @@ retry:
     return NULL;
 }
 
-#endif
 

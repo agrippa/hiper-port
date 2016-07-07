@@ -123,9 +123,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     unsigned long long cycles; cycles = ctx->cycles;
@@ -166,7 +163,6 @@ free(new_ctx);
     } ;     free(____arg);
 }
 
-#endif
 void run(int argc, char** argv)
 {
     init(argc, argv);

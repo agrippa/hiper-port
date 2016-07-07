@@ -457,9 +457,6 @@ hclib_async(pragma430_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    /* Uses list v->population, v->hosp->asses and v->h->waiting */
    check_patients_population(village);
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma430_omp_task_hclib_async(void *____arg) {
     pragma430_omp_task *ctx = (pragma430_omp_task *)____arg;
     struct Village (*vlist); vlist = ctx->vlist;
@@ -470,7 +467,6 @@ sim_village_par(vlist) ;     ; hclib_end_finish_nonblocking();
     free(____arg);
 }
 
-#endif
 
 /**********************************************************************/
 void my_print(struct Village *village)
@@ -589,9 +585,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     long i; i = ctx->i;
@@ -608,7 +601,6 @@ hclib_async(pragma566_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
     } ;     free(____arg);
 }
 
-#endif
 void sim_village_main_par(struct Village *top)
 {
     long i;
@@ -619,9 +611,6 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma566_omp_task_hclib_async(void *____arg) {
     pragma566_omp_task *ctx = (pragma566_omp_task *)____arg;
     hclib_start_finish();
@@ -632,6 +621,5 @@ static void pragma566_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 

@@ -1713,9 +1713,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     char (*usage); usage = ctx->usage;
@@ -1733,7 +1730,6 @@ static void main_entrypoint(void *____arg) {
 particleFilter(I, IszX, IszY, Nfr, seed, Nparticles) ;     free(____arg);
 }
 
-#endif
 int main(int argc, char * argv[]){
 	
 	char* usage = "openmp.out -x <dimX> -y <dimY> -z <Nfr> -np <Nparticles>";

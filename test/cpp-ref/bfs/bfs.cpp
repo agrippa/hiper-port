@@ -137,9 +137,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int no_of_nodes; no_of_nodes = ctx->no_of_nodes;
@@ -245,7 +242,6 @@ free(new_ctx);
     } ;     free(____arg);
 }
 
-#endif
 void BFSGraph( int argc, char** argv) 
 {
         int no_of_nodes = 0;

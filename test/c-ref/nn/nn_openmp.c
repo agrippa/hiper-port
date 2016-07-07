@@ -100,9 +100,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     long long time0; time0 = ctx->time0;
@@ -217,7 +214,6 @@ free(new_ctx);
 	} ;     free(____arg);
 }
 
-#endif
 int main(int argc, char* argv[]) {
 	long long time0 = clock();
     FILE   *flist,*fp;

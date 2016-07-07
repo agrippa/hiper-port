@@ -220,9 +220,6 @@ hclib_async(pragma129_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
     free(unew);
     return TIMER;
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma129_omp_task_hclib_async(void *____arg) {
     pragma129_omp_task *ctx = (pragma129_omp_task *)____arg;
     int ii; ii = ctx->ii;
@@ -241,7 +238,6 @@ for (jj=j; jj<j+(*(ctx->block_size_ptr)); ++jj) {
                 } ;     free(____arg);
 }
 
-#endif
 
 
 /* R8MAT_RMS returns the RMS norm of a vector stored as a matrix. */
@@ -307,9 +303,6 @@ hclib_async(pragma238_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
         }
     } ; hclib_end_finish(); 
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma238_omp_task_hclib_async(void *____arg) {
     pragma238_omp_task *ctx = (pragma238_omp_task *)____arg;
     int i; i = ctx->i;
@@ -338,7 +331,6 @@ for (jj=j; jj<j+block_size; ++jj)
     free(____arg);
 }
 
-#endif
 
 
 /* Evaluates the exact solution. */

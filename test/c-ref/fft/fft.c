@@ -118,9 +118,6 @@ hclib_async(pragma70_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma68_omp_task_hclib_async(void *____arg) {
     pragma68_omp_task *ctx = (pragma68_omp_task *)____arg;
     hclib_start_finish();
@@ -129,10 +126,6 @@ compute_w_coefficients((*(ctx->n_ptr)), (*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ct
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma70_omp_task_hclib_async(void *____arg) {
     pragma70_omp_task *ctx = (pragma70_omp_task *)____arg;
@@ -142,7 +135,6 @@ compute_w_coefficients((*(ctx->n_ptr)), (*(ctx->ab_ptr)) + 1, (*(ctx->b_ptr)), (
     free(____arg);
 }
 
-#endif
 
 void compute_w_coefficients_seq(int n, int a, int b, COMPLEX * W)
 {
@@ -281,9 +273,6 @@ hclib_async(pragma147_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma145_omp_task_hclib_async(void *____arg) {
     pragma145_omp_task *ctx = (pragma145_omp_task *)____arg;
     hclib_start_finish();
@@ -292,10 +281,6 @@ unshuffle((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr))
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma147_omp_task_hclib_async(void *____arg) {
     pragma147_omp_task *ctx = (pragma147_omp_task *)____arg;
@@ -305,7 +290,6 @@ unshuffle((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr))
     free(____arg);
 }
 
-#endif
 
 void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 {
@@ -457,9 +441,6 @@ hclib_async(pragma223_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
      }
  hclib_end_finish(); hclib_start_finish(); ;
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma215_omp_task_hclib_async(void *____arg) {
     pragma215_omp_task *ctx = (pragma215_omp_task *)____arg;
     hclib_start_finish();
@@ -469,10 +450,6 @@ fft_twiddle_gen1((*(ctx->in_ptr)) + (*(ctx->i_ptr)), (*(ctx->out_ptr)) + (*(ctx-
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma220_omp_task_hclib_async(void *____arg) {
     pragma220_omp_task *ctx = (pragma220_omp_task *)____arg;
@@ -483,10 +460,6 @@ fft_twiddle_gen((*(ctx->i_ptr)), (*(ctx->i2_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma223_omp_task_hclib_async(void *____arg) {
     pragma223_omp_task *ctx = (pragma223_omp_task *)____arg;
@@ -497,7 +470,6 @@ fft_twiddle_gen((*(ctx->i2_ptr)), (*(ctx->i1_ptr)), (*(ctx->in_ptr)), (*(ctx->ou
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_gen_seq(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W,
                          int nW, int nWdn, int r, int m)
@@ -642,9 +614,6 @@ hclib_async(pragma287_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma285_omp_task_hclib_async(void *____arg) {
     pragma285_omp_task *ctx = (pragma285_omp_task *)____arg;
     hclib_start_finish();
@@ -653,10 +622,6 @@ fft_twiddle_2((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma287_omp_task_hclib_async(void *____arg) {
     pragma287_omp_task *ctx = (pragma287_omp_task *)____arg;
@@ -666,7 +631,6 @@ fft_twiddle_2((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -770,9 +734,6 @@ hclib_async(pragma341_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma339_omp_task_hclib_async(void *____arg) {
     pragma339_omp_task *ctx = (pragma339_omp_task *)____arg;
     hclib_start_finish();
@@ -781,10 +742,6 @@ fft_unshuffle_2((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma341_omp_task_hclib_async(void *____arg) {
     pragma341_omp_task *ctx = (pragma341_omp_task *)____arg;
@@ -794,7 +751,6 @@ fft_unshuffle_2((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
 
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -1003,9 +959,6 @@ hclib_async(pragma468_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma466_omp_task_hclib_async(void *____arg) {
     pragma466_omp_task *ctx = (pragma466_omp_task *)____arg;
     hclib_start_finish();
@@ -1014,10 +967,6 @@ fft_twiddle_4((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma468_omp_task_hclib_async(void *____arg) {
     pragma468_omp_task *ctx = (pragma468_omp_task *)____arg;
@@ -1027,7 +976,6 @@ fft_twiddle_4((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -1169,9 +1117,6 @@ hclib_async(pragma560_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma558_omp_task_hclib_async(void *____arg) {
     pragma558_omp_task *ctx = (pragma558_omp_task *)____arg;
     hclib_start_finish();
@@ -1180,10 +1125,6 @@ fft_unshuffle_4((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma560_omp_task_hclib_async(void *____arg) {
     pragma560_omp_task *ctx = (pragma560_omp_task *)____arg;
@@ -1193,7 +1134,6 @@ fft_unshuffle_4((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
 
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -1561,9 +1501,6 @@ hclib_async(pragma846_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma844_omp_task_hclib_async(void *____arg) {
     pragma844_omp_task *ctx = (pragma844_omp_task *)____arg;
     hclib_start_finish();
@@ -1572,10 +1509,6 @@ fft_twiddle_8((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma846_omp_task_hclib_async(void *____arg) {
     pragma846_omp_task *ctx = (pragma846_omp_task *)____arg;
@@ -1585,7 +1518,6 @@ fft_twiddle_8((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_p
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -1819,9 +1751,6 @@ hclib_async(pragma1030_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma1028_omp_task_hclib_async(void *____arg) {
     pragma1028_omp_task *ctx = (pragma1028_omp_task *)____arg;
     hclib_start_finish();
@@ -1830,10 +1759,6 @@ fft_unshuffle_8((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma1030_omp_task_hclib_async(void *____arg) {
     pragma1030_omp_task *ctx = (pragma1030_omp_task *)____arg;
@@ -1843,7 +1768,6 @@ fft_unshuffle_8((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out
     free(____arg);
 }
 
-#endif
 
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -2587,9 +2511,6 @@ hclib_async(pragma1692_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma1690_omp_task_hclib_async(void *____arg) {
     pragma1690_omp_task *ctx = (pragma1690_omp_task *)____arg;
     hclib_start_finish();
@@ -2598,10 +2519,6 @@ fft_twiddle_16((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma1692_omp_task_hclib_async(void *____arg) {
     pragma1692_omp_task *ctx = (pragma1692_omp_task *)____arg;
@@ -2611,7 +2528,6 @@ fft_twiddle_16((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -3061,9 +2977,6 @@ hclib_async(pragma2092_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma2090_omp_task_hclib_async(void *____arg) {
     pragma2090_omp_task *ctx = (pragma2090_omp_task *)____arg;
     hclib_start_finish();
@@ -3072,10 +2985,6 @@ fft_unshuffle_16((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->ou
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma2092_omp_task_hclib_async(void *____arg) {
     pragma2092_omp_task *ctx = (pragma2092_omp_task *)____arg;
@@ -3085,7 +2994,6 @@ fft_unshuffle_16((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->ou
     free(____arg);
 }
 
-#endif
 
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -4709,9 +4617,6 @@ hclib_async(pragma3634_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma3632_omp_task_hclib_async(void *____arg) {
     pragma3632_omp_task *ctx = (pragma3632_omp_task *)____arg;
     hclib_start_finish();
@@ -4720,10 +4625,6 @@ fft_twiddle_32((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->out_
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma3634_omp_task_hclib_async(void *____arg) {
     pragma3634_omp_task *ctx = (pragma3634_omp_task *)____arg;
@@ -4733,7 +4634,6 @@ fft_twiddle_32((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->out_
     free(____arg);
 }
 
-#endif
 
 void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
 {
@@ -5679,9 +5579,6 @@ hclib_async(pragma4530_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  hclib_end_finish(); hclib_start_finish(); ;
      }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma4528_omp_task_hclib_async(void *____arg) {
     pragma4528_omp_task *ctx = (pragma4528_omp_task *)____arg;
     hclib_start_finish();
@@ -5690,10 +5587,6 @@ fft_unshuffle_32((*(ctx->a_ptr)), (*(ctx->ab_ptr)), (*(ctx->in_ptr)), (*(ctx->ou
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4530_omp_task_hclib_async(void *____arg) {
     pragma4530_omp_task *ctx = (pragma4530_omp_task *)____arg;
@@ -5703,7 +5596,6 @@ fft_unshuffle_32((*(ctx->ab_ptr)), (*(ctx->b_ptr)), (*(ctx->in_ptr)), (*(ctx->ou
     free(____arg);
 }
 
-#endif
 
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 {
@@ -6181,9 +6073,6 @@ hclib_async(pragma4715_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 
      return;
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma4670_omp_task_hclib_async(void *____arg) {
     pragma4670_omp_task *ctx = (pragma4670_omp_task *)____arg;
     hclib_start_finish();
@@ -6192,10 +6081,6 @@ fft_unshuffle_32(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4673_omp_task_hclib_async(void *____arg) {
     pragma4673_omp_task *ctx = (pragma4673_omp_task *)____arg;
@@ -6205,10 +6090,6 @@ fft_unshuffle_16(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4676_omp_task_hclib_async(void *____arg) {
     pragma4676_omp_task *ctx = (pragma4676_omp_task *)____arg;
@@ -6218,10 +6099,6 @@ fft_unshuffle_8(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx-
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4679_omp_task_hclib_async(void *____arg) {
     pragma4679_omp_task *ctx = (pragma4679_omp_task *)____arg;
@@ -6231,10 +6108,6 @@ fft_unshuffle_4(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx-
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4682_omp_task_hclib_async(void *____arg) {
     pragma4682_omp_task *ctx = (pragma4682_omp_task *)____arg;
@@ -6244,10 +6117,6 @@ fft_unshuffle_2(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx-
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4690_omp_task_hclib_async(void *____arg) {
     pragma4690_omp_task *ctx = (pragma4690_omp_task *)____arg;
@@ -6258,10 +6127,6 @@ fft_aux((*(ctx->m_ptr)), (*(ctx->out_ptr)) + k, (*(ctx->in_ptr)) + k, (*(ctx->fa
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4700_omp_task_hclib_async(void *____arg) {
     pragma4700_omp_task *ctx = (pragma4700_omp_task *)____arg;
@@ -6271,10 +6136,6 @@ fft_twiddle_2(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx->W
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4703_omp_task_hclib_async(void *____arg) {
     pragma4703_omp_task *ctx = (pragma4703_omp_task *)____arg;
@@ -6284,10 +6145,6 @@ fft_twiddle_4(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx->W
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4706_omp_task_hclib_async(void *____arg) {
     pragma4706_omp_task *ctx = (pragma4706_omp_task *)____arg;
@@ -6297,10 +6154,6 @@ fft_twiddle_8(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx->W
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4709_omp_task_hclib_async(void *____arg) {
     pragma4709_omp_task *ctx = (pragma4709_omp_task *)____arg;
@@ -6310,10 +6163,6 @@ fft_twiddle_16(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx->
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4712_omp_task_hclib_async(void *____arg) {
     pragma4712_omp_task *ctx = (pragma4712_omp_task *)____arg;
@@ -6323,10 +6172,6 @@ fft_twiddle_32(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx->
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4715_omp_task_hclib_async(void *____arg) {
     pragma4715_omp_task *ctx = (pragma4715_omp_task *)____arg;
@@ -6336,7 +6181,6 @@ fft_twiddle_gen(0, (*(ctx->m_ptr)), (*(ctx->in_ptr)), (*(ctx->out_ptr)), (*(ctx-
     free(____arg);
 }
 
-#endif
 
 
 void fft_aux_seq(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int nW)
@@ -6440,9 +6284,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int (*factors); factors = ctx->factors;
@@ -6501,7 +6342,6 @@ hclib_async(pragma4830_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
      } ;     free(____arg);
 }
 
-#endif
 void fft(int n, COMPLEX * in, COMPLEX * out)
 {
     int *factors = (int *)malloc(40 * sizeof(int));
@@ -6529,9 +6369,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
      return;
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma4807_omp_task_hclib_async(void *____arg) {
     pragma4807_omp_task *ctx = (pragma4807_omp_task *)____arg;
     hclib_start_finish();
@@ -6542,10 +6379,6 @@ static void pragma4807_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma4830_omp_task_hclib_async(void *____arg) {
     pragma4830_omp_task *ctx = (pragma4830_omp_task *)____arg;
@@ -6557,7 +6390,6 @@ static void pragma4830_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 void fft_seq(int n, COMPLEX * in, COMPLEX * out)
 {

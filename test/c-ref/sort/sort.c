@@ -405,9 +405,6 @@ hclib_async(pragma360_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 
      return;
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma358_omp_task_hclib_async(void *____arg) {
     pragma358_omp_task *ctx = (pragma358_omp_task *)____arg;
     hclib_start_finish();
@@ -416,10 +413,6 @@ cilkmerge_par((*(ctx->low1_ptr)), (*(ctx->split1_ptr)) - 1, (*(ctx->low2_ptr)), 
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma360_omp_task_hclib_async(void *____arg) {
     pragma360_omp_task *ctx = (pragma360_omp_task *)____arg;
@@ -430,7 +423,6 @@ cilkmerge_par((*(ctx->split1_ptr)) + 1, (*(ctx->high1_ptr)), (*(ctx->split2_ptr)
     free(____arg);
 }
 
-#endif
 
 
 typedef struct _pragma394_omp_task {
@@ -657,9 +649,6 @@ hclib_async(pragma406_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 
      cilkmerge_par(tmpA, tmpC - 1, tmpC, tmpA + size - 1, A);
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma394_omp_task_hclib_async(void *____arg) {
     pragma394_omp_task *ctx = (pragma394_omp_task *)____arg;
     hclib_start_finish();
@@ -668,10 +657,6 @@ cilksort_par((*(ctx->A_ptr)), (*(ctx->tmpA_ptr)), (*(ctx->quarter_ptr))) ;     ;
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma396_omp_task_hclib_async(void *____arg) {
     pragma396_omp_task *ctx = (pragma396_omp_task *)____arg;
@@ -681,10 +666,6 @@ cilksort_par((*(ctx->B_ptr)), (*(ctx->tmpB_ptr)), (*(ctx->quarter_ptr))) ;     ;
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma398_omp_task_hclib_async(void *____arg) {
     pragma398_omp_task *ctx = (pragma398_omp_task *)____arg;
@@ -694,10 +675,6 @@ cilksort_par((*(ctx->C_ptr)), (*(ctx->tmpC_ptr)), (*(ctx->quarter_ptr))) ;     ;
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma400_omp_task_hclib_async(void *____arg) {
     pragma400_omp_task *ctx = (pragma400_omp_task *)____arg;
@@ -707,10 +684,6 @@ cilksort_par((*(ctx->D_ptr)), (*(ctx->tmpD_ptr)), (*(ctx->size_ptr)) - 3 * (*(ct
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma404_omp_task_hclib_async(void *____arg) {
     pragma404_omp_task *ctx = (pragma404_omp_task *)____arg;
@@ -720,10 +693,6 @@ cilkmerge_par((*(ctx->A_ptr)), (*(ctx->A_ptr)) + (*(ctx->quarter_ptr)) - 1, (*(c
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma406_omp_task_hclib_async(void *____arg) {
     pragma406_omp_task *ctx = (pragma406_omp_task *)____arg;
@@ -733,7 +702,6 @@ cilkmerge_par((*(ctx->C_ptr)), (*(ctx->C_ptr)) + (*(ctx->quarter_ptr)) - 1, (*(c
     free(____arg);
 }
 
-#endif
 
 
 void scramble_array( ELM *array )
@@ -808,9 +776,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
 {
@@ -823,7 +788,6 @@ hclib_async(pragma486_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
     } ;     free(____arg);
 }
 
-#endif
 void sort_par ( void )
 {
 	bots_message("Computing multisort algorithm (n=%d) ", bots_arg_size);
@@ -833,9 +797,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 	bots_message(" completed!\n");
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma486_omp_task_hclib_async(void *____arg) {
     pragma486_omp_task *ctx = (pragma486_omp_task *)____arg;
     hclib_start_finish();
@@ -846,7 +807,6 @@ static void pragma486_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 int sort_verify ( void )

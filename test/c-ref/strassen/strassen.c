@@ -1387,9 +1387,6 @@ hclib_async(pragma711_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   }
   free(StartHeap);
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma687_omp_task_hclib_async(void *____arg) {
     pragma687_omp_task *ctx = (pragma687_omp_task *)____arg;
     hclib_start_finish();
@@ -1398,10 +1395,6 @@ OptimizedStrassenMultiply_par((*(ctx->M2_ptr)), (*(ctx->A_ptr)), (*(ctx->B_ptr))
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma691_omp_task_hclib_async(void *____arg) {
     pragma691_omp_task *ctx = (pragma691_omp_task *)____arg;
@@ -1411,10 +1404,6 @@ OptimizedStrassenMultiply_par((*(ctx->M5_ptr)), (*(ctx->S1_ptr)), (*(ctx->S5_ptr
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma695_omp_task_hclib_async(void *____arg) {
     pragma695_omp_task *ctx = (pragma695_omp_task *)____arg;
@@ -1424,10 +1413,6 @@ OptimizedStrassenMultiply_par((*(ctx->T1sMULT_ptr)), (*(ctx->S2_ptr)), (*(ctx->S
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma699_omp_task_hclib_async(void *____arg) {
     pragma699_omp_task *ctx = (pragma699_omp_task *)____arg;
@@ -1437,10 +1422,6 @@ OptimizedStrassenMultiply_par((*(ctx->C22_ptr)), (*(ctx->S3_ptr)), (*(ctx->S7_pt
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma703_omp_task_hclib_async(void *____arg) {
     pragma703_omp_task *ctx = (pragma703_omp_task *)____arg;
@@ -1450,10 +1431,6 @@ OptimizedStrassenMultiply_par((*(ctx->C_ptr)), (*(ctx->A12_ptr)), (*(ctx->B21_pt
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma707_omp_task_hclib_async(void *____arg) {
     pragma707_omp_task *ctx = (pragma707_omp_task *)____arg;
@@ -1463,10 +1440,6 @@ OptimizedStrassenMultiply_par((*(ctx->C12_ptr)), (*(ctx->S4_ptr)), (*(ctx->B22_p
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma711_omp_task_hclib_async(void *____arg) {
     pragma711_omp_task *ctx = (pragma711_omp_task *)____arg;
@@ -1476,7 +1449,6 @@ OptimizedStrassenMultiply_par((*(ctx->C21_ptr)), (*(ctx->A22_ptr)), (*(ctx->S8_p
     free(____arg);
 }
 
-#endif
 
 /*
  * Set an n by n matrix A to random values.  The distance between
@@ -1541,9 +1513,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     double (*A); A = ctx->A;
@@ -1565,7 +1534,6 @@ hclib_async(pragma832_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
     } ;     free(____arg);
 }
 
-#endif
 void strassen_main_par(REAL *A, REAL *B, REAL *C, int n)
 {
 	bots_message("Computing parallel Strassen algorithm (n=%d) ", n);
@@ -1578,9 +1546,6 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma832_omp_task_hclib_async(void *____arg) {
     pragma832_omp_task *ctx = (pragma832_omp_task *)____arg;
     hclib_start_finish();
@@ -1589,7 +1554,6 @@ OptimizedStrassenMultiply_par((*(ctx->C_ptr)), (*(ctx->A_ptr)), (*(ctx->B_ptr)),
     free(____arg);
 }
 
-#endif
 
 
 void strassen_main_seq(REAL *A, REAL *B, REAL *C, int n)

@@ -471,9 +471,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int i; i = ctx->i;
@@ -523,7 +520,6 @@ hclib_async(pragma473_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    } ;     free(____arg);
 }
 
-#endif
 int pairalign()
 {
    int i, n, m, si, sj;
@@ -555,9 +551,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
    return 0;
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma473_omp_task_hclib_async(void *____arg) {
     pragma473_omp_task *ctx = (pragma473_omp_task *)____arg;
     int i; i = ctx->i;
@@ -609,7 +602,6 @@ static void pragma473_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 int pairalign_seq()

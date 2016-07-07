@@ -159,9 +159,6 @@ hclib_async(pragma136_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 	for ( i = 0; i < n; i++) *solutions += csols[i];
     free(csols);
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma136_omp_task_hclib_async(void *____arg) {
     pragma136_omp_task *ctx = (pragma136_omp_task *)____arg;
     int (*csols); csols = ctx->csols;
@@ -184,16 +181,12 @@ static void pragma136_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 typedef struct _main_entrypoint_ctx {
     int size;
  } main_entrypoint_ctx;
 
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
@@ -212,7 +205,6 @@ hclib_start_finish(); {
     } ;     free(____arg);
 }
 
-#endif
 void find_queens (int size)
 {
 main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));

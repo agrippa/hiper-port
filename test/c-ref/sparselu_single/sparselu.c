@@ -260,9 +260,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int ii; ii = ctx->ii;
@@ -284,7 +281,6 @@ hclib_async(pragma261_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    } ;     free(____arg);
 }
 
-#endif
 void sparselu_par_call(float **BENCH)
 {
    int ii, jj, kk;
@@ -301,9 +297,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
    bots_message(" completed!\n");
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma261_omp_task_hclib_async(void *____arg) {
     pragma261_omp_task *ctx = (pragma261_omp_task *)____arg;
     hclib_start_finish();
@@ -358,11 +351,7 @@ hclib_async(pragma265_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
     free(____arg);
 }
 
-#endif
  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma244_omp_task_hclib_async(void *____arg) {
     pragma244_omp_task *ctx = (pragma244_omp_task *)____arg;
     int jj; jj = ctx->jj;
@@ -375,10 +364,6 @@ static void pragma244_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma252_omp_task_hclib_async(void *____arg) {
     pragma252_omp_task *ctx = (pragma252_omp_task *)____arg;
@@ -392,10 +377,6 @@ static void pragma252_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma265_omp_task_hclib_async(void *____arg) {
     pragma265_omp_task *ctx = (pragma265_omp_task *)____arg;
@@ -411,7 +392,6 @@ static void pragma265_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 

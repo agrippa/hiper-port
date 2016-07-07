@@ -602,9 +602,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     const char (*data_file_name); data_file_name = ctx->data_file_name;
@@ -730,7 +727,6 @@ static void main_entrypoint(void *____arg) {
     } ;     free(____arg);
 }
 
-#endif
 int main(int argc, char** argv)
 {
 	if (argc < 2)

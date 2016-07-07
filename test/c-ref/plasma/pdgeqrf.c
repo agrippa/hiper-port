@@ -225,9 +225,6 @@ hclib_emulate_omp_task(pragma99_omp_task_hclib_async, new_ctx, ANY_PLACE, 4, 2, 
         }
     }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void *pragma54_omp_task_hclib_async(void *____arg) {
     pragma54_omp_task *ctx = (pragma54_omp_task *)____arg;
     hclib_start_finish();
@@ -241,10 +238,6 @@ static void *pragma54_omp_task_hclib_async(void *____arg) {
     return NULL;
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma66_omp_task_hclib_async(void *____arg) {
     pragma66_omp_task *ctx = (pragma66_omp_task *)____arg;
@@ -263,10 +256,6 @@ static void *pragma66_omp_task_hclib_async(void *____arg) {
     return NULL;
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma83_omp_task_hclib_async(void *____arg) {
     pragma83_omp_task *ctx = (pragma83_omp_task *)____arg;
@@ -284,10 +273,6 @@ static void *pragma83_omp_task_hclib_async(void *____arg) {
     return NULL;
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void *pragma99_omp_task_hclib_async(void *____arg) {
     pragma99_omp_task *ctx = (pragma99_omp_task *)____arg;
@@ -306,5 +291,4 @@ static void *pragma99_omp_task_hclib_async(void *____arg) {
     return NULL;
 }
 
-#endif
 

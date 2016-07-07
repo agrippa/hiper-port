@@ -285,9 +285,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int ii; ii = ctx->ii;
@@ -346,7 +343,6 @@ hclib_async(pragma295_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
    } ;     free(____arg);
 }
 
-#endif
 void sparselu_par_call(float **BENCH)
 {
    int ii, jj, kk;
@@ -360,9 +356,6 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma276_omp_task_hclib_async(void *____arg) {
     pragma276_omp_task *ctx = (pragma276_omp_task *)____arg;
     int jj; jj = ctx->jj;
@@ -375,10 +368,6 @@ static void pragma276_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma284_omp_task_hclib_async(void *____arg) {
     pragma284_omp_task *ctx = (pragma284_omp_task *)____arg;
@@ -392,10 +381,6 @@ static void pragma284_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
-
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma295_omp_task_hclib_async(void *____arg) {
     pragma295_omp_task *ctx = (pragma295_omp_task *)____arg;
@@ -411,7 +396,6 @@ static void pragma295_omp_task_hclib_async(void *____arg) {
     free(____arg);
 }
 
-#endif
 
 
 void sparselu_fini (float **BENCH, char *pass)

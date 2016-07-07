@@ -67,9 +67,6 @@ hclib_emulate_omp_task(pragma45_omp_task_hclib_async, new_ctx, ANY_PLACE, 0, 1, 
         }
     }
 } 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void *pragma45_omp_task_hclib_async(void *____arg) {
     pragma45_omp_task *ctx = (pragma45_omp_task *)____arg;
     hclib_start_finish();
@@ -79,7 +76,6 @@ CORE_dplrnt((*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->dA_ptr)), (*(ctx
     return NULL;
 }
 
-#endif
 
 
 /***************************************************************************//**

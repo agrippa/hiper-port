@@ -860,9 +860,6 @@ typedef struct _main_entrypoint_ctx {
  } main_entrypoint_ctx;
 
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
 static void main_entrypoint(void *____arg) {
     main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
     int i; i = ctx->i;
@@ -939,7 +936,6 @@ while(1) {
   } ;     free(____arg);
 }
 
-#endif
 float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
 	       int pid)
 {
