@@ -114,7 +114,7 @@ void bpnn_zero_weights(float **w, int m, int n)
 }
 
 
-void bpnn_initialize(seed)
+void bpnn_initialize(int seed)
 {
   printf("Random number generator seed: %d\n", seed);
   srand(seed);
