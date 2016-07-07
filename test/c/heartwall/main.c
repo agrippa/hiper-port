@@ -1,3 +1,8 @@
+#include "hclib.h"
+#ifdef __cplusplus
+#include "hclib_cpp.h"
+#include "hclib_system.h"
+#endif
 //===============================================================================================================================================================================================================
 //===============================================================================================================================================================================================================
 //	DEFINE / INCLUDE
@@ -93,6 +98,98 @@ void write_data(	char* filename,
 //	MAIN FUNCTION
 //===============================================================================================================================================================================================================
 //===============================================================================================================================================================================================================
+
+typedef struct _pragma554_omp_parallel {
+    int i;
+    int (*frames_processed_ptr);
+    public_struct (*public_ptr);
+    private_struct (*private_ptr)[51];
+    char (*(*video_file_name_ptr));
+    avi_t (*(*d_frames_ptr));
+    int (*omp_num_threads_ptr);
+    int (*argc_ptr);
+    char (*(*(*argv_ptr)));
+ } pragma554_omp_parallel;
+
+static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+typedef struct _main_entrypoint_ctx {
+    int i;
+    int frames_processed;
+    public_struct public;
+    private_struct private[51];
+    char (*video_file_name);
+    avi_t (*d_frames);
+    int omp_num_threads;
+    int argc;
+    char (*(*argv));
+ } main_entrypoint_ctx;
+
+
+static void main_entrypoint(void *____arg) {
+    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
+    int i; i = ctx->i;
+    int frames_processed; frames_processed = ctx->frames_processed;
+    public_struct public; public = ctx->public;
+    private_struct private[51]; memcpy(private, ctx->private, 51 * (sizeof(private_struct))); 
+    char (*video_file_name); video_file_name = ctx->video_file_name;
+    avi_t (*d_frames); d_frames = ctx->d_frames;
+    int omp_num_threads; omp_num_threads = ctx->omp_num_threads;
+    int argc; argc = ctx->argc;
+    char (*(*argv)); argv = ctx->argv;
+for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
+
+	//====================================================================================================
+	//	GETTING FRAME
+	//====================================================================================================
+
+		// Extract a cropped version of the first frame from the video file
+		public.d_frame = get_frame(public.d_frames,				// pointer to video file
+													public.frame_no,				// number of frame that needs to be returned
+													0,										// cropped?
+													0,										// scaled?
+													1);									// converted
+
+	//====================================================================================================
+	//	PROCESSING
+	//====================================================================================================
+
+ { 
+pragma554_omp_parallel *new_ctx = (pragma554_omp_parallel *)malloc(sizeof(pragma554_omp_parallel));
+new_ctx->i = i;
+new_ctx->frames_processed_ptr = &(frames_processed);
+new_ctx->public_ptr = &(public);
+new_ctx->private_ptr = &(private);
+new_ctx->video_file_name_ptr = &(video_file_name);
+new_ctx->d_frames_ptr = &(d_frames);
+new_ctx->omp_num_threads_ptr = &(omp_num_threads);
+new_ctx->argc_ptr = &(argc);
+new_ctx->argv_ptr = &(argv);
+hclib_loop_domain_t domain[1];
+domain[0].low = 0;
+domain[0].high = public.allPoints;
+domain[0].stride = 1;
+domain[0].tile = -1;
+hclib_future_t *fut = hclib_forasync_future((void *)pragma554_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_wait(fut);
+free(new_ctx);
+ } 
+
+	//====================================================================================================
+	//	FREE MEMORY FOR FRAME
+	//====================================================================================================
+
+		// free frame after each loop iteration, since AVI library allocates memory for every frame fetched
+		free(public.d_frame);
+
+	//====================================================================================================
+	//	PRINT FRAME PROGRESS
+	//====================================================================================================
+
+		printf("%d ", public.frame_no);
+		fflush(NULL);
+
+	} ;     free(____arg);
+}
 
 int main(int argc, char *argv []){
 
@@ -526,45 +623,18 @@ int main(int argc, char *argv []){
 	//	KERNEL
 	//======================================================================================================================================================
 
-#pragma omp_to_hclib
-	for(public.frame_no=0; public.frame_no<frames_processed; public.frame_no++){
+main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
+new_ctx->i = i;
+new_ctx->frames_processed = frames_processed;
+new_ctx->public = public;
+memcpy(new_ctx->private, private, 51 * (sizeof(private_struct))); 
+new_ctx->video_file_name = video_file_name;
+new_ctx->d_frames = d_frames;
+new_ctx->omp_num_threads = omp_num_threads;
+new_ctx->argc = argc;
+new_ctx->argv = argv;
+hclib_launch(main_entrypoint, new_ctx);
 
-	//====================================================================================================
-	//	GETTING FRAME
-	//====================================================================================================
-
-		// Extract a cropped version of the first frame from the video file
-		public.d_frame = get_frame(public.d_frames,				// pointer to video file
-													public.frame_no,				// number of frame that needs to be returned
-													0,										// cropped?
-													0,										// scaled?
-													1);									// converted
-
-	//====================================================================================================
-	//	PROCESSING
-	//====================================================================================================
-
-		#pragma omp parallel for
-		for(i=0; i<public.allPoints; i++){
-			kernel(	public,
-						private[i]);
-		}
-
-	//====================================================================================================
-	//	FREE MEMORY FOR FRAME
-	//====================================================================================================
-
-		// free frame after each loop iteration, since AVI library allocates memory for every frame fetched
-		free(public.d_frame);
-
-	//====================================================================================================
-	//	PRINT FRAME PROGRESS
-	//====================================================================================================
-
-		printf("%d ", public.frame_no);
-		fflush(NULL);
-
-	}
 
 	//======================================================================================================================================================
 	//	PRINT FRAME PROGRESS END
@@ -640,7 +710,22 @@ int main(int argc, char *argv []){
 	}
 
     return 0;
+}  
+static void pragma554_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma554_omp_parallel *ctx = (pragma554_omp_parallel *)____arg;
+    int i; i = ctx->i;
+    hclib_start_finish();
+    do {
+    i = ___iter0;
+{
+			kernel(	(*(ctx->public_ptr)),
+						(*(ctx->private_ptr))[i]);
+		} ;     } while (0);
+    ; hclib_end_finish_nonblocking();
+
 }
+
+
 
 //========================================================================================================================================================================================================
 //========================================================================================================================================================================================================
