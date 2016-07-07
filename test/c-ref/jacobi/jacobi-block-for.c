@@ -45,34 +45,8 @@ typedef struct _pragma34_omp_parallel {
     int (*block_size_ptr);
  } pragma34_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma29_omp_parallel_hclib_async {
-    private:
-
-    public:
-        __host__ __device__ void operator()(int idx) {
-        }
-};
-
-#else
 static void pragma29_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
-#endif
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma34_omp_parallel_hclib_async {
-    private:
-
-    public:
-        __host__ __device__ void operator()(int idx) {
-        }
-};
-
-#else
 static void pragma34_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1);
-#endif
 void sweep (int nx, int ny, double dx, double dy, double *f_,
         int itold, int itnew, double *u_, double *unew_, int block_size)
 {
@@ -151,9 +125,6 @@ free(new_ctx);
  } ;
     }
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma29_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma29_omp_parallel *ctx = (pragma29_omp_parallel *)____arg;
     int it; it = ctx->it;
@@ -168,10 +139,6 @@ copy_block((*(ctx->nx_ptr)), (*(ctx->ny_ptr)), block_x, block_y, (*(ctx->u__ptr)
 
 }
 
-#endif
-
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma34_omp_parallel_hclib_async(void *____arg, const int ___iter0, const int ___iter1) {
     pragma34_omp_parallel *ctx = (pragma34_omp_parallel *)____arg;
@@ -188,5 +155,4 @@ compute_estimate(block_x, block_y, (*(ctx->u__ptr)), (*(ctx->unew__ptr)), (*(ctx
 
 }
 
-#endif
 

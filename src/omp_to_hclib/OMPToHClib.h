@@ -52,14 +52,14 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
 
         std::string getClosureDecl(std::string closureName,
                 bool isForasyncClosure, int forasyncDim,
-                bool isFuture);
+                bool isFuture, bool isAcceleratable);
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName,
                 std::vector<clang::ValueDecl *> *captured, std::string bodyStr,
                 bool isFuture, OMPClauses *clauses,
                 bool wrapBodyInFinish, bool waitAtEnd,
-                std::vector<const clang::ValueDecl *> *condVars = NULL);
+                bool isAcceleratable, std::vector<const clang::ValueDecl *> *condVars = NULL);
         std::string getStructDef(std::string structName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);
         std::string getContextSetup(PragmaNode *node, std::string structName,

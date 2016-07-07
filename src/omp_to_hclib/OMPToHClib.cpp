@@ -495,10 +495,11 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 }
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
-        bool isForasyncClosure, int forasyncDim, bool isFuture) {
+        bool isForasyncClosure, int forasyncDim, bool isFuture,
+        bool isAcceleratable) {
     std::stringstream ss;
 
-    if (isForasyncClosure) {
+    if (isAcceleratable) {
         ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
         ss << "class " << closureName << " {\n";
         ss << "    private:\n";
@@ -526,7 +527,7 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
     }
     ss << ");\n";
 
-    if (isForasyncClosure) {
+    if (isAcceleratable) {
         ss << "#endif\n";
     }
     return ss.str();
@@ -554,15 +555,15 @@ bool OMPToHClib::canLaunchTasks(const clang::Stmt *body) {
 std::string OMPToHClib::getClosureDef(std::string closureName,
         bool isForasyncClosure, bool isAsyncClosure,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
-        std::string bodyStr, bool isFuture,
-        OMPClauses *clauses,
-        bool wrapBodyInFinish, bool waitAtEnd, std::vector<const clang::ValueDecl *> *condVars) {
+        std::string bodyStr, bool isFuture, OMPClauses *clauses,
+        bool wrapBodyInFinish, bool waitAtEnd,
+        bool isAcceleratable, std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
     std::vector<OMPReductionVar> *reductions = clauses->getReductions();
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
-    if (isForasyncClosure) {
+    if (isAcceleratable) {
         ss << "\n\n#ifndef OMP_TO_HCLIB_ENABLE_GPU\n";
     }
     ss << "\nstatic ";
@@ -718,7 +719,7 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     ss << "}\n\n";
-    if (isForasyncClosure) {
+    if (isAcceleratable) {
         ss << "#endif\n";
     }
 
@@ -872,7 +873,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         "main_entrypoint_ctx", captures, generatedClauses);
                 std::string closureFunction = getClosureDef(
                         "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        captures, launchBody, false, generatedClauses, false, false);
+                        captures, launchBody, false, generatedClauses, false, false, false);
                 std::string contextSetup = getContextSetup(node,
                         "main_entrypoint_ctx", captures,
                         generatedClauses);
@@ -988,12 +989,13 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 clauses->getSharedVarInfo(node->getCaptures()));
 
                         accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, false, -1, true);
+                                node->getLbl() + ASYNC_SUFFIX, false, -1, true,
+                                false);
 
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, false, true,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, true, clauses, canLaunchTasks(body), true);
+                                bodyStr, true, clauses, canLaunchTasks(body), true, false);
 
                         const std::string structDef = getStructDef(
                                 node->getLbl(), node->getCaptures(), clauses);
@@ -1030,12 +1032,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                     accumulatedKernelDecls += getClosureDecl(
                             node->getLbl() + ASYNC_SUFFIX, false, -1,
-                            clauses->hasClause("depend"));
+                            clauses->hasClause("depend"), false);
 
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
                             node->getLbl(), node->getCaptures(),
-                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body), false);
+                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body), false, false);
 
                     const std::string structDef = getStructDef(
                             node->getLbl(), node->getCaptures(), clauses);
@@ -1118,9 +1120,6 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         std::vector<const clang::ValueDecl *> condVars;
                         const int nLoops = clauses->getNumCollapsedLoops();
 
-                        accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, true, nLoops, false);
-
                         std::vector<std::string> accumulated_low;
                         std::vector<std::string> accumulated_high;
                         std::vector<std::string> accumulated_stride;
@@ -1172,6 +1171,12 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             assert(currLoop || l == nLoops - 1);
                         }
 
+                        const bool isAcceleratable = (nLoops == 1 && accumulated_stride.at(0) == "1");
+
+                        accumulatedKernelDecls += getClosureDecl(
+                                node->getLbl() + ASYNC_SUFFIX, true, nLoops,
+                                false, isAcceleratable);
+
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<
                             getContextSetup(node, node->getLbl(),
@@ -1185,10 +1190,10 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, false, clauses, canLaunchTasks(forLoop), false, &condVars);
+                                bodyStr, false, clauses, canLaunchTasks(forLoop), false, isAcceleratable, &condVars);
 
                         // For now only support offload of 1D parallel loops
-                        if (nLoops == 1 && accumulated_stride.at(0) == "1") {
+                        if (isAcceleratable) {
                             contextCreation << "#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
                             contextCreation << "hclib::future_t *fut = " <<
                                 "hclib::forasync_cuda((" <<
