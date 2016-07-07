@@ -1,11 +1,3 @@
-#include "hclib.h"
-#ifdef __cplusplus
-#include "hclib_cpp.h"
-#include "hclib_system.h"
-#ifdef __CUDACC__
-#include "hclib_cuda.h"
-#endif
-#endif
 // # ifdef __cplusplus
 // extern "C" {
 // # endif
@@ -70,6 +62,7 @@
 // #include <sys/time.h>							// (in directory known to compiler)			needed by ???
 #include <math.h>									// (in directory known to compiler)			needed by log, pow
 #include <string.h>									// (in directory known to compiler)			needed by memset
+#include <sys/time.h>
 
 //======================================================================================================================================================150
 //	COMMON
@@ -1848,55 +1841,188 @@ destroy_tree(node* root)
 //	MAIN FUNCTION
 //========================================================================================================================================================================================================200
 
-typedef struct _main_entrypoint_ctx {
-    int cur_arg;
-    int cores_arg;
-    char (*input_file);
-    char (*command_file);
-    char (*output);
-    FILE (*pFile);
-    FILE (*commandFile);
-    long lSize;
-    char (*commandBuffer);
-    unsigned long result;
-    char (*sPointer);
-    FILE (*file_pointer);
-    node (*root);
-    record (*r);
-    int input;
-    char instruction;
-    long mem_used;
-    long rootLoc;
-    char (*commandPointer);
-    int argc;
-    char (*(*argv));
- } main_entrypoint_ctx;
+int 
+main(	int argc, 
+		char** argv ) 
+{
+	// assing default values
+	int cur_arg;
+	int cores_arg =1;
+	char *input_file = NULL;
+	char *command_file = NULL;
+	char *output="output.txt";
+	FILE * pFile;
 
 
-static void main_entrypoint(void *____arg) {
-    main_entrypoint_ctx *ctx = (main_entrypoint_ctx *)____arg;
-    int cur_arg; cur_arg = ctx->cur_arg;
-    int cores_arg; cores_arg = ctx->cores_arg;
-    char (*input_file); input_file = ctx->input_file;
-    char (*command_file); command_file = ctx->command_file;
-    char (*output); output = ctx->output;
-    FILE (*pFile); pFile = ctx->pFile;
-    FILE (*commandFile); commandFile = ctx->commandFile;
-    long lSize; lSize = ctx->lSize;
-    char (*commandBuffer); commandBuffer = ctx->commandBuffer;
-    unsigned long result; result = ctx->result;
-    char (*sPointer); sPointer = ctx->sPointer;
-    FILE (*file_pointer); file_pointer = ctx->file_pointer;
-    node (*root); root = ctx->root;
-    record (*r); r = ctx->r;
-    int input; input = ctx->input;
-    char instruction; instruction = ctx->instruction;
-    long mem_used; mem_used = ctx->mem_used;
-    long rootLoc; rootLoc = ctx->rootLoc;
-    char (*commandPointer); commandPointer = ctx->commandPointer;
-    int argc; argc = ctx->argc;
-    char (*(*argv)); argv = ctx->argv;
-while (sscanf(commandPointer, "%c", &instruction) != EOF) {
+	// go through arguments
+	for(cur_arg=1; cur_arg<argc; cur_arg++){
+	  if(strcmp(argv[cur_arg], "cores")==0){
+	    // check if value provided
+	    if(argc>=cur_arg+1){
+	      // check if value is a number
+	      if(isInteger(argv[cur_arg+1])==1){
+		cores_arg = atoi(argv[cur_arg+1]);
+		if(cores_arg<0){
+		  printf("ERROR: Wrong value to cores parameter, cannot be <=0\n");
+		  return -1;
+		}
+		cur_arg = cur_arg+1;
+	      }
+	      // value is not a number
+	      else{
+		printf("ERROR: Value to cores parameter in not a number\n");
+		return 0;
+	      }
+	    }
+	  }
+	  // check if -file
+	  else if(strcmp(argv[cur_arg], "file")==0){
+	    // check if value provided
+	    if(argc>=cur_arg+1){
+	      input_file = argv[cur_arg+1];
+	      cur_arg = cur_arg+1;
+	      // value is not a number
+	    }
+	    // value not provided
+	    else{
+	      printf("ERROR: Missing value to -file parameter\n");
+	      return -1;
+	    }
+	  }
+	  else if(strcmp(argv[cur_arg], "command")==0){
+	    // check if value provided
+	    if(argc>=cur_arg+1){
+	      command_file = argv[cur_arg+1];
+	      cur_arg = cur_arg+1;
+	      // value is not a number
+	    }
+	    // value not provided
+	    else{
+	      printf("ERROR: Missing value to command parameter\n");
+	      return -1;
+	    }
+	  }
+	}
+	// Print configuration
+	  if((input_file==NULL)||(command_file==NULL))
+	    printf("Usage: ./b+tree file input_file command command_list\n");
+
+	  // For debug
+	  printf("Input File: %s \n", input_file);
+	  printf("Command File: %s \n", command_file);
+
+     FILE * commandFile;
+     long lSize;
+     char * commandBuffer;
+     size_t result;
+
+     commandFile = fopen ( command_file, "rb" );
+     if (commandFile==NULL) {fputs ("Command File error",stderr); exit (1);}
+     
+     // obtain file size:
+     fseek (commandFile , 0 , SEEK_END);
+     lSize = ftell (commandFile);
+     rewind (commandFile);
+
+     // allocate memory to contain the whole file:
+     commandBuffer = (char*) malloc (sizeof(char)*(lSize + 1));
+     if (commandBuffer == NULL) {fputs ("Command Buffer memory error",stderr); exit (2);}
+     
+     // copy the file into the buffer:
+     result = fread (commandBuffer,1,lSize,commandFile);
+     if (result != lSize) {fputs ("Command file reading error",stderr); exit (3);}
+     commandBuffer[lSize] = '\0';
+
+     /* the whole file is now loaded in the memory buffer. */
+
+  // terminate
+     fclose (commandFile);
+
+     // For Debug
+     char *sPointer=commandBuffer;
+     printf("Command Buffer: \n");
+     printf("%s",commandBuffer);
+     //
+
+
+     pFile = fopen (output,"w+");
+     if (pFile==NULL)  {
+       fprintf(stderr, "Fail to open %s !\n",output);
+     }
+     fprintf(pFile,"******starting******\n");
+     fclose(pFile);
+
+
+	// ------------------------------------------------------------60
+	// general variables
+	// ------------------------------------------------------------60
+
+	FILE *file_pointer;
+	node *root;
+	root = NULL;
+	record *r;
+	int input;
+	char instruction;
+	order = DEFAULT_ORDER;
+	verbose_output = false;
+
+	//usage_1();  
+	//usage_2();
+
+	// ------------------------------------------------------------60
+	// get input from file, if file provided
+	// ------------------------------------------------------------60
+
+	if (input_file != NULL) {
+
+		printf("Getting input from file %s...\n", argv[1]);
+
+		// open input file
+		file_pointer = fopen(input_file, "r");
+		if (file_pointer == NULL) {
+			perror("Failure to open input file.");
+			exit(EXIT_FAILURE);
+		}
+
+		// get # of numbers in the file
+		fscanf(file_pointer, "%d\n", &input);
+		size = input;
+
+		// save all numbers
+		while (!feof(file_pointer)) {
+			fscanf(file_pointer, "%d\n", &input);
+			root = insert(root, input, input);
+		}
+
+		// close file
+		fclose(file_pointer);
+		//print_tree(root);
+		//printf("Height of tree = %d\n", height(root));
+
+	}
+	else{
+		printf("ERROR: Argument -file missing\n");
+		return 0;
+	}
+
+	// ------------------------------------------------------------60
+	// get tree statistics
+	// ------------------------------------------------------------60
+
+	printf("Transforming data to a GPU suitable structure...\n");
+	long mem_used = transform_to_cuda(root,0);
+	maxheight = height(root);
+	long rootLoc = (long)knodes - (long)mem;
+
+	// ------------------------------------------------------------60
+	// process commands
+	// ------------------------------------------------------------60
+	char *commandPointer=commandBuffer;
+
+	printf("Waiting for command\n");
+	printf("> ");
+
+	while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 	  commandPointer++;
 		switch (instruction) {
 			// ----------------------------------------40
@@ -2014,9 +2140,11 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 
 				// get # of queries from user
 				int count;
+				commandPointer++; // Increment past space
 				sscanf(commandPointer, "%d", &count);
-				while(*commandPointer!=32 && commandPointer!='\n')
+				while(*commandPointer!=32 && *commandPointer!='\n') {
 				  commandPointer++;
+                }
 
 				printf("\n ******command: k count=%d \n",count);
 
@@ -2094,7 +2222,7 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 				pFile = fopen (output,"aw+");
 				if (pFile==NULL)
 				  {
-				    fputs ("Fail to open %s !\n",output);
+				    fprintf (stderr, "Fail to open %s !\n",output);
 				  }
 				
 				fprintf(pFile,"\n ******command: k count=%d \n",count);
@@ -2147,14 +2275,18 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 
 				// get # of queries from user
 				int count;
+				commandPointer++; // Increment past space
 				sscanf(commandPointer, "%d", &count);
-				while(*commandPointer!=32 && commandPointer!='\n')
+				while(*commandPointer!=32 && *commandPointer!='\n') {
 				  commandPointer++;
+                }
 
 				int rSize;
+				commandPointer++; // Increment past space
 				sscanf(commandPointer, "%d", &rSize);
-				while(*commandPointer!=32 && commandPointer!='\n')
+				while(*commandPointer!=32 && *commandPointer!='\n') {
 				  commandPointer++;
+                }
 
 				printf("\n******command: j count=%d, rSize=%d \n",count, rSize);
 
@@ -2250,7 +2382,7 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 				pFile = fopen (output,"aw+");
 				if (pFile==NULL)
 				  {
-				    fputs ("Fail to open %s !\n",output);
+				    fprintf (stderr, "Fail to open %s !\n",output);
 				  }
 
 				fprintf(pFile,"\n******command: j count=%d, rSize=%d \n",count, rSize);				
@@ -2290,213 +2422,7 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 		}
 		printf("> ");
 
-	} ;     free(____arg);
-}
-
-int 
-main(	int argc, 
-		char** argv ) 
-{
-	// assing default values
-	int cur_arg;
-	int cores_arg =1;
-	char *input_file = NULL;
-	char *command_file = NULL;
-	char *output="output.txt";
-	FILE * pFile;
-
-
-	// go through arguments
-	for(cur_arg=1; cur_arg<argc; cur_arg++){
-	  if(strcmp(argv[cur_arg], "cores")==0){
-	    // check if value provided
-	    if(argc>=cur_arg+1){
-	      // check if value is a number
-	      if(isInteger(argv[cur_arg+1])==1){
-		cores_arg = atoi(argv[cur_arg+1]);
-		if(cores_arg<0){
-		  printf("ERROR: Wrong value to cores parameter, cannot be <=0\n");
-		  return -1;
-		}
-		cur_arg = cur_arg+1;
-	      }
-	      // value is not a number
-	      else{
-		printf("ERROR: Value to cores parameter in not a number\n");
-		return 0;
-	      }
-	    }
-	  }
-	  // check if -file
-	  else if(strcmp(argv[cur_arg], "file")==0){
-	    // check if value provided
-	    if(argc>=cur_arg+1){
-	      input_file = argv[cur_arg+1];
-	      cur_arg = cur_arg+1;
-	      // value is not a number
-	    }
-	    // value not provided
-	    else{
-	      printf("ERROR: Missing value to -file parameter\n");
-	      return -1;
-	    }
-	  }
-	  else if(strcmp(argv[cur_arg], "command")==0){
-	    // check if value provided
-	    if(argc>=cur_arg+1){
-	      command_file = argv[cur_arg+1];
-	      cur_arg = cur_arg+1;
-	      // value is not a number
-	    }
-	    // value not provided
-	    else{
-	      printf("ERROR: Missing value to command parameter\n");
-	      return -1;
-	    }
-	  }
-	}
-	// Print configuration
-	  if((input_file==NULL)||(command_file==NULL))
-	    printf("Usage: ./b+tree file input_file command command_list\n");
-
-	  // For debug
-	  printf("Input File: %s \n", input_file);
-	  printf("Command File: %s \n", command_file);
-
-     FILE * commandFile;
-     long lSize;
-     char * commandBuffer;
-     size_t result;
-
-     commandFile = fopen ( command_file, "rb" );
-     if (commandFile==NULL) {fputs ("Command File error",stderr); exit (1);}
-     
-     // obtain file size:
-     fseek (commandFile , 0 , SEEK_END);
-     lSize = ftell (commandFile);
-     rewind (commandFile);
-
-     // allocate memory to contain the whole file:
-     commandBuffer = (char*) malloc (sizeof(char)*lSize);
-     if (commandBuffer == NULL) {fputs ("Command Buffer memory error",stderr); exit (2);}
-     
-     // copy the file into the buffer:
-     result = fread (commandBuffer,1,lSize,commandFile);
-     if (result != lSize) {fputs ("Command file reading error",stderr); exit (3);}
-
-     /* the whole file is now loaded in the memory buffer. */
-
-  // terminate
-     fclose (commandFile);
-
-     // For Debug
-     char *sPointer=commandBuffer;
-     printf("Command Buffer: \n");
-     printf("%s",commandBuffer);
-     //
-
-
-     pFile = fopen (output,"w+");
-     if (pFile==NULL) 
-       fputs ("Fail to open %s !\n",output);
-     fprintf(pFile,"******starting******\n");
-     fclose(pFile);
-
-
-	// ------------------------------------------------------------60
-	// general variables
-	// ------------------------------------------------------------60
-
-	FILE *file_pointer;
-	node *root;
-	root = NULL;
-	record *r;
-	int input;
-	char instruction;
-	order = DEFAULT_ORDER;
-	verbose_output = false;
-
-	//usage_1();  
-	//usage_2();
-
-	// ------------------------------------------------------------60
-	// get input from file, if file provided
-	// ------------------------------------------------------------60
-
-	if (input_file != NULL) {
-
-		printf("Getting input from file %s...\n", argv[1]);
-
-		// open input file
-		file_pointer = fopen(input_file, "r");
-		if (file_pointer == NULL) {
-			perror("Failure to open input file.");
-			exit(EXIT_FAILURE);
-		}
-
-		// get # of numbers in the file
-		fscanf(file_pointer, "%d\n", &input);
-		size = input;
-
-		// save all numbers
-		while (!feof(file_pointer)) {
-			fscanf(file_pointer, "%d\n", &input);
-			root = insert(root, input, input);
-		}
-
-		// close file
-		fclose(file_pointer);
-		//print_tree(root);
-		//printf("Height of tree = %d\n", height(root));
-
-	}
-	else{
-		printf("ERROR: Argument -file missing\n");
-		return 0;
-	}
-
-	// ------------------------------------------------------------60
-	// get tree statistics
-	// ------------------------------------------------------------60
-
-	printf("Transforming data to a GPU suitable structure...\n");
-	long mem_used = transform_to_cuda(root,0);
-	maxheight = height(root);
-	long rootLoc = (long)knodes - (long)mem;
-
-	// ------------------------------------------------------------60
-	// process commands
-	// ------------------------------------------------------------60
-	char *commandPointer=commandBuffer;
-
-	printf("Waiting for command\n");
-	printf("> ");
-
-main_entrypoint_ctx *new_ctx = (main_entrypoint_ctx *)malloc(sizeof(main_entrypoint_ctx));
-new_ctx->cur_arg = cur_arg;
-new_ctx->cores_arg = cores_arg;
-new_ctx->input_file = input_file;
-new_ctx->command_file = command_file;
-new_ctx->output = output;
-new_ctx->pFile = pFile;
-new_ctx->commandFile = commandFile;
-new_ctx->lSize = lSize;
-new_ctx->commandBuffer = commandBuffer;
-new_ctx->result = result;
-new_ctx->sPointer = sPointer;
-new_ctx->file_pointer = file_pointer;
-new_ctx->root = root;
-new_ctx->r = r;
-new_ctx->input = input;
-new_ctx->instruction = instruction;
-new_ctx->mem_used = mem_used;
-new_ctx->rootLoc = rootLoc;
-new_ctx->commandPointer = commandPointer;
-new_ctx->argc = argc;
-new_ctx->argv = argv;
-const char *deps[] = { "system" };
-hclib_launch(main_entrypoint, new_ctx, deps, 1);
-
+	} ;
 	printf("\n");
 
 	// ------------------------------------------------------------60
@@ -2506,7 +2432,7 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free(mem);
 	return EXIT_SUCCESS;
 
-} 
+}
 
 //========================================================================================================================================================================================================200
 //	END
