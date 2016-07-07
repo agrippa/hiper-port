@@ -1189,7 +1189,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 accumulated_high.at(0) << ") - (" <<
                                 accumulated_low.at(0) << "), " <<
                                 node->getLbl() << ASYNC_SUFFIX <<
-                                "(), hclib::get_closest_gpu_locale(), NULL);\n";
+                                "(), hclib::get_closest_gpu_locale());\n";
                             contextCreation << "fut->wait();\n";
                             contextCreation << "#else\n";
                         }

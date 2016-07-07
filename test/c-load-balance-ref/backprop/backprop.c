@@ -14,6 +14,8 @@ int ____num_tasks[32] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 #include <stdlib.h>
 #include "backprop.h"
 #include <math.h>
+#include <fcntl.h>
+#include <unistd.h>
 #define OPEN
 
 #define ABS(x)          (((x) > 0.0) ? (x) : (-(x)))

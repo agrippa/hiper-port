@@ -126,7 +126,7 @@ domain[0].high = num_chunk;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((num_chunk) - (0), pragma72_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((num_chunk) - (0), pragma72_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale());
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma72_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

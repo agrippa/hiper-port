@@ -123,7 +123,7 @@ domain[0].high = chunks_in_inter_row;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((chunks_in_inter_row) - (0), pragma61_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((chunks_in_inter_row) - (0), pragma61_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale());
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma61_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -150,7 +150,7 @@ domain[0].high = chunks_per_inter;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((chunks_per_inter) - (0), pragma113_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((chunks_per_inter) - (0), pragma113_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale());
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma113_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
