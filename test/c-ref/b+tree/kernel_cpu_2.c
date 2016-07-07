@@ -20,6 +20,8 @@
 
 #include <omp.h>									// (in directory known to compiler)
 #include <stdlib.h>									// (in directory known to compiler)
+#include <assert.h>
+#include <stdio.h>
 
 //======================================================================================================================================================150
 //	COMMON
@@ -43,7 +45,7 @@
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-typedef struct _pragma101_omp_parallel {
+typedef struct _pragma103_omp_parallel {
     int thid;
     int bid;
     long long (*time0_ptr);
@@ -65,12 +67,12 @@ typedef struct _pragma101_omp_parallel {
     int (*(*end_ptr));
     int (*(*recstart_ptr));
     int (*(*reclength_ptr));
- } pragma101_omp_parallel;
+ } pragma103_omp_parallel;
 
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
 
-class pragma101_omp_parallel_hclib_async {
+class pragma103_omp_parallel_hclib_async {
     private:
 
     public:
@@ -79,7 +81,7 @@ class pragma101_omp_parallel_hclib_async {
 };
 
 #else
-static void pragma101_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma103_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 void 
 kernel_cpu_2(	int cores_arg,
@@ -135,7 +137,7 @@ kernel_cpu_2(	int cores_arg,
 
 	// process number of querries
  { 
-pragma101_omp_parallel *new_ctx = (pragma101_omp_parallel *)malloc(sizeof(pragma101_omp_parallel));
+pragma103_omp_parallel *new_ctx = (pragma103_omp_parallel *)malloc(sizeof(pragma103_omp_parallel));
 new_ctx->thid = thid;
 new_ctx->bid = bid;
 new_ctx->time0_ptr = &(time0);
@@ -163,10 +165,10 @@ domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma101_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma103_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma101_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma103_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -191,8 +193,8 @@ free(new_ctx);
 
 #ifndef OMP_TO_HCLIB_ENABLE_GPU
 
-static void pragma101_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma101_omp_parallel *ctx = (pragma101_omp_parallel *)____arg;
+static void pragma103_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma103_omp_parallel *ctx = (pragma103_omp_parallel *)____arg;
     int thid; thid = ctx->thid;
     int bid; bid = ctx->bid;
     int i; i = ctx->i;

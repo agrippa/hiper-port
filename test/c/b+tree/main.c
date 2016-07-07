@@ -2022,6 +2022,7 @@ main(	int argc,
 	printf("Waiting for command\n");
 	printf("> ");
 
+#pragma omp_to_hclib
 	while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 	  commandPointer++;
 		switch (instruction) {
