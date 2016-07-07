@@ -30,7 +30,7 @@ static void main_entrypoint(void *____arg) {
   } ;     free(____arg);
 }
 
-backprop_face()
+void backprop_face()
 {
   BPNN *net;
   int i;
@@ -49,9 +49,7 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
   printf("Training done\n");
 } 
 
-int setup(argc, argv)
-int argc;
-char *argv[];
+int setup(int argc, char *argv[])
 {
   if(argc!=2){
   fprintf(stderr, "usage: backprop <num of input elements>\n");
