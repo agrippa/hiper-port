@@ -14,6 +14,8 @@ int ____num_tasks[32] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 #include <omp.h>									// (in directory known to compiler)
 #include <stdlib.h>									// (in directory known to compiler)
+#include <assert.h>
+#include <stdio.h>
 
 //======================================================================================================================================================150
 //	COMMON
