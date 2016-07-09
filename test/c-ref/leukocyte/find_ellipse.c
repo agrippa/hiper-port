@@ -155,7 +155,7 @@ class pragma121_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
@@ -389,7 +389,7 @@ class pragma196_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {

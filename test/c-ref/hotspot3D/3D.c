@@ -228,7 +228,7 @@ class pragma167_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int z) {
+        __device__ void operator()(int z) {
             {
                 int y;
                 for (y = 0; y < ny; y++) {

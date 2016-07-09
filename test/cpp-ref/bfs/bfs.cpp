@@ -120,7 +120,7 @@ class pragma136_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int tid) {
+        __device__ void operator()(int tid) {
             {
                 if (h_graph_mask[tid] == true){ 
                     h_graph_mask[tid]=false;
@@ -167,7 +167,7 @@ class pragma153_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int tid) {
+        __device__ void operator()(int tid) {
             {
                 if (h_updating_graph_mask[tid] == true){
                     h_graph_mask[tid]=true;

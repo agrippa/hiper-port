@@ -166,7 +166,7 @@ class pragma110_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int b_index_x) {
+        __device__ void operator()(int b_index_x) {
             {
             int b_index_y = blk - 1 - b_index_x;
             int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
@@ -263,7 +263,7 @@ class pragma162_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int b_index_x) {
+        __device__ void operator()(int b_index_x) {
             {
             int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
 

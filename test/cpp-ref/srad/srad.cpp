@@ -205,7 +205,7 @@ class pragma135_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
             for (int j = 0; j < cols; j++) { 
 		
@@ -306,7 +306,7 @@ class pragma168_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
             for (int j = 0; j < cols; j++) {        
 

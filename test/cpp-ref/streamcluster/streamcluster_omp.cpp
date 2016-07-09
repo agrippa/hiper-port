@@ -410,7 +410,7 @@ class pragma399_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
     float x_cost = dist(points->p[i], points->p[x], points->dim) 
       * points->p[i].weight;
@@ -485,7 +485,7 @@ class pragma475_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
       bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
       if ( switch_membership[i] || close_center ) {

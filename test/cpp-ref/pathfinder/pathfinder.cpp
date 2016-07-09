@@ -133,7 +133,7 @@ class pragma114_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int n) {
+        __device__ void operator()(int n) {
             {
           min = src[n];
           if (n > 0) {

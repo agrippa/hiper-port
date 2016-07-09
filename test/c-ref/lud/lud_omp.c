@@ -83,7 +83,7 @@ class pragma61_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int chunk_idx) {
+        __device__ void operator()(int chunk_idx) {
             {
             int i, j, k, i_global, j_global, i_here, j_here;
             float sum;           
@@ -164,7 +164,7 @@ class pragma113_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int chunk_idx) {
+        __device__ void operator()(int chunk_idx) {
             {
             int i, j, k, i_global, j_global;
             float temp_top[BS*BS] __attribute__ ((aligned (64)));

@@ -128,7 +128,7 @@ class pragma103_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int bid) {
+        __device__ void operator()(int bid) {
             {
 
 		// process levels of the tree

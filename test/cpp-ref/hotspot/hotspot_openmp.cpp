@@ -137,7 +137,7 @@ class pragma72_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int chunk) {
+        __device__ void operator()(int chunk) {
             {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 

@@ -1068,7 +1068,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << constructor_body.str() << std::endl;
     ss << "        }" << std::endl;
     ss << std::endl;
-    ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
+    ss << "        __device__ void operator()(int " << iterator << ") {\n";
     ss << "            " << bodyStr << "\n";
     ss << "        }\n";
     ss << "};\n\n";

@@ -223,7 +223,7 @@ class pragma179_omp_parallel_hclib_async {
 
         }
 
-        __host__ __device__ void operator()(int i) {
+        __device__ void operator()(int i) {
             {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				
