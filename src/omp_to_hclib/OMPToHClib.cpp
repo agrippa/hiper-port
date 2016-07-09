@@ -925,7 +925,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                         }
                     } else if (const clang::RecordType *record =
                             clang::dyn_cast<clang::RecordType>(ref->getType())) {
-                        ss << "    volatile struct " <<
+                        ss << "    struct " <<
                             record->getDecl()->getNameAsString() << " " <<
                             ref->getNameAsString() << ";" << std::endl;
                         constructor_sig << "struct " <<

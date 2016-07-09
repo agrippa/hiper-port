@@ -486,10 +486,10 @@ class pragma196_omp_parallel_hclib_async {
     double* volatile normals;
     volatile double smoothing_coefficient;
     volatile double ff_variable[5];
-    volatile struct cfd_double3 ff_flux_contribution_density_energy;
-    volatile struct cfd_double3 ff_flux_contribution_momentum_x;
-    volatile struct cfd_double3 ff_flux_contribution_momentum_y;
-    volatile struct cfd_double3 ff_flux_contribution_momentum_z;
+    struct cfd_double3 ff_flux_contribution_density_energy;
+    struct cfd_double3 ff_flux_contribution_momentum_x;
+    struct cfd_double3 ff_flux_contribution_momentum_y;
+    struct cfd_double3 ff_flux_contribution_momentum_z;
     double* volatile fluxes;
 
     public:
