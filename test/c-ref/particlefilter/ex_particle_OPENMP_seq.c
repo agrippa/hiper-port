@@ -825,37 +825,6 @@ class pragma412_omp_parallel_hclib_async {
 	return fabs(seed[index]/((double) M));
 }
         }
-        __device__ double randu(int * seed, int index) {
-            {
-	int num = A*seed[index] + C;
-	seed[index] = num % M;
-	return fabs(seed[index]/((double) M));
-}
-        }
-        __device__ double randn(int * seed, int index) {
-            {
-	/*Box-Muller algorithm*/
-	double u = randu(seed, index);
-	double v = randu(seed, index);
-	double cosine = cos(2*PI*v);
-	double rt = -2*log(u);
-	return sqrt(rt)*cosine;
-}
-        }
-        __device__ double randu(int * seed, int index) {
-            {
-	int num = A*seed[index] + C;
-	seed[index] = num % M;
-	return fabs(seed[index]/((double) M));
-}
-        }
-        __device__ double randu(int * seed, int index) {
-            {
-	int num = A*seed[index] + C;
-	seed[index] = num % M;
-	return fabs(seed[index]/((double) M));
-}
-        }
     double* volatile arrayX;
     int x;
     volatile int A;
@@ -902,15 +871,6 @@ class pragma420_omp_parallel_hclib_async {
             return blockIdx.x * blockDim.x + threadIdx.x;
         }
 
-        __device__ double roundDouble(double value) {
-            {
-	int newValue = (int)(value);
-	if(value - newValue < .5)
-	return newValue;
-	else
-	return newValue++;
-}
-        }
         __device__ double roundDouble(double value) {
             {
 	int newValue = (int)(value);

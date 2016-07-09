@@ -15,7 +15,9 @@ void ParallelRegionInfo::foundUnresolvedFunction(
 }
 
 void ParallelRegionInfo::addCalledFunction(const clang::FunctionDecl *func) {
-    called.push_back(func);
+    if (std::find(called.begin(), called.end(), func) == called.end()) {
+        called.push_back(func);
+    }
 }
 
 void ParallelRegionInfo::addDeclaredVar(const clang::Decl *var) {

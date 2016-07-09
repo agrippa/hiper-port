@@ -117,9 +117,6 @@ class pragma121_omp_parallel_hclib_async {
         __device__ inline double m_get_val(MAT *A, int i, int j) {
             {	return ((A)->me[(i)][(j)]); }
         }
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
         __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
             {	((A)->me[(i)][(j)] = (val)); }
         }
@@ -147,13 +144,13 @@ class pragma121_omp_parallel_hclib_async {
                 MAT* set_gicov) {
             MaxR = set_MaxR;
             height = set_height;
-            memcpy(tY, set_tY, sizeof(tY));
+            memcpy((void *)tY, (void *)set_tY, sizeof(tY));
             i = set_i;
-            memcpy(tX, set_tX, sizeof(tX));
+            memcpy((void *)tX, (void *)set_tX, sizeof(tX));
             grad_x = set_grad_x;
-            memcpy(cos_angle, set_cos_angle, sizeof(cos_angle));
+            memcpy((void *)cos_angle, (void *)set_cos_angle, sizeof(cos_angle));
             grad_y = set_grad_y;
-            memcpy(sin_angle, set_sin_angle, sizeof(sin_angle));
+            memcpy((void *)sin_angle, (void *)set_sin_angle, sizeof(sin_angle));
             gicov = set_gicov;
 
         }
@@ -363,9 +360,6 @@ class pragma196_omp_parallel_hclib_async {
             return blockIdx.x * blockDim.x + threadIdx.x;
         }
 
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
         __device__ inline double m_get_val(MAT *A, int i, int j) {
             {	return ((A)->me[(i)][(j)]); }
         }

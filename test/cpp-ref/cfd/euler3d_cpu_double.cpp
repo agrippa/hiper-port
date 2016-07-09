@@ -190,7 +190,7 @@ class pragma112_omp_parallel_hclib_async {
         pragma112_omp_parallel_hclib_async(double* set_variables,
                 double set_ff_variable[5]) {
             variables = set_variables;
-            memcpy(ff_variable, set_ff_variable, sizeof(ff_variable));
+            memcpy((void *)ff_variable, (void *)set_ff_variable, sizeof(ff_variable));
 
         }
 
@@ -481,48 +481,6 @@ class pragma196_omp_parallel_hclib_async {
 	fc_density_energy.z = velocity.z*de_p;
 }
         }
-        __device__ inline void compute_velocity(double& density, cfd_double3& momentum, cfd_double3& velocity) {
-            {
-	velocity.x = momentum.x / density;
-	velocity.y = momentum.y / density;
-	velocity.z = momentum.z / density;
-}
-        }
-        __device__ inline double compute_speed_sqd(cfd_double3& velocity) {
-            {
-	return velocity.x*velocity.x + velocity.y*velocity.y + velocity.z*velocity.z;
-}
-        }
-        __device__ inline double compute_pressure(double& density, double& density_energy, double& speed_sqd) {
-            {
-	return (double(GAMMA)-double(1.0))*(density_energy - double(0.5)*density*speed_sqd);
-}
-        }
-        __device__ inline double compute_speed_of_sound(double& density, double& pressure) {
-            {
-	return std::sqrt(double(GAMMA)*pressure/density);
-}
-        }
-        __device__ inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy) {
-            {
-	fc_momentum_x.x = velocity.x*momentum.x + pressure;
-	fc_momentum_x.y = velocity.x*momentum.y;
-	fc_momentum_x.z = velocity.x*momentum.z;
-
-	fc_momentum_y.x = fc_momentum_x.y;
-	fc_momentum_y.y = velocity.y*momentum.y + pressure;
-	fc_momentum_y.z = velocity.y*momentum.z;
-
-	fc_momentum_z.x = fc_momentum_x.z;
-	fc_momentum_z.y = fc_momentum_y.z;
-	fc_momentum_z.z = velocity.z*momentum.z + pressure;
-
-	double de_p = density_energy+pressure;
-	fc_density_energy.x = velocity.x*de_p;
-	fc_density_energy.y = velocity.y*de_p;
-	fc_density_energy.z = velocity.z*de_p;
-}
-        }
     double* volatile variables;
     int* volatile elements_surrounding_elements;
     double* volatile normals;
@@ -549,11 +507,11 @@ class pragma196_omp_parallel_hclib_async {
             elements_surrounding_elements = set_elements_surrounding_elements;
             normals = set_normals;
             smoothing_coefficient = set_smoothing_coefficient;
-            memcpy(ff_variable, set_ff_variable, sizeof(ff_variable));
-            memcpy(&ff_flux_contribution_density_energy, &set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
-            memcpy(&ff_flux_contribution_momentum_x, &set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
-            memcpy(&ff_flux_contribution_momentum_y, &set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
-            memcpy(&ff_flux_contribution_momentum_z, &set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
+            memcpy((void *)ff_variable, (void *)set_ff_variable, sizeof(ff_variable));
+            memcpy((void *)&ff_flux_contribution_density_energy, (void *)&set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_x, (void *)&set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_y, (void *)&set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_z, (void *)&set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
             fluxes = set_fluxes;
 
         }

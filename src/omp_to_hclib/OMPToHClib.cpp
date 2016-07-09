@@ -883,8 +883,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                                 ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
                                 "]";
                             functor_params->addParameter(ref, foundVarInfo);
-                            constructor_body << "            memcpy(" <<
-                                ref->getNameAsString() << ", set_" <<
+                            constructor_body << "            memcpy((void *)" <<
+                                ref->getNameAsString() << ", (void *)set_" <<
                                 ref->getNameAsString() << ", sizeof(" <<
                                 ref->getNameAsString() << "));" << std::endl;
                         } else if (const clang::ConstantArrayType *nestedArr =
@@ -903,8 +903,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                                     ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
                                     "][" << nestedArrSize.toString(10, false) << "]";
                                 functor_params->addParameter(ref, foundVarInfo);
-                                constructor_body << "            memcpy(" <<
-                                    ref->getNameAsString() << ", set_" <<
+                                constructor_body << "            memcpy((void *)" <<
+                                    ref->getNameAsString() << ", (void *)set_" <<
                                     ref->getNameAsString() << ", sizeof(" <<
                                     ref->getNameAsString() << "));" << std::endl;
                             } else {
@@ -932,8 +932,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                             record->getDecl()->getNameAsString() << " set_" <<
                             ref->getNameAsString();
                         functor_params->addParameter(ref, foundVarInfo);
-                        constructor_body << "            memcpy(&" <<
-                            ref->getNameAsString() << ", &set_" <<
+                        constructor_body << "            memcpy((void *)&" <<
+                            ref->getNameAsString() << ", (void *)&set_" <<
                             ref->getNameAsString() << ", sizeof(struct " <<
                             record->getDecl()->getNameAsString() << "));" <<
                             std::endl;
