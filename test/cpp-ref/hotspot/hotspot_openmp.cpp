@@ -80,6 +80,10 @@ typedef struct _pragma72_omp_parallel {
 
 class pragma72_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     int chunk;
     volatile int chunks_in_col;
     int chunks_in_row;

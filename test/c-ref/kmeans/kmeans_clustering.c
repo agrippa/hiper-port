@@ -150,6 +150,10 @@ typedef struct _pragma179_omp_parallel {
 
 class pragma179_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ int find_nearest_point(float  *pt,          /* [nfeatures] */
                        int     nfeatures,
                        float *pts,         /* [npts][nfeatures] */

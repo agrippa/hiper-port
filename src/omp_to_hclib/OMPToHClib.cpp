@@ -784,9 +784,9 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "class " << closureName << " {\n";
     ss << "    private:\n";
 
-    // ss << "        __device__ int hclib_get_current_worker() {" << std::endl;
-    // ss << "            return blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
-    // ss << "        }" << std::endl << std::endl;
+    ss << "        __device__ int hclib_get_current_worker() {" << std::endl;
+    ss << "            return blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
+    ss << "        }" << std::endl << std::endl;
 
     for (std::vector<const clang::FunctionDecl *>::iterator i =
             info.called_begin(), e = info.called_end(); i != e; i++) {

@@ -45,6 +45,10 @@ static void pragma71_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 
 class pragma87_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     int j;
     volatile int MatrixDim;
     FP_NUMBER sum;

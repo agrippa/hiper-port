@@ -65,6 +65,10 @@ typedef struct _pragma93_omp_parallel {
 
 class pragma93_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     int i;
     volatile long maxheight;
     int thid;

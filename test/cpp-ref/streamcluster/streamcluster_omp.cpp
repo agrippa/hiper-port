@@ -366,6 +366,10 @@ typedef struct _pragma475_omp_parallel {
 
 class pragma399_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ float dist(Point p1, Point p2, int dim) {
             {
   int i;
@@ -443,6 +447,10 @@ static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma475_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ float dist(Point p1, Point p2, int dim) {
             {
   int i;

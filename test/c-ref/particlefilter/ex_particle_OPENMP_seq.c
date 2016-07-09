@@ -731,6 +731,10 @@ typedef struct _pragma498_omp_parallel {
 
 class pragma383_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile weights;
     int x;
     volatile int Nparticles;
@@ -760,6 +764,10 @@ static void pragma383_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma398_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile arrayX;
     int x;
     volatile double xe;
@@ -796,6 +804,10 @@ static void pragma398_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma412_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ double randn(int * seed, int index) {
             {
 	/*Box-Muller algorithm*/
@@ -886,6 +898,10 @@ static void pragma412_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma420_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ double roundDouble(double value) {
             {
 	int newValue = (int)(value);
@@ -984,6 +1000,10 @@ static void pragma420_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma443_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile weights;
     int x;
     double* volatile likelihood;
@@ -1013,6 +1033,10 @@ static void pragma443_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma450_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double sumWeights;
     double* volatile weights;
     int x;
@@ -1042,6 +1066,10 @@ static void pragma450_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma456_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile weights;
     int x;
     volatile double sumWeights;
@@ -1071,6 +1099,10 @@ static void pragma456_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma465_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double xe;
     double* volatile arrayX;
     int x;
@@ -1110,6 +1142,10 @@ static void pragma465_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma490_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile u;
     int x;
     volatile double u1;
@@ -1142,6 +1178,10 @@ static void pragma490_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma498_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ int findIndex(double * CDF, int lengthCDF, double value) {
             {
 	int index = -1;

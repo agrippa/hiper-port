@@ -139,6 +139,10 @@ typedef struct _pragma168_omp_parallel {
 
 class pragma135_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     volatile int cols;
     int k;
     float Jc;
@@ -245,6 +249,10 @@ static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma168_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     volatile int cols;
     int k;
     float cN;

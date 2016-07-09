@@ -93,6 +93,10 @@ typedef struct _pragma153_omp_parallel {
 
 class pragma136_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     bool* h_graph_mask;
     struct Node* h_graph_nodes;
     int* h_graph_edges;
@@ -142,6 +146,10 @@ static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma153_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     bool* h_updating_graph_mask;
     bool* h_graph_mask;
     bool* h_graph_visited;

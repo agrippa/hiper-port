@@ -110,6 +110,10 @@ typedef struct _pragma121_omp_parallel {
 
 class pragma121_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ inline double m_get_val(MAT *A, int i, int j) {
             {	return ((A)->me[(i)][(j)]); }
         }
@@ -355,6 +359,10 @@ typedef struct _pragma196_omp_parallel {
 
 class pragma196_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ inline double m_get_val(MAT *A, int i, int j) {
             {	return ((A)->me[(i)][(j)]); }
         }

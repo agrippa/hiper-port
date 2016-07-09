@@ -67,6 +67,10 @@ typedef struct _pragma63_omp_parallel {
 
 class pragma63_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile dst;
     double* volatile src;
 
@@ -175,6 +179,10 @@ typedef struct _pragma112_omp_parallel {
 
 class pragma112_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile variables;
     volatile double ff_variable[5];
 
@@ -288,6 +296,10 @@ typedef struct _pragma165_omp_parallel {
 
 class pragma165_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ inline void compute_velocity(double& density, cfd_double3& momentum, cfd_double3& velocity) {
             {
 	velocity.x = momentum.x / density;
@@ -423,6 +435,10 @@ typedef struct _pragma196_omp_parallel {
 
 class pragma196_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
         __device__ inline void compute_velocity(double& density, cfd_double3& momentum, cfd_double3& velocity) {
             {
 	velocity.x = momentum.x / density;
@@ -855,6 +871,10 @@ typedef struct _pragma327_omp_parallel {
 
 class pragma327_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     double* volatile step_factors;
     volatile int j;
     double* volatile variables;

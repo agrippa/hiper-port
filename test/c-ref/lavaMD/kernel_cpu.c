@@ -85,6 +85,10 @@ typedef struct _pragma123_omp_parallel {
 
 class pragma123_omp_parallel_hclib_async {
     private:
+        __device__ int hclib_get_current_worker() {
+            return blockIdx.x * blockDim.x + threadIdx.x;
+        }
+
     long first_i;
     box_str* volatile box;
     int l;
