@@ -152,6 +152,10 @@ class pragma193_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma193_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 	        /* find the index of nestest cluster centers */					

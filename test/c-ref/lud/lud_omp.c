@@ -64,6 +64,10 @@ class pragma61_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma61_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int chunk_idx) {
             {
             int i, j, k, i_global, j_global, i_here, j_here;
@@ -123,6 +127,10 @@ class pragma113_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma113_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int chunk_idx) {
             {
             int i, j, k, i_global, j_global;

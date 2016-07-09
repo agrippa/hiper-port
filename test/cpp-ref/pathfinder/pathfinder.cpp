@@ -105,6 +105,10 @@ class pragma111_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma111_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int n) {
             {
           min = src[n];

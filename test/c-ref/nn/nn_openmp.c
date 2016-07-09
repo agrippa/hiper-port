@@ -67,6 +67,10 @@ class pragma127_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma127_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);

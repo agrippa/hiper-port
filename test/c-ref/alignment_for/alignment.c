@@ -476,6 +476,10 @@ class pragma474_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma474_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int si) {
             {
      n = seqlen_array[si+1];

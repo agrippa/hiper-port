@@ -46,6 +46,10 @@ class pragma76_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma76_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
         for (j=0; j < MatrixDim; j++){
@@ -74,6 +78,10 @@ class pragma92_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma92_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
         for (j=0; j < MatrixDim; j++){

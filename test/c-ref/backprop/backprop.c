@@ -249,6 +249,10 @@ class pragma242_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma242_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int j) {
             {
 
@@ -393,6 +397,10 @@ class pragma304_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma304_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int j) {
             {
     for (k = 0; k <= nly; k++) {

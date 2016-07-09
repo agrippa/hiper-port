@@ -42,6 +42,10 @@ class pragma93_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma93_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int cell_num) {
             {
 			// Make copies of the current cell's location

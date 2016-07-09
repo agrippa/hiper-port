@@ -173,6 +173,10 @@ class pragma167_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma167_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int z) {
             {
                 int y;

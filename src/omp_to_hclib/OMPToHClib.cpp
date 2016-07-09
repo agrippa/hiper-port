@@ -20,6 +20,8 @@
 #include "OMPToHClib.h"
 #include "OMPDependencies.h"
 
+#define VERBOSE
+
 /*
  * NOTE: The one thing to be careful about whenever inserting code in an
  * existing function is that the brace inserter is not run before this pass
@@ -494,21 +496,150 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
     }
 }
 
+std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
+        std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses,
+        std::string iterator, std::string body) {
+    std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
+    std::stringstream ss;
+    bool first_field = true;
+    std::stringstream constructor_sig;
+    std::stringstream constructor_body;
+
+#ifdef VERBOSE
+    std::cerr << "getCUDAFunctorDef: Generating " << closureName << std::endl;
+#endif
+
+    std::vector<OMPVarInfo> *toBeTransferred = new std::vector<OMPVarInfo>();
+
+    constructor_sig << "        " << closureName << "(";
+
+    ss << "class " << closureName << " {\n";
+    ss << "    private:\n";
+    /*
+    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
+            i != e; i++) {
+        OMPVarInfo var = *i;
+        clang::ValueDecl *decl = var.getDecl();
+
+        if (!first_field) {
+            constructor_sig << "," << std::endl << "                ";
+        }
+
+        switch (var.getType()) {
+            case (CAPTURE_TYPE::SHARED):
+#ifdef VERBOSE
+                std::cerr << "getCUDAFunctorDef: shared field " <<
+                    decl->getNameAsString() << ", type " <<
+                    std::string(decl->getType()->getTypeClassName()) <<
+                    std::endl;
+#endif
+                if (const clang::BuiltinType *builtin =
+                        clang::dyn_cast<clang::BuiltinType>(decl->getType())) {
+                    const std::string builtinStr =
+                        builtin->getName(Context->getPrintingPolicy()).str();
+                    ss << "    volatile " << builtinStr << " " <<
+                        decl->getNameAsString() << ";" << std::endl;
+                    constructor_sig << "    " << builtinStr << " set_" <<
+                        decl->getNameAsString();
+                    constructor_body << "            " <<
+                        decl->getNameAsString() << " = set_" <<
+                        decl->getNameAsString() << ";" << std::endl;
+                } else if (const clang::PointerType *pointer =
+                        clang::dyn_cast<clang::PointerType>(decl->getType())) {
+                    const clang::Type *pointee =
+                        pointer->getPointeeType().getTypePtr();
+                    const clang::BuiltinType *builtinPointee =
+                        clang::dyn_cast<clang::BuiltinType>(pointee);
+                    if (!builtinPointee) {
+                        std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                            "pointee type " <<
+                            std::string(decl->getType()->getTypeClassName()) <<
+                            " for " << decl->getNameAsString() << std::endl;
+                    }
+                    const std::string builtinStr =
+                        builtinPointee->getName(Context->getPrintingPolicy()).str();
+                    ss << "    " << builtinStr << "* " <<
+                        decl->getNameAsString() << ";" << std::endl;
+                    constructor_sig << "    " << builtinStr << "* set_" <<
+                        decl->getNameAsString();
+                    constructor_body << "            " <<
+                        decl->getNameAsString() << " = set_" <<
+                        decl->getNameAsString() << ";" << std::endl;
+                    toBeTransferred->push_back(var);
+                } else {
+                    std::cerr << "getCUDAFunctorDef: Unsupported shared " <<
+                        "capture type " <<
+                        std::string(decl->getType()->getTypeClassName()) <<
+                        std::endl;
+                    exit(1);
+                }
+                break;
+            case (CAPTURE_TYPE::PRIVATE):
+            case (CAPTURE_TYPE::FIRSTPRIVATE):
+#ifdef VERBOSE
+                std::cerr << "getCUDAFunctorDef: private/firstprivate field " <<
+                    decl->getNameAsString() << std::endl;
+#endif
+                if (const clang::BuiltinType *builtin =
+                        clang::dyn_cast<clang::BuiltinType>(decl->getType())) {
+                    const std::string builtinStr =
+                        builtin->getName(Context->getPrintingPolicy()).str();
+                    ss << "    " << builtinStr << " " <<
+                        decl->getNameAsString() << ";" << std::endl;
+                    constructor_sig << "    " << builtinStr << " set_" <<
+                        decl->getNameAsString();
+                    constructor_body << "            " <<
+                        decl->getNameAsString() << " = set_" <<
+                        decl->getNameAsString() << ";" << std::endl;
+                } else {
+                    std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                        "private/firstprivate capture type " <<
+                        std::string(decl->getType()->getTypeClassName()) <<
+                        std::endl;
+                    exit(1);
+                }
+                break;
+            case (CAPTURE_TYPE::LASTPRIVATE):
+#ifdef VERBOSE
+                std::cerr << "getCUDAFunctorDef: lastprivate field " <<
+                    decl->getNameAsString() << std::endl;
+#endif
+                assert(false);
+                break;
+            default:
+                std::cerr << "getCUDAFunctorDef: Unsupported capture clause " <<
+                    std::endl;
+                exit(1);
+        }
+
+        first_field = false;
+    }
+*/
+    ss << "\n";
+    ss << "    public:\n";
+    ss << constructor_sig.str() << ") {" << std::endl;
+    ss << constructor_body.str() << std::endl;
+    ss << "        }" << std::endl;
+    ss << std::endl;
+    ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
+    ss << "            " << body << "\n";
+    ss << "        }\n";
+    ss << "};\n\n";
+
+    // TODO handle toBeTransferred
+
+    return ss.str();
+}
+
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
-        bool isAcceleratable, std::string iterator, std::string body) {
+        bool isAcceleratable, std::string iterator, std::string body,
+        std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses) {
     std::stringstream ss;
 
     if (isAcceleratable) {
         ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
-        ss << "class " << closureName << " {\n";
-        ss << "    private:\n";
-        ss << "\n";
-        ss << "    public:\n";
-        ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
-        ss << "            " << body << "\n";
-        ss << "        }\n";
-        ss << "};\n\n";
+        ss << getCUDAFunctorDef(closureName, captured, clauses, iterator, body);
         ss << "#else\n";
     }
     ss << "static ";
@@ -1178,7 +1309,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
-                                false, isAcceleratable, accumulated_cond.at(0)->getNameAsString(), originalBodyStr);
+                                false, isAcceleratable,
+                                accumulated_cond.at(0)->getNameAsString(),
+                                originalBodyStr, node->getCaptures(), clauses);
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<

@@ -112,6 +112,10 @@ class pragma121_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma121_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		double Grad[NPOINTS];
@@ -315,6 +319,10 @@ class pragma196_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma196_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		int j, el_i, el_j, x, y;

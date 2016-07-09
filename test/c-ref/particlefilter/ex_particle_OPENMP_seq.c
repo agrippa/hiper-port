@@ -733,6 +733,10 @@ class pragma383_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma383_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 		weights[x] = 1/((double)(Nparticles));
@@ -750,6 +754,10 @@ class pragma398_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma398_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 		arrayX[x] = xe;
@@ -768,6 +776,10 @@ class pragma412_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma412_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			arrayX[x] += 1 + 5*randn(seed, x);
@@ -786,6 +798,10 @@ class pragma420_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma420_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			//compute the likelihood: remember our assumption is that you know
@@ -818,6 +834,10 @@ class pragma443_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma443_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			weights[x] = weights[x] * exp(likelihood[x]);
@@ -835,6 +855,10 @@ class pragma450_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma450_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			sumWeights += weights[x];
@@ -852,6 +876,10 @@ class pragma456_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma456_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			weights[x] = weights[x]/sumWeights;
@@ -869,6 +897,10 @@ class pragma465_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma465_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			xe += arrayX[x] * weights[x];
@@ -887,6 +919,10 @@ class pragma490_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma490_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int x) {
             {
 			u[x] = u1 + x/((double)(Nparticles));
@@ -904,6 +940,10 @@ class pragma498_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma498_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int j) {
             {
 			i = findIndex(CDF, Nparticles, u[j]);

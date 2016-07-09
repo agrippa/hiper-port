@@ -69,6 +69,10 @@ class pragma63_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma63_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		dst[i] = src[i];
@@ -168,6 +172,10 @@ class pragma112_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma112_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
@@ -272,6 +280,10 @@ class pragma165_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma165_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		double density = variables[NVAR*i + VAR_DENSITY];
@@ -373,6 +385,10 @@ class pragma196_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma196_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		int j, nb;
@@ -688,6 +704,10 @@ class pragma327_omp_parallel_hclib_async {
     private:
 
     public:
+        pragma327_omp_parallel_hclib_async() {
+
+        }
+
         __host__ __device__ void operator()(int i) {
             {
 		double factor = step_factors[i]/double(RK+1-j);
