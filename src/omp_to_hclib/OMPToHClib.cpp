@@ -496,9 +496,94 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
     }
 }
 
+void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
+        ParallelRegionInfo &acc) {
+#ifdef VERBOSE
+    std::cerr << "traverseFunctorBody: " << curr->getStmtClassName() << std::endl;
+#endif
+
+    if (const clang::CompoundStmt *cmpd =
+            clang::dyn_cast<clang::CompoundStmt>(curr)) {
+        for (clang::CompoundStmt::const_body_iterator i = cmpd->body_begin(),
+                e = cmpd->body_end(); i != e; i++) {
+            const clang::Stmt *member = *i;
+            traverseFunctorBody(member, acc);
+        }
+    } else if (const clang::BinaryOperator *bin =
+            clang::dyn_cast<clang::BinaryOperator>(curr)) {
+        traverseFunctorBody(bin->getLHS(), acc);
+        traverseFunctorBody(bin->getRHS(), acc);
+    } else if (const clang::DeclRefExpr *declref =
+            clang::dyn_cast<clang::DeclRefExpr>(curr)) {
+        acc.addReferencedVar(declref->getDecl());
+    } else if (const clang::CastExpr *cast =
+            clang::dyn_cast<clang::CastExpr>(curr)) {
+        traverseFunctorBody(cast->getSubExpr(), acc);
+    } else if (const clang::ArraySubscriptExpr *arrayRef =
+            clang::dyn_cast<clang::ArraySubscriptExpr>(curr)) {
+        /*
+         * Traverse the base variable reference this array reference is relative
+         * to.
+         */
+        traverseFunctorBody(arrayRef->getBase(), acc);
+        // Traverse the expression of the offset from base.
+        traverseFunctorBody(arrayRef->getIdx(), acc);
+    } else if (const clang::ForStmt *loop =
+            clang::dyn_cast<clang::ForStmt>(curr)) {
+        traverseFunctorBody(loop->getInit(), acc);
+        traverseFunctorBody(loop->getCond(), acc);
+        traverseFunctorBody(loop->getInc(), acc);
+        traverseFunctorBody(loop->getBody(), acc);
+    } else if (const clang::UnaryOperator *unary =
+            clang::dyn_cast<clang::UnaryOperator>(curr)) {
+        traverseFunctorBody(unary->getSubExpr(), acc);
+    } else if (const clang::IfStmt *branch =
+            clang::dyn_cast<clang::IfStmt>(curr)) {
+        traverseFunctorBody(branch->getCond(), acc);
+        if (branch->getThen()) {
+            traverseFunctorBody(branch->getThen(), acc);
+        }
+        if (branch->getElse()) {
+            traverseFunctorBody(branch->getElse(), acc);
+        }
+    } else if (const clang::ParenExpr *paren =
+            clang::dyn_cast<clang::ParenExpr>(curr)) {
+        traverseFunctorBody(paren->getSubExpr(), acc);
+    } else if (const clang::MemberExpr *member =
+            clang::dyn_cast<clang::MemberExpr>(curr)) {
+        traverseFunctorBody(member->getBase(), acc);
+    } else if (const clang::CallExpr *call =
+            clang::dyn_cast<clang::CallExpr>(curr)) {
+        const clang::FunctionDecl *callee = call->getDirectCallee();
+        if (callee == NULL || callee->getBody() == NULL) {
+            acc.foundUnresolvedFunction();
+        } else {
+            acc.addCalledFunction(callee);
+            traverseFunctorBody(callee->getBody(), acc);
+        }
+    } else if (const clang::ReturnStmt *ret =
+            clang::dyn_cast<clang::ReturnStmt>(curr)) {
+        traverseFunctorBody(ret->getRetValue(), acc);
+    } else if (const clang::ConditionalOperator *cond = clang::dyn_cast<clang::ConditionalOperator>(curr)) {
+        traverseFunctorBody(cond->getLHS(), acc);
+        traverseFunctorBody(cond->getRHS(), acc);
+    } else if (clang::isa<clang::IntegerLiteral>(curr) ||
+            clang::isa<clang::DeclStmt>(curr) ||
+            clang::isa<clang::FloatingLiteral>(curr) ||
+            clang::isa<clang::BreakStmt>(curr) ||
+            clang::isa<clang::CXXBoolLiteralExpr>(curr) ||
+            clang::isa<clang::ContinueStmt>(curr)) {
+        // Do nothing
+    } else {
+        std::cerr << "traverseFunctorBody: Unsupported statement type: " <<
+            curr->getStmtClassName() << std::endl;
+        exit(1);
+    }
+}
+
 std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
         std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses,
-        std::string iterator, std::string body) {
+        std::string iterator, std::string bodyStr, const clang::Stmt *body) {
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
     std::stringstream ss;
     bool first_field = true;
@@ -508,6 +593,9 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 #ifdef VERBOSE
     std::cerr << "getCUDAFunctorDef: Generating " << closureName << std::endl;
 #endif
+
+    ParallelRegionInfo info;
+    traverseFunctorBody(body, info);
 
     std::vector<OMPVarInfo> *toBeTransferred = new std::vector<OMPVarInfo>();
 
@@ -622,7 +710,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "        }" << std::endl;
     ss << std::endl;
     ss << "        __host__ __device__ void operator()(int " << iterator << ") {\n";
-    ss << "            " << body << "\n";
+    ss << "            " << bodyStr << "\n";
     ss << "        }\n";
     ss << "};\n\n";
 
@@ -633,13 +721,15 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
-        bool isAcceleratable, std::string iterator, std::string body,
-        std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses) {
+        bool isAcceleratable, std::string iterator, std::string bodyStr,
+        const clang::Stmt *body, std::vector<clang::ValueDecl *> *captured,
+        OMPClauses *clauses) {
     std::stringstream ss;
 
     if (isAcceleratable) {
         ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
-        ss << getCUDAFunctorDef(closureName, captured, clauses, iterator, body);
+        ss << getCUDAFunctorDef(closureName, captured, clauses, iterator,
+                bodyStr, body);
         ss << "#else\n";
     }
     ss << "static ";
@@ -1262,6 +1352,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             nLoops << "];\n";
                         const clang::ForStmt *currLoop = forLoop;
                         std::string originalBodyStr;
+                        const clang::Stmt *body = NULL;
+
                         for (int l = 0; l < nLoops; l++) {
                             const clang::Stmt *init = currLoop->getInit();
                             const clang::Stmt *cond = currLoop->getCond();
@@ -1287,6 +1379,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                     condVar->getNameAsString());
 
                             originalBodyStr = stmtToString(currLoop->getBody());
+                            body = currLoop->getBody();
                             bodyStr = stmtToStringWithSharedVars(
                                     currLoop->getBody(),
                                     clauses->getSharedVarInfo(node->getCaptures()));
@@ -1311,7 +1404,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
                                 false, isAcceleratable,
                                 accumulated_cond.at(0)->getNameAsString(),
-                                originalBodyStr, node->getCaptures(), clauses);
+                                originalBodyStr, body, node->getCaptures(), clauses);
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<

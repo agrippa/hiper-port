@@ -20,6 +20,7 @@
 #include "SingleClauseArgs.h"
 #include "OMPClauses.h"
 #include "OMPReductionVar.h"
+#include "ParallelRegionInfo.h"
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
@@ -53,12 +54,16 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string getClosureDecl(std::string closureName,
                 bool isForasyncClosure, int forasyncDim,
                 bool isFuture, bool isAcceleratable,
-                std::string iterator = "", std::string body = "",
+                std::string iterator = "", std::string bodyStr = "",
+                const clang::Stmt *body = NULL,
                 std::vector<clang::ValueDecl *> *captured = NULL,
                 OMPClauses *clauses = NULL);
+        void traverseFunctorBody(const clang::Stmt *curr,
+                ParallelRegionInfo &info);
         std::string getCUDAFunctorDef(std::string closureName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses,
-                std::string iterator, std::string body);
+                std::string iterator, std::string bodyStr,
+                const clang::Stmt *body);
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName,
