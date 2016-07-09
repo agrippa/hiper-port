@@ -125,6 +125,23 @@ typedef struct _pragma162_omp_parallel {
 
 class pragma110_omp_parallel_hclib_async {
     private:
+        __device__ int maximum( int a,
+		 int b,
+		 int c) {
+            {
+
+	int k;
+	if( a <= b )
+		k = b;
+	else 
+	k = a;
+
+	if( k <=c )
+	return(c);
+	else
+	return(k);
+}
+        }
 
     public:
         pragma110_omp_parallel_hclib_async() {
@@ -187,6 +204,23 @@ static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma162_omp_parallel_hclib_async {
     private:
+        __device__ int maximum( int a,
+		 int b,
+		 int c) {
+            {
+
+	int k;
+	if( a <= b )
+		k = b;
+	else 
+	k = a;
+
+	if( k <=c )
+	return(c);
+	else
+	return(k);
+}
+        }
 
     public:
         pragma162_omp_parallel_hclib_async() {

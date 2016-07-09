@@ -150,6 +150,37 @@ typedef struct _pragma193_omp_parallel {
 
 class pragma193_omp_parallel_hclib_async {
     private:
+        __device__ int find_nearest_point(float  *pt,          /* [nfeatures] */
+                       int     nfeatures,
+                       float **pts,         /* [npts][nfeatures] */
+                       int     npts) {
+            {
+    int index, i;
+    float min_dist=FLT_MAX;
+
+    /* find the cluster center id with min distance to pt */
+    for (i=0; i<npts; i++) {
+        float dist;
+        dist = euclid_dist_2(pt, pts[i], nfeatures);  /* no need square root */
+        if (dist < min_dist) {
+            min_dist = dist;
+            index    = i;
+        }
+    }
+    return(index);
+}
+        }
+        __device__ float   euclid_dist_2        (float*, float*, int) {
+            {
+    int i;
+    float ans=0.0;
+
+    for (i=0; i<numdims; i++)
+        ans += (pt1[i]-pt2[i]) * (pt1[i]-pt2[i]);
+
+    return(ans);
+}
+        }
 
     public:
         pragma193_omp_parallel_hclib_async() {

@@ -247,6 +247,15 @@ typedef struct _pragma242_omp_parallel {
 
 class pragma242_omp_parallel_hclib_async {
     private:
+        __device__ float squash(float x) {
+            {
+  float m;
+  //x = -x;
+  //m = 1 + x + x*x/2 + x*x*x/6 + x*x*x*x/24 + x*x*x*x*x/120;
+  //return(1.0 / (1.0 + m));
+  return (1.0 / (1.0 + exp(-x)));
+}
+        }
 
     public:
         pragma242_omp_parallel_hclib_async() {

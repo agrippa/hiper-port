@@ -409,6 +409,20 @@ static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma475_omp_parallel_hclib_async {
     private:
+        __device__ float dist(Point p1, Point p2, int dim) {
+            {
+  int i;
+  float result=0.0;
+  for (i=0;i<dim;i++)
+    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
+#ifdef INSERT_WASTE
+  double s = waste(result);
+  result += s;
+  result -= s;
+#endif
+  return(result);
+}
+        }
 
     public:
         pragma475_omp_parallel_hclib_async() {

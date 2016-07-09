@@ -39,38 +39,7 @@ typedef struct _pragma92_omp_parallel {
     float (*(*(*A_ptr)));
  } pragma92_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma76_omp_parallel_hclib_async {
-    private:
-
-    public:
-        pragma76_omp_parallel_hclib_async() {
-
-        }
-
-        __host__ __device__ void operator()(int i) {
-            {
-        for (j=0; j < MatrixDim; j++){
-            if ( i == j) {
-                L[i][j] = 1.0;
-                U[i][j] = GET_RAND_FP;
-            } else if (i < j){
-                L[i][j] = 0;
-                U[i][j] = GET_RAND_FP;
-            } else { // i > j
-                L[i][j] = GET_RAND_FP;
-                U[i][j] = 0;
-            }
-        }
-    }
-        }
-};
-
-#else
 static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
 
@@ -160,10 +129,6 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((MatrixDim) - (0), pragma76_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma76_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
@@ -228,9 +193,6 @@ free(new_ctx);
 
     return 0;
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma76_omp_parallel *ctx = (pragma76_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -256,7 +218,6 @@ static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 
 }
 
-#endif
 
 
 #ifndef OMP_TO_HCLIB_ENABLE_GPU

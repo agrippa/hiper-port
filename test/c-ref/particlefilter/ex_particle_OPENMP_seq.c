@@ -774,6 +774,26 @@ static void pragma398_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma412_omp_parallel_hclib_async {
     private:
+        __device__ double randn(int * seed, int index) {
+            {
+	/*Box-Muller algorithm*/
+	double u = randu(seed, index);
+	double v = randu(seed, index);
+	double cosine = cos(2*PI*v);
+	double rt = -2*log(u);
+	return sqrt(rt)*cosine;
+}
+        }
+        __device__ double randn(int * seed, int index) {
+            {
+	/*Box-Muller algorithm*/
+	double u = randu(seed, index);
+	double v = randu(seed, index);
+	double cosine = cos(2*PI*v);
+	double rt = -2*log(u);
+	return sqrt(rt)*cosine;
+}
+        }
 
     public:
         pragma412_omp_parallel_hclib_async() {
@@ -796,6 +816,24 @@ static void pragma412_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma420_omp_parallel_hclib_async {
     private:
+        __device__ double roundDouble(double value) {
+            {
+	int newValue = (int)(value);
+	if(value - newValue < .5)
+	return newValue;
+	else
+	return newValue++;
+}
+        }
+        __device__ double roundDouble(double value) {
+            {
+	int newValue = (int)(value);
+	if(value - newValue < .5)
+	return newValue;
+	else
+	return newValue++;
+}
+        }
 
     public:
         pragma420_omp_parallel_hclib_async() {
@@ -938,6 +976,22 @@ static void pragma490_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma498_omp_parallel_hclib_async {
     private:
+        __device__ int findIndex(double * CDF, int lengthCDF, double value) {
+            {
+	int index = -1;
+	int x;
+	for(x = 0; x < lengthCDF; x++){
+		if(CDF[x] >= value){
+			index = x;
+			break;
+		}
+	}
+	if(index == -1){
+		return lengthCDF-1;
+	}
+	return index;
+}
+        }
 
     public:
         pragma498_omp_parallel_hclib_async() {

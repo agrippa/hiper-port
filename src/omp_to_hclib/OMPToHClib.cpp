@@ -555,18 +555,28 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
     } else if (const clang::CallExpr *call =
             clang::dyn_cast<clang::CallExpr>(curr)) {
         const clang::FunctionDecl *callee = call->getDirectCallee();
-        if (callee == NULL || callee->getBody() == NULL) {
-            acc.foundUnresolvedFunction();
+        assert(callee != NULL);
+        if (callee->getBody() == NULL) {
+            acc.foundUnresolvedFunction(callee);
         } else {
             acc.addCalledFunction(callee);
             traverseFunctorBody(callee->getBody(), acc);
         }
+
+        for (unsigned i = 0; i < call->getNumArgs(); i++) {
+            traverseFunctorBody(call->getArg(i), acc);
+        }
     } else if (const clang::ReturnStmt *ret =
             clang::dyn_cast<clang::ReturnStmt>(curr)) {
         traverseFunctorBody(ret->getRetValue(), acc);
-    } else if (const clang::ConditionalOperator *cond = clang::dyn_cast<clang::ConditionalOperator>(curr)) {
+    } else if (const clang::ConditionalOperator *cond =
+            clang::dyn_cast<clang::ConditionalOperator>(curr)) {
         traverseFunctorBody(cond->getLHS(), acc);
         traverseFunctorBody(cond->getRHS(), acc);
+    } else if (const clang::CXXConstructExpr *constr = clang::dyn_cast<clang::CXXConstructExpr>(curr)) {
+        for (unsigned i = 0; i < constr->getNumArgs(); i++) {
+            traverseFunctorBody(constr->getArg(i), acc);
+        }
     } else if (clang::isa<clang::IntegerLiteral>(curr) ||
             clang::isa<clang::DeclStmt>(curr) ||
             clang::isa<clang::FloatingLiteral>(curr) ||
@@ -589,6 +599,14 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     bool first_field = true;
     std::stringstream constructor_sig;
     std::stringstream constructor_body;
+    
+    std::vector<std::string> cudaIntrinsics;
+    cudaIntrinsics.push_back("exp");
+    cudaIntrinsics.push_back("sqrt");
+    cudaIntrinsics.push_back("cos");
+    cudaIntrinsics.push_back("sin");
+    cudaIntrinsics.push_back("fabs");
+    cudaIntrinsics.push_back("pow");
 
 #ifdef VERBOSE
     std::cerr << "getCUDAFunctorDef: Generating " << closureName << std::endl;
@@ -597,12 +615,42 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ParallelRegionInfo info;
     traverseFunctorBody(body, info);
 
+    bool anyUnresolved = false;
+    for (std::vector<const clang::FunctionDecl *>::iterator i =
+            info.unresolved_begin(), e = info.unresolved_end(); i != e; i++) {
+        const clang::FunctionDecl *unresolved = *i;
+        std::string unresolvedName = unresolved->getNameAsString();
+        if (std::find(cudaIntrinsics.begin(), cudaIntrinsics.end(),
+                    unresolvedName) == cudaIntrinsics.end()) {
+            anyUnresolved = true;
+            std::cerr << "Found call to unresolved function \"" <<
+                unresolved->getNameAsString() << "\" inside acceleratable " <<
+                "parallel region" << std::endl;
+        }
+    }
+
+    if (anyUnresolved) {
+        return "";
+    }
+
     std::vector<OMPVarInfo> *toBeTransferred = new std::vector<OMPVarInfo>();
 
     constructor_sig << "        " << closureName << "(";
 
     ss << "class " << closureName << " {\n";
     ss << "    private:\n";
+
+    for (std::vector<const clang::FunctionDecl *>::iterator i =
+            info.called_begin(), e = info.called_end(); i != e; i++) {
+        const clang::FunctionDecl *func = *i;
+        std::string funcDef = rewriter->getRewrittenText(clang::SourceRange(
+                    func->getLocStart(),
+                    func->getParamDecl(func->param_size() - 1)->getLocEnd()));
+        ss << "        __device__ " << funcDef << ") {" << std::endl;
+        ss << "            " << stmtToString(func->getBody()) << std::endl;
+        ss << "        }" << std::endl;
+    }
+
     /*
     for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
             i != e; i++) {
@@ -721,16 +769,21 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 
 std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
-        bool isAcceleratable, std::string iterator, std::string bodyStr,
+        bool &isAcceleratable, std::string iterator, std::string bodyStr,
         const clang::Stmt *body, std::vector<clang::ValueDecl *> *captured,
         OMPClauses *clauses) {
     std::stringstream ss;
 
     if (isAcceleratable) {
-        ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
-        ss << getCUDAFunctorDef(closureName, captured, clauses, iterator,
-                bodyStr, body);
-        ss << "#else\n";
+        std::string functor = getCUDAFunctorDef(closureName, captured, clauses,
+                iterator, bodyStr, body);
+        if (functor.length() == 0) {
+            isAcceleratable = false;
+        } else {
+            ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
+            ss << functor;
+            ss << "#else\n";
+        }
     }
     ss << "static ";
     if (isFuture) {
@@ -1210,9 +1263,10 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         std::string bodyStr = stmtToStringWithSharedVars(body,
                                 clauses->getSharedVarInfo(node->getCaptures()));
 
+                        bool isAcceleratable = false;
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, false, -1, true,
-                                false);
+                                isAcceleratable);
 
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, false, true,
@@ -1252,9 +1306,10 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     std::string bodyStr = stmtToStringWithSharedVars(body,
                             clauses->getSharedVarInfo(node->getCaptures()));
 
+                    bool isAcceleratable = false;
                     accumulatedKernelDecls += getClosureDecl(
                             node->getLbl() + ASYNC_SUFFIX, false, -1,
-                            clauses->hasClause("depend"), false);
+                            clauses->hasClause("depend"), isAcceleratable);
 
                     accumulatedKernelDefs += getClosureDef(
                             node->getLbl() + ASYNC_SUFFIX, false, true,
@@ -1398,13 +1453,15 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             assert(currLoop || l == nLoops - 1);
                         }
 
-                        const bool isAcceleratable = (nLoops == 1 && accumulated_stride.at(0) == "1");
+                        bool isAcceleratable = (nLoops == 1 &&
+                                accumulated_stride.at(0) == "1");
 
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
                                 false, isAcceleratable,
                                 accumulated_cond.at(0)->getNameAsString(),
-                                originalBodyStr, body, node->getCaptures(), clauses);
+                                originalBodyStr, body, node->getCaptures(),
+                                clauses);
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<

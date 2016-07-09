@@ -110,6 +110,15 @@ typedef struct _pragma121_omp_parallel {
 
 class pragma121_omp_parallel_hclib_async {
     private:
+        __device__ inline double m_get_val(MAT *A, int i, int j) {
+            {	return ((A)->me[(i)][(j)]); }
+        }
+        __device__ inline double m_get_val(MAT *A, int i, int j) {
+            {	return ((A)->me[(i)][(j)]); }
+        }
+        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
+            {	((A)->me[(i)][(j)] = (val)); }
+        }
 
     public:
         pragma121_omp_parallel_hclib_async() {
@@ -317,6 +326,15 @@ typedef struct _pragma196_omp_parallel {
 
 class pragma196_omp_parallel_hclib_async {
     private:
+        __device__ inline double m_get_val(MAT *A, int i, int j) {
+            {	return ((A)->me[(i)][(j)]); }
+        }
+        __device__ inline double m_get_val(MAT *A, int i, int j) {
+            {	return ((A)->me[(i)][(j)]); }
+        }
+        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
+            {	((A)->me[(i)][(j)] = (val)); }
+        }
 
     public:
         pragma196_omp_parallel_hclib_async() {
