@@ -1794,7 +1794,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             node->getLbl() << ASYNC_SUFFIX << ", new_ctx, " <<
                             nLoops << ", domain, HCLIB_FORASYNC_MODE);\n";
                         contextCreation << "hclib_future_wait(fut);\n";
-                        if (nLoops == 1) {
+                        if (isAcceleratable) {
                             contextCreation << "#endif\n";
                         }
                         contextCreation << "free(new_ctx);\n";

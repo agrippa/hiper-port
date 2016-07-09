@@ -582,7 +582,6 @@ domain[0].stride = 1;
 domain[0].tile = -1;
 hclib_future_t *fut = hclib_forasync_future((void *)pragma556_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
