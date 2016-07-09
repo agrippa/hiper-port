@@ -929,11 +929,11 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                             record->getDecl()->getNameAsString() << " " <<
                             ref->getNameAsString() << ";" << std::endl;
                         constructor_sig << "struct " <<
-                            record->getDecl()->getNameAsString() << " set_" <<
+                            record->getDecl()->getNameAsString() << " *set_" <<
                             ref->getNameAsString();
                         functor_params->addParameter(ref, foundVarInfo);
                         constructor_body << "            memcpy((void *)&" <<
-                            ref->getNameAsString() << ", (void *)&set_" <<
+                            ref->getNameAsString() << ", set_" <<
                             ref->getNameAsString() << ", sizeof(struct " <<
                             record->getDecl()->getNameAsString() << "));" <<
                             std::endl;
@@ -1782,7 +1782,13 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             if (i != functor_parameters.begin()) {
                                 constructor_params << ", ";
                             }
-                            constructor_params << param.getDecl()->getNameAsString();
+
+                            if (param.getInfo().getType() == CAPTURE_TYPE::SHARED &&
+                                    clang::isa<clang::RecordType>(param.getDecl()->getType())) {
+                                constructor_params << "&" << param.getDecl()->getNameAsString();
+                            } else {
+                                constructor_params << param.getDecl()->getNameAsString();
+                            }
                         }
 
                         std::stringstream contextCreation;

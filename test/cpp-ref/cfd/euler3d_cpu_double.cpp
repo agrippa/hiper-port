@@ -498,20 +498,20 @@ class pragma196_omp_parallel_hclib_async {
                 double* set_normals,
                 double set_smoothing_coefficient,
                 double set_ff_variable[5],
-                struct cfd_double3 set_ff_flux_contribution_density_energy,
-                struct cfd_double3 set_ff_flux_contribution_momentum_x,
-                struct cfd_double3 set_ff_flux_contribution_momentum_y,
-                struct cfd_double3 set_ff_flux_contribution_momentum_z,
+                struct cfd_double3 *set_ff_flux_contribution_density_energy,
+                struct cfd_double3 *set_ff_flux_contribution_momentum_x,
+                struct cfd_double3 *set_ff_flux_contribution_momentum_y,
+                struct cfd_double3 *set_ff_flux_contribution_momentum_z,
                 double* set_fluxes) {
             variables = set_variables;
             elements_surrounding_elements = set_elements_surrounding_elements;
             normals = set_normals;
             smoothing_coefficient = set_smoothing_coefficient;
             memcpy((void *)ff_variable, (void *)set_ff_variable, sizeof(ff_variable));
-            memcpy((void *)&ff_flux_contribution_density_energy, (void *)&set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_x, (void *)&set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_y, (void *)&set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_z, (void *)&set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_density_energy, set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_x, set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_y, set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
+            memcpy((void *)&ff_flux_contribution_momentum_z, set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
             fluxes = set_fluxes;
 
         }
@@ -666,7 +666,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, ff_flux_contribution_density_energy, ff_flux_contribution_momentum_x, ff_flux_contribution_momentum_y, ff_flux_contribution_momentum_z, fluxes), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, &ff_flux_contribution_density_energy, &ff_flux_contribution_momentum_x, &ff_flux_contribution_momentum_y, &ff_flux_contribution_momentum_z, fluxes), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma196_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
