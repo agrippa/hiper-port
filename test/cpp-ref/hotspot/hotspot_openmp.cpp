@@ -80,6 +80,9 @@ typedef struct _pragma72_omp_parallel {
 
 class pragma72_omp_parallel_hclib_async {
     private:
+    int chunk;
+    volatile int chunks_in_col;
+    int chunks_in_row;
     int row;
     int col;
     int r;
@@ -95,7 +98,10 @@ class pragma72_omp_parallel_hclib_async {
     FLOAT* volatile result;
 
     public:
-        pragma72_omp_parallel_hclib_async(int set_row,
+        pragma72_omp_parallel_hclib_async(int set_chunk,
+                int set_chunks_in_col,
+                int set_chunks_in_row,
+                int set_row,
                 int set_col,
                 int set_r,
                 int set_c,
@@ -108,6 +114,9 @@ class pragma72_omp_parallel_hclib_async {
                 FLOAT set_amb_temp,
                 FLOAT set_Rz_1,
                 FLOAT* set_result) {
+            chunk = set_chunk;
+            chunks_in_col = set_chunks_in_col;
+            chunks_in_row = set_chunks_in_row;
             row = set_row;
             col = set_col;
             r = set_r;
@@ -244,7 +253,7 @@ domain[0].high = num_chunk;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((num_chunk) - (0), pragma72_omp_parallel_hclib_async(row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((num_chunk) - (0), pragma72_omp_parallel_hclib_async(chunk, chunks_in_col, chunks_in_row, row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma72_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

@@ -469,87 +469,7 @@ typedef struct _pragma474_omp_parallel {
     int (*(*matptr_ptr));
  } pragma474_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma474_omp_parallel_hclib_async {
-    private:
-    int n;
-    int* volatile seqlen_array;
-    int si;
-    int i;
-    int len1;
-    volatile int gap_pos1;
-    volatile int gap_pos2;
-    int sj;
-    volatile int nseqs;
-    int m;
-    int* volatile bench_output;
-
-    public:
-        pragma474_omp_parallel_hclib_async(int set_n,
-                int* set_seqlen_array,
-                int set_si,
-                int set_i,
-                int set_len1,
-                int set_gap_pos1,
-                int set_gap_pos2,
-                int set_sj,
-                int set_nseqs,
-                int set_m,
-                int* set_bench_output) {
-            n = set_n;
-            seqlen_array = set_seqlen_array;
-            si = set_si;
-            i = set_i;
-            len1 = set_len1;
-            gap_pos1 = set_gap_pos1;
-            gap_pos2 = set_gap_pos2;
-            sj = set_sj;
-            nseqs = set_nseqs;
-            m = set_m;
-            bench_output = set_bench_output;
-
-        }
-
-        __host__ __device__ void operator()(int si) {
-            {
-     n = seqlen_array[si+1];
-     for (i = 1, len1 = 0; i <= n; i++) {
-        char c = seq_array[si+1][i];
-        if ((c != gap_pos1) && (c != gap_pos2)) len1++;
-     }
-     for (sj = si + 1; sj < nseqs; sj++) 
-     {
-        m = seqlen_array[sj+1];
-        if ( n == 0 || m == 0 ) {
-           bench_output[si*nseqs+sj] = (int) 1.0;
-        } else {
- { 
-pragma471_omp_task *new_ctx = (pragma471_omp_task *)malloc(sizeof(pragma471_omp_task));
-new_ctx->i = i;
-new_ctx->n = n;
-new_ctx->m = m;
-new_ctx->si = si;
-new_ctx->sj = sj;
-new_ctx->len1 = len1;
-new_ctx->len2 = *(ctx->len2_ptr);
-new_ctx->maxres_ptr = ctx->maxres_ptr;
-new_ctx->gg = *(ctx->gg_ptr);
-new_ctx->mm_score = *(ctx->mm_score_ptr);
-new_ctx->mat_xref_ptr = ctx->mat_xref_ptr;
-new_ctx->matptr_ptr = ctx->matptr_ptr;
-hclib_async(pragma471_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
- }  // end task
-        } // end if (n == 0 || m == 0)
-     } // for (j)
-  }
-        }
-};
-
-#else
 static void pragma474_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 typedef struct _main_entrypoint_ctx {
     int i;
     int n;
@@ -601,13 +521,8 @@ domain[0].low = 0;
 domain[0].high = nseqs;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nseqs) - (0), pragma474_omp_parallel_hclib_async(n, seqlen_array, si, i, len1, gap_pos1, gap_pos2, sj, nseqs, m, bench_output), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma474_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  }  // end parallel for (i)
    } ;     free(____arg);
@@ -643,9 +558,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
    return 0;
 }  
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma474_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma474_omp_parallel *ctx = (pragma474_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -692,7 +604,6 @@ hclib_async(pragma471_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 
 }
 
-#endif
  
 static void pragma471_omp_task_hclib_async(void *____arg) {
     pragma471_omp_task *ctx = (pragma471_omp_task *)____arg;

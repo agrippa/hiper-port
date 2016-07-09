@@ -295,6 +295,21 @@ class pragma165_omp_parallel_hclib_async {
 	velocity.z = momentum.z / density;
 }
         }
+        __device__ inline double compute_speed_sqd(cfd_double3& velocity) {
+            {
+	return velocity.x*velocity.x + velocity.y*velocity.y + velocity.z*velocity.z;
+}
+        }
+        __device__ inline double compute_pressure(double& density, double& density_energy, double& speed_sqd) {
+            {
+	return (double(GAMMA)-double(1.0))*(density_energy - double(0.5)*density*speed_sqd);
+}
+        }
+        __device__ inline double compute_speed_of_sound(double& density, double& pressure) {
+            {
+	return std::sqrt(double(GAMMA)*pressure/density);
+}
+        }
     double* volatile variables;
     double* volatile step_factors;
     double* volatile areas;
@@ -413,6 +428,21 @@ class pragma196_omp_parallel_hclib_async {
 	velocity.x = momentum.x / density;
 	velocity.y = momentum.y / density;
 	velocity.z = momentum.z / density;
+}
+        }
+        __device__ inline double compute_speed_sqd(cfd_double3& velocity) {
+            {
+	return velocity.x*velocity.x + velocity.y*velocity.y + velocity.z*velocity.z;
+}
+        }
+        __device__ inline double compute_pressure(double& density, double& density_energy, double& speed_sqd) {
+            {
+	return (double(GAMMA)-double(1.0))*(density_energy - double(0.5)*density*speed_sqd);
+}
+        }
+        __device__ inline double compute_speed_of_sound(double& density, double& pressure) {
+            {
+	return std::sqrt(double(GAMMA)*pressure/density);
 }
         }
         __device__ inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy) {
@@ -825,14 +855,20 @@ typedef struct _pragma327_omp_parallel {
 
 class pragma327_omp_parallel_hclib_async {
     private:
+    double* volatile step_factors;
+    volatile int j;
     double* volatile variables;
     double* volatile old_variables;
     double* volatile fluxes;
 
     public:
-        pragma327_omp_parallel_hclib_async(double* set_variables,
+        pragma327_omp_parallel_hclib_async(double* set_step_factors,
+                int set_j,
+                double* set_variables,
                 double* set_old_variables,
                 double* set_fluxes) {
+            step_factors = set_step_factors;
+            j = set_j;
             variables = set_variables;
             old_variables = set_old_variables;
             fluxes = set_fluxes;
@@ -871,7 +907,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(variables, old_variables, fluxes), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(step_factors, j, variables, old_variables, fluxes), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma327_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

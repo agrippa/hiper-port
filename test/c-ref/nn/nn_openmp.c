@@ -60,47 +60,7 @@ typedef struct _pragma127_omp_parallel {
     char (*(*(*argv_ptr)));
  } pragma127_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma127_omp_parallel_hclib_async {
-    private:
-    char* rec_iter;
-    volatile char sandbox[490];
-    int i;
-    float* volatile z;
-    volatile float target_lat;
-    volatile float target_long;
-
-    public:
-        pragma127_omp_parallel_hclib_async(char* set_rec_iter,
-                char set_sandbox[490],
-                int set_i,
-                float* set_z,
-                float set_target_lat,
-                float set_target_long) {
-            rec_iter = set_rec_iter;
-            memcpy(sandbox, set_sandbox, sizeof(sandbox));
-            i = set_i;
-            z = set_z;
-            target_lat = set_target_lat;
-            target_long = set_target_long;
-
-        }
-
-        __host__ __device__ void operator()(int i) {
-            {
-			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
-            float tmp_lat = atof(rec_iter);
-            float tmp_long = atof(rec_iter+5);
-			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
-        }
-        }
-};
-
-#else
 static void pragma127_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 typedef struct _main_entrypoint_ctx {
     long long time0;
     FILE (*flist);
@@ -210,13 +170,8 @@ domain[0].low = 0;
 domain[0].high = rec_count;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rec_count) - (0), pragma127_omp_parallel_hclib_async(rec_iter, sandbox, i, z, target_lat, target_long), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma127_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
@@ -337,9 +292,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
     printf("total time : %15.12f s\n", (float) (time1 - time0) / 1000000);
     return 0;
 }  
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma127_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma127_omp_parallel *ctx = (pragma127_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -357,6 +309,5 @@ static void pragma127_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 

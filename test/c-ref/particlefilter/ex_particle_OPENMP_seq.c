@@ -806,6 +806,20 @@ class pragma412_omp_parallel_hclib_async {
 	return sqrt(rt)*cosine;
 }
         }
+        __device__ double randu(int * seed, int index) {
+            {
+	int num = A*seed[index] + C;
+	seed[index] = num % M;
+	return fabs(seed[index]/((double) M));
+}
+        }
+        __device__ double randu(int * seed, int index) {
+            {
+	int num = A*seed[index] + C;
+	seed[index] = num % M;
+	return fabs(seed[index]/((double) M));
+}
+        }
         __device__ double randn(int * seed, int index) {
             {
 	/*Box-Muller algorithm*/
@@ -816,18 +830,41 @@ class pragma412_omp_parallel_hclib_async {
 	return sqrt(rt)*cosine;
 }
         }
+        __device__ double randu(int * seed, int index) {
+            {
+	int num = A*seed[index] + C;
+	seed[index] = num % M;
+	return fabs(seed[index]/((double) M));
+}
+        }
+        __device__ double randu(int * seed, int index) {
+            {
+	int num = A*seed[index] + C;
+	seed[index] = num % M;
+	return fabs(seed[index]/((double) M));
+}
+        }
     double* volatile arrayX;
     int x;
+    volatile int A;
+    volatile int C;
+    volatile long M;
     int* volatile seed;
     double* volatile arrayY;
 
     public:
         pragma412_omp_parallel_hclib_async(double* set_arrayX,
                 int set_x,
+                int set_A,
+                int set_C,
+                long set_M,
                 int* set_seed,
                 double* set_arrayY) {
             arrayX = set_arrayX;
             x = set_x;
+            A = set_A;
+            C = set_C;
+            M = set_M;
             seed = set_seed;
             arrayY = set_arrayY;
 
@@ -1335,7 +1372,7 @@ domain[0].high = Nparticles;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma412_omp_parallel_hclib_async(arrayX, x, seed, arrayY), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((Nparticles) - (0), pragma412_omp_parallel_hclib_async(arrayX, x, A, C, M, seed, arrayY), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma412_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

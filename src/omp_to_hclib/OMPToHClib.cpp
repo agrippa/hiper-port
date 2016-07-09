@@ -608,6 +608,26 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
                 e = decl->decl_end(); i != e; i++) {
             const clang::Decl *curr = *i;
             acc.addDeclaredVar(curr);
+
+            if (const clang::VarDecl *var =
+                    clang::dyn_cast<clang::VarDecl>(curr)) {
+                if (var->getInit()) {
+                    traverseFunctorBody(var->getInit(), acc,
+                            beneathFunctionCall);
+                }
+            }
+        }
+    } else if (const clang::UnaryExprOrTypeTraitExpr *unary =
+            clang::dyn_cast<clang::UnaryExprOrTypeTraitExpr>(curr)) {
+        if (!unary->isArgumentType()) {
+            traverseFunctorBody(unary->getArgumentExpr(), acc,
+                    beneathFunctionCall);
+        }
+    } else if (const clang::InitListExpr *initList =
+            clang::dyn_cast<clang::InitListExpr>(curr)) {
+        for (unsigned i = 0; i < initList->getNumInits(); i++) {
+            traverseFunctorBody(initList->getInit(i), acc,
+                    beneathFunctionCall);
         }
     } else if (clang::isa<clang::IntegerLiteral>(curr) ||
             clang::isa<clang::FloatingLiteral>(curr) ||
@@ -729,6 +749,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     cudaIntrinsics.push_back("sin");
     cudaIntrinsics.push_back("fabs");
     cudaIntrinsics.push_back("pow");
+    cudaIntrinsics.push_back("log");
+    cudaIntrinsics.push_back("hclib_get_current_worker");
 
 #ifdef VERBOSE
     std::cerr << "getCUDAFunctorDef: Generating " << closureName << std::endl;
@@ -761,6 +783,10 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 
     ss << "class " << closureName << " {\n";
     ss << "    private:\n";
+
+    // ss << "        __device__ int hclib_get_current_worker() {" << std::endl;
+    // ss << "            return blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
+    // ss << "        }" << std::endl << std::endl;
 
     for (std::vector<const clang::FunctionDecl *>::iterator i =
             info.called_begin(), e = info.called_end(); i != e; i++) {

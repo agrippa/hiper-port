@@ -366,20 +366,40 @@ typedef struct _pragma475_omp_parallel {
 
 class pragma399_omp_parallel_hclib_async {
     private:
-    bool* volatile switch_membership;
+        __device__ float dist(Point p1, Point p2, int dim) {
+            {
+  int i;
+  float result=0.0;
+  for (i=0;i<dim;i++)
+    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
+#ifdef INSERT_WASTE
+  double s = waste(result);
+  result += s;
+  result -= s;
+#endif
+  return(result);
+}
+        }
+    Points* volatile points;
     int i;
+    volatile long x;
+    bool* volatile switch_membership;
     double cost_of_opening_x;
     double* volatile lower;
     int* volatile center_table;
 
     public:
-        pragma399_omp_parallel_hclib_async(bool* set_switch_membership,
+        pragma399_omp_parallel_hclib_async(Points* set_points,
                 int set_i,
+                long set_x,
+                bool* set_switch_membership,
                 double set_cost_of_opening_x,
                 double* set_lower,
                 int* set_center_table) {
-            switch_membership = set_switch_membership;
+            points = set_points;
             i = set_i;
+            x = set_x;
+            switch_membership = set_switch_membership;
             cost_of_opening_x = set_cost_of_opening_x;
             lower = set_lower;
             center_table = set_center_table;
@@ -437,16 +457,22 @@ class pragma475_omp_parallel_hclib_async {
   return(result);
 }
         }
-    bool* volatile switch_membership;
+    double* volatile gl_lower;
+    int* volatile center_table;
     Points* volatile points;
+    bool* volatile switch_membership;
     volatile long x;
 
     public:
-        pragma475_omp_parallel_hclib_async(bool* set_switch_membership,
+        pragma475_omp_parallel_hclib_async(double* set_gl_lower,
+                int* set_center_table,
                 Points* set_points,
+                bool* set_switch_membership,
                 long set_x) {
-            switch_membership = set_switch_membership;
+            gl_lower = set_gl_lower;
+            center_table = set_center_table;
             points = set_points;
+            switch_membership = set_switch_membership;
             x = set_x;
 
         }
@@ -586,7 +612,7 @@ domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(switch_membership, i, cost_of_opening_x, lower, center_table), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(points, i, x, switch_membership, cost_of_opening_x, lower, center_table), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma399_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -676,7 +702,7 @@ domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(switch_membership, points, x), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(gl_lower, center_table, points, switch_membership, x), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma475_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
