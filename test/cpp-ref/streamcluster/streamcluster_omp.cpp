@@ -366,9 +366,23 @@ typedef struct _pragma475_omp_parallel {
 
 class pragma399_omp_parallel_hclib_async {
     private:
+    bool* volatile switch_membership;
+    int i;
+    double cost_of_opening_x;
+    double* volatile lower;
+    int* volatile center_table;
 
     public:
-        pragma399_omp_parallel_hclib_async() {
+        pragma399_omp_parallel_hclib_async(bool* set_switch_membership,
+                int set_i,
+                double set_cost_of_opening_x,
+                double* set_lower,
+                int* set_center_table) {
+            switch_membership = set_switch_membership;
+            i = set_i;
+            cost_of_opening_x = set_cost_of_opening_x;
+            lower = set_lower;
+            center_table = set_center_table;
 
         }
 
@@ -423,9 +437,17 @@ class pragma475_omp_parallel_hclib_async {
   return(result);
 }
         }
+    bool* volatile switch_membership;
+    Points* volatile points;
+    volatile long x;
 
     public:
-        pragma475_omp_parallel_hclib_async() {
+        pragma475_omp_parallel_hclib_async(bool* set_switch_membership,
+                Points* set_points,
+                long set_x) {
+            switch_membership = set_switch_membership;
+            points = set_points;
+            x = set_x;
 
         }
 
@@ -564,7 +586,7 @@ domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(switch_membership, i, cost_of_opening_x, lower, center_table), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma399_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -654,7 +676,7 @@ domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(switch_membership, points, x), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma475_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

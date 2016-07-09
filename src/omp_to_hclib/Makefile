@@ -34,7 +34,7 @@ LIBS=-Wl,--start-group -lclangAST -lclangAnalysis -lclangBasic -lclangDriver -lc
 endif
 
 OBJS=Driver.o OMPToHClib.o OMPReductionVar.o PragmaNode.o SingleClauseArgs.o \
-	 OMPClauses.o OMPDependencies.o OMPVarInfo.o ParallelRegionInfo.o
+	 OMPClauses.o OMPDependencies.o OMPVarInfo.o ParallelRegionInfo.o CUDAFunctorParameters.o
 
 ${EXE}: ${OBJS}
 	${GXX} ${GXX_FLAGS} ${INCLUDES} ${OBJS} -o ${EXE} ${LIBS}

@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
            int     nclusters=5;
            char   *filename = 0;           
            float  *buf;
-           float **attributes;
+           float *attributes;
            float **cluster_centres=NULL;
            int     i, j;
                 
@@ -153,13 +153,9 @@ int main(int argc, char **argv) {
    
 
         /* allocate space for attributes[] and read attributes of all objects */
-        buf           = (float*) malloc(numObjects*numAttributes*sizeof(float));
-        attributes    = (float**)malloc(numObjects*             sizeof(float*));
-        attributes[0] = (float*) malloc(numObjects*numAttributes*sizeof(float));
-        for (i=1; i<numObjects; i++)
-            attributes[i] = attributes[i-1] + numAttributes;
+        attributes    = (float*) malloc(numObjects * numAttributes * sizeof(float));
 
-        read(infile, buf, numObjects*numAttributes*sizeof(float));
+        read(infile, attributes, numObjects*numAttributes*sizeof(float));
 
         close(infile);
     }
@@ -183,25 +179,19 @@ int main(int argc, char **argv) {
      
 
         /* allocate space for attributes[] and read attributes of all objects */
-        buf           = (float*) malloc(numObjects*numAttributes*sizeof(float));
-        attributes    = (float**)malloc(numObjects*             sizeof(float*));
-        attributes[0] = (float*) malloc(numObjects*numAttributes*sizeof(float));
-        for (i=1; i<numObjects; i++)
-            attributes[i] = attributes[i-1] + numAttributes;
+        attributes           = (float*) malloc(numObjects*numAttributes*sizeof(float));
         rewind(infile);
         i = 0;
         while (fgets(line, 1024, infile) != NULL) {
             if (strtok(line, " \t\n") == NULL) continue; 
             for (j=0; j<numAttributes; j++) {
-                buf[i] = atof(strtok(NULL, " ,\t\n"));
+                attributes[i] = atof(strtok(NULL, " ,\t\n"));
                 i++;
             }
         }
         fclose(infile);
     }     
 	printf("I/O completed\n");	
-
-	memcpy(attributes[0], buf, numObjects*numAttributes*sizeof(float));
 
 #pragma omp_to_hclib
     for (i=0; i<nloops; i++) {
@@ -233,7 +223,6 @@ int main(int argc, char **argv) {
 */
 
     free(attributes);
-    free(buf);
     return(0);
 }
 

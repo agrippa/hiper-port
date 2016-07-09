@@ -171,9 +171,56 @@ typedef struct _pragma167_omp_parallel {
 
 class pragma167_omp_parallel_hclib_async {
     private:
+    volatile int ny;
+    volatile int nx;
+    int z;
+    float* volatile tOut_t;
+    volatile float cc;
+    float* volatile tIn_t;
+    volatile float cw;
+    volatile float ce;
+    volatile float cs;
+    volatile float cn;
+    volatile float cb;
+    volatile float ct;
+    volatile float dt;
+    volatile float Cap;
+    float* volatile pIn;
+    volatile float amb_temp;
 
     public:
-        pragma167_omp_parallel_hclib_async() {
+        pragma167_omp_parallel_hclib_async(int set_ny,
+                int set_nx,
+                int set_z,
+                float* set_tOut_t,
+                float set_cc,
+                float* set_tIn_t,
+                float set_cw,
+                float set_ce,
+                float set_cs,
+                float set_cn,
+                float set_cb,
+                float set_ct,
+                float set_dt,
+                float set_Cap,
+                float* set_pIn,
+                float set_amb_temp) {
+            ny = set_ny;
+            nx = set_nx;
+            z = set_z;
+            tOut_t = set_tOut_t;
+            cc = set_cc;
+            tIn_t = set_tIn_t;
+            cw = set_cw;
+            ce = set_ce;
+            cs = set_cs;
+            cn = set_cn;
+            cb = set_cb;
+            ct = set_ct;
+            dt = set_dt;
+            Cap = set_Cap;
+            pIn = set_pIn;
+            amb_temp = set_amb_temp;
 
         }
 
@@ -257,7 +304,7 @@ domain[0].high = nz;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nz) - (0), pragma167_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nz) - (0), pragma167_omp_parallel_hclib_async(ny, nx, z, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma167_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

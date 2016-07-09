@@ -139,9 +139,65 @@ typedef struct _pragma168_omp_parallel {
 
 class pragma135_omp_parallel_hclib_async {
     private:
+    volatile int cols;
+    int k;
+    float Jc;
+    float* volatile J;
+    float* volatile dN;
+    int* volatile iN;
+    float* volatile dS;
+    int* volatile iS;
+    float* volatile dW;
+    int* volatile jW;
+    float* volatile dE;
+    int* volatile jE;
+    float G2;
+    float L;
+    float num;
+    float den;
+    float qsqr;
+    volatile float q0sqr;
+    float* volatile c;
 
     public:
-        pragma135_omp_parallel_hclib_async() {
+        pragma135_omp_parallel_hclib_async(int set_cols,
+                int set_k,
+                float set_Jc,
+                float* set_J,
+                float* set_dN,
+                int* set_iN,
+                float* set_dS,
+                int* set_iS,
+                float* set_dW,
+                int* set_jW,
+                float* set_dE,
+                int* set_jE,
+                float set_G2,
+                float set_L,
+                float set_num,
+                float set_den,
+                float set_qsqr,
+                float set_q0sqr,
+                float* set_c) {
+            cols = set_cols;
+            k = set_k;
+            Jc = set_Jc;
+            J = set_J;
+            dN = set_dN;
+            iN = set_iN;
+            dS = set_dS;
+            iS = set_iS;
+            dW = set_dW;
+            jW = set_jW;
+            dE = set_dE;
+            jE = set_jE;
+            G2 = set_G2;
+            L = set_L;
+            num = set_num;
+            den = set_den;
+            qsqr = set_qsqr;
+            q0sqr = set_q0sqr;
+            c = set_c;
 
         }
 
@@ -189,9 +245,56 @@ static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma168_omp_parallel_hclib_async {
     private:
+    volatile int cols;
+    int k;
+    float cN;
+    float* volatile c;
+    float cS;
+    int* volatile iS;
+    float cW;
+    float cE;
+    int* volatile jE;
+    float D;
+    float* volatile dN;
+    float* volatile dS;
+    float* volatile dW;
+    float* volatile dE;
+    float* volatile J;
+    volatile float lambda;
 
     public:
-        pragma168_omp_parallel_hclib_async() {
+        pragma168_omp_parallel_hclib_async(int set_cols,
+                int set_k,
+                float set_cN,
+                float* set_c,
+                float set_cS,
+                int* set_iS,
+                float set_cW,
+                float set_cE,
+                int* set_jE,
+                float set_D,
+                float* set_dN,
+                float* set_dS,
+                float* set_dW,
+                float* set_dE,
+                float* set_J,
+                float set_lambda) {
+            cols = set_cols;
+            k = set_k;
+            cN = set_cN;
+            c = set_c;
+            cS = set_cS;
+            iS = set_iS;
+            cW = set_cW;
+            cE = set_cE;
+            jE = set_jE;
+            D = set_D;
+            dN = set_dN;
+            dS = set_dS;
+            dW = set_dW;
+            dE = set_dE;
+            J = set_J;
+            lambda = set_lambda;
 
         }
 
@@ -390,7 +493,7 @@ domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma135_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma135_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma135_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -451,7 +554,7 @@ domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma168_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma168_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma168_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

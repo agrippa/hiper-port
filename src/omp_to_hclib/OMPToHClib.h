@@ -21,6 +21,7 @@
 #include "OMPClauses.h"
 #include "OMPReductionVar.h"
 #include "ParallelRegionInfo.h"
+#include "CUDAFunctorParameters.h"
 
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
@@ -57,13 +58,20 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::string iterator = "", std::string bodyStr = "",
                 const clang::Stmt *body = NULL,
                 std::vector<clang::ValueDecl *> *captured = NULL,
-                OMPClauses *clauses = NULL);
+                OMPClauses *clauses = NULL,
+                CUDAFunctorParameters *functor_params = NULL);
         void traverseFunctorBody(const clang::Stmt *curr,
-                ParallelRegionInfo &info);
+                ParallelRegionInfo &info, bool beneathFunctionCall);
         std::string getCUDAFunctorDef(std::string closureName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses,
                 std::string iterator, std::string bodyStr,
-                const clang::Stmt *body);
+                const clang::Stmt *body, CUDAFunctorParameters *functor_params);
+        bool handleCapturedPointer(const clang::PointerType *pointer,
+                const clang::ValueDecl *ref, OMPVarInfo &foundVarInfo,
+                const bool isShared, std::stringstream &constructor_sig,
+                std::stringstream &constructor_body, std::stringstream &ss,
+                CUDAFunctorParameters *functor_params,
+                std::vector<OMPVarInfo> *toBeTransferred);
         std::string getClosureDef(std::string closureName,
                 bool isForasyncClosure, bool isAsyncClosure,
                 std::string contextName,

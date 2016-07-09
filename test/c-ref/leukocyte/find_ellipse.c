@@ -119,9 +119,38 @@ class pragma121_omp_parallel_hclib_async {
         __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
             {	((A)->me[(i)][(j)] = (val)); }
         }
+    volatile int MaxR;
+    volatile int height;
+    volatile int tY[7][150];
+    int i;
+    volatile int tX[7][150];
+    MAT* volatile grad_x;
+    volatile double cos_angle[150];
+    MAT* volatile grad_y;
+    volatile double sin_angle[150];
+    MAT* volatile gicov;
 
     public:
-        pragma121_omp_parallel_hclib_async() {
+        pragma121_omp_parallel_hclib_async(int set_MaxR,
+                int set_height,
+                int set_tY[7][150],
+                int set_i,
+                int set_tX[7][150],
+                MAT* set_grad_x,
+                double set_cos_angle[150],
+                MAT* set_grad_y,
+                double set_sin_angle[150],
+                MAT* set_gicov) {
+            MaxR = set_MaxR;
+            height = set_height;
+            memcpy(tY, set_tY, sizeof(tY));
+            i = set_i;
+            memcpy(tX, set_tX, sizeof(tX));
+            grad_x = set_grad_x;
+            memcpy(cos_angle, set_cos_angle, sizeof(cos_angle));
+            grad_y = set_grad_y;
+            memcpy(sin_angle, set_sin_angle, sizeof(sin_angle));
+            gicov = set_gicov;
 
         }
 
@@ -223,7 +252,7 @@ domain[0].high = width - MaxR;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((width - MaxR) - (MaxR), pragma121_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((width - MaxR) - (MaxR), pragma121_omp_parallel_hclib_async(MaxR, height, tY, i, tX, grad_x, cos_angle, grad_y, sin_angle, gicov), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma121_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -335,9 +364,26 @@ class pragma196_omp_parallel_hclib_async {
         __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
             {	((A)->me[(i)][(j)] = (val)); }
         }
+    MAT* volatile img_in;
+    MAT* volatile strel;
+    int i;
+    volatile int el_center_i;
+    volatile int el_center_j;
+    MAT* volatile dilated;
 
     public:
-        pragma196_omp_parallel_hclib_async() {
+        pragma196_omp_parallel_hclib_async(MAT* set_img_in,
+                MAT* set_strel,
+                int set_i,
+                int set_el_center_i,
+                int set_el_center_j,
+                MAT* set_dilated) {
+            img_in = set_img_in;
+            strel = set_strel;
+            i = set_i;
+            el_center_i = set_el_center_i;
+            el_center_j = set_el_center_j;
+            dilated = set_dilated;
 
         }
 
@@ -390,7 +436,7 @@ domain[0].high = img_in->m;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((img_in->m) - (0), pragma196_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((img_in->m) - (0), pragma196_omp_parallel_hclib_async(img_in, strel, i, el_center_i, el_center_j, dilated), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma196_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

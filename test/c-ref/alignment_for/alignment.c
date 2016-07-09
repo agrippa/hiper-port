@@ -474,9 +474,41 @@ typedef struct _pragma474_omp_parallel {
 
 class pragma474_omp_parallel_hclib_async {
     private:
+    int n;
+    int* volatile seqlen_array;
+    int si;
+    int i;
+    int len1;
+    volatile int gap_pos1;
+    volatile int gap_pos2;
+    int sj;
+    volatile int nseqs;
+    int m;
+    int* volatile bench_output;
 
     public:
-        pragma474_omp_parallel_hclib_async() {
+        pragma474_omp_parallel_hclib_async(int set_n,
+                int* set_seqlen_array,
+                int set_si,
+                int set_i,
+                int set_len1,
+                int set_gap_pos1,
+                int set_gap_pos2,
+                int set_sj,
+                int set_nseqs,
+                int set_m,
+                int* set_bench_output) {
+            n = set_n;
+            seqlen_array = set_seqlen_array;
+            si = set_si;
+            i = set_i;
+            len1 = set_len1;
+            gap_pos1 = set_gap_pos1;
+            gap_pos2 = set_gap_pos2;
+            sj = set_sj;
+            nseqs = set_nseqs;
+            m = set_m;
+            bench_output = set_bench_output;
 
         }
 
@@ -570,7 +602,7 @@ domain[0].high = nseqs;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nseqs) - (0), pragma474_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nseqs) - (0), pragma474_omp_parallel_hclib_async(n, seqlen_array, si, i, len1, gap_pos1, gap_pos2, sj, nseqs, m, bench_output), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma474_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

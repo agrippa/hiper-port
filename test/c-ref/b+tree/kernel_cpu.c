@@ -65,9 +65,44 @@ typedef struct _pragma93_omp_parallel {
 
 class pragma93_omp_parallel_hclib_async {
     private:
+    int i;
+    volatile long maxheight;
+    int thid;
+    volatile int threadsPerBlock;
+    knode* volatile knodes;
+    long* volatile currKnode;
+    int bid;
+    int* volatile keys;
+    long* volatile offset;
+    volatile long knodes_elem;
+    record* volatile ans;
+    record* volatile records;
 
     public:
-        pragma93_omp_parallel_hclib_async() {
+        pragma93_omp_parallel_hclib_async(int set_i,
+                long set_maxheight,
+                int set_thid,
+                int set_threadsPerBlock,
+                knode* set_knodes,
+                long* set_currKnode,
+                int set_bid,
+                int* set_keys,
+                long* set_offset,
+                long set_knodes_elem,
+                record* set_ans,
+                record* set_records) {
+            i = set_i;
+            maxheight = set_maxheight;
+            thid = set_thid;
+            threadsPerBlock = set_threadsPerBlock;
+            knodes = set_knodes;
+            currKnode = set_currKnode;
+            bid = set_bid;
+            keys = set_keys;
+            offset = set_offset;
+            knodes_elem = set_knodes_elem;
+            ans = set_ans;
+            records = set_records;
 
         }
 
@@ -190,7 +225,7 @@ domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma93_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma93_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, keys, offset, knodes_elem, ans, records), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma93_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

@@ -85,7 +85,7 @@ extern int num_omp_threads;
 
 int find_nearest_point(float  *pt,          /* [nfeatures] */
                        int     nfeatures,
-                       float **pts,         /* [npts][nfeatures] */
+                       float *pts,         /* [npts][nfeatures] */
                        int     npts)
 {
     int index, i;
@@ -94,7 +94,7 @@ int find_nearest_point(float  *pt,          /* [nfeatures] */
     /* find the cluster center id with min distance to pt */
     for (i=0; i<npts; i++) {
         float dist;
-        dist = euclid_dist_2(pt, pts[i], nfeatures);  /* no need square root */
+        dist = euclid_dist_2(pt, pts + (i * nfeatures), nfeatures);  /* no need square root */
         if (dist < min_dist) {
             min_dist = dist;
             index    = i;
@@ -121,7 +121,7 @@ float euclid_dist_2(float *pt1,
 
 
 /*----< kmeans_clustering() >---------------------------------------------*/
-typedef struct _pragma193_omp_parallel {
+typedef struct _pragma179_omp_parallel {
     int i;
     int j;
     int (*k_ptr);
@@ -130,29 +130,29 @@ typedef struct _pragma193_omp_parallel {
     int (*loop_ptr);
     int (*(*new_centers_len_ptr));
     float (*(*(*new_centers_ptr)));
-    float (*(*(*clusters_ptr)));
+    float (*(*clusters_ptr));
     float delta;
     double (*timing_ptr);
     int (*nthreads_ptr);
-    int (*(*(*partial_new_centers_len_ptr)));
-    float (*(*(*(*partial_new_centers_ptr))));
-    float (*(*(*feature_ptr)));
+    int (*(*partial_new_centers_len_ptr));
+    float (*(*partial_new_centers_ptr));
+    float (*(*feature_ptr));
     int nfeatures;
     int npoints;
     int nclusters;
     float (*threshold_ptr);
     int (*(*membership_ptr));
     pthread_mutex_t reduction_mutex;
- } pragma193_omp_parallel;
+ } pragma179_omp_parallel;
 
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
 
-class pragma193_omp_parallel_hclib_async {
+class pragma179_omp_parallel_hclib_async {
     private:
         __device__ int find_nearest_point(float  *pt,          /* [nfeatures] */
                        int     nfeatures,
-                       float **pts,         /* [npts][nfeatures] */
+                       float *pts,         /* [npts][nfeatures] */
                        int     npts) {
             {
     int index, i;
@@ -161,7 +161,7 @@ class pragma193_omp_parallel_hclib_async {
     /* find the cluster center id with min distance to pt */
     for (i=0; i<npts; i++) {
         float dist;
-        dist = euclid_dist_2(pt, pts[i], nfeatures);  /* no need square root */
+        dist = euclid_dist_2(pt, pts + (i * nfeatures), nfeatures);  /* no need square root */
         if (dist < min_dist) {
             min_dist = dist;
             index    = i;
@@ -181,9 +181,41 @@ class pragma193_omp_parallel_hclib_async {
     return(ans);
 }
         }
+    int index;
+    float* volatile feature;
+    int i;
+    int nfeatures;
+    float* volatile clusters;
+    int nclusters;
+    int* volatile membership;
+    float delta;
+    int* volatile partial_new_centers_len;
+    int j;
+    float* volatile partial_new_centers;
 
     public:
-        pragma193_omp_parallel_hclib_async() {
+        pragma179_omp_parallel_hclib_async(int set_index,
+                float* set_feature,
+                int set_i,
+                int set_nfeatures,
+                float* set_clusters,
+                int set_nclusters,
+                int* set_membership,
+                float set_delta,
+                int* set_partial_new_centers_len,
+                int set_j,
+                float* set_partial_new_centers) {
+            index = set_index;
+            feature = set_feature;
+            i = set_i;
+            nfeatures = set_nfeatures;
+            clusters = set_clusters;
+            nclusters = set_nclusters;
+            membership = set_membership;
+            delta = set_delta;
+            partial_new_centers_len = set_partial_new_centers_len;
+            j = set_j;
+            partial_new_centers = set_partial_new_centers;
 
         }
 
@@ -191,7 +223,7 @@ class pragma193_omp_parallel_hclib_async {
             {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				
-	        index = find_nearest_point(feature[i],
+	        index = find_nearest_point(feature + (i * nfeatures),
 		             nfeatures,
 		             clusters,
 		             nclusters);				
@@ -203,17 +235,17 @@ class pragma193_omp_parallel_hclib_async {
 				
 	        /* update new cluster centers : sum of all objects located
 		       within */
-	        partial_new_centers_len[tid][index]++;				
+	        partial_new_centers_len[tid * nclusters + index]++;				
 	        for (j=0; j<nfeatures; j++)
-		       partial_new_centers[tid][index][j] += feature[i][j];
+		       partial_new_centers[tid * nclusters * nfeatures + index * nfeatures + j] += feature[i * nfeatures + j];
             }
         }
 };
 
 #else
-static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma179_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
-float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
+float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
                           int     nfeatures,
                           int     npoints,
                           int     nclusters,
@@ -224,28 +256,25 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     int      i, j, k, n=0, index, loop=0;
     int     *new_centers_len;			/* [nclusters]: no. of points in each cluster */
 	float  **new_centers;				/* [nclusters][nfeatures] */
-	float  **clusters;					/* out: [nclusters][nfeatures] */
+	float  *clusters;					/* out: [nclusters][nfeatures] */
     float    delta;
         
     double   timing;
 
 	int      nthreads;
-    int    **partial_new_centers_len;
-    float ***partial_new_centers;
+    int    *partial_new_centers_len;
+    float *partial_new_centers;
 
     nthreads = num_omp_threads; 
 
     /* allocate space for returning variable clusters[] */
-    clusters    = (float**) malloc(nclusters *             sizeof(float*));
-    clusters[0] = (float*)  malloc(nclusters * nfeatures * sizeof(float));
-    for (i=1; i<nclusters; i++)
-        clusters[i] = clusters[i-1] + nfeatures;
+    clusters = (float *)malloc(nclusters * nfeatures * sizeof(float));
 
     /* randomly pick cluster centers */
     for (i=0; i<nclusters; i++) {
         //n = (int)rand() % npoints;
         for (j=0; j<nfeatures; j++)
-            clusters[i][j] = feature[n][j];
+            clusters[i * nfeatures + j] = feature[n * nfeatures + j];
 		n++;
     }
 
@@ -261,27 +290,16 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
         new_centers[i] = new_centers[i-1] + nfeatures;
 
 
-    partial_new_centers_len    = (int**) malloc(nthreads * sizeof(int*));
-    partial_new_centers_len[0] = (int*)  calloc(nthreads*nclusters, sizeof(int));
-    for (i=1; i<nthreads; i++)
-		partial_new_centers_len[i] = partial_new_centers_len[i-1]+nclusters;
+    partial_new_centers_len = (int *)calloc(nthreads * nclusters, sizeof(int));
 
-	partial_new_centers    =(float***)malloc(nthreads * sizeof(float**));
-    partial_new_centers[0] =(float**) malloc(nthreads*nclusters * sizeof(float*));
-    for (i=1; i<nthreads; i++)
-        partial_new_centers[i] = partial_new_centers[i-1] + nclusters;
+    partial_new_centers = (float *)calloc(nthreads * nclusters * nfeatures, sizeof(float));
 
-	for (i=0; i<nthreads; i++)
-	{
-        for (j=0; j<nclusters; j++)
-            partial_new_centers[i][j] = (float*)calloc(nfeatures, sizeof(float));
-	}
-	printf("num of threads = %d\n", num_omp_threads);
+    printf("num of threads = %d\n", num_omp_threads);
     do {
         delta = 0.0;
         {
  { 
-pragma193_omp_parallel *new_ctx = (pragma193_omp_parallel *)malloc(sizeof(pragma193_omp_parallel));
+pragma179_omp_parallel *new_ctx = (pragma179_omp_parallel *)malloc(sizeof(pragma179_omp_parallel));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->k_ptr = &(k);
@@ -311,10 +329,10 @@ domain[0].high = npoints;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((npoints) - (0), pragma193_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((npoints) - (0), pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma193_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma179_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -325,11 +343,11 @@ delta = new_ctx->delta;
         /* let the main thread perform the array reduction */
         for (i=0; i<nclusters; i++) {
             for (j=0; j<nthreads; j++) {
-                new_centers_len[i] += partial_new_centers_len[j][i];
-                partial_new_centers_len[j][i] = 0.0;
+                new_centers_len[i] += partial_new_centers_len[j * nclusters + i];
+                partial_new_centers_len[j * nclusters + i] = 0.0;
                 for (k=0; k<nfeatures; k++) {
-                    new_centers[i][k] += partial_new_centers[j][i][k];
-                    partial_new_centers[j][i][k] = 0.0;
+                    new_centers[i][k] += partial_new_centers[j * nclusters * nfeatures + i * nfeatures + k];
+                    partial_new_centers[j * nclusters * nfeatures + i * nfeatures + k] = 0.0;
                 }
             }
         }    
@@ -338,7 +356,7 @@ delta = new_ctx->delta;
 		for (i=0; i<nclusters; i++) {
             for (j=0; j<nfeatures; j++) {
                 if (new_centers_len[i] > 0)
-					clusters[i][j] = new_centers[i][j] / new_centers_len[i];
+					clusters[i * nfeatures + j] = new_centers[i][j] / new_centers_len[i];
 				new_centers[i][j] = 0.0;   /* set back to 0 */
 			}
 			new_centers_len[i] = 0;   /* set back to 0 */
@@ -356,8 +374,8 @@ delta = new_ctx->delta;
 
 #ifndef OMP_TO_HCLIB_ENABLE_GPU
 
-static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma193_omp_parallel *ctx = (pragma193_omp_parallel *)____arg;
+static void pragma179_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma179_omp_parallel *ctx = (pragma179_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int index; index = ctx->index;
@@ -371,7 +389,7 @@ static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0
 {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				
-	        index = find_nearest_point((*(ctx->feature_ptr))[i],
+	        index = find_nearest_point((*(ctx->feature_ptr)) + (i * nfeatures),
 		             nfeatures,
 		             (*(ctx->clusters_ptr)),
 		             nclusters);				
@@ -383,9 +401,9 @@ static void pragma193_omp_parallel_hclib_async(void *____arg, const int ___iter0
 				
 	        /* update new cluster centers : sum of all objects located
 		       within */
-	        (*(ctx->partial_new_centers_len_ptr))[tid][index]++;				
+	        (*(ctx->partial_new_centers_len_ptr))[tid * nclusters + index]++;				
 	        for (j=0; j<nfeatures; j++)
-		       (*(ctx->partial_new_centers_ptr))[tid][index][j] += (*(ctx->feature_ptr))[i][j];
+		       (*(ctx->partial_new_centers_ptr))[tid * nclusters * nfeatures + index * nfeatures + j] += (*(ctx->feature_ptr))[i * nfeatures + j];
             } ;     } while (0);
     const int lock_err = pthread_mutex_lock(&ctx->reduction_mutex);
     assert(lock_err == 0);

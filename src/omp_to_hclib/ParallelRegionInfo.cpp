@@ -4,7 +4,9 @@ ParallelRegionInfo::ParallelRegionInfo() {
 }
 
 void ParallelRegionInfo::addReferencedVar(const clang::ValueDecl *var) {
-    referenced.push_back(var);
+    if (std::find(referenced.begin(), referenced.end(), var) == referenced.end()) {
+        referenced.push_back(var);
+    }
 }
 
 void ParallelRegionInfo::foundUnresolvedFunction(
@@ -14,6 +16,17 @@ void ParallelRegionInfo::foundUnresolvedFunction(
 
 void ParallelRegionInfo::addCalledFunction(const clang::FunctionDecl *func) {
     called.push_back(func);
+}
+
+void ParallelRegionInfo::addDeclaredVar(const clang::Decl *var) {
+    declaredInsideParallelRegion.push_back(var);
+}
+
+bool ParallelRegionInfo::isDeclaredInsideParallelRegion(
+        const clang::Decl *var) {
+    return (std::find(declaredInsideParallelRegion.begin(),
+                declaredInsideParallelRegion.end(), var) !=
+            declaredInsideParallelRegion.end());
 }
 
 std::vector<const clang::FunctionDecl *>::iterator ParallelRegionInfo::called_begin() {
@@ -32,3 +45,10 @@ std::vector<const clang::FunctionDecl *>::iterator ParallelRegionInfo::unresolve
     return unresolved.end();
 }
 
+std::vector<const clang::ValueDecl *>::iterator ParallelRegionInfo::referenced_begin() {
+    return referenced.begin();
+}
+
+std::vector<const clang::ValueDecl *>::iterator ParallelRegionInfo::referenced_end() {
+    return referenced.end();
+}

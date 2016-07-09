@@ -85,9 +85,80 @@ typedef struct _pragma123_omp_parallel {
 
 class pragma123_omp_parallel_hclib_async {
     private:
+    long first_i;
+    box_str* volatile box;
+    int l;
+    FOUR_VECTOR* rA;
+    FOUR_VECTOR* volatile rv;
+    FOUR_VECTOR* fA;
+    FOUR_VECTOR* volatile fv;
+    int k;
+    int pointer;
+    long first_j;
+    FOUR_VECTOR* rB;
+    double* qB;
+    double* volatile qv;
+    int i;
+    int j;
+    double r2;
+    double u2;
+    volatile double a2;
+    double vij;
+    double fs;
+    THREE_VECTOR d;
+    double fxij;
+    double fyij;
+    double fzij;
 
     public:
-        pragma123_omp_parallel_hclib_async() {
+        pragma123_omp_parallel_hclib_async(long set_first_i,
+                box_str* set_box,
+                int set_l,
+                FOUR_VECTOR* set_rA,
+                FOUR_VECTOR* set_rv,
+                FOUR_VECTOR* set_fA,
+                FOUR_VECTOR* set_fv,
+                int set_k,
+                int set_pointer,
+                long set_first_j,
+                FOUR_VECTOR* set_rB,
+                double* set_qB,
+                double* set_qv,
+                int set_i,
+                int set_j,
+                double set_r2,
+                double set_u2,
+                double set_a2,
+                double set_vij,
+                double set_fs,
+                THREE_VECTOR set_d,
+                double set_fxij,
+                double set_fyij,
+                double set_fzij) {
+            first_i = set_first_i;
+            box = set_box;
+            l = set_l;
+            rA = set_rA;
+            rv = set_rv;
+            fA = set_fA;
+            fv = set_fv;
+            k = set_k;
+            pointer = set_pointer;
+            first_j = set_first_j;
+            rB = set_rB;
+            qB = set_qB;
+            qv = set_qv;
+            i = set_i;
+            j = set_j;
+            r2 = set_r2;
+            u2 = set_u2;
+            a2 = set_a2;
+            vij = set_vij;
+            fs = set_fs;
+            d = set_d;
+            fxij = set_fxij;
+            fyij = set_fyij;
+            fzij = set_fzij;
 
         }
 
@@ -294,7 +365,7 @@ domain[0].high = dim.number_boxes;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((dim.number_boxes) - (0), pragma123_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((dim.number_boxes) - (0), pragma123_omp_parallel_hclib_async(first_i, box, l, rA, rv, fA, fv, k, pointer, first_j, rB, qB, qv, i, j, r2, u2, a2, vij, fs, d, fxij, fyij, fzij), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma123_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

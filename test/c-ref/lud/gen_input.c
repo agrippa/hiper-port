@@ -20,34 +20,57 @@ typedef float FP_NUMBER;
 #define GET_RAND_FP ((FP_NUMBER)rand()/((FP_NUMBER)(RAND_MAX)+(FP_NUMBER)(1)))
 char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
-typedef struct _pragma76_omp_parallel {
+typedef struct _pragma71_omp_parallel {
     int i;
     int j;
     int (*MatrixDim_ptr);
-    float (*(*(*L_ptr)));
-    float (*(*(*U_ptr)));
- } pragma76_omp_parallel;
+    float (*(*L_ptr));
+    float (*(*U_ptr));
+ } pragma71_omp_parallel;
 
-typedef struct _pragma92_omp_parallel {
+typedef struct _pragma87_omp_parallel {
     int i;
     int j;
     int k;
     int (*MatrixDim_ptr);
     float sum;
-    float (*(*(*L_ptr)));
-    float (*(*(*U_ptr)));
-    float (*(*(*A_ptr)));
- } pragma92_omp_parallel;
+    float (*(*L_ptr));
+    float (*(*U_ptr));
+    float (*(*A_ptr));
+ } pragma87_omp_parallel;
 
-static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma71_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
 
-class pragma92_omp_parallel_hclib_async {
+class pragma87_omp_parallel_hclib_async {
     private:
+    int j;
+    volatile int MatrixDim;
+    FP_NUMBER sum;
+    int k;
+    FP_NUMBER* volatile L;
+    int i;
+    FP_NUMBER* volatile U;
+    FP_NUMBER* volatile A;
 
     public:
-        pragma92_omp_parallel_hclib_async() {
+        pragma87_omp_parallel_hclib_async(int set_j,
+                int set_MatrixDim,
+                FP_NUMBER set_sum,
+                int set_k,
+                FP_NUMBER* set_L,
+                int set_i,
+                FP_NUMBER* set_U,
+                FP_NUMBER* set_A) {
+            j = set_j;
+            MatrixDim = set_MatrixDim;
+            sum = set_sum;
+            k = set_k;
+            L = set_L;
+            i = set_i;
+            U = set_U;
+            A = set_A;
 
         }
 
@@ -56,19 +79,19 @@ class pragma92_omp_parallel_hclib_async {
         for (j=0; j < MatrixDim; j++){
             sum = 0;
             for(k=0; k < MatrixDim; k++)
-                sum += L[i][k]*U[k][j];
-            A[i][j] = sum;
+                sum += L[i * MatrixDim + k]*U[k * MatrixDim + j];
+            A[i * MatrixDim + j] = sum;
         }
     }
         }
 };
 
 #else
-static void pragma92_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma87_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
-    FP_NUMBER sum, **L, **U, **A;
+    FP_NUMBER sum, *L, *U, *A;
     FILE *fl,*fu,*fa;
 
     if ( argc < 2) {
@@ -77,9 +100,9 @@ int main (int argc, char **argv){
     }
 
     MatrixDim = atoi(argv[1]);
-    L = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
-    U = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
-    A = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
+    L = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
+    U = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
+    A = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
 
     if ( !L || !U || !A){
         printf("Can not allocate memory\n");
@@ -112,13 +135,8 @@ int main (int argc, char **argv){
         return 1;
     }
 
-    for (i=0; i < MatrixDim; i ++){
-        L[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-        U[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-        A[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-    }
  { 
-pragma76_omp_parallel *new_ctx = (pragma76_omp_parallel *)malloc(sizeof(pragma76_omp_parallel));
+pragma71_omp_parallel *new_ctx = (pragma71_omp_parallel *)malloc(sizeof(pragma71_omp_parallel));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->MatrixDim_ptr = &(MatrixDim);
@@ -129,14 +147,14 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = -1;
-hclib_future_t *fut = hclib_forasync_future((void *)pragma76_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma71_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
  } 
 
  { 
-pragma92_omp_parallel *new_ctx = (pragma92_omp_parallel *)malloc(sizeof(pragma92_omp_parallel));
+pragma87_omp_parallel *new_ctx = (pragma87_omp_parallel *)malloc(sizeof(pragma87_omp_parallel));
 new_ctx->i = i;
 new_ctx->j = j;
 new_ctx->k = k;
@@ -151,10 +169,10 @@ domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((MatrixDim) - (0), pragma92_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((MatrixDim) - (0), pragma87_omp_parallel_hclib_async(j, MatrixDim, sum, k, L, i, U, A), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma92_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma87_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -162,14 +180,14 @@ free(new_ctx);
 
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fl, "%f ", L[i][j]);
+            fprintf(fl, "%f ", L[i * MatrixDim + j]);
         fprintf(fl, "\n");
     }
     fclose(fl);
 
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fu, "%f ", U[i][j]);
+            fprintf(fu, "%f ", U[i * MatrixDim + j]);
         fprintf(fu, "\n");
     }
     fclose(fu);
@@ -177,24 +195,19 @@ free(new_ctx);
     fprintf(fa, "%d\n", MatrixDim);
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fa, "%f ", A[i][j]);
+            fprintf(fa, "%f ", A[i * MatrixDim + j]);
         fprintf(fa, "\n");
     }
     fclose(fa);
 
-    for (i = 0; i < MatrixDim; i ++ ){
-        free(L[i]);
-        free(U[i]);
-        free(A[i]);
-    }
     free(L);
     free(U);
     free(A);
 
     return 0;
 } 
-static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma76_omp_parallel *ctx = (pragma76_omp_parallel *)____arg;
+static void pragma71_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma71_omp_parallel *ctx = (pragma71_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     hclib_start_finish();
@@ -203,14 +216,14 @@ static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 {
         for (j=0; j < (*(ctx->MatrixDim_ptr)); j++){
             if ( i == j) {
-                (*(ctx->L_ptr))[i][j] = 1.0;
-                (*(ctx->U_ptr))[i][j] = GET_RAND_FP;
+                (*(ctx->L_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = 1.0;
+                (*(ctx->U_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = GET_RAND_FP;
             } else if (i < j){
-                (*(ctx->L_ptr))[i][j] = 0;
-                (*(ctx->U_ptr))[i][j] = GET_RAND_FP;
+                (*(ctx->L_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = 0;
+                (*(ctx->U_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = GET_RAND_FP;
             } else { // i > j
-                (*(ctx->L_ptr))[i][j] = GET_RAND_FP;
-                (*(ctx->U_ptr))[i][j] = 0;
+                (*(ctx->L_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = GET_RAND_FP;
+                (*(ctx->U_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = 0;
             }
         }
     } ;     } while (0);
@@ -222,8 +235,8 @@ static void pragma76_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 
 #ifndef OMP_TO_HCLIB_ENABLE_GPU
 
-static void pragma92_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma92_omp_parallel *ctx = (pragma92_omp_parallel *)____arg;
+static void pragma87_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma87_omp_parallel *ctx = (pragma87_omp_parallel *)____arg;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int k; k = ctx->k;
@@ -234,8 +247,8 @@ static void pragma92_omp_parallel_hclib_async(void *____arg, const int ___iter0)
         for (j=0; j < (*(ctx->MatrixDim_ptr)); j++){
             sum = 0;
             for(k=0; k < (*(ctx->MatrixDim_ptr)); k++)
-                sum += (*(ctx->L_ptr))[i][k]*(*(ctx->U_ptr))[k][j];
-            (*(ctx->A_ptr))[i][j] = sum;
+                sum += (*(ctx->L_ptr))[i * (*(ctx->MatrixDim_ptr)) + k]*(*(ctx->U_ptr))[k * (*(ctx->MatrixDim_ptr)) + j];
+            (*(ctx->A_ptr))[i * (*(ctx->MatrixDim_ptr)) + j] = sum;
         }
     } ;     } while (0);
 }

@@ -67,9 +67,14 @@ typedef struct _pragma63_omp_parallel {
 
 class pragma63_omp_parallel_hclib_async {
     private:
+    double* volatile dst;
+    double* volatile src;
 
     public:
-        pragma63_omp_parallel_hclib_async() {
+        pragma63_omp_parallel_hclib_async(double* set_dst,
+                double* set_src) {
+            dst = set_dst;
+            src = set_src;
 
         }
 
@@ -96,7 +101,7 @@ domain[0].high = N;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((N) - (0), pragma63_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((N) - (0), pragma63_omp_parallel_hclib_async(dst, src), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma63_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -170,9 +175,14 @@ typedef struct _pragma112_omp_parallel {
 
 class pragma112_omp_parallel_hclib_async {
     private:
+    double* volatile variables;
+    volatile double ff_variable[5];
 
     public:
-        pragma112_omp_parallel_hclib_async() {
+        pragma112_omp_parallel_hclib_async(double* set_variables,
+                double set_ff_variable[5]) {
+            variables = set_variables;
+            memcpy(ff_variable, set_ff_variable, sizeof(ff_variable));
 
         }
 
@@ -198,7 +208,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma112_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma112_omp_parallel_hclib_async(variables, ff_variable), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma112_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -285,9 +295,17 @@ class pragma165_omp_parallel_hclib_async {
 	velocity.z = momentum.z / density;
 }
         }
+    double* volatile variables;
+    double* volatile step_factors;
+    double* volatile areas;
 
     public:
-        pragma165_omp_parallel_hclib_async() {
+        pragma165_omp_parallel_hclib_async(double* set_variables,
+                double* set_step_factors,
+                double* set_areas) {
+            variables = set_variables;
+            step_factors = set_step_factors;
+            areas = set_areas;
 
         }
 
@@ -329,7 +347,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma165_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma165_omp_parallel_hclib_async(variables, step_factors, areas), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma165_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -459,9 +477,38 @@ class pragma196_omp_parallel_hclib_async {
 	fc_density_energy.z = velocity.z*de_p;
 }
         }
+    double* volatile variables;
+    int* volatile elements_surrounding_elements;
+    double* volatile normals;
+    volatile double smoothing_coefficient;
+    volatile double ff_variable[5];
+    volatile struct cfd_double3 ff_flux_contribution_density_energy;
+    volatile struct cfd_double3 ff_flux_contribution_momentum_x;
+    volatile struct cfd_double3 ff_flux_contribution_momentum_y;
+    volatile struct cfd_double3 ff_flux_contribution_momentum_z;
+    double* volatile fluxes;
 
     public:
-        pragma196_omp_parallel_hclib_async() {
+        pragma196_omp_parallel_hclib_async(double* set_variables,
+                int* set_elements_surrounding_elements,
+                double* set_normals,
+                double set_smoothing_coefficient,
+                double set_ff_variable[5],
+                struct cfd_double3 set_ff_flux_contribution_density_energy,
+                struct cfd_double3 set_ff_flux_contribution_momentum_x,
+                struct cfd_double3 set_ff_flux_contribution_momentum_y,
+                struct cfd_double3 set_ff_flux_contribution_momentum_z,
+                double* set_fluxes) {
+            variables = set_variables;
+            elements_surrounding_elements = set_elements_surrounding_elements;
+            normals = set_normals;
+            smoothing_coefficient = set_smoothing_coefficient;
+            memcpy(ff_variable, set_ff_variable, sizeof(ff_variable));
+            memcpy(&ff_flux_contribution_density_energy, &set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
+            memcpy(&ff_flux_contribution_momentum_x, &set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
+            memcpy(&ff_flux_contribution_momentum_y, &set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
+            memcpy(&ff_flux_contribution_momentum_z, &set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
+            fluxes = set_fluxes;
 
         }
 
@@ -615,7 +662,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, ff_flux_contribution_density_energy, ff_flux_contribution_momentum_x, ff_flux_contribution_momentum_y, ff_flux_contribution_momentum_z, fluxes), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma196_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -778,9 +825,17 @@ typedef struct _pragma327_omp_parallel {
 
 class pragma327_omp_parallel_hclib_async {
     private:
+    double* volatile variables;
+    double* volatile old_variables;
+    double* volatile fluxes;
 
     public:
-        pragma327_omp_parallel_hclib_async() {
+        pragma327_omp_parallel_hclib_async(double* set_variables,
+                double* set_old_variables,
+                double* set_fluxes) {
+            variables = set_variables;
+            old_variables = set_old_variables;
+            fluxes = set_fluxes;
 
         }
 
@@ -816,7 +871,7 @@ domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(variables, old_variables, fluxes), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma327_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

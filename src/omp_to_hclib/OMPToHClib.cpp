@@ -217,7 +217,8 @@ std::string OMPToHClib::getArraySizeExpr(clang::QualType qualType) {
 
     if (const clang::ArrayType *arrayType = type->getAsArrayTypeUnsafe()) {
         std::string sizeStr;
-        if (const clang::ConstantArrayType *constantArrayType = clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
+        if (const clang::ConstantArrayType *constantArrayType =
+                clang::dyn_cast<clang::ConstantArrayType>(arrayType)) {
             sizeStr = constantArrayType->getSize().toString(10, true);
         } else {
             std::cerr << "Unsupported array type " <<
@@ -462,25 +463,30 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
                 } else if (declref = clang::dyn_cast<clang::DeclRefExpr>(rhs)) {
                     other = lhs;
                 } else {
-                    std::cerr << "Neither of the inputs to the RHS binary op for an incr clause are a decl ref" << std::endl;
+                    std::cerr << "Neither of the inputs to the RHS binary " <<
+                        "op for an incr clause are a decl ref" << std::endl;
                     exit(1);
                 }
 
                 assert(condVar == declref->getDecl());
 
                 if (rhsBin->getOpcode() == clang::BO_Add) {
-                    if (const clang::IntegerLiteral *literal = clang::dyn_cast<clang::IntegerLiteral>(other)) {
+                    if (const clang::IntegerLiteral *literal =
+                            clang::dyn_cast<clang::IntegerLiteral>(other)) {
                         return stmtToString(literal);
                     } else {
-                        std::cerr << "unsupported other is a " << other->getStmtClassName() << std::endl;
+                        std::cerr << "unsupported other is a " <<
+                            other->getStmtClassName() << std::endl;
                         exit(1);
                     }
                 } else {
-                    std::cerr << "Unsupported binary operator on RHS of binary incr clause" << std::endl;
+                    std::cerr << "Unsupported binary operator on RHS of " <<
+                        "binary incr clause" << std::endl;
                     exit(1);
                 }
             } else {
-                std::cerr << "Unsupported RHS to binary incr clause: " << rhs->getStmtClassName() << std::endl;
+                std::cerr << "Unsupported RHS to binary incr clause: " <<
+                    rhs->getStmtClassName() << std::endl;
                 exit(1);
             }
         } else {
@@ -497,9 +503,10 @@ std::string OMPToHClib::getStrideFromIncr(const clang::Stmt *inc,
 }
 
 void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
-        ParallelRegionInfo &acc) {
+        ParallelRegionInfo &acc, bool beneathFunctionCall) {
 #ifdef VERBOSE
-    std::cerr << "traverseFunctorBody: " << curr->getStmtClassName() << std::endl;
+    std::cerr << "traverseFunctorBody: " << curr->getStmtClassName() <<
+        std::endl;
 #endif
 
     if (const clang::CompoundStmt *cmpd =
@@ -507,51 +514,68 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
         for (clang::CompoundStmt::const_body_iterator i = cmpd->body_begin(),
                 e = cmpd->body_end(); i != e; i++) {
             const clang::Stmt *member = *i;
-            traverseFunctorBody(member, acc);
+            traverseFunctorBody(member, acc, beneathFunctionCall);
         }
     } else if (const clang::BinaryOperator *bin =
             clang::dyn_cast<clang::BinaryOperator>(curr)) {
-        traverseFunctorBody(bin->getLHS(), acc);
-        traverseFunctorBody(bin->getRHS(), acc);
+        traverseFunctorBody(bin->getLHS(), acc, beneathFunctionCall);
+        traverseFunctorBody(bin->getRHS(), acc, beneathFunctionCall);
     } else if (const clang::DeclRefExpr *declref =
             clang::dyn_cast<clang::DeclRefExpr>(curr)) {
-        acc.addReferencedVar(declref->getDecl());
+        if (beneathFunctionCall) {
+            /*
+             * Escaped to a different scope, so only worry about capturing
+             * global variables in the functor here.
+             */
+            if (isGlobal(declref->getDecl()->getNameAsString())) {
+                acc.addReferencedVar(declref->getDecl());
+            }
+        } else {
+            /*
+             * This could add referenced variables that are declared from within
+             * the parallel region itself. When generating the functor we can
+             * ignore any referenced variables that are not in the capture list
+             * of the pragma and assume they are declared within the functor,
+             * though this is slightly riskier code.
+             */
+            acc.addReferencedVar(declref->getDecl());
+        }
     } else if (const clang::CastExpr *cast =
             clang::dyn_cast<clang::CastExpr>(curr)) {
-        traverseFunctorBody(cast->getSubExpr(), acc);
+        traverseFunctorBody(cast->getSubExpr(), acc, beneathFunctionCall);
     } else if (const clang::ArraySubscriptExpr *arrayRef =
             clang::dyn_cast<clang::ArraySubscriptExpr>(curr)) {
         /*
          * Traverse the base variable reference this array reference is relative
          * to.
          */
-        traverseFunctorBody(arrayRef->getBase(), acc);
+        traverseFunctorBody(arrayRef->getBase(), acc, beneathFunctionCall);
         // Traverse the expression of the offset from base.
-        traverseFunctorBody(arrayRef->getIdx(), acc);
+        traverseFunctorBody(arrayRef->getIdx(), acc, beneathFunctionCall);
     } else if (const clang::ForStmt *loop =
             clang::dyn_cast<clang::ForStmt>(curr)) {
-        traverseFunctorBody(loop->getInit(), acc);
-        traverseFunctorBody(loop->getCond(), acc);
-        traverseFunctorBody(loop->getInc(), acc);
-        traverseFunctorBody(loop->getBody(), acc);
+        traverseFunctorBody(loop->getInit(), acc, beneathFunctionCall);
+        traverseFunctorBody(loop->getCond(), acc, beneathFunctionCall);
+        traverseFunctorBody(loop->getInc(), acc, beneathFunctionCall);
+        traverseFunctorBody(loop->getBody(), acc, beneathFunctionCall);
     } else if (const clang::UnaryOperator *unary =
             clang::dyn_cast<clang::UnaryOperator>(curr)) {
-        traverseFunctorBody(unary->getSubExpr(), acc);
+        traverseFunctorBody(unary->getSubExpr(), acc, beneathFunctionCall);
     } else if (const clang::IfStmt *branch =
             clang::dyn_cast<clang::IfStmt>(curr)) {
-        traverseFunctorBody(branch->getCond(), acc);
+        traverseFunctorBody(branch->getCond(), acc, beneathFunctionCall);
         if (branch->getThen()) {
-            traverseFunctorBody(branch->getThen(), acc);
+            traverseFunctorBody(branch->getThen(), acc, beneathFunctionCall);
         }
         if (branch->getElse()) {
-            traverseFunctorBody(branch->getElse(), acc);
+            traverseFunctorBody(branch->getElse(), acc, beneathFunctionCall);
         }
     } else if (const clang::ParenExpr *paren =
             clang::dyn_cast<clang::ParenExpr>(curr)) {
-        traverseFunctorBody(paren->getSubExpr(), acc);
+        traverseFunctorBody(paren->getSubExpr(), acc, beneathFunctionCall);
     } else if (const clang::MemberExpr *member =
             clang::dyn_cast<clang::MemberExpr>(curr)) {
-        traverseFunctorBody(member->getBase(), acc);
+        traverseFunctorBody(member->getBase(), acc, beneathFunctionCall);
     } else if (const clang::CallExpr *call =
             clang::dyn_cast<clang::CallExpr>(curr)) {
         const clang::FunctionDecl *callee = call->getDirectCallee();
@@ -560,25 +584,32 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
             acc.foundUnresolvedFunction(callee);
         } else {
             acc.addCalledFunction(callee);
-            traverseFunctorBody(callee->getBody(), acc);
+            traverseFunctorBody(callee->getBody(), acc, true);
         }
 
         for (unsigned i = 0; i < call->getNumArgs(); i++) {
-            traverseFunctorBody(call->getArg(i), acc);
+            traverseFunctorBody(call->getArg(i), acc, beneathFunctionCall);
         }
     } else if (const clang::ReturnStmt *ret =
             clang::dyn_cast<clang::ReturnStmt>(curr)) {
-        traverseFunctorBody(ret->getRetValue(), acc);
+        traverseFunctorBody(ret->getRetValue(), acc, beneathFunctionCall);
     } else if (const clang::ConditionalOperator *cond =
             clang::dyn_cast<clang::ConditionalOperator>(curr)) {
-        traverseFunctorBody(cond->getLHS(), acc);
-        traverseFunctorBody(cond->getRHS(), acc);
-    } else if (const clang::CXXConstructExpr *constr = clang::dyn_cast<clang::CXXConstructExpr>(curr)) {
+        traverseFunctorBody(cond->getLHS(), acc, beneathFunctionCall);
+        traverseFunctorBody(cond->getRHS(), acc, beneathFunctionCall);
+    } else if (const clang::CXXConstructExpr *constr =
+            clang::dyn_cast<clang::CXXConstructExpr>(curr)) {
         for (unsigned i = 0; i < constr->getNumArgs(); i++) {
-            traverseFunctorBody(constr->getArg(i), acc);
+            traverseFunctorBody(constr->getArg(i), acc, beneathFunctionCall);
+        }
+    } else if (const clang::DeclStmt *decl =
+            clang::dyn_cast<clang::DeclStmt>(curr)) {
+        for (clang::DeclStmt::const_decl_iterator i = decl->decl_begin(),
+                e = decl->decl_end(); i != e; i++) {
+            const clang::Decl *curr = *i;
+            acc.addDeclaredVar(curr);
         }
     } else if (clang::isa<clang::IntegerLiteral>(curr) ||
-            clang::isa<clang::DeclStmt>(curr) ||
             clang::isa<clang::FloatingLiteral>(curr) ||
             clang::isa<clang::BreakStmt>(curr) ||
             clang::isa<clang::CXXBoolLiteralExpr>(curr) ||
@@ -591,9 +622,100 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
     }
 }
 
+bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
+        const clang::ValueDecl *ref, OMPVarInfo &foundVarInfo,
+        const bool isShared, std::stringstream &constructor_sig,
+        std::stringstream &constructor_body, std::stringstream &ss,
+        CUDAFunctorParameters *functor_params,
+        std::vector<OMPVarInfo> *toBeTransferred) {
+    const clang::Type *pointee = pointer->getPointeeType().getTypePtr();
+
+    if (const clang::BuiltinType *builtinPointee =
+            clang::dyn_cast<clang::BuiltinType>(pointee)) {
+        const std::string builtinStr = builtinPointee->getName(
+                Context->getPrintingPolicy()).str();
+        ss << "    " << builtinStr << "* " << (isShared ? "volatile " : "") <<
+            ref->getNameAsString() << ";" << std::endl;
+        constructor_sig << builtinStr << "* set_" << ref->getNameAsString();
+        functor_params->addParameter(ref, foundVarInfo);
+        constructor_body << "            " << ref->getNameAsString() <<
+            " = set_" << ref->getNameAsString() << ";" << std::endl;
+        toBeTransferred->push_back(foundVarInfo);
+    } else if (const clang::TypedefType *typdef =
+            clang::dyn_cast<clang::TypedefType>(pointee)) {
+        const clang::Type *nested =
+            typdef->getDecl()->getTypeSourceInfo()->getType().getTypePtr();
+
+        if (const clang::ElaboratedType *elaborated =
+                clang::dyn_cast<clang::ElaboratedType>(nested)) {
+            const clang::Type *nested = elaborated->getNamedType().getTypePtr();
+            if (const clang::RecordType *record =
+                    clang::dyn_cast<clang::RecordType>(nested)) {
+                const std::string typdefStr =
+                    typdef->getDecl()->getNameAsString();
+                ss << "    " << typdefStr << "* " <<
+                    (isShared ? "volatile " : "") << ref->getNameAsString() <<
+                    ";" << std::endl;
+                constructor_sig << typdefStr << "* set_" <<
+                    ref->getNameAsString();
+                functor_params->addParameter(ref, foundVarInfo);
+                constructor_body << "            " << ref->getNameAsString() <<
+                    " = set_" << ref->getNameAsString() << ";" << std::endl;
+                toBeTransferred->push_back(foundVarInfo);
+            } else {
+                std::cerr << "getCUDAFunctorDef: " <<
+                    "Unsupported elaborated pointee type " <<
+                    std::string(nested->getTypeClassName()) <<
+                    " for " << ref->getNameAsString() << std::endl;
+                exit(1);
+            }
+        } else if (const clang::BuiltinType *builtin =
+                clang::dyn_cast<clang::BuiltinType>(nested)) {
+            const std::string typdefStr =
+                typdef->getDecl()->getNameAsString();
+            ss << "    " << typdefStr << "* " <<
+                (isShared ? "volatile " : "") << ref->getNameAsString() <<
+                ";" << std::endl;
+            constructor_sig << typdefStr << "* set_" <<
+                ref->getNameAsString();
+            functor_params->addParameter(ref, foundVarInfo);
+            constructor_body << "            " << ref->getNameAsString() <<
+                " = set_" << ref->getNameAsString() << ";" << std::endl;
+            toBeTransferred->push_back(foundVarInfo);
+        } else {
+            std::cerr << "getCUDAFunctorDef: " <<
+                "Unsupported typedef pointee type " <<
+                std::string(nested->getTypeClassName()) <<
+                " for " << ref->getNameAsString() << std::endl;
+            exit(1);
+        }
+    } else if (const clang::RecordType *record =
+            clang::dyn_cast<clang::RecordType>(pointee)) {
+        ss << "    struct " << record->getDecl()->getNameAsString() << "* " <<
+            (isShared ? "volatile" : "") << ref->getNameAsString() << ";" <<
+            std::endl;
+        constructor_sig << "struct " << record->getDecl()->getNameAsString() <<
+            "* set_" << ref->getNameAsString();
+        functor_params->addParameter(ref, foundVarInfo);
+        constructor_body << "            " << ref->getNameAsString() <<
+            " = set_" << ref->getNameAsString() << ";" << std::endl;
+        toBeTransferred->push_back(foundVarInfo);
+    } else {
+        std::cerr << "getCUDAFunctorDef: Unsupported " <<
+            "pointee type " <<
+            std::string(pointee->getTypeClassName()) <<
+            " for " << ref->getNameAsString() << std::endl;
+        return false;
+        // exit(1);
+    }
+
+    return true;
+}
+
 std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
         std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses,
-        std::string iterator, std::string bodyStr, const clang::Stmt *body) {
+        std::string iterator, std::string bodyStr, const clang::Stmt *body,
+        CUDAFunctorParameters *functor_params) {
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
     std::stringstream ss;
     bool first_field = true;
@@ -613,7 +735,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 #endif
 
     ParallelRegionInfo info;
-    traverseFunctorBody(body, info);
+    traverseFunctorBody(body, info, false);
 
     bool anyUnresolved = false;
     for (std::vector<const clang::FunctionDecl *>::iterator i =
@@ -651,106 +773,269 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
         ss << "        }" << std::endl;
     }
 
-    /*
-    for (std::vector<OMPVarInfo>::iterator i = vars->begin(), e = vars->end();
-            i != e; i++) {
-        OMPVarInfo var = *i;
-        clang::ValueDecl *decl = var.getDecl();
+    for (std::vector<const clang::ValueDecl *>::iterator i =
+            info.referenced_begin(), e = info.referenced_end(); i != e; i++) {
+        const clang::ValueDecl *ref = *i;
 
-        if (!first_field) {
-            constructor_sig << "," << std::endl << "                ";
+        bool found = false;
+        OMPVarInfo foundVarInfo;
+        for (std::vector<OMPVarInfo>::iterator ii = vars->begin(), ee =
+                vars->end(); ii != ee; ii++) {
+            OMPVarInfo curr = *ii;
+            if (curr.getDecl() == ref) {
+                found = true;
+                foundVarInfo = curr;
+            }
         }
 
-        switch (var.getType()) {
-            case (CAPTURE_TYPE::SHARED):
+        /*
+         * If the variable 'ref' that we discovered as being referenced from
+         * inside of this functor is not either:
+         *
+         *   1) A variable that we marked as captured from the external scope of
+         *      the OpenMP pragma (found).
+         *   2) A variable that was declared locally inside the parallel region
+         *      itself (info.isDeclaredInsideParallelRegion).
+         *   3) The iterator variable for this parallel region (iterator).
+         *
+         * then this would indicate we do not know of a variable that is being
+         * captured, and there's some bug in the analysis.
+         */
+        if (!found && !info.isDeclaredInsideParallelRegion(ref) &&
+                ref->getNameAsString() != iterator) {
+            std::cerr << "Failed to discover " << ref->getNameAsString() <<
+                " for " << closureName << std::endl;
+            exit(1);
+        }
+
+        if (found) {
+            if (!first_field) {
+                constructor_sig << "," << std::endl << "                ";
+            }
+
+            switch (foundVarInfo.getType()) {
+                case (CAPTURE_TYPE::SHARED):
 #ifdef VERBOSE
-                std::cerr << "getCUDAFunctorDef: shared field " <<
-                    decl->getNameAsString() << ", type " <<
-                    std::string(decl->getType()->getTypeClassName()) <<
-                    std::endl;
+                    std::cerr << "getCUDAFunctorDef: shared field " <<
+                        ref->getNameAsString() << ", type " <<
+                        std::string(ref->getType()->getTypeClassName()) <<
+                        std::endl;
 #endif
-                if (const clang::BuiltinType *builtin =
-                        clang::dyn_cast<clang::BuiltinType>(decl->getType())) {
-                    const std::string builtinStr =
-                        builtin->getName(Context->getPrintingPolicy()).str();
-                    ss << "    volatile " << builtinStr << " " <<
-                        decl->getNameAsString() << ";" << std::endl;
-                    constructor_sig << "    " << builtinStr << " set_" <<
-                        decl->getNameAsString();
-                    constructor_body << "            " <<
-                        decl->getNameAsString() << " = set_" <<
-                        decl->getNameAsString() << ";" << std::endl;
-                } else if (const clang::PointerType *pointer =
-                        clang::dyn_cast<clang::PointerType>(decl->getType())) {
-                    const clang::Type *pointee =
-                        pointer->getPointeeType().getTypePtr();
-                    const clang::BuiltinType *builtinPointee =
-                        clang::dyn_cast<clang::BuiltinType>(pointee);
-                    if (!builtinPointee) {
-                        std::cerr << "getCUDAFunctorDef: Unsupported " <<
-                            "pointee type " <<
-                            std::string(decl->getType()->getTypeClassName()) <<
-                            " for " << decl->getNameAsString() << std::endl;
+                    if (const clang::BuiltinType *builtin =
+                            clang::dyn_cast<clang::BuiltinType>(ref->getType())) {
+                        const std::string builtinStr =
+                            builtin->getName(Context->getPrintingPolicy()).str();
+                        ss << "    volatile " << builtinStr << " " <<
+                            ref->getNameAsString() << ";" << std::endl;
+                        constructor_sig << builtinStr << " set_" <<
+                            ref->getNameAsString();
+                        functor_params->addParameter(ref, foundVarInfo);
+                        constructor_body << "            " <<
+                            ref->getNameAsString() << " = set_" <<
+                            ref->getNameAsString() << ";" << std::endl;
+                    } else if (const clang::PointerType *pointer =
+                            clang::dyn_cast<clang::PointerType>(ref->getType())) {
+                        if (!handleCapturedPointer(pointer, ref, foundVarInfo,
+                                    true, constructor_sig, constructor_body, ss,
+                                    functor_params, toBeTransferred)) {
+                            return "";
+                        }
+                    } else if (const clang::ConstantArrayType *arr =
+                            clang::dyn_cast<clang::ConstantArrayType>(
+                                ref->getType())) {
+                        const llvm::APInt arraySize = arr->getSize();
+                        const clang::Type *eleType =
+                            arr->getElementType().getTypePtr();
+                        if (const clang::BuiltinType *builtin =
+                                clang::dyn_cast<clang::BuiltinType>(eleType)) {
+                            const std::string builtinStr =
+                                builtin->getName(Context->getPrintingPolicy()).str();
+                            ss << "    volatile " << builtinStr << " " <<
+                                ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
+                                "];" << std::endl;
+                            constructor_sig << builtinStr << " set_" <<
+                                ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
+                                "]";
+                            functor_params->addParameter(ref, foundVarInfo);
+                            constructor_body << "            memcpy(" <<
+                                ref->getNameAsString() << ", set_" <<
+                                ref->getNameAsString() << ", sizeof(" <<
+                                ref->getNameAsString() << "));" << std::endl;
+                        } else if (const clang::ConstantArrayType *nestedArr =
+                                clang::dyn_cast<clang::ConstantArrayType>(eleType)) {
+                            const llvm::APInt nestedArrSize = nestedArr->getSize();
+                            const clang::Type *nestedEleType =
+                                nestedArr->getElementType().getTypePtr();
+                            if (const clang::BuiltinType *builtin =
+                                    clang::dyn_cast<clang::BuiltinType>(nestedEleType)) {
+                                const std::string builtinStr =
+                                    builtin->getName(Context->getPrintingPolicy()).str();
+                                ss << "    volatile " << builtinStr << " " <<
+                                    ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
+                                    "][" << nestedArrSize.toString(10, false) << "];" << std::endl;
+                                constructor_sig << builtinStr << " set_" <<
+                                    ref->getNameAsString() << "[" << arraySize.toString(10, false) <<
+                                    "][" << nestedArrSize.toString(10, false) << "]";
+                                functor_params->addParameter(ref, foundVarInfo);
+                                constructor_body << "            memcpy(" <<
+                                    ref->getNameAsString() << ", set_" <<
+                                    ref->getNameAsString() << ", sizeof(" <<
+                                    ref->getNameAsString() << "));" << std::endl;
+                            } else {
+                                std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                                    "element type on constant array \"" <<
+                                    ref->getNameAsString() << "\": " <<
+                                    std::string(nestedEleType->getTypeClassName()) <<
+                                    std::endl;
+                                exit(1);
+                            }
+                        } else {
+                            std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                                "element type on constant array \"" <<
+                                ref->getNameAsString() << "\": " <<
+                                std::string(eleType->getTypeClassName()) <<
+                                std::endl;
+                            exit(1);
+                        }
+                    } else if (const clang::RecordType *record =
+                            clang::dyn_cast<clang::RecordType>(ref->getType())) {
+                        ss << "    volatile struct " <<
+                            record->getDecl()->getNameAsString() << " " <<
+                            ref->getNameAsString() << ";" << std::endl;
+                        constructor_sig << "struct " <<
+                            record->getDecl()->getNameAsString() << " set_" <<
+                            ref->getNameAsString();
+                        functor_params->addParameter(ref, foundVarInfo);
+                        constructor_body << "            memcpy(&" <<
+                            ref->getNameAsString() << ", &set_" <<
+                            ref->getNameAsString() << ", sizeof(struct " <<
+                            record->getDecl()->getNameAsString() << "));" <<
+                            std::endl;
+                    } else if (const clang::TypedefType *typdef =
+                            clang::dyn_cast<clang::TypedefType>(ref->getType())) {
+                        const clang::Type *nested =
+                            typdef->getDecl()->getTypeSourceInfo()->getType().getTypePtr();
+                        if (const clang::BuiltinType *builtin = clang::dyn_cast<clang::BuiltinType>(nested)) {
+                            const std::string typdefStr =
+                                typdef->getDecl()->getNameAsString();
+                            ss << "    volatile " << typdefStr << " " <<
+                                ref->getNameAsString() << ";" << std::endl;
+                            constructor_sig << typdefStr << " set_" <<
+                                ref->getNameAsString();
+                            functor_params->addParameter(ref, foundVarInfo);
+                            constructor_body << "            " <<
+                                ref->getNameAsString() << " = set_" <<
+                                ref->getNameAsString() << ";" << std::endl;
+                        } else {
+                            std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                                "shared typedef capture type " <<
+                                std::string(nested->getTypeClassName()) <<
+                                std::endl;
+                            exit(1);
+                        }
+                    } else {
+                        std::cerr << "getCUDAFunctorDef: Unsupported shared " <<
+                            "capture type " <<
+                            std::string(ref->getType()->getTypeClassName()) <<
+                            std::endl;
+                        exit(1);
                     }
-                    const std::string builtinStr =
-                        builtinPointee->getName(Context->getPrintingPolicy()).str();
-                    ss << "    " << builtinStr << "* " <<
-                        decl->getNameAsString() << ";" << std::endl;
-                    constructor_sig << "    " << builtinStr << "* set_" <<
-                        decl->getNameAsString();
-                    constructor_body << "            " <<
-                        decl->getNameAsString() << " = set_" <<
-                        decl->getNameAsString() << ";" << std::endl;
-                    toBeTransferred->push_back(var);
-                } else {
-                    std::cerr << "getCUDAFunctorDef: Unsupported shared " <<
-                        "capture type " <<
-                        std::string(decl->getType()->getTypeClassName()) <<
-                        std::endl;
-                    exit(1);
-                }
-                break;
-            case (CAPTURE_TYPE::PRIVATE):
-            case (CAPTURE_TYPE::FIRSTPRIVATE):
+                    break;
+                case (CAPTURE_TYPE::PRIVATE):
+                case (CAPTURE_TYPE::FIRSTPRIVATE):
 #ifdef VERBOSE
-                std::cerr << "getCUDAFunctorDef: private/firstprivate field " <<
-                    decl->getNameAsString() << std::endl;
+                    std::cerr << "getCUDAFunctorDef: private/firstprivate field " <<
+                        ref->getNameAsString() << std::endl;
 #endif
-                if (const clang::BuiltinType *builtin =
-                        clang::dyn_cast<clang::BuiltinType>(decl->getType())) {
-                    const std::string builtinStr =
-                        builtin->getName(Context->getPrintingPolicy()).str();
-                    ss << "    " << builtinStr << " " <<
-                        decl->getNameAsString() << ";" << std::endl;
-                    constructor_sig << "    " << builtinStr << " set_" <<
-                        decl->getNameAsString();
-                    constructor_body << "            " <<
-                        decl->getNameAsString() << " = set_" <<
-                        decl->getNameAsString() << ";" << std::endl;
-                } else {
-                    std::cerr << "getCUDAFunctorDef: Unsupported " <<
-                        "private/firstprivate capture type " <<
-                        std::string(decl->getType()->getTypeClassName()) <<
-                        std::endl;
-                    exit(1);
-                }
-                break;
-            case (CAPTURE_TYPE::LASTPRIVATE):
-#ifdef VERBOSE
-                std::cerr << "getCUDAFunctorDef: lastprivate field " <<
-                    decl->getNameAsString() << std::endl;
-#endif
-                assert(false);
-                break;
-            default:
-                std::cerr << "getCUDAFunctorDef: Unsupported capture clause " <<
-                    std::endl;
-                exit(1);
-        }
+                    if (const clang::BuiltinType *builtin =
+                            clang::dyn_cast<clang::BuiltinType>(ref->getType())) {
+                        const std::string builtinStr =
+                            builtin->getName(Context->getPrintingPolicy()).str();
+                        ss << "    " << builtinStr << " " <<
+                            ref->getNameAsString() << ";" << std::endl;
+                        constructor_sig << builtinStr << " set_" <<
+                            ref->getNameAsString();
+                        functor_params->addParameter(ref, foundVarInfo);
+                        constructor_body << "            " <<
+                            ref->getNameAsString() << " = set_" <<
+                            ref->getNameAsString() << ";" << std::endl;
+                    } else if (const clang::PointerType *pointer =
+                            clang::dyn_cast<clang::PointerType>(ref->getType())) {
+                        if (!handleCapturedPointer(pointer, ref, foundVarInfo,
+                                    false, constructor_sig, constructor_body,
+                                    ss, functor_params, toBeTransferred)) {
+                            return "";
+                        }
+                    } else if (const clang::TypedefType *typedefType =
+                            clang::dyn_cast<clang::TypedefType>(ref->getType())) {
+                        const clang::Type *nested =
+                            typedefType->getDecl()->getTypeSourceInfo()->getType().getTypePtr();
 
-        first_field = false;
+                        if (const clang::ElaboratedType *elaborated = clang::dyn_cast<clang::ElaboratedType>(nested)) {
+                            const clang::Type *nested = elaborated->getNamedType().getTypePtr();
+                            if (const clang::RecordType *record =
+                                    clang::dyn_cast<clang::RecordType>(nested)) {
+                                const std::string typdefStr =
+                                    typedefType->getDecl()->getNameAsString();
+                                ss << "    " << typdefStr << " " <<
+                                    ref->getNameAsString() << ";" << std::endl;
+                                constructor_sig << typdefStr << " set_" <<
+                                    ref->getNameAsString();
+                                functor_params->addParameter(ref, foundVarInfo);
+                                constructor_body << "            " <<
+                                    ref->getNameAsString() << " = set_" <<
+                                    ref->getNameAsString() << ";" << std::endl;
+                            } else {
+                                std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                                    "nested private/firstprivate elaborated type: " <<
+                                    std::string(nested->getTypeClassName()) <<
+                                    std::endl;
+                                exit(1);
+                            }
+                        } else if (const clang::BuiltinType *builtin =
+                                clang::dyn_cast<clang::BuiltinType>(nested)) {
+                            const std::string typdefStr =
+                                typedefType->getDecl()->getNameAsString();
+                            ss << "    " << typdefStr << " " <<
+                                ref->getNameAsString() << ";" << std::endl;
+                            constructor_sig << typdefStr << " set_" <<
+                                ref->getNameAsString();
+                            functor_params->addParameter(ref, foundVarInfo);
+                            constructor_body << "            " <<
+                                ref->getNameAsString() << " = set_" <<
+                                ref->getNameAsString() << ";" << std::endl;
+                        } else {
+                            std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                                "nested private/firstprivate typedef type: " <<
+                                std::string(nested->getTypeClassName()) <<
+                                std::endl;
+                            exit(1);
+                        }
+                    } else {
+                        std::cerr << "getCUDAFunctorDef: Unsupported " <<
+                            "private/firstprivate capture type " <<
+                            std::string(ref->getType()->getTypeClassName()) <<
+                            std::endl;
+                        exit(1);
+                    }
+                    break;
+                case (CAPTURE_TYPE::LASTPRIVATE):
+#ifdef VERBOSE
+                    std::cerr << "getCUDAFunctorDef: lastprivate field " <<
+                        ref->getNameAsString() << std::endl;
+#endif
+                    assert(false);
+                    break;
+                default:
+                    std::cerr << "getCUDAFunctorDef: Unsupported capture clause " <<
+                        foundVarInfo.getType() << std::endl;
+                    exit(1);
+            }
+
+            first_field = false;
+        }
     }
-*/
+
     ss << "\n";
     ss << "    public:\n";
     ss << constructor_sig.str() << ") {" << std::endl;
@@ -771,12 +1056,12 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
         bool isForasyncClosure, int forasyncDim, bool isFuture,
         bool &isAcceleratable, std::string iterator, std::string bodyStr,
         const clang::Stmt *body, std::vector<clang::ValueDecl *> *captured,
-        OMPClauses *clauses) {
+        OMPClauses *clauses, CUDAFunctorParameters *functor_params) {
     std::stringstream ss;
 
     if (isAcceleratable) {
         std::string functor = getCUDAFunctorDef(closureName, captured, clauses,
-                iterator, bodyStr, body);
+                iterator, bodyStr, body, functor_params);
         if (functor.length() == 0) {
             isAcceleratable = false;
         } else {
@@ -1456,12 +1741,23 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         bool isAcceleratable = (nLoops == 1 &&
                                 accumulated_stride.at(0) == "1");
 
+                        CUDAFunctorParameters functor_parameters;
                         accumulatedKernelDecls += getClosureDecl(
                                 node->getLbl() + ASYNC_SUFFIX, true, nLoops,
                                 false, isAcceleratable,
                                 accumulated_cond.at(0)->getNameAsString(),
                                 originalBodyStr, body, node->getCaptures(),
-                                clauses);
+                                clauses, &functor_parameters);
+                        std::stringstream constructor_params;
+                        for (std::vector<CUDAParameter>::iterator i =
+                                functor_parameters.begin(), e =
+                                functor_parameters.end(); i != e; i++) {
+                            CUDAParameter param = *i;
+                            if (i != functor_parameters.begin()) {
+                                constructor_params << ", ";
+                            }
+                            constructor_params << param.getDecl()->getNameAsString();
+                        }
 
                         std::stringstream contextCreation;
                         contextCreation << "\n" <<
@@ -1476,7 +1772,9 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         accumulatedKernelDefs += getClosureDef(
                                 node->getLbl() + ASYNC_SUFFIX, true, false,
                                 node->getLbl(), node->getCaptures(),
-                                bodyStr, false, clauses, canLaunchTasks(forLoop), false, isAcceleratable, &condVars);
+                                bodyStr, false, clauses,
+                                canLaunchTasks(forLoop), false, isAcceleratable,
+                                &condVars);
 
                         // For now only support offload of 1D parallel loops
                         if (isAcceleratable) {
@@ -1486,7 +1784,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 accumulated_high.at(0) << ") - (" <<
                                 accumulated_low.at(0) << "), " <<
                                 node->getLbl() << ASYNC_SUFFIX <<
-                                "(), hclib::get_closest_gpu_locale(), NULL);\n";
+                                "(" << constructor_params.str() <<
+                                "), hclib::get_closest_gpu_locale(), NULL);\n";
                             contextCreation << "fut->wait();\n";
                             contextCreation << "#else\n";
                         }

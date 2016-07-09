@@ -65,9 +65,26 @@ typedef struct _pragma127_omp_parallel {
 
 class pragma127_omp_parallel_hclib_async {
     private:
+    char* rec_iter;
+    volatile char sandbox[490];
+    int i;
+    float* volatile z;
+    volatile float target_lat;
+    volatile float target_long;
 
     public:
-        pragma127_omp_parallel_hclib_async() {
+        pragma127_omp_parallel_hclib_async(char* set_rec_iter,
+                char set_sandbox[490],
+                int set_i,
+                float* set_z,
+                float set_target_lat,
+                float set_target_long) {
+            rec_iter = set_rec_iter;
+            memcpy(sandbox, set_sandbox, sizeof(sandbox));
+            i = set_i;
+            z = set_z;
+            target_lat = set_target_lat;
+            target_long = set_target_long;
 
         }
 
@@ -194,7 +211,7 @@ domain[0].high = rec_count;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rec_count) - (0), pragma127_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((rec_count) - (0), pragma127_omp_parallel_hclib_async(rec_iter, sandbox, i, z, target_lat, target_long), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma127_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

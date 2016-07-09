@@ -93,9 +93,23 @@ typedef struct _pragma153_omp_parallel {
 
 class pragma136_omp_parallel_hclib_async {
     private:
+    bool* h_graph_mask;
+    struct Node* h_graph_nodes;
+    bool* h_graph_visited;
+    int* h_cost;
+    bool* h_updating_graph_mask;
 
     public:
-        pragma136_omp_parallel_hclib_async() {
+        pragma136_omp_parallel_hclib_async(bool* set_h_graph_mask,
+                struct Node* set_h_graph_nodes,
+                bool* set_h_graph_visited,
+                int* set_h_cost,
+                bool* set_h_updating_graph_mask) {
+            h_graph_mask = set_h_graph_mask;
+            h_graph_nodes = set_h_graph_nodes;
+            h_graph_visited = set_h_graph_visited;
+            h_cost = set_h_cost;
+            h_updating_graph_mask = set_h_updating_graph_mask;
 
         }
 
@@ -125,9 +139,20 @@ static void pragma136_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 class pragma153_omp_parallel_hclib_async {
     private:
+    bool* h_updating_graph_mask;
+    bool* h_graph_mask;
+    bool* h_graph_visited;
+    volatile bool stop;
 
     public:
-        pragma153_omp_parallel_hclib_async() {
+        pragma153_omp_parallel_hclib_async(bool* set_h_updating_graph_mask,
+                bool* set_h_graph_mask,
+                bool* set_h_graph_visited,
+                bool set_stop) {
+            h_updating_graph_mask = set_h_updating_graph_mask;
+            h_graph_mask = set_h_graph_mask;
+            h_graph_visited = set_h_graph_visited;
+            stop = set_stop;
 
         }
 
@@ -222,7 +247,7 @@ domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma136_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_visited, h_cost, h_updating_graph_mask), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma136_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
@@ -258,7 +283,7 @@ domain[0].high = no_of_nodes;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma153_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma153_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);

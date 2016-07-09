@@ -24,7 +24,7 @@ void run(int argc, char** argv);
 
 int rows, cols;
 int* data;
-int** wall;
+// int** wall;
 int* result;
 #define M_SEED 9
 
@@ -39,9 +39,9 @@ init(int argc, char** argv)
                 exit(0);
         }
 	data = new int[rows*cols];
-	wall = new int*[rows];
-	for(int n=0; n<rows; n++)
-		wall[n]=data+cols*n;
+	// wall = new int*[rows];
+	// for(int n=0; n<rows; n++)
+	// 	wall[n]=data+cols*n;
 	result = new int[cols];
 	
 	int seed = M_SEED;
@@ -51,17 +51,20 @@ init(int argc, char** argv)
     {
         for (int j = 0; j < cols; j++)
         {
-            wall[i][j] = rand() % 10;
+            // wall[i][j] = rand() % 10;
+            data[i * cols + j] = rand() % 10;
         }
     }
-    for (int j = 0; j < cols; j++)
-        result[j] = wall[0][j];
+    for (int j = 0; j < cols; j++) {
+        // result[j] = wall[0][j];
+        result[j] = data[0 * cols + j];
+    }
 #ifdef BENCH_PRINT
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
         {
-            printf("%d ",wall[i][j]) ;
+            printf("%d ",data[i * cols + j]) ;
         }
         printf("\n") ;
     }
@@ -87,7 +90,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-typedef struct _pragma111_omp_parallel {
+typedef struct _pragma114_omp_parallel {
     int (*t_ptr);
     unsigned long long (*cycles_ptr);
     int (*(*src_ptr));
@@ -96,16 +99,33 @@ typedef struct _pragma111_omp_parallel {
     int min;
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma111_omp_parallel;
+ } pragma114_omp_parallel;
 
 
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
 
-class pragma111_omp_parallel_hclib_async {
+class pragma114_omp_parallel_hclib_async {
     private:
+    int min;
+    int* volatile src;
+    volatile int cols;
+    int* volatile dst;
+    int* volatile data;
+    volatile int t;
 
     public:
-        pragma111_omp_parallel_hclib_async() {
+        pragma114_omp_parallel_hclib_async(int set_min,
+                int* set_src,
+                int set_cols,
+                int* set_dst,
+                int* set_data,
+                int set_t) {
+            min = set_min;
+            src = set_src;
+            cols = set_cols;
+            dst = set_dst;
+            data = set_data;
+            t = set_t;
 
         }
 
@@ -118,13 +138,13 @@ class pragma111_omp_parallel_hclib_async {
           if (n < cols-1) {
               min = src[n + 1] < min ? src[n + 1] : min;
           }
-          dst[n] = wall[t+1][n]+min;
+          dst[n] = data[t+1 * cols + n]+min;
         }
         }
 };
 
 #else
-static void pragma111_omp_parallel_hclib_async(void *____arg, const int ___iter0);
+static void pragma114_omp_parallel_hclib_async(void *____arg, const int ___iter0);
 #endif
 typedef struct _main_entrypoint_ctx {
     unsigned long long cycles;
@@ -151,7 +171,7 @@ for (int t = 0; t < rows-1; t++) {
         src = dst;
         dst = temp;
  { 
-pragma111_omp_parallel *new_ctx = (pragma111_omp_parallel *)malloc(sizeof(pragma111_omp_parallel));
+pragma114_omp_parallel *new_ctx = (pragma114_omp_parallel *)malloc(sizeof(pragma114_omp_parallel));
 new_ctx->t_ptr = &(t);
 new_ctx->cycles_ptr = &(cycles);
 new_ctx->src_ptr = &(src);
@@ -166,10 +186,10 @@ domain[0].high = cols;
 domain[0].stride = 1;
 domain[0].tile = -1;
 #ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((cols) - (0), pragma111_omp_parallel_hclib_async(), hclib::get_closest_gpu_locale(), NULL);
+hclib::future_t *fut = hclib::forasync_cuda((cols) - (0), pragma114_omp_parallel_hclib_async(min, src, cols, dst, data, t), hclib::get_closest_gpu_locale(), NULL);
 fut->wait();
 #else
-hclib_future_t *fut = hclib_forasync_future((void *)pragma111_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
+hclib_future_t *fut = hclib_forasync_future((void *)pragma114_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
 #endif
 free(new_ctx);
@@ -216,15 +236,15 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 #endif
 
     delete [] data;
-    delete [] wall;
+    // delete [] wall;
     delete [] dst;
     delete [] src;
 }  
 
 #ifndef OMP_TO_HCLIB_ENABLE_GPU
 
-static void pragma111_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
-    pragma111_omp_parallel *ctx = (pragma111_omp_parallel *)____arg;
+static void pragma114_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
+    pragma114_omp_parallel *ctx = (pragma114_omp_parallel *)____arg;
     int min; min = ctx->min;
     do {
     int n;     n = ___iter0;
@@ -236,7 +256,7 @@ static void pragma111_omp_parallel_hclib_async(void *____arg, const int ___iter0
           if (n < cols-1) {
               min = (*(ctx->src_ptr))[n + 1] < min ? (*(ctx->src_ptr))[n + 1] : min;
           }
-          (*(ctx->dst_ptr))[n] = wall[(*(ctx->t_ptr))+1][n]+min;
+          (*(ctx->dst_ptr))[n] = data[(*(ctx->t_ptr))+1 * cols + n]+min;
         } ;     } while (0);
 }
 

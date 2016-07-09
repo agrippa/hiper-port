@@ -1,5 +1,17 @@
 #include "OMPVarInfo.h"
 
+OMPVarInfo::OMPVarInfo() {
+    decl = NULL;
+    type = NONE;
+    isGlobal = false;
+}
+
+OMPVarInfo::OMPVarInfo(const OMPVarInfo& other) {
+    decl = other.decl;
+    type = other.type;
+    isGlobal = other.isGlobal;
+}
+
 OMPVarInfo::OMPVarInfo(clang::ValueDecl *setDecl, enum CAPTURE_TYPE setType,
         bool setIsGlobal) {
     decl = setDecl;

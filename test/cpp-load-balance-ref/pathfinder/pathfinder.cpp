@@ -18,7 +18,7 @@ void run(int argc, char** argv);
 
 int rows, cols;
 int* data;
-int** wall;
+// int** wall;
 int* result;
 #define M_SEED 9
 
@@ -33,9 +33,9 @@ init(int argc, char** argv)
                 exit(0);
         }
 	data = new int[rows*cols];
-	wall = new int*[rows];
-	for(int n=0; n<rows; n++)
-		wall[n]=data+cols*n;
+	// wall = new int*[rows];
+	// for(int n=0; n<rows; n++)
+	// 	wall[n]=data+cols*n;
 	result = new int[cols];
 	
 	int seed = M_SEED;
@@ -45,17 +45,20 @@ init(int argc, char** argv)
     {
         for (int j = 0; j < cols; j++)
         {
-            wall[i][j] = rand() % 10;
+            // wall[i][j] = rand() % 10;
+            data[i * cols + j] = rand() % 10;
         }
     }
-    for (int j = 0; j < cols; j++)
-        result[j] = wall[0][j];
+    for (int j = 0; j < cols; j++) {
+        // result[j] = wall[0][j];
+        result[j] = data[0 * cols + j];
+    }
 #ifdef BENCH_PRINT
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
         {
-            printf("%d ",wall[i][j]) ;
+            printf("%d ",data[i * cols + j]) ;
         }
         printf("\n") ;
     }
@@ -110,7 +113,7 @@ for (int t = 0; t < rows-1; t++) {
           if (n < cols-1) {
               min = src[n + 1] < min ? src[n + 1] : min;
           }
-          dst[n] = wall[t+1][n]+min;
+          dst[n] = data[t+1 * cols + n]+min;
         } ; }
 
     } ; {
@@ -135,7 +138,7 @@ for (int t = 0; t < rows-1; t++) {
 #endif
 
     delete [] data;
-    delete [] wall;
+    // delete [] wall;
     delete [] dst;
     delete [] src;
 }

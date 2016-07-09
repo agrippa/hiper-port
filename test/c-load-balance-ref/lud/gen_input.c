@@ -16,7 +16,7 @@ char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
-    FP_NUMBER sum, **L, **U, **A;
+    FP_NUMBER sum, *L, *U, *A;
     FILE *fl,*fu,*fa;
 
     if ( argc < 2) {
@@ -25,9 +25,9 @@ int main (int argc, char **argv){
     }
 
     MatrixDim = atoi(argv[1]);
-    L = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
-    U = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
-    A = (FP_NUMBER **) malloc(sizeof(FP_NUMBER*)*MatrixDim);
+    L = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
+    U = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
+    A = (FP_NUMBER *) malloc(sizeof(FP_NUMBER*)*MatrixDim*MatrixDim);
 
     if ( !L || !U || !A){
         printf("Can not allocate memory\n");
@@ -60,25 +60,20 @@ int main (int argc, char **argv){
         return 1;
     }
 
-    for (i=0; i < MatrixDim; i ++){
-        L[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-        U[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-        A[i]=(FP_NUMBER*)malloc(sizeof(FP_NUMBER)*MatrixDim);
-    }
 #pragma omp parallel for default(none) private(i,j) shared(L,U,MatrixDim)
 ;
     for (i=0; i < MatrixDim; i ++){ ____num_tasks[omp_get_thread_num()]++;
 {
         for (j=0; j < MatrixDim; j++){
             if ( i == j) {
-                L[i][j] = 1.0;
-                U[i][j] = GET_RAND_FP;
+                L[i * MatrixDim + j] = 1.0;
+                U[i * MatrixDim + j] = GET_RAND_FP;
             } else if (i < j){
-                L[i][j] = 0;
-                U[i][j] = GET_RAND_FP;
+                L[i * MatrixDim + j] = 0;
+                U[i * MatrixDim + j] = GET_RAND_FP;
             } else { // i > j
-                L[i][j] = GET_RAND_FP;
-                U[i][j] = 0;
+                L[i * MatrixDim + j] = GET_RAND_FP;
+                U[i * MatrixDim + j] = 0;
             }
         }
     } ; }
@@ -91,22 +86,22 @@ int main (int argc, char **argv){
         for (j=0; j < MatrixDim; j++){
             sum = 0;
             for(k=0; k < MatrixDim; k++)
-                sum += L[i][k]*U[k][j];
-            A[i][j] = sum;
+                sum += L[i * MatrixDim + k]*U[k * MatrixDim + j];
+            A[i * MatrixDim + j] = sum;
         }
     } ; }
 
 
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fl, "%f ", L[i][j]);
+            fprintf(fl, "%f ", L[i * MatrixDim + j]);
         fprintf(fl, "\n");
     }
     fclose(fl);
 
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fu, "%f ", U[i][j]);
+            fprintf(fu, "%f ", U[i * MatrixDim + j]);
         fprintf(fu, "\n");
     }
     fclose(fu);
@@ -114,16 +109,11 @@ int main (int argc, char **argv){
     fprintf(fa, "%d\n", MatrixDim);
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)
-            fprintf(fa, "%f ", A[i][j]);
+            fprintf(fa, "%f ", A[i * MatrixDim + j]);
         fprintf(fa, "\n");
     }
     fclose(fa);
 
-    for (i = 0; i < MatrixDim; i ++ ){
-        free(L[i]);
-        free(U[i]);
-        free(A[i]);
-    }
     free(L);
     free(U);
     free(A);

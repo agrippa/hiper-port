@@ -18,6 +18,8 @@ class OMPVarInfo {
         bool isGlobal;
 
     public:
+        OMPVarInfo();
+        OMPVarInfo(const OMPVarInfo& other);
         OMPVarInfo(clang::ValueDecl *decl, enum CAPTURE_TYPE type,
                 bool isGlobal);
 
