@@ -56,7 +56,8 @@ class pragma87_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
         for (j=0; j < MatrixDim; j++){
             sum = 0;
             for(k=0; k < MatrixDim; k++)
@@ -64,6 +65,7 @@ class pragma87_omp_parallel_hclib_async {
             A[i * MatrixDim + j] = sum;
         }
     }
+            }
         }
 };
 

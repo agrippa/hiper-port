@@ -199,7 +199,8 @@ class pragma167_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int z) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
                 int y;
                 for (y = 0; y < ny; y++) {
                     int x;
@@ -216,6 +217,7 @@ class pragma167_omp_parallel_hclib_async {
                             + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
                     }
                 }
+            }
             }
         }
 };

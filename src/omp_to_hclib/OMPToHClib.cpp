@@ -1075,7 +1075,10 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "        }" << std::endl;
     ss << std::endl;
     ss << "        __device__ void operator()(int " << iterator << ") {\n";
-    ss << "            " << bodyStr << "\n";
+    // Included so that continue statements have the same semantics.
+    ss << "            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {" << std::endl;
+    ss << "                " << bodyStr << "\n";
+    ss << "            }" << std::endl;
     ss << "        }\n";
     ss << "};\n\n";
 

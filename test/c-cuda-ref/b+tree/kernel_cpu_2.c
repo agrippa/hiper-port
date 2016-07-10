@@ -102,7 +102,8 @@ class pragma103_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int bid) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 
 		// process levels of the tree
 		for(i = 0; i < maxheight; i++){
@@ -156,6 +157,7 @@ class pragma103_omp_parallel_hclib_async {
 		}
 
 	}
+            }
         }
 };
 

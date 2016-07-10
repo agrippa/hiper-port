@@ -115,7 +115,8 @@ class pragma72_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int chunk) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 
         int r_end = r_start + BLOCK_SIZE_R > row ? row : r_start + BLOCK_SIZE_R;
@@ -191,6 +192,7 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
             }
         }
     }
+            }
         }
 };
 

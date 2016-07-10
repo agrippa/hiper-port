@@ -120,7 +120,8 @@ class pragma114_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int n) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
           min = src[n];
           if (n > 0) {
               min = src[n - 1] < min ? src[n - 1] : min;
@@ -130,6 +131,7 @@ class pragma114_omp_parallel_hclib_async {
           }
           dst[n] = data[t+1 * cols + n]+min;
         }
+            }
         }
 };
 

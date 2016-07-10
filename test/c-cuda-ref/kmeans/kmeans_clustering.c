@@ -197,7 +197,8 @@ class pragma179_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 	        /* find the index of nestest cluster centers */					
             int tid = hclib_get_current_worker();				
 	        index = find_nearest_point(feature + (i * nfeatures),
@@ -215,6 +216,7 @@ class pragma179_omp_parallel_hclib_async {
 	        partial_new_centers_len[tid * nclusters + index]++;				
 	        for (j=0; j<nfeatures; j++)
 		       partial_new_centers[tid * nclusters * nfeatures + index * nfeatures + j] += feature[i * nfeatures + j];
+            }
             }
         }
 };

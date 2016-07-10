@@ -107,7 +107,8 @@ class pragma135_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
             for (int j = 0; j < cols; j++) { 
 		
 				k = i * cols + j;
@@ -139,6 +140,7 @@ class pragma135_omp_parallel_hclib_async {
 		}
   
     }
+            }
         }
 };
 
@@ -210,7 +212,8 @@ class pragma168_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
             for (int j = 0; j < cols; j++) {        
 
                 // current index
@@ -235,6 +238,7 @@ class pragma168_omp_parallel_hclib_async {
                 //printf("\n"); 
                 #endif //output
 	     }
+            }
         }
 };
 

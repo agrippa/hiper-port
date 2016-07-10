@@ -371,9 +371,11 @@ class pragma383_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 		weights[x] = 1/((double)(Nparticles));
 	}
+            }
         }
 };
 
@@ -412,10 +414,12 @@ class pragma398_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 		arrayX[x] = xe;
 		arrayY[x] = ye;
 	}
+            }
         }
 };
 
@@ -469,10 +473,12 @@ class pragma412_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			arrayX[x] += 1 + 5*randn(seed, x);
 			arrayY[x] += -2 + 2*randn(seed, x);
 		}
+            }
         }
 };
 
@@ -542,7 +548,8 @@ class pragma420_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			//compute the likelihood: remember our assumption is that you know
 			// foreground and the background image intensity distribution.
 			// Notice that we consider here a likelihood ratio, instead of
@@ -560,6 +567,7 @@ class pragma420_omp_parallel_hclib_async {
 				likelihood[x] += (pow((I[ind[x*countOnes + y]] - 100),2) - pow((I[ind[x*countOnes + y]]-228),2))/50.0;
 			likelihood[x] = likelihood[x]/((double) countOnes);
 		}
+            }
         }
 };
 
@@ -584,9 +592,11 @@ class pragma443_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			weights[x] = weights[x] * exp(likelihood[x]);
 		}
+            }
         }
 };
 
@@ -611,9 +621,11 @@ class pragma450_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			sumWeights += weights[x];
 		}
+            }
         }
 };
 
@@ -638,9 +650,11 @@ class pragma456_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			weights[x] = weights[x]/sumWeights;
 		}
+            }
         }
 };
 
@@ -674,10 +688,12 @@ class pragma465_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			xe += arrayX[x] * weights[x];
 			ye += arrayY[x] * weights[x];
 		}
+            }
         }
 };
 
@@ -705,9 +721,11 @@ class pragma490_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int x) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			u[x] = u1 + x/((double)(Nparticles));
 		}
+            }
         }
 };
 
@@ -766,7 +784,8 @@ class pragma498_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int j) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 			i = findIndex(CDF, Nparticles, u[j]);
 			if(i == -1)
 				i = Nparticles-1;
@@ -774,6 +793,7 @@ class pragma498_omp_parallel_hclib_async {
 			yj[j] = arrayY[i];
 			
 		}
+            }
         }
 };
 

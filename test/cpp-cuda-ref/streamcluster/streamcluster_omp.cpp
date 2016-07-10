@@ -356,7 +356,8 @@ class pragma399_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
     float x_cost = dist(points->p[i], points->p[x], points->dim) 
       * points->p[i].weight;
     float current_cost = points->p[i].cost;
@@ -381,6 +382,7 @@ class pragma399_omp_parallel_hclib_async {
       lower[center_table[assign]] += current_cost - x_cost;			
     }
   }
+            }
         }
 };
 
@@ -433,7 +435,8 @@ class pragma475_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
       bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
       if ( switch_membership[i] || close_center ) {
 				// Either i's median (which may be i itself) is closing,
@@ -443,6 +446,7 @@ class pragma475_omp_parallel_hclib_async {
 				points->p[i].assign = x;
       }
     }
+            }
         }
 };
 

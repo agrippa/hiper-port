@@ -136,7 +136,8 @@ class pragma121_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
 		
@@ -177,6 +178,7 @@ class pragma121_omp_parallel_hclib_async {
 			}
 		}
 	}
+            }
         }
 };
 
@@ -283,7 +285,8 @@ class pragma196_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int i) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {
 			double max = 0.0, temp;
@@ -304,6 +307,7 @@ class pragma196_omp_parallel_hclib_async {
 			m_set_val(dilated, i, j, max);
 		}
 	}
+            }
         }
 };
 

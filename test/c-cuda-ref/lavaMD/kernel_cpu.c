@@ -129,7 +129,8 @@ class pragma123_omp_parallel_hclib_async {
         }
 
         __device__ void operator()(int l) {
-            {
+            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
+                {
 
 		//------------------------------------------------------------------------------------------100
 		//	home box - box parameters
@@ -209,6 +210,7 @@ class pragma123_omp_parallel_hclib_async {
 		} // for k
 
 	}
+            }
         }
 };
 
