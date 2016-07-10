@@ -147,7 +147,10 @@ class pragma179_omp_parallel_hclib_async {
     return(index);
 }
         }
-        __device__ float   euclid_dist_2        (float*, float*, int) {
+        __device__ __inline
+float euclid_dist_2(float *pt1,
+                    float *pt2,
+                    int    numdims) {
             {
     int i;
     float ans=0.0;

@@ -797,7 +797,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 
     for (std::vector<const clang::FunctionDecl *>::iterator i =
             info.called_begin(), e = info.called_end(); i != e; i++) {
-        const clang::FunctionDecl *func = *i;
+        const clang::FunctionDecl *func = (*i)->getMostRecentDecl();
+
         std::string funcDef = rewriter->getRewrittenText(clang::SourceRange(
                     func->getLocStart(),
                     func->getParamDecl(func->param_size() - 1)->getLocEnd()));
