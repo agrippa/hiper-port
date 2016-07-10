@@ -16,7 +16,7 @@ static void kernel_launcher(unsigned niters, functor_type functor) {
     wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
     const cudaError_t err = cudaDeviceSynchronize();
     if (err != cudaSuccess) {
-        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        fprintf(stderr, "CUDA Launch Error - %s\n", cudaGetErrorString(err));
         exit(2);
     }
 }
