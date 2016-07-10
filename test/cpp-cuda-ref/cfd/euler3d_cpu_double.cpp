@@ -112,6 +112,7 @@ class pragma63_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_dst, (void *)dst, get_size_from_allocation(h_dst), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
@@ -219,6 +220,7 @@ class pragma112_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_variables, (void *)variables, get_size_from_allocation(h_variables), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
@@ -367,6 +369,7 @@ class pragma165_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_variables, (void *)variables, get_size_from_allocation(h_variables), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
@@ -563,6 +566,7 @@ class pragma196_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_variables, (void *)variables, get_size_from_allocation(h_variables), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
@@ -816,6 +820,7 @@ class pragma327_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_step_factors, (void *)step_factors, get_size_from_allocation(h_step_factors), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));

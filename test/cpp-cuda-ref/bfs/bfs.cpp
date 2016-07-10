@@ -156,6 +156,7 @@ class pragma136_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_h_graph_mask, (void *)h_graph_mask, get_size_from_allocation(h_h_graph_mask), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
@@ -295,6 +296,7 @@ class pragma153_omp_parallel_hclib_async {
     }
 
     void transfer_from_device() {
+        cudaError_t err;
         err = cudaMemcpy((void *)h_h_updating_graph_mask, (void *)h_updating_graph_mask, get_size_from_allocation(h_h_updating_graph_mask), cudaMemcpyDeviceToHost);
         if (err != cudaSuccess) {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));

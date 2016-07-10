@@ -1156,6 +1156,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "    }" << std::endl;
     ss << std::endl;
     ss << "    void transfer_from_device() {" << std::endl;
+    ss << "        cudaError_t err;" << std::endl;
     for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
             e = toBeTransferred->end(); i != e; i++) {
         OMPVarInfo curr = *i;
