@@ -202,12 +202,9 @@ template<class functor_type>
 static void kernel_launcher(unsigned niters, functor_type functor) {
     const int threads_per_block = 256;
     const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    functor.transfer_to_device();
     wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
-    const cudaError_t err = cudaDeviceSynchronize();
-    if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA Launch Error - %s\n", cudaGetErrorString(err));
-        exit(2);
-    }
+    functor.transfer_from_device();
 }' > ${OUTPUT_PATH}.header
     cat ${OUTPUT_PATH}.header ${OUTPUT_PATH}.body | grep -v '^#include "hclib' > $OUTPUT_PATH
 else

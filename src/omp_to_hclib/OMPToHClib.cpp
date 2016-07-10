@@ -663,11 +663,12 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
                 Context->getPrintingPolicy()).str();
         ss << "    " << builtinStr << "* " << (isShared ? "volatile " : "") <<
             ref->getNameAsString() << ";" << std::endl;
+        ss << "    " << builtinStr << "* " << (isShared ? "volatile " : "") <<
+            "h_" << ref->getNameAsString() << ";" << std::endl;
         constructor_sig << builtinStr << "* set_" << ref->getNameAsString();
         functor_params->addParameter(ref, foundVarInfo);
-        constructor_body << "            " << ref->getNameAsString() <<
+        constructor_body << "            h_" << ref->getNameAsString() <<
             " = set_" << ref->getNameAsString() << ";" << std::endl;
-        toBeTransferred->push_back(foundVarInfo);
     } else if (const clang::TypedefType *typdef =
             clang::dyn_cast<clang::TypedefType>(pointee)) {
         const clang::Type *nested =
@@ -690,12 +691,15 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
                 ss << "    " << typdefStr << "* " <<
                     (isShared ? "volatile " : "") << ref->getNameAsString() <<
                     ";" << std::endl;
+                ss << "    " << typdefStr << "* " <<
+                    (isShared ? "volatile " : "") << "h_" <<
+                    ref->getNameAsString() << ";" << std::endl;
                 constructor_sig << typdefStr << "* set_" <<
                     ref->getNameAsString();
                 functor_params->addParameter(ref, foundVarInfo);
-                constructor_body << "            " << ref->getNameAsString() <<
-                    " = set_" << ref->getNameAsString() << ";" << std::endl;
-                toBeTransferred->push_back(foundVarInfo);
+                constructor_body << "            h_" <<
+                    ref->getNameAsString() << " = set_" <<
+                    ref->getNameAsString() << ";" << std::endl;
             } else {
                 std::cerr << "getCUDAFunctorDef: " <<
                     "Unsupported elaborated pointee type " <<
@@ -710,12 +714,14 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
             ss << "    " << typdefStr << "* " <<
                 (isShared ? "volatile " : "") << ref->getNameAsString() <<
                 ";" << std::endl;
+            ss << "    " << typdefStr << "* " <<
+                (isShared ? "volatile " : "") << "h_" <<
+                ref->getNameAsString() << ";" << std::endl;
             constructor_sig << typdefStr << "* set_" <<
                 ref->getNameAsString();
             functor_params->addParameter(ref, foundVarInfo);
-            constructor_body << "            " << ref->getNameAsString() <<
+            constructor_body << "            h_" << ref->getNameAsString() <<
                 " = set_" << ref->getNameAsString() << ";" << std::endl;
-            toBeTransferred->push_back(foundVarInfo);
         } else {
             std::cerr << "getCUDAFunctorDef: " <<
                 "Unsupported typedef pointee type " <<
@@ -735,12 +741,14 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
         ss << "    struct " << record->getDecl()->getNameAsString() << "* " <<
             (isShared ? "volatile" : "") << ref->getNameAsString() << ";" <<
             std::endl;
+        ss << "    struct " << record->getDecl()->getNameAsString() << "* " <<
+            (isShared ? "volatile" : "") << "h_" << ref->getNameAsString() <<
+            ";" << std::endl;
         constructor_sig << "struct " << record->getDecl()->getNameAsString() <<
             "* set_" << ref->getNameAsString();
         functor_params->addParameter(ref, foundVarInfo);
-        constructor_body << "            " << ref->getNameAsString() <<
+        constructor_body << "            h_" << ref->getNameAsString() <<
             " = set_" << ref->getNameAsString() << ";" << std::endl;
-        toBeTransferred->push_back(foundVarInfo);
     } else {
         std::cerr << "getCUDAFunctorDef: Unsupported " <<
             "pointee type " <<
@@ -750,6 +758,7 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
         // exit(1);
     }
 
+    toBeTransferred->push_back(foundVarInfo);
     return true;
 }
 
@@ -1116,11 +1125,49 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
         }
     }
 
+    std::stringstream cudaErrorChecking;
+    cudaErrorChecking << "        if (err != cudaSuccess) {" << std::endl;
+    cudaErrorChecking << "            fprintf(stderr, \"CUDA Error @ %s:%d " <<
+        "- %s\\n\", __FILE__, __LINE__, cudaGetErrorString(err));" << std::endl;
+    cudaErrorChecking << "            exit(3);" << std::endl;
+    cudaErrorChecking << "        }" << std::endl;
+    const std::string cudaErrorCheckingStr = cudaErrorChecking.str();
+
     ss << "\n";
     ss << "    public:\n";
     ss << constructor_sig.str() << ") {" << std::endl;
     ss << constructor_body.str() << std::endl;
     ss << "        }" << std::endl;
+    ss << std::endl;
+    ss << "    void transfer_to_device() {" << std::endl;
+    ss << "        cudaError_t err;" << std::endl;
+    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
+            e = toBeTransferred->end(); i != e; i++) {
+        OMPVarInfo curr = *i;
+        const std::string varname = curr.getDecl()->getNameAsString();
+        ss << "        err = cudaMalloc((void **)&" << varname <<
+            ", get_size_from_allocation(h_" << varname << "));" << std::endl;
+        ss << cudaErrorCheckingStr;
+        ss << "        err = cudaMemcpy((void *)" << varname <<
+            ", (void *)h_" << varname << ", get_size_from_allocation(h_" <<
+            varname << "), cudaMemcpyHostToDevice);" << std::endl;
+        ss << cudaErrorCheckingStr;
+    }
+    ss << "    }" << std::endl;
+    ss << std::endl;
+    ss << "    void transfer_from_device() {" << std::endl;
+    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
+            e = toBeTransferred->end(); i != e; i++) {
+        OMPVarInfo curr = *i;
+        const std::string varname = curr.getDecl()->getNameAsString();
+        ss << "        err = cudaMemcpy((void *)h_" << varname <<
+            ", (void *)" << varname << ", get_size_from_allocation(h_" <<
+            varname << "), cudaMemcpyDeviceToHost);" << std::endl;
+        ss << cudaErrorCheckingStr;
+        ss << "        err = cudaFree(" << varname << ");" << std::endl;
+        ss << cudaErrorCheckingStr;
+    }
+    ss << "    }" << std::endl;
     ss << std::endl;
     ss << "        __device__ void operator()(int " << iterator << ") {\n";
     // Included so that continue statements have the same semantics.
