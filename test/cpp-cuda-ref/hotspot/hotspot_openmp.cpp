@@ -1,5 +1,7 @@
 #include <stdio.h>
-#define hclib_get_current_worker() (blockIdx.x * blockDim.x + threadIdx.x)
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
 
 template<class functor_type>
 __global__ void wrapper_kernel(unsigned niters, functor_type functor) {
@@ -19,12 +21,8 @@ static void kernel_launcher(unsigned niters, functor_type functor) {
         exit(2);
     }
 }
-#include "hclib.h"
 #ifdef __cplusplus
-#include "hclib_cpp.h"
-#include "hclib_system.h"
 #ifdef __CUDACC__
-#include "hclib_cuda.h"
 #endif
 #endif
 #include <stdio.h>
