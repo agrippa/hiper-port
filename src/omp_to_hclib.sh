@@ -187,9 +187,8 @@ DID_CUDA_TRANSFORMS=$(cat $PREV | grep '^class pragma' | wc -l)
 [[ $VERBOSE == 1 ]] && echo "DEBUG >>> Producing final output file at $OUTPUT_PATH from $PREV"
 if [[ $TARGET_LANG == 'CUDA' ]] && [[ $DID_CUDA_TRANSFORMS -ne 0 ]]; then
     echo '#include <stdio.h>
-__device__ int hclib_get_current_worker() {
-    return blockIdx.x * blockDim.x + threadIdx.x;
-}
+#define hclib_get_current_worker() (blockIdx.x * blockDim.x + threadIdx.x)
+
 template<class functor_type>
 __global__ void wrapper_kernel(unsigned niters, functor_type functor) {
     const int tid = blockIdx.x * blockDim.x + threadIdx.x;

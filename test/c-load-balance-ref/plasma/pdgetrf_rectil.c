@@ -127,15 +127,6 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                     double *dC = A(m , n);
                     double *fake1 = A(k+1, n);
                     double *fake2 = (double *)fakedep;
-#if defined(KLANG_VERSION) && defined(KASTOR_USE_CW)
-#warning "KLANG EXTENSION USED"
-hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb]), depend(cw:fake1[0:A.mb*A.nb])");
-                        cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
-                                tempmm, tempnn, A.nb,
-                                mzone, dA, ldam,
-                                dB, ldak,
-                                zone, dC, ldam);
-#else
 #ifdef HCLIB_TASK_UNTIED
 #pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb]) untied
 #else
@@ -149,7 +140,6 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                                 dB, ldak,
                                 zone, dC, ldam) ; }
 ;
-#endif
                 }
             }
         }
@@ -176,11 +166,6 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
             double *prevSwap = A(k-1, n);
             int *dipiv = IPIV(k);
             PLASMA_desc descA = plasma_desc_submatrix(A, tempk, n*A.nb, tempm, tempnn);
-#if defined(KLANG_VERSION) && defined(KASTOR_USE_CW)
-#warning "KLANG EXTENSION USED"
-hclib_pragma_marker("omp", "task depend(inout:Aij[0:1]) depend(cw:fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb])");
-            CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
-#else
 #ifdef HCLIB_TASK_UNTIED
 #pragma omp task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb]) untied
 #else
@@ -190,7 +175,6 @@ hclib_pragma_marker("omp", "task depend(inout:Aij[0:1]) depend(cw:fakedep) depen
             { ____num_tasks[omp_get_thread_num()]++;
 CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1) ; }
 ;
-#endif
         }
     }
 }

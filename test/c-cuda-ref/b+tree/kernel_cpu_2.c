@@ -1,7 +1,6 @@
 #include <stdio.h>
-__device__ int hclib_get_current_worker() {
-    return blockIdx.x * blockDim.x + threadIdx.x;
-}
+#define hclib_get_current_worker() (blockIdx.x * blockDim.x + threadIdx.x)
+
 template<class functor_type>
 __global__ void wrapper_kernel(unsigned niters, functor_type functor) {
     const int tid = blockIdx.x * blockDim.x + threadIdx.x;
