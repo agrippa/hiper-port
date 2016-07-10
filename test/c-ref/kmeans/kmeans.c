@@ -115,7 +115,7 @@ typedef struct _main_entrypoint_ctx {
     char (*filename);
     float (*buf);
     float (*attributes);
-    float (*(*cluster_centres));
+    float (*cluster_centres);
     int i;
     int j;
     int numAttributes;
@@ -139,7 +139,7 @@ static void main_entrypoint(void *____arg) {
     char (*filename); filename = ctx->filename;
     float (*buf); buf = ctx->buf;
     float (*attributes); attributes = ctx->attributes;
-    float (*(*cluster_centres)); cluster_centres = ctx->cluster_centres;
+    float (*cluster_centres); cluster_centres = ctx->cluster_centres;
     int i; i = ctx->i;
     int j; j = ctx->j;
     int numAttributes; numAttributes = ctx->numAttributes;
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
            char   *filename = 0;           
            float  *buf;
            float *attributes;
-           float **cluster_centres=NULL;
+           float *cluster_centres=NULL;
            int     i, j;
                 
            int     numAttributes;

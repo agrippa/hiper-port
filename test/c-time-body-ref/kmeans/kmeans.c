@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
            char   *filename = 0;           
            float  *buf;
            float *attributes;
-           float **cluster_centres=NULL;
+           float *cluster_centres=NULL;
            int     i, j;
                 
            int     numAttributes;
