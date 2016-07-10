@@ -6,9 +6,9 @@
 #include "hclib_cuda.h"
 #endif
 #endif
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 
 //========================================================================================================================================================================================================200
 //	DEFINE/INCLUDE
@@ -433,6 +433,6 @@ static void pragma123_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
  // main
 
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// }
+// #endif

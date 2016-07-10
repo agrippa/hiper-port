@@ -6,9 +6,9 @@
 #include "hclib_cuda.h"
 #endif
 #endif
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 
 //========================================================================================================================================================================================================200
 //	DEFINE/INCLUDE
@@ -320,6 +320,6 @@ cudaDeviceSynchronize();
 
 }  // main
 
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// }
+// #endif
