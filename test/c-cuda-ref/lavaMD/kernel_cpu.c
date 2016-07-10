@@ -1,5 +1,5 @@
 #include <stdio.h>
-__device__ int hclib_get_current_worker() {
+__device__ inline int hclib_get_current_worker() {
     return blockIdx.x * blockDim.x + threadIdx.x;
 }
 
