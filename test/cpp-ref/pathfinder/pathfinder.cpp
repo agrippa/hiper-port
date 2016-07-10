@@ -101,55 +101,7 @@ typedef struct _pragma114_omp_parallel {
     char (*(*(*argv_ptr)));
  } pragma114_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma114_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    int min;
-    int* volatile src;
-    volatile int cols;
-    int* volatile dst;
-    int* volatile data;
-    volatile int t;
-
-    public:
-        pragma114_omp_parallel_hclib_async(int set_min,
-                int* set_src,
-                int set_cols,
-                int* set_dst,
-                int* set_data,
-                int set_t) {
-            min = set_min;
-            src = set_src;
-            cols = set_cols;
-            dst = set_dst;
-            data = set_data;
-            t = set_t;
-
-        }
-
-        __device__ void operator()(int n) {
-            {
-          min = src[n];
-          if (n > 0) {
-              min = src[n - 1] < min ? src[n - 1] : min;
-          }
-          if (n < cols-1) {
-              min = src[n + 1] < min ? src[n + 1] : min;
-          }
-          dst[n] = data[t+1 * cols + n]+min;
-        }
-        }
-};
-
-#else
 static void pragma114_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 typedef struct _main_entrypoint_ctx {
     unsigned long long cycles;
     int (*src);
@@ -189,13 +141,8 @@ domain[0].low = 0;
 domain[0].high = cols;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((cols) - (0), pragma114_omp_parallel_hclib_async(min, src, cols, dst, data, t), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma114_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
     } ;     free(____arg);
@@ -244,9 +191,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
     delete [] dst;
     delete [] src;
 }  
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma114_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma114_omp_parallel *ctx = (pragma114_omp_parallel *)____arg;
     int min; min = ctx->min;
@@ -264,6 +208,5 @@ static void pragma114_omp_parallel_hclib_async(void *____arg, const int ___iter0
         } ;     } while (0);
 }
 
-#endif
 
 

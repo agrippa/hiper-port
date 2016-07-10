@@ -21,9 +21,13 @@ KEEP=0
 VERBOSE=0
 USER_INCLUDES=
 USER_DEFINES=
+TARGET_LANG=HCLIB
 
-while getopts "i:o:kvhI:D:" opt; do
+while getopts "i:o:kvhI:D:l:" opt; do
     case $opt in 
+        l)
+            TARGET_LANG=$OPTARG
+            ;;
         i)
             INPUT_PATH=$OPTARG
             ;;
@@ -143,7 +147,8 @@ until [[ $CHANGED -eq 0 ]]; do
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
     $OMP_TO_HCLIB -o $TMP_OUTPUT -c $CRITICAL_SECTION_ID \
         -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD -s $USES_SHMEM_FILE \
-        $PREV -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include -I$HCLIB_ROOT/../modules/system/inc
+        -l $TARGET_LANG $PREV -- $INCLUDE $USER_INCLUDES $DEFINES \
+        -I$HCLIB_ROOT/include -I$HCLIB_ROOT/../modules/system/inc
 
     PREV_CRITICAL_SECTION_ID=$CRITICAL_SECTION_ID
     CRITICAL_SECTION_ID=$(cat $CRITICAL_SECTION_ID_FILE)

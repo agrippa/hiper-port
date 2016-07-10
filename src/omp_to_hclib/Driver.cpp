@@ -26,11 +26,13 @@ static llvm::cl::opt<std::string> checkForPthread("n");
 static llvm::cl::opt<std::string> startingCriticalSectionId("c");
 static llvm::cl::opt<std::string> outputCriticalSectionIdFile("r");
 static llvm::cl::opt<std::string> outputUsesShmemFile("s");
+static llvm::cl::opt<std::string> targetLang("l");
 
 static OMPToHClib *transform = NULL;
 FunctionDecl *curr_func_decl = NULL;
 std::vector<ValueDecl *> globals;
 std::vector<std::string> discoveredGlobals;
+TargetLang target;
 
 class TransformASTConsumer : public ASTConsumer {
 public:
@@ -175,6 +177,19 @@ int main(int argc, const char **argv) {
   check_opt(startingCriticalSectionId, "Starting critical section ID");
   check_opt(outputCriticalSectionIdFile, "Output critical section ID file");
   check_opt(outputUsesShmemFile, "Output uses SHMEM file");
+  check_opt(targetLang, "Target language");
+
+  if (std::string(targetLang.c_str()) == "HCLIB") {
+      std::cerr << "Target HClib" << std::endl;
+      target = HCLIB;
+  } else if (std::string(targetLang.c_str()) == "CUDA") {
+      std::cerr << "Target CUDA" << std::endl;
+      target = CUDA;
+  } else {
+      std::cerr << "Unknown target language \"" <<
+          std::string(targetLang.c_str()) << "\"" << std::endl;
+      exit(1);
+  }
 
   assert(op.getSourcePathList().size() == 1);
 

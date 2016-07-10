@@ -62,36 +62,7 @@ typedef struct _pragma63_omp_parallel {
     int (*N_ptr);
  } pragma63_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma63_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    double* volatile dst;
-    double* volatile src;
-
-    public:
-        pragma63_omp_parallel_hclib_async(double* set_dst,
-                double* set_src) {
-            dst = set_dst;
-            src = set_src;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		dst[i] = src[i];
-	}
-        }
-};
-
-#else
 static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void copy(double *dst, double *src, int N)
 {
  { 
@@ -104,19 +75,11 @@ domain[0].low = 0;
 domain[0].high = N;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((N) - (0), pragma63_omp_parallel_hclib_async(dst, src), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma63_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma63_omp_parallel *ctx = (pragma63_omp_parallel *)____arg;
     do {
@@ -126,7 +89,6 @@ static void pragma63_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 	} ;     } while (0);
 }
 
-#endif
 
 
 
@@ -174,36 +136,7 @@ typedef struct _pragma112_omp_parallel {
     double (*(*variables_ptr));
  } pragma112_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma112_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    double* volatile variables;
-    volatile double ff_variable[5];
-
-    public:
-        pragma112_omp_parallel_hclib_async(double* set_variables,
-                double set_ff_variable[5]) {
-            variables = set_variables;
-            memcpy((void *)ff_variable, (void *)set_ff_variable, sizeof(ff_variable));
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
-	}
-        }
-};
-
-#else
 static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void initialize_variables(int nelr, double* variables)
 {
  { 
@@ -215,19 +148,11 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma112_omp_parallel_hclib_async(variables, ff_variable), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma112_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma112_omp_parallel *ctx = (pragma112_omp_parallel *)____arg;
     do {
@@ -237,7 +162,6 @@ static void pragma112_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
-#endif
 
 
 inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy)
@@ -291,75 +215,7 @@ typedef struct _pragma165_omp_parallel {
     double (*(*step_factors_ptr));
  } pragma165_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma165_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ inline void compute_velocity(double& density, cfd_double3& momentum, cfd_double3& velocity) {
-            {
-	velocity.x = momentum.x / density;
-	velocity.y = momentum.y / density;
-	velocity.z = momentum.z / density;
-}
-        }
-        __device__ inline double compute_speed_sqd(cfd_double3& velocity) {
-            {
-	return velocity.x*velocity.x + velocity.y*velocity.y + velocity.z*velocity.z;
-}
-        }
-        __device__ inline double compute_pressure(double& density, double& density_energy, double& speed_sqd) {
-            {
-	return (double(GAMMA)-double(1.0))*(density_energy - double(0.5)*density*speed_sqd);
-}
-        }
-        __device__ inline double compute_speed_of_sound(double& density, double& pressure) {
-            {
-	return std::sqrt(double(GAMMA)*pressure/density);
-}
-        }
-    double* volatile variables;
-    double* volatile step_factors;
-    double* volatile areas;
-
-    public:
-        pragma165_omp_parallel_hclib_async(double* set_variables,
-                double* set_step_factors,
-                double* set_areas) {
-            variables = set_variables;
-            step_factors = set_step_factors;
-            areas = set_areas;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		double density = variables[NVAR*i + VAR_DENSITY];
-
-		cfd_double3 momentum;
-		momentum.x = variables[NVAR*i + (VAR_MOMENTUM+0)];
-		momentum.y = variables[NVAR*i + (VAR_MOMENTUM+1)];
-		momentum.z = variables[NVAR*i + (VAR_MOMENTUM+2)];
-
-		double density_energy = variables[NVAR*i + VAR_DENSITY_ENERGY];
-		cfd_double3 velocity;	   compute_velocity(density, momentum, velocity);
-		double speed_sqd      = compute_speed_sqd(velocity);
-		double pressure       = compute_pressure(density, density_energy, speed_sqd);
-		double speed_of_sound = compute_speed_of_sound(density, pressure);
-
-		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
-		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
-	}
-        }
-};
-
-#else
 static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
  { 
@@ -373,19 +229,11 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma165_omp_parallel_hclib_async(variables, step_factors, areas), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma165_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma165_omp_parallel *ctx = (pragma165_omp_parallel *)____arg;
     hclib_start_finish();
@@ -412,7 +260,6 @@ static void pragma165_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 
 
@@ -430,224 +277,7 @@ typedef struct _pragma196_omp_parallel {
     double (*(*fluxes_ptr));
  } pragma196_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma196_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ inline void compute_velocity(double& density, cfd_double3& momentum, cfd_double3& velocity) {
-            {
-	velocity.x = momentum.x / density;
-	velocity.y = momentum.y / density;
-	velocity.z = momentum.z / density;
-}
-        }
-        __device__ inline double compute_speed_sqd(cfd_double3& velocity) {
-            {
-	return velocity.x*velocity.x + velocity.y*velocity.y + velocity.z*velocity.z;
-}
-        }
-        __device__ inline double compute_pressure(double& density, double& density_energy, double& speed_sqd) {
-            {
-	return (double(GAMMA)-double(1.0))*(density_energy - double(0.5)*density*speed_sqd);
-}
-        }
-        __device__ inline double compute_speed_of_sound(double& density, double& pressure) {
-            {
-	return std::sqrt(double(GAMMA)*pressure/density);
-}
-        }
-        __device__ inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy) {
-            {
-	fc_momentum_x.x = velocity.x*momentum.x + pressure;
-	fc_momentum_x.y = velocity.x*momentum.y;
-	fc_momentum_x.z = velocity.x*momentum.z;
-
-	fc_momentum_y.x = fc_momentum_x.y;
-	fc_momentum_y.y = velocity.y*momentum.y + pressure;
-	fc_momentum_y.z = velocity.y*momentum.z;
-
-	fc_momentum_z.x = fc_momentum_x.z;
-	fc_momentum_z.y = fc_momentum_y.z;
-	fc_momentum_z.z = velocity.z*momentum.z + pressure;
-
-	double de_p = density_energy+pressure;
-	fc_density_energy.x = velocity.x*de_p;
-	fc_density_energy.y = velocity.y*de_p;
-	fc_density_energy.z = velocity.z*de_p;
-}
-        }
-    double* volatile variables;
-    int* volatile elements_surrounding_elements;
-    double* volatile normals;
-    volatile double smoothing_coefficient;
-    volatile double ff_variable[5];
-    struct cfd_double3 ff_flux_contribution_density_energy;
-    struct cfd_double3 ff_flux_contribution_momentum_x;
-    struct cfd_double3 ff_flux_contribution_momentum_y;
-    struct cfd_double3 ff_flux_contribution_momentum_z;
-    double* volatile fluxes;
-
-    public:
-        pragma196_omp_parallel_hclib_async(double* set_variables,
-                int* set_elements_surrounding_elements,
-                double* set_normals,
-                double set_smoothing_coefficient,
-                double set_ff_variable[5],
-                struct cfd_double3 *set_ff_flux_contribution_density_energy,
-                struct cfd_double3 *set_ff_flux_contribution_momentum_x,
-                struct cfd_double3 *set_ff_flux_contribution_momentum_y,
-                struct cfd_double3 *set_ff_flux_contribution_momentum_z,
-                double* set_fluxes) {
-            variables = set_variables;
-            elements_surrounding_elements = set_elements_surrounding_elements;
-            normals = set_normals;
-            smoothing_coefficient = set_smoothing_coefficient;
-            memcpy((void *)ff_variable, (void *)set_ff_variable, sizeof(ff_variable));
-            memcpy((void *)&ff_flux_contribution_density_energy, set_ff_flux_contribution_density_energy, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_x, set_ff_flux_contribution_momentum_x, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_y, set_ff_flux_contribution_momentum_y, sizeof(struct cfd_double3));
-            memcpy((void *)&ff_flux_contribution_momentum_z, set_ff_flux_contribution_momentum_z, sizeof(struct cfd_double3));
-            fluxes = set_fluxes;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		int j, nb;
-		cfd_double3 normal; double normal_len;
-		double factor;
-
-		double density_i = variables[NVAR*i + VAR_DENSITY];
-		cfd_double3 momentum_i;
-		momentum_i.x = variables[NVAR*i + (VAR_MOMENTUM+0)];
-		momentum_i.y = variables[NVAR*i + (VAR_MOMENTUM+1)];
-		momentum_i.z = variables[NVAR*i + (VAR_MOMENTUM+2)];
-
-		double density_energy_i = variables[NVAR*i + VAR_DENSITY_ENERGY];
-
-		cfd_double3 velocity_i;             				 compute_velocity(density_i, momentum_i, velocity_i);
-		double speed_sqd_i                          = compute_speed_sqd(velocity_i);
-		double speed_i                              = std::sqrt(speed_sqd_i);
-		double pressure_i                           = compute_pressure(density_i, density_energy_i, speed_sqd_i);
-		double speed_of_sound_i                     = compute_speed_of_sound(density_i, pressure_i);
-		cfd_double3 flux_contribution_i_momentum_x, flux_contribution_i_momentum_y, flux_contribution_i_momentum_z;
-		cfd_double3 flux_contribution_i_density_energy;
-		compute_flux_contribution(density_i, momentum_i, density_energy_i, pressure_i, velocity_i, flux_contribution_i_momentum_x, flux_contribution_i_momentum_y, flux_contribution_i_momentum_z, flux_contribution_i_density_energy);
-
-		double flux_i_density = double(0.0);
-		cfd_double3 flux_i_momentum;
-		flux_i_momentum.x = double(0.0);
-		flux_i_momentum.y = double(0.0);
-		flux_i_momentum.z = double(0.0);
-		double flux_i_density_energy = double(0.0);
-
-		cfd_double3 velocity_nb;
-		double density_nb, density_energy_nb;
-		cfd_double3 momentum_nb;
-		cfd_double3 flux_contribution_nb_momentum_x, flux_contribution_nb_momentum_y, flux_contribution_nb_momentum_z;
-		cfd_double3 flux_contribution_nb_density_energy;
-		double speed_sqd_nb, speed_of_sound_nb, pressure_nb;
-
-		for(j = 0; j < NNB; j++)
-		{
-			nb = elements_surrounding_elements[i*NNB + j];
-			normal.x = normals[(i*NNB + j)*NDIM + 0];
-			normal.y = normals[(i*NNB + j)*NDIM + 1];
-			normal.z = normals[(i*NNB + j)*NDIM + 2];
-			normal_len = std::sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
-
-			if(nb >= 0) 	// a legitimate neighbor
-			{
-				density_nb =        variables[nb*NVAR + VAR_DENSITY];
-				momentum_nb.x =     variables[nb*NVAR + (VAR_MOMENTUM+0)];
-				momentum_nb.y =     variables[nb*NVAR + (VAR_MOMENTUM+1)];
-				momentum_nb.z =     variables[nb*NVAR + (VAR_MOMENTUM+2)];
-				density_energy_nb = variables[nb*NVAR + VAR_DENSITY_ENERGY];
-													compute_velocity(density_nb, momentum_nb, velocity_nb);
-				speed_sqd_nb                      = compute_speed_sqd(velocity_nb);
-				pressure_nb                       = compute_pressure(density_nb, density_energy_nb, speed_sqd_nb);
-				speed_of_sound_nb                 = compute_speed_of_sound(density_nb, pressure_nb);
-													compute_flux_contribution(density_nb, momentum_nb, density_energy_nb, pressure_nb, velocity_nb, flux_contribution_nb_momentum_x, flux_contribution_nb_momentum_y, flux_contribution_nb_momentum_z, flux_contribution_nb_density_energy);
-
-				// artificial viscosity
-				factor = -normal_len*smoothing_coefficient*double(0.5)*(speed_i + std::sqrt(speed_sqd_nb) + speed_of_sound_i + speed_of_sound_nb);
-				flux_i_density += factor*(density_i-density_nb);
-				flux_i_density_energy += factor*(density_energy_i-density_energy_nb);
-				flux_i_momentum.x += factor*(momentum_i.x-momentum_nb.x);
-				flux_i_momentum.y += factor*(momentum_i.y-momentum_nb.y);
-				flux_i_momentum.z += factor*(momentum_i.z-momentum_nb.z);
-
-				// accumulate cell-centered fluxes
-				factor = double(0.5)*normal.x;
-				flux_i_density += factor*(momentum_nb.x+momentum_i.x);
-				flux_i_density_energy += factor*(flux_contribution_nb_density_energy.x+flux_contribution_i_density_energy.x);
-				flux_i_momentum.x += factor*(flux_contribution_nb_momentum_x.x+flux_contribution_i_momentum_x.x);
-				flux_i_momentum.y += factor*(flux_contribution_nb_momentum_y.x+flux_contribution_i_momentum_y.x);
-				flux_i_momentum.z += factor*(flux_contribution_nb_momentum_z.x+flux_contribution_i_momentum_z.x);
-
-				factor = double(0.5)*normal.y;
-				flux_i_density += factor*(momentum_nb.y+momentum_i.y);
-				flux_i_density_energy += factor*(flux_contribution_nb_density_energy.y+flux_contribution_i_density_energy.y);
-				flux_i_momentum.x += factor*(flux_contribution_nb_momentum_x.y+flux_contribution_i_momentum_x.y);
-				flux_i_momentum.y += factor*(flux_contribution_nb_momentum_y.y+flux_contribution_i_momentum_y.y);
-				flux_i_momentum.z += factor*(flux_contribution_nb_momentum_z.y+flux_contribution_i_momentum_z.y);
-
-				factor = double(0.5)*normal.z;
-				flux_i_density += factor*(momentum_nb.z+momentum_i.z);
-				flux_i_density_energy += factor*(flux_contribution_nb_density_energy.z+flux_contribution_i_density_energy.z);
-				flux_i_momentum.x += factor*(flux_contribution_nb_momentum_x.z+flux_contribution_i_momentum_x.z);
-				flux_i_momentum.y += factor*(flux_contribution_nb_momentum_y.z+flux_contribution_i_momentum_y.z);
-				flux_i_momentum.z += factor*(flux_contribution_nb_momentum_z.z+flux_contribution_i_momentum_z.z);
-			}
-			else if(nb == -1)	// a wing boundary
-			{
-				flux_i_momentum.x += normal.x*pressure_i;
-				flux_i_momentum.y += normal.y*pressure_i;
-				flux_i_momentum.z += normal.z*pressure_i;
-			}
-			else if(nb == -2) // a far field boundary
-			{
-				factor = double(0.5)*normal.x;
-				flux_i_density += factor*(ff_variable[VAR_MOMENTUM+0]+momentum_i.x);
-				flux_i_density_energy += factor*(ff_flux_contribution_density_energy.x+flux_contribution_i_density_energy.x);
-				flux_i_momentum.x += factor*(ff_flux_contribution_momentum_x.x + flux_contribution_i_momentum_x.x);
-				flux_i_momentum.y += factor*(ff_flux_contribution_momentum_y.x + flux_contribution_i_momentum_y.x);
-				flux_i_momentum.z += factor*(ff_flux_contribution_momentum_z.x + flux_contribution_i_momentum_z.x);
-
-				factor = double(0.5)*normal.y;
-				flux_i_density += factor*(ff_variable[VAR_MOMENTUM+1]+momentum_i.y);
-				flux_i_density_energy += factor*(ff_flux_contribution_density_energy.y+flux_contribution_i_density_energy.y);
-				flux_i_momentum.x += factor*(ff_flux_contribution_momentum_x.y + flux_contribution_i_momentum_x.y);
-				flux_i_momentum.y += factor*(ff_flux_contribution_momentum_y.y + flux_contribution_i_momentum_y.y);
-				flux_i_momentum.z += factor*(ff_flux_contribution_momentum_z.y + flux_contribution_i_momentum_z.y);
-
-				factor = double(0.5)*normal.z;
-				flux_i_density += factor*(ff_variable[VAR_MOMENTUM+2]+momentum_i.z);
-				flux_i_density_energy += factor*(ff_flux_contribution_density_energy.z+flux_contribution_i_density_energy.z);
-				flux_i_momentum.x += factor*(ff_flux_contribution_momentum_x.z + flux_contribution_i_momentum_x.z);
-				flux_i_momentum.y += factor*(ff_flux_contribution_momentum_y.z + flux_contribution_i_momentum_y.z);
-				flux_i_momentum.z += factor*(ff_flux_contribution_momentum_z.z + flux_contribution_i_momentum_z.z);
-
-			}
-		}
-
-		fluxes[i*NVAR + VAR_DENSITY] = flux_i_density;
-		fluxes[i*NVAR + (VAR_MOMENTUM+0)] = flux_i_momentum.x;
-		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
-		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
-		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
-	}
-        }
-};
-
-#else
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
 {
 	double smoothing_coefficient = double(0.2f);
@@ -665,19 +295,11 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, &ff_flux_contribution_density_energy, &ff_flux_contribution_momentum_x, &ff_flux_contribution_momentum_y, &ff_flux_contribution_momentum_z, fluxes), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma196_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma196_omp_parallel *ctx = (pragma196_omp_parallel *)____arg;
     hclib_start_finish();
@@ -812,7 +434,6 @@ static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 
 typedef struct _pragma327_omp_parallel {
@@ -824,51 +445,7 @@ typedef struct _pragma327_omp_parallel {
     double (*(*fluxes_ptr));
  } pragma327_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma327_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    double* volatile step_factors;
-    volatile int j;
-    double* volatile variables;
-    double* volatile old_variables;
-    double* volatile fluxes;
-
-    public:
-        pragma327_omp_parallel_hclib_async(double* set_step_factors,
-                int set_j,
-                double* set_variables,
-                double* set_old_variables,
-                double* set_fluxes) {
-            step_factors = set_step_factors;
-            j = set_j;
-            variables = set_variables;
-            old_variables = set_old_variables;
-            fluxes = set_fluxes;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		double factor = step_factors[i]/double(RK+1-j);
-
-		variables[NVAR*i + VAR_DENSITY] = old_variables[NVAR*i + VAR_DENSITY] + factor*fluxes[NVAR*i + VAR_DENSITY];
-		variables[NVAR*i + VAR_DENSITY_ENERGY] = old_variables[NVAR*i + VAR_DENSITY_ENERGY] + factor*fluxes[NVAR*i + VAR_DENSITY_ENERGY];
-		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
-		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
-		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
-	}
-        }
-};
-
-#else
 static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
  { 
@@ -884,19 +461,11 @@ domain[0].low = 0;
 domain[0].high = nelr;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(step_factors, j, variables, old_variables, fluxes), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma327_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma327_omp_parallel *ctx = (pragma327_omp_parallel *)____arg;
     do {
@@ -912,7 +481,6 @@ static void pragma327_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
-#endif
 
 /*
  * Main function

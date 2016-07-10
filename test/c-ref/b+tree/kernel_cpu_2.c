@@ -69,126 +69,7 @@ typedef struct _pragma103_omp_parallel {
     int (*(*reclength_ptr));
  } pragma103_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma103_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    int i;
-    volatile long maxheight;
-    int thid;
-    volatile int threadsPerBlock;
-    knode* volatile knodes;
-    long* volatile currKnode;
-    int bid;
-    int* volatile start;
-    volatile long knodes_elem;
-    long* volatile offset;
-    long* volatile lastKnode;
-    int* volatile end;
-    long* volatile offset_2;
-    int* volatile recstart;
-    int* volatile reclength;
-
-    public:
-        pragma103_omp_parallel_hclib_async(int set_i,
-                long set_maxheight,
-                int set_thid,
-                int set_threadsPerBlock,
-                knode* set_knodes,
-                long* set_currKnode,
-                int set_bid,
-                int* set_start,
-                long set_knodes_elem,
-                long* set_offset,
-                long* set_lastKnode,
-                int* set_end,
-                long* set_offset_2,
-                int* set_recstart,
-                int* set_reclength) {
-            i = set_i;
-            maxheight = set_maxheight;
-            thid = set_thid;
-            threadsPerBlock = set_threadsPerBlock;
-            knodes = set_knodes;
-            currKnode = set_currKnode;
-            bid = set_bid;
-            start = set_start;
-            knodes_elem = set_knodes_elem;
-            offset = set_offset;
-            lastKnode = set_lastKnode;
-            end = set_end;
-            offset_2 = set_offset_2;
-            recstart = set_recstart;
-            reclength = set_reclength;
-
-        }
-
-        __device__ void operator()(int bid) {
-            {
-
-		// process levels of the tree
-		for(i = 0; i < maxheight; i++){
-
-			// process all leaves at each level
-			for(thid = 0; thid < threadsPerBlock; thid++){
-
-				if((knodes[currKnode[bid]].keys[thid] <= start[bid]) && (knodes[currKnode[bid]].keys[thid+1] > start[bid])){
-					// this conditional statement is inserted to avoid crush due to but in original code
-					// "offset[bid]" calculated below that later addresses part of knodes goes outside of its bounds cause segmentation fault
-					// more specifically, values saved into knodes->indices in the main function are out of bounds of knodes that they address
-					if(knodes[currKnode[bid]].indices[thid] < knodes_elem){
-						offset[bid] = knodes[currKnode[bid]].indices[thid];
-					}
-				}
-				if((knodes[lastKnode[bid]].keys[thid] <= end[bid]) && (knodes[lastKnode[bid]].keys[thid+1] > end[bid])){
-					// this conditional statement is inserted to avoid crush due to but in original code
-					// "offset_2[bid]" calculated below that later addresses part of knodes goes outside of its bounds cause segmentation fault
-					// more specifically, values saved into knodes->indices in the main function are out of bounds of knodes that they address
-					if(knodes[lastKnode[bid]].indices[thid] < knodes_elem){
-						offset_2[bid] = knodes[lastKnode[bid]].indices[thid];
-					}
-				}
-
-			}
-
-			// set for next tree level
-			currKnode[bid] = offset[bid];
-			lastKnode[bid] = offset_2[bid];
-
-		}
-
-		// process leaves
-		for(thid = 0; thid < threadsPerBlock; thid++){
-
-			// Find the index of the starting record
-			if(knodes[currKnode[bid]].keys[thid] == start[bid]){
-				recstart[bid] = knodes[currKnode[bid]].indices[thid];
-			}
-
-		}
-
-		// process leaves
-		for(thid = 0; thid < threadsPerBlock; thid++){
-
-			// Find the index of the ending record
-			if(knodes[lastKnode[bid]].keys[thid] == end[bid]){
-				reclength[bid] = knodes[lastKnode[bid]].indices[thid] - recstart[bid]+1;
-			}
-
-		}
-
-	}
-        }
-};
-
-#else
 static void pragma103_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void 
 kernel_cpu_2(	int cores_arg,
 
@@ -270,13 +151,8 @@ domain[0].low = 0;
 domain[0].high = count;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma103_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, start, knodes_elem, offset, lastKnode, end, offset_2, recstart, reclength), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma103_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
@@ -296,9 +172,6 @@ free(new_ctx);
 	printf("%.12f s\n", 												(float) (time2-time0) / 1000000);
 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma103_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma103_omp_parallel *ctx = (pragma103_omp_parallel *)____arg;
     int thid; thid = ctx->thid;
@@ -362,7 +235,6 @@ static void pragma103_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	} ;     } while (0);
 }
 
-#endif
  // main
 
 //========================================================================================================================================================================================================200

@@ -57,149 +57,8 @@ typedef struct _pragma113_omp_parallel {
     int size;
  } pragma113_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma61_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    float* a;
-    int size;
-    volatile int offset;
-    int chunk_idx;
-
-    public:
-        pragma61_omp_parallel_hclib_async(float* set_a,
-                int set_size,
-                int set_offset,
-                int set_chunk_idx) {
-            a = set_a;
-            size = set_size;
-            offset = set_offset;
-            chunk_idx = set_chunk_idx;
-
-        }
-
-        __device__ void operator()(int chunk_idx) {
-            {
-            int i, j, k, i_global, j_global, i_here, j_here;
-            float sum;           
-            float temp[BS*BS] __attribute__ ((aligned (64)));
-
-            for (i = 0; i < BS; i++) {
-for (j =0; j < BS; j++){
-                    temp[i*BS + j] = a[size*(i + offset) + offset + j ];
-                }
-            }
-            i_global = offset;
-            j_global = offset;
-            
-            // processing top perimeter
-            //
-            j_global += BS * (chunk_idx+1);
-            for (j = 0; j < BS; j++) {
-                for (i = 0; i < BS; i++) {
-                    sum = 0.f;
-                    for (k=0; k < i; k++) {
-                        sum += temp[BS*i +k] * BB((i_global+k),(j_global+j));
-                    }
-                    i_here = i_global + i;
-                    j_here = j_global + j;
-                    BB(i_here, j_here) = BB(i_here,j_here) - sum;
-                }
-            }
-
-            // processing left perimeter
-            //
-            j_global = offset;
-            i_global += BS * (chunk_idx + 1);
-            for (i = 0; i < BS; i++) {
-                for (j = 0; j < BS; j++) {
-                    sum = 0.f;
-                    for (k=0; k < j; k++) {
-                        sum += BB((i_global+i),(j_global+k)) * temp[BS*k + j];
-                    }
-                    i_here = i_global + i;
-                    j_here = j_global + j;
-                    a[size*i_here + j_here] = ( a[size*i_here+j_here] - sum ) / a[size*(offset+j) + offset+j];
-                }
-            }
-
-        }
-        }
-};
-
-#else
 static void pragma61_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma113_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    volatile int offset;
-    int chunk_idx;
-    volatile int chunks_in_inter_row;
-    float* a;
-    int size;
-
-    public:
-        pragma113_omp_parallel_hclib_async(int set_offset,
-                int set_chunk_idx,
-                int set_chunks_in_inter_row,
-                float* set_a,
-                int set_size) {
-            offset = set_offset;
-            chunk_idx = set_chunk_idx;
-            chunks_in_inter_row = set_chunks_in_inter_row;
-            a = set_a;
-            size = set_size;
-
-        }
-
-        __device__ void operator()(int chunk_idx) {
-            {
-            int i, j, k, i_global, j_global;
-            float temp_top[BS*BS] __attribute__ ((aligned (64)));
-            float temp_left[BS*BS] __attribute__ ((aligned (64)));
-            float sum[BS] __attribute__ ((aligned (64))) = {0.f};
-            
-            i_global = offset + BS * (1 +  chunk_idx/chunks_in_inter_row);
-            j_global = offset + BS * (1 + chunk_idx%chunks_in_inter_row);
-
-            for (i = 0; i < BS; i++) {
-for (j =0; j < BS; j++){
-                    temp_top[i*BS + j]  = a[size*(i + offset) + j + j_global ];
-                    temp_left[i*BS + j] = a[size*(i + i_global) + offset + j];
-                }
-            }
-
-            for (i = 0; i < BS; i++)
-            {
-                for (k=0; k < BS; k++) {
-for (j = 0; j < BS; j++) {
-                        sum[j] += temp_left[BS*i + k] * temp_top[BS*k + j];
-                    }
-                }
-for (j = 0; j < BS; j++) {
-                    BB((i+i_global),(j+j_global)) -= sum[j];
-                    sum[j] = 0.f;
-                }
-            }
-        }
-        }
-};
-
-#else
 static void pragma113_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 typedef struct _main_entrypoint_ctx {
     float (*a);
     int size;
@@ -237,13 +96,8 @@ domain[0].low = 0;
 domain[0].high = chunks_in_inter_row;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((chunks_in_inter_row) - (0), pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma61_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
         
@@ -264,13 +118,8 @@ domain[0].low = 0;
 domain[0].high = chunks_per_inter;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((chunks_per_inter) - (0), pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma113_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
     }
@@ -288,9 +137,6 @@ const char *deps[] = { "system" };
 hclib_launch(main_entrypoint, new_ctx, deps, 1);
 
 }  
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma61_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma61_omp_parallel *ctx = (pragma61_omp_parallel *)____arg;
     int chunk_idx; chunk_idx = ctx->chunk_idx;
@@ -345,10 +191,6 @@ for (j =0; j < BS; j++){
         } ;     } while (0);
 }
 
-#endif
-
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma113_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma113_omp_parallel *ctx = (pragma113_omp_parallel *)____arg;
@@ -388,5 +230,4 @@ for (j = 0; j < BS; j++) {
         } ;     } while (0);
 }
 
-#endif
 

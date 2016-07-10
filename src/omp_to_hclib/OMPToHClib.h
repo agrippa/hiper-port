@@ -23,6 +23,8 @@
 #include "ParallelRegionInfo.h"
 #include "CUDAFunctorParameters.h"
 
+enum TargetLang { HCLIB, CUDA };
+
 class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
     public:
         OMPToHClib(const char *checkForPthread,
@@ -42,6 +44,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string stmtToString(const clang::Stmt* s);
         std::string stmtToStringWithSharedVars(const clang::Stmt *stmt,
                 std::vector<OMPVarInfo> *shared);
+        void removePragma(PragmaNode *node);
         void replaceAllReferencesTo(const clang::Stmt *stmt,
                 std::vector<OMPVarInfo> *shared);
         std::string stringForAST(const clang::Stmt *stmt);
@@ -78,7 +81,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
                 std::vector<clang::ValueDecl *> *captured, std::string bodyStr,
                 bool isFuture, OMPClauses *clauses,
                 bool wrapBodyInFinish, bool waitAtEnd,
-                bool isAcceleratable, std::vector<const clang::ValueDecl *> *condVars = NULL);
+                std::vector<const clang::ValueDecl *> *condVars = NULL);
         std::string getStructDef(std::string structName,
                 std::vector<clang::ValueDecl *> *captured, OMPClauses *clauses);
         std::string getContextSetup(PragmaNode *node, std::string structName,

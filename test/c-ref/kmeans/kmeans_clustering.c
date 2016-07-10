@@ -145,110 +145,7 @@ typedef struct _pragma179_omp_parallel {
     pthread_mutex_t reduction_mutex;
  } pragma179_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma179_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ int find_nearest_point(float  *pt,          /* [nfeatures] */
-                       int     nfeatures,
-                       float *pts,         /* [npts][nfeatures] */
-                       int     npts) {
-            {
-    int index, i;
-    float min_dist=FLT_MAX;
-
-    /* find the cluster center id with min distance to pt */
-    for (i=0; i<npts; i++) {
-        float dist;
-        dist = euclid_dist_2(pt, pts + (i * nfeatures), nfeatures);  /* no need square root */
-        if (dist < min_dist) {
-            min_dist = dist;
-            index    = i;
-        }
-    }
-    return(index);
-}
-        }
-        __device__ float   euclid_dist_2        (float*, float*, int) {
-            {
-    int i;
-    float ans=0.0;
-
-    for (i=0; i<numdims; i++)
-        ans += (pt1[i]-pt2[i]) * (pt1[i]-pt2[i]);
-
-    return(ans);
-}
-        }
-    int index;
-    float* volatile feature;
-    int i;
-    int nfeatures;
-    float* volatile clusters;
-    int nclusters;
-    int* volatile membership;
-    float delta;
-    int* volatile partial_new_centers_len;
-    int j;
-    float* volatile partial_new_centers;
-
-    public:
-        pragma179_omp_parallel_hclib_async(int set_index,
-                float* set_feature,
-                int set_i,
-                int set_nfeatures,
-                float* set_clusters,
-                int set_nclusters,
-                int* set_membership,
-                float set_delta,
-                int* set_partial_new_centers_len,
-                int set_j,
-                float* set_partial_new_centers) {
-            index = set_index;
-            feature = set_feature;
-            i = set_i;
-            nfeatures = set_nfeatures;
-            clusters = set_clusters;
-            nclusters = set_nclusters;
-            membership = set_membership;
-            delta = set_delta;
-            partial_new_centers_len = set_partial_new_centers_len;
-            j = set_j;
-            partial_new_centers = set_partial_new_centers;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-	        /* find the index of nestest cluster centers */					
-            int tid = hclib_get_current_worker();				
-	        index = find_nearest_point(feature + (i * nfeatures),
-		             nfeatures,
-		             clusters,
-		             nclusters);				
-	        /* if membership changes, increase delta by 1 */
-	        if (membership[i] != index) delta += 1.0;
-
-	        /* assign the membership to object i */
-	        membership[i] = index;
-				
-	        /* update new cluster centers : sum of all objects located
-		       within */
-	        partial_new_centers_len[tid * nclusters + index]++;				
-	        for (j=0; j<nfeatures; j++)
-		       partial_new_centers[tid * nclusters * nfeatures + index * nfeatures + j] += feature[i * nfeatures + j];
-            }
-        }
-};
-
-#else
 static void pragma179_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
                           int     nfeatures,
                           int     npoints,
@@ -332,13 +229,8 @@ domain[0].low = 0;
 domain[0].high = npoints;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((npoints) - (0), pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma179_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
 delta = new_ctx->delta;
  } 
@@ -375,9 +267,6 @@ delta = new_ctx->delta;
 
     return clusters;
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma179_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma179_omp_parallel *ctx = (pragma179_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -418,6 +307,5 @@ static void pragma179_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 

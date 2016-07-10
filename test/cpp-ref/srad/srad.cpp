@@ -134,210 +134,8 @@ typedef struct _pragma168_omp_parallel {
     char (*(*(*argv_ptr)));
  } pragma168_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma135_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    volatile int cols;
-    int k;
-    float Jc;
-    float* volatile J;
-    float* volatile dN;
-    int* volatile iN;
-    float* volatile dS;
-    int* volatile iS;
-    float* volatile dW;
-    int* volatile jW;
-    float* volatile dE;
-    int* volatile jE;
-    float G2;
-    float L;
-    float num;
-    float den;
-    float qsqr;
-    volatile float q0sqr;
-    float* volatile c;
-
-    public:
-        pragma135_omp_parallel_hclib_async(int set_cols,
-                int set_k,
-                float set_Jc,
-                float* set_J,
-                float* set_dN,
-                int* set_iN,
-                float* set_dS,
-                int* set_iS,
-                float* set_dW,
-                int* set_jW,
-                float* set_dE,
-                int* set_jE,
-                float set_G2,
-                float set_L,
-                float set_num,
-                float set_den,
-                float set_qsqr,
-                float set_q0sqr,
-                float* set_c) {
-            cols = set_cols;
-            k = set_k;
-            Jc = set_Jc;
-            J = set_J;
-            dN = set_dN;
-            iN = set_iN;
-            dS = set_dS;
-            iS = set_iS;
-            dW = set_dW;
-            jW = set_jW;
-            dE = set_dE;
-            jE = set_jE;
-            G2 = set_G2;
-            L = set_L;
-            num = set_num;
-            den = set_den;
-            qsqr = set_qsqr;
-            q0sqr = set_q0sqr;
-            c = set_c;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-            for (int j = 0; j < cols; j++) { 
-		
-				k = i * cols + j;
-				Jc = J[k];
- 
-				// directional derivates
-                dN[k] = J[iN[i] * cols + j] - Jc;
-                dS[k] = J[iS[i] * cols + j] - Jc;
-                dW[k] = J[i * cols + jW[j]] - Jc;
-                dE[k] = J[i * cols + jE[j]] - Jc;
-			
-                G2 = (dN[k]*dN[k] + dS[k]*dS[k] 
-                    + dW[k]*dW[k] + dE[k]*dE[k]) / (Jc*Jc);
-
-   		        L = (dN[k] + dS[k] + dW[k] + dE[k]) / Jc;
-
-				num  = (0.5*G2) - ((1.0/16.0)*(L*L)) ;
-                den  = 1 + (.25*L);
-                qsqr = num/(den*den);
- 
-                // diffusion coefficent (equ 33)
-                den = (qsqr-q0sqr) / (q0sqr * (1+q0sqr)) ;
-                c[k] = 1.0 / (1.0+den) ;
-                
-                // saturate diffusion coefficent
-                if (c[k] < 0) {c[k] = 0;}
-                else if (c[k] > 1) {c[k] = 1;}
-   
-		}
-  
-    }
-        }
-};
-
-#else
 static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma168_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    volatile int cols;
-    int k;
-    float cN;
-    float* volatile c;
-    float cS;
-    int* volatile iS;
-    float cW;
-    float cE;
-    int* volatile jE;
-    float D;
-    float* volatile dN;
-    float* volatile dS;
-    float* volatile dW;
-    float* volatile dE;
-    float* volatile J;
-    volatile float lambda;
-
-    public:
-        pragma168_omp_parallel_hclib_async(int set_cols,
-                int set_k,
-                float set_cN,
-                float* set_c,
-                float set_cS,
-                int* set_iS,
-                float set_cW,
-                float set_cE,
-                int* set_jE,
-                float set_D,
-                float* set_dN,
-                float* set_dS,
-                float* set_dW,
-                float* set_dE,
-                float* set_J,
-                float set_lambda) {
-            cols = set_cols;
-            k = set_k;
-            cN = set_cN;
-            c = set_c;
-            cS = set_cS;
-            iS = set_iS;
-            cW = set_cW;
-            cE = set_cE;
-            jE = set_jE;
-            D = set_D;
-            dN = set_dN;
-            dS = set_dS;
-            dW = set_dW;
-            dE = set_dE;
-            J = set_J;
-            lambda = set_lambda;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-            for (int j = 0; j < cols; j++) {        
-
-                // current index
-                k = i * cols + j;
-                
-                // diffusion coefficent
-					cN = c[k];
-					cS = c[iS[i] * cols + j];
-					cW = c[k];
-					cE = c[i * cols + jE[j]];
-
-                // divergence (equ 58)
-                D = cN * dN[k] + cS * dS[k] + cW * dW[k] + cE * dE[k];
-                
-                // image update (equ 61)
-                J[k] = J[k] + 0.25*lambda*D;
-                #ifdef OUTPUT
-                //printf("%.5f ", J[k]); 
-                #endif //output
-            }
-	            #ifdef OUTPUT
-                //printf("\n"); 
-                #endif //output
-	     }
-        }
-};
-
-#else
 static void pragma168_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 typedef struct _main_entrypoint_ctx {
     int rows;
     int cols;
@@ -500,13 +298,8 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma135_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma135_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
  { 
@@ -561,13 +354,8 @@ domain[0].low = 0;
 domain[0].high = rows;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma168_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma168_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
@@ -723,9 +511,6 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
 	free(c);
 	return 0;
 }  
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma135_omp_parallel *ctx = (pragma135_omp_parallel *)____arg;
     int k; k = ctx->k;
@@ -773,10 +558,6 @@ static void pragma135_omp_parallel_hclib_async(void *____arg, const int ___iter0
     } ;     } while (0);
 }
 
-#endif
-
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma168_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma168_omp_parallel *ctx = (pragma168_omp_parallel *)____arg;
@@ -817,7 +598,6 @@ static void pragma168_omp_parallel_hclib_async(void *____arg, const int ___iter0
 	     } ;     } while (0);
 }
 
-#endif
 
 
 

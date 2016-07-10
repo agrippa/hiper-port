@@ -69,19 +69,24 @@ for FILE in $FILES; do
     TEST_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME
     REFERENCE=$(dirname $DIRNAME)-ref/$TESTNAME/$FILENAME
 
+    CUDA_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME.cuda
+    CUDA_REFERENCE=$(dirname $DIRNAME)-cuda-ref/$TESTNAME/$FILENAME
+
     TIME_BODY_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME.time_body
     TIME_BODY_REFERENCE=$(dirname $DIRNAME)-time-body-ref/$TESTNAME/$FILENAME
 
     BALANCE_OUTPUT=$SCRIPT_DIR/test-output/$FILENAME.load_balance
     BALANCE_REFERENCE=$(dirname $DIRNAME)-load-balance-ref/$TESTNAME/$FILENAME
 
-    CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v"
+    CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v -l HCLIB"
+    CUDA_CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $CUDA_OUTPUT -I $DIRNAME -v -l CUDA"
     TIME_BODY_CMD="$SCRIPT_DIR/../src/time_body.sh -i $FILE -o $TIME_BODY_OUTPUT -I $DIRNAME -v"
     BALANCE_CMD="$SCRIPT_DIR/../src/measure_load_balance.sh -i $FILE -o $BALANCE_OUTPUT -I $DIRNAME -v"
     for P in "${!defines[@]}"; do
         if [[ "$(stat_file $P)" == "$(stat_file $FILE)" ]]; then
             for DEF in ${defines[$P]}; do
                 CMD="$CMD -D $DEF"
+                CUDA_CMD="$CUDA_CMD -D $DEF"
                 TIME_BODY_CMD="$TIME_BODY_CMD -D $DEF"
                 BALANCE_CMD="$BALANCE_CMD -D $DEF"
             done
@@ -90,6 +95,9 @@ for FILE in $FILES; do
 
     $CMD &> transform.log
     compare_outputs $REFERENCE $FILE $TEST_OUTPUT
+
+    $CUDA_CMD &> transform.cuda.log
+    compare_outputs $CUDA_REFERENCE $FILE $CUDA_OUTPUT
 
     $TIME_BODY_CMD &> transform.time_body.log
     compare_outputs $TIME_BODY_REFERENCE $FILE $TIME_BODY_OUTPUT

@@ -120,200 +120,8 @@ typedef struct _pragma162_omp_parallel {
     int penalty;
  } pragma162_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma110_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ int maximum( int a,
-		 int b,
-		 int c) {
-            {
-
-	int k;
-	if( a <= b )
-		k = b;
-	else 
-	k = a;
-
-	if( k <=c )
-	return(c);
-	else
-	return(k);
-}
-        }
-    int blk;
-    int* volatile referrence;
-    int max_cols;
-    int* volatile input_itemsets;
-    int penalty;
-
-    public:
-        pragma110_omp_parallel_hclib_async(int set_blk,
-                int* set_referrence,
-                int set_max_cols,
-                int* set_input_itemsets,
-                int set_penalty) {
-            blk = set_blk;
-            referrence = set_referrence;
-            max_cols = set_max_cols;
-            input_itemsets = set_input_itemsets;
-            penalty = set_penalty;
-
-        }
-
-        __device__ void operator()(int b_index_x) {
-            {
-            int b_index_y = blk - 1 - b_index_x;
-            int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
-            int reference_l[BLOCK_SIZE * BLOCK_SIZE] __attribute__ ((aligned (64)));
-
-            // Copy referrence to local memory
-            for ( int i = 0; i < BLOCK_SIZE; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE; ++j)
-                {
-                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
-                }
-            }
-
-            // Copy input_itemsets to local memory
-            for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
-                {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
-                }
-            }
-
-            // Compute
-            for ( int i = 1; i < BLOCK_SIZE + 1; ++i )
-            {
-                for ( int j = 1; j < BLOCK_SIZE + 1; ++j)
-                {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = maximum( input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j - 1] + reference_l[(i - 1)*BLOCK_SIZE + j - 1],
-                            input_itemsets_l[i*(BLOCK_SIZE + 1) + j - 1] - penalty,
-                            input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j] - penalty);
-                }
-            }
-
-            // Copy results to global memory
-            for ( int i = 0; i < BLOCK_SIZE; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE; ++j)
-                {
-                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j + 1];
-                }
-            }
-            
-        }
-        }
-};
-
-#else
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma162_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ int maximum( int a,
-		 int b,
-		 int c) {
-            {
-
-	int k;
-	if( a <= b )
-		k = b;
-	else 
-	k = a;
-
-	if( k <=c )
-	return(c);
-	else
-	return(k);
-}
-        }
-    int max_cols;
-    int blk;
-    int* volatile referrence;
-    int* volatile input_itemsets;
-    int penalty;
-
-    public:
-        pragma162_omp_parallel_hclib_async(int set_max_cols,
-                int set_blk,
-                int* set_referrence,
-                int* set_input_itemsets,
-                int set_penalty) {
-            max_cols = set_max_cols;
-            blk = set_blk;
-            referrence = set_referrence;
-            input_itemsets = set_input_itemsets;
-            penalty = set_penalty;
-
-        }
-
-        __device__ void operator()(int b_index_x) {
-            {
-            int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
-
-            int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
-            int reference_l[BLOCK_SIZE * BLOCK_SIZE] __attribute__ ((aligned (64)));
- 
-            // Copy referrence to local memory
-            for ( int i = 0; i < BLOCK_SIZE; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE; ++j)
-                {
-                    reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
-                }
-            }
-
-            // Copy input_itemsets to local memory
-            for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
-                {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
-                }
-            }
-
-            // Compute
-            for ( int i = 1; i < BLOCK_SIZE + 1; ++i )
-            {
-                for ( int j = 1; j < BLOCK_SIZE + 1; ++j)
-                {
-                    input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = maximum( input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j - 1] + reference_l[(i - 1)*BLOCK_SIZE + j - 1],
-                            input_itemsets_l[i*(BLOCK_SIZE + 1) + j - 1] - penalty,
-                            input_itemsets_l[(i - 1)*(BLOCK_SIZE + 1) + j] - penalty);
-                }
-            }
-
-            // Copy results to global memory
-            for ( int i = 0; i < BLOCK_SIZE; ++i )
-            {
-for ( int j = 0; j < BLOCK_SIZE; ++j)
-                {
-                    input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
-                }
-            }
-        }
-        }
-};
-
-#else
 static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
         int max_rows, int max_cols, int penalty)
 {
@@ -333,13 +141,8 @@ domain[0].low = 0;
 domain[0].high = blk;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((blk) - (0), pragma110_omp_parallel_hclib_async(blk, referrence, max_cols, input_itemsets, penalty), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma110_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
     }    
@@ -362,21 +165,13 @@ domain[0].low = blk - 1;
 domain[0].high = (max_cols - 1) / 16;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda(((max_cols - 1) / 16) - (blk - 1), pragma162_omp_parallel_hclib_async(max_cols, blk, referrence, input_itemsets, penalty), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma162_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
     }
 
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma110_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma110_omp_parallel *ctx = (pragma110_omp_parallel *)____arg;
     int blk; blk = ctx->blk;
@@ -434,10 +229,6 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 
 }
 
-#endif
-
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma162_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma162_omp_parallel *ctx = (pragma162_omp_parallel *)____arg;
@@ -496,7 +287,6 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
 
 }
 
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

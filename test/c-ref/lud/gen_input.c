@@ -40,59 +40,7 @@ typedef struct _pragma87_omp_parallel {
  } pragma87_omp_parallel;
 
 static void pragma71_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma87_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-    int j;
-    volatile int MatrixDim;
-    FP_NUMBER sum;
-    int k;
-    FP_NUMBER* volatile L;
-    int i;
-    FP_NUMBER* volatile U;
-    FP_NUMBER* volatile A;
-
-    public:
-        pragma87_omp_parallel_hclib_async(int set_j,
-                int set_MatrixDim,
-                FP_NUMBER set_sum,
-                int set_k,
-                FP_NUMBER* set_L,
-                int set_i,
-                FP_NUMBER* set_U,
-                FP_NUMBER* set_A) {
-            j = set_j;
-            MatrixDim = set_MatrixDim;
-            sum = set_sum;
-            k = set_k;
-            L = set_L;
-            i = set_i;
-            U = set_U;
-            A = set_A;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-        for (j=0; j < MatrixDim; j++){
-            sum = 0;
-            for(k=0; k < MatrixDim; k++)
-                sum += L[i * MatrixDim + k]*U[k * MatrixDim + j];
-            A[i * MatrixDim + j] = sum;
-        }
-    }
-        }
-};
-
-#else
 static void pragma87_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 int main (int argc, char **argv){
     int i,j,k,MatrixDim;
     FP_NUMBER sum, *L, *U, *A;
@@ -171,13 +119,8 @@ domain[0].low = 0;
 domain[0].high = MatrixDim;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((MatrixDim) - (0), pragma87_omp_parallel_hclib_async(j, MatrixDim, sum, k, L, i, U, A), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma87_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
@@ -235,9 +178,6 @@ static void pragma71_omp_parallel_hclib_async(void *____arg, const int ___iter0)
 }
 
 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma87_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma87_omp_parallel *ctx = (pragma87_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -256,5 +196,4 @@ static void pragma87_omp_parallel_hclib_async(void *____arg, const int ___iter0)
     } ;     } while (0);
 }
 
-#endif
 

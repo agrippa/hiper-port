@@ -105,104 +105,7 @@ typedef struct _pragma121_omp_parallel {
     MAT (*(*grad_y_ptr));
  } pragma121_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma121_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
-        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
-            {	((A)->me[(i)][(j)] = (val)); }
-        }
-    volatile int MaxR;
-    volatile int height;
-    volatile int tY[7][150];
-    int i;
-    volatile int tX[7][150];
-    MAT* volatile grad_x;
-    volatile double cos_angle[150];
-    MAT* volatile grad_y;
-    volatile double sin_angle[150];
-    MAT* volatile gicov;
-
-    public:
-        pragma121_omp_parallel_hclib_async(int set_MaxR,
-                int set_height,
-                int set_tY[7][150],
-                int set_i,
-                int set_tX[7][150],
-                MAT* set_grad_x,
-                double set_cos_angle[150],
-                MAT* set_grad_y,
-                double set_sin_angle[150],
-                MAT* set_gicov) {
-            MaxR = set_MaxR;
-            height = set_height;
-            memcpy((void *)tY, (void *)set_tY, sizeof(tY));
-            i = set_i;
-            memcpy((void *)tX, (void *)set_tX, sizeof(tX));
-            grad_x = set_grad_x;
-            memcpy((void *)cos_angle, (void *)set_cos_angle, sizeof(cos_angle));
-            grad_y = set_grad_y;
-            memcpy((void *)sin_angle, (void *)set_sin_angle, sizeof(sin_angle));
-            gicov = set_gicov;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		double Grad[NPOINTS];
-		int j, k, n, x, y;
-		
-		for (j = MaxR; j < height - MaxR; j++) {
-			// Initialize the maximal GICOV score to 0
-			double max_GICOV = 0;	
-			
-			// Iterate across each stencil
-			for (k = 0; k < NCIRCLES; k++) {
-				// Iterate across each sample point in the current stencil
-				for (n = 0; n < NPOINTS; n++)	{
-					// Determine the x- and y-coordinates of the current sample point
-					y = j + tY[k][n];
-					x = i + tX[k][n];
-					
-					// Compute the combined gradient value at the current sample point
-					Grad[n] = m_get_val(grad_x, y, x) * cos_angle[n] + m_get_val(grad_y, y, x) * sin_angle[n];
-				}
-				
-				// Compute the mean gradient value across all sample points
-				double sum = 0.0;
-				for (n = 0; n < NPOINTS; n++) sum += Grad[n];
-				double mean = sum / (double)NPOINTS;
-				
-				// Compute the variance of the gradient values
-				double var = 0.0;				
-				for (n = 0; n < NPOINTS; n++)	{
-					sum = Grad[n] - mean;
-					var += sum * sum;
-				}				
-				var = var / (double) (NPOINTS - 1);
-				
-				// Keep track of the maximal GICOV value seen so far
-				if (mean * mean / var > max_GICOV) {
-					m_set_val(gicov, j, i, mean / sqrt(var));
-					max_GICOV = mean * mean / var;
-				}
-			}
-		}
-	}
-        }
-};
-
-#else
 static void pragma121_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
@@ -252,21 +155,13 @@ domain[0].low = MaxR;
 domain[0].high = width - MaxR;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((width - MaxR) - (MaxR), pragma121_omp_parallel_hclib_async(MaxR, height, tY, i, tX, grad_x, cos_angle, grad_y, sin_angle, gicov), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma121_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 	
 	return gicov;
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma121_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma121_omp_parallel *ctx = (pragma121_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -318,7 +213,6 @@ static void pragma121_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 
 
@@ -351,72 +245,7 @@ typedef struct _pragma196_omp_parallel {
     MAT (*(*strel_ptr));
  } pragma196_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma196_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
-        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
-            {	((A)->me[(i)][(j)] = (val)); }
-        }
-    MAT* volatile img_in;
-    MAT* volatile strel;
-    int i;
-    volatile int el_center_i;
-    volatile int el_center_j;
-    MAT* volatile dilated;
-
-    public:
-        pragma196_omp_parallel_hclib_async(MAT* set_img_in,
-                MAT* set_strel,
-                int set_i,
-                int set_el_center_i,
-                int set_el_center_j,
-                MAT* set_dilated) {
-            img_in = set_img_in;
-            strel = set_strel;
-            i = set_i;
-            el_center_i = set_el_center_i;
-            el_center_j = set_el_center_j;
-            dilated = set_dilated;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-		int j, el_i, el_j, x, y;
-		for (j = 0; j < img_in->n; j++) {
-			double max = 0.0, temp;
-			// Iterate across the structuring element
-			for (el_i = 0; el_i < strel->m; el_i++) {
-				for (el_j = 0; el_j < strel->n; el_j++) {
-					y = i - el_center_i + el_i;
-					x = j - el_center_j + el_j;
-					// Make sure we have not gone off the edge of the matrix
-					if (y >=0 && x >= 0 && y < img_in->m && x < img_in->n && m_get_val(strel, el_i, el_j) != 0) {
-						// Determine if this is maximal value seen so far
-						temp = m_get_val(img_in, y, x);
-						if (temp > max)	max = temp;
-					}
-				}
-			}
-			// Store the maximum value found
-			m_set_val(dilated, i, j, max);
-		}
-	}
-        }
-};
-
-#else
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 MAT * dilate_f(MAT * img_in, MAT * strel) {
 	MAT * dilated = m_get(img_in->m, img_in->n);
 	
@@ -437,21 +266,13 @@ domain[0].low = 0;
 domain[0].high = img_in->m;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((img_in->m) - (0), pragma196_omp_parallel_hclib_async(img_in, strel, i, el_center_i, el_center_j, dilated), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma196_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 
 	return dilated;
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma196_omp_parallel *ctx = (pragma196_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -483,7 +304,6 @@ static void pragma196_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 
 

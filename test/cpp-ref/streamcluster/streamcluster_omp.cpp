@@ -361,147 +361,8 @@ typedef struct _pragma475_omp_parallel {
     int (*pid_ptr);
  } pragma475_omp_parallel;
 
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma399_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ float dist(Point p1, Point p2, int dim) {
-            {
-  int i;
-  float result=0.0;
-  for (i=0;i<dim;i++)
-    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
-#ifdef INSERT_WASTE
-  double s = waste(result);
-  result += s;
-  result -= s;
-#endif
-  return(result);
-}
-        }
-    Points* volatile points;
-    int i;
-    volatile long x;
-    bool* volatile switch_membership;
-    double cost_of_opening_x;
-    double* volatile lower;
-    int* volatile center_table;
-
-    public:
-        pragma399_omp_parallel_hclib_async(Points* set_points,
-                int set_i,
-                long set_x,
-                bool* set_switch_membership,
-                double set_cost_of_opening_x,
-                double* set_lower,
-                int* set_center_table) {
-            points = set_points;
-            i = set_i;
-            x = set_x;
-            switch_membership = set_switch_membership;
-            cost_of_opening_x = set_cost_of_opening_x;
-            lower = set_lower;
-            center_table = set_center_table;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-    float x_cost = dist(points->p[i], points->p[x], points->dim) 
-      * points->p[i].weight;
-    float current_cost = points->p[i].cost;
-		
-    if ( x_cost < current_cost ) {
-
-      // point i would save cost just by switching to x
-      // (note that i cannot be a median, 
-      // or else dist(p[i], p[x]) would be 0)			
-      switch_membership[i] = 1;
-      cost_of_opening_x += x_cost - current_cost;			
-    } else {
-
-      // cost of assigning i to x is at least current assignment cost of i
-
-      // consider the savings that i's **current** median would realize
-      // if we reassigned that median and all its members to x;
-      // note we've already accounted for the fact that the median
-      // would save z by closing; now we have to subtract from the savings
-      // the extra cost of reassigning that median and its members 
-      int assign = points->p[i].assign;
-      lower[center_table[assign]] += current_cost - x_cost;			
-    }
-  }
-        }
-};
-
-#else
 static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
-
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-
-class pragma475_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ float dist(Point p1, Point p2, int dim) {
-            {
-  int i;
-  float result=0.0;
-  for (i=0;i<dim;i++)
-    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
-#ifdef INSERT_WASTE
-  double s = waste(result);
-  result += s;
-  result -= s;
-#endif
-  return(result);
-}
-        }
-    double* volatile gl_lower;
-    int* volatile center_table;
-    Points* volatile points;
-    bool* volatile switch_membership;
-    volatile long x;
-
-    public:
-        pragma475_omp_parallel_hclib_async(double* set_gl_lower,
-                int* set_center_table,
-                Points* set_points,
-                bool* set_switch_membership,
-                long set_x) {
-            gl_lower = set_gl_lower;
-            center_table = set_center_table;
-            points = set_points;
-            switch_membership = set_switch_membership;
-            x = set_x;
-
-        }
-
-        __device__ void operator()(int i) {
-            {
-      bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
-      if ( switch_membership[i] || close_center ) {
-				// Either i's median (which may be i itself) is closing,
-				// or i is closer to x than to its current median
-				points->p[i].cost = points->p[i].weight *
-					dist(points->p[i], points->p[x], points->dim);
-				points->p[i].assign = x;
-      }
-    }
-        }
-};
-
-#else
 static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0);
-#endif
 double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
@@ -619,13 +480,8 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(points, i, x, switch_membership, cost_of_opening_x, lower, center_table), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma399_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
 cost_of_opening_x = new_ctx->cost_of_opening_x;
  } 
@@ -709,13 +565,8 @@ domain[0].low = k1;
 domain[0].high = k2;
 domain[0].stride = 1;
 domain[0].tile = -1;
-#ifdef OMP_TO_HCLIB_ENABLE_GPU
-hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(gl_lower, center_table, points, switch_membership, x), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
-#else
 hclib_future_t *fut = hclib_forasync_future((void *)pragma475_omp_parallel_hclib_async, new_ctx, 1, domain, HCLIB_FORASYNC_MODE);
 hclib_future_wait(fut);
-#endif
 free(new_ctx);
  } 
 		
@@ -752,9 +603,6 @@ free(new_ctx);
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
 } 
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
-
 static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma399_omp_parallel *ctx = (pragma399_omp_parallel *)____arg;
     int i; i = ctx->i;
@@ -796,10 +644,6 @@ static void pragma399_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
-
-
-#ifndef OMP_TO_HCLIB_ENABLE_GPU
 
 static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0) {
     pragma475_omp_parallel *ctx = (pragma475_omp_parallel *)____arg;
@@ -821,7 +665,6 @@ static void pragma475_omp_parallel_hclib_async(void *____arg, const int ___iter0
 
 }
 
-#endif
 
 
 

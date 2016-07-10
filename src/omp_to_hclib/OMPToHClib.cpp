@@ -20,6 +20,8 @@
 #include "OMPToHClib.h"
 #include "OMPDependencies.h"
 
+extern TargetLang target;
+
 #define VERBOSE
 
 /*
@@ -580,11 +582,15 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
             clang::dyn_cast<clang::CallExpr>(curr)) {
         const clang::FunctionDecl *callee = call->getDirectCallee();
         assert(callee != NULL);
+
         if (callee->getBody() == NULL) {
             acc.foundUnresolvedFunction(callee);
         } else {
-            acc.addCalledFunction(callee);
-            traverseFunctorBody(callee->getBody(), acc, true);
+            if (std::find(acc.called_begin(), acc.called_end(), callee) ==
+                    acc.called_end()) {
+                acc.addCalledFunction(callee);
+                traverseFunctorBody(callee->getBody(), acc, true);
+            }
         }
 
         for (unsigned i = 0; i < call->getNumArgs(); i++) {
@@ -1085,37 +1091,35 @@ std::string OMPToHClib::getClosureDecl(std::string closureName,
         OMPClauses *clauses, CUDAFunctorParameters *functor_params) {
     std::stringstream ss;
 
-    if (isAcceleratable) {
-        std::string functor = getCUDAFunctorDef(closureName, captured, clauses,
-                iterator, bodyStr, body, functor_params);
-        if (functor.length() == 0) {
-            isAcceleratable = false;
+    if (target == CUDA) {
+        if (isAcceleratable) {
+            std::string functor = getCUDAFunctorDef(closureName, captured, clauses,
+                    iterator, bodyStr, body, functor_params);
+            if (functor.length() == 0) {
+                isAcceleratable = false;
+            } else {
+                ss << functor;
+            }
+        }
+    } else {
+        ss << "static ";
+        if (isFuture) {
+            ss << "void *";
         } else {
-            ss << "\n#ifdef OMP_TO_HCLIB_ENABLE_GPU\n\n";
-            ss << functor;
-            ss << "#else\n";
+            ss << "void ";
         }
-    }
-    ss << "static ";
-    if (isFuture) {
-        ss << "void *";
-    } else {
-        ss << "void ";
-    }
-    ss << closureName << "(void *____arg";
-    if (isForasyncClosure) {
-        assert(forasyncDim > 0);
-        for (int i = 0; i < forasyncDim; i++) {
-            ss << ", const int ___iter" << i;
+        ss << closureName << "(void *____arg";
+        if (isForasyncClosure) {
+            assert(forasyncDim > 0);
+            for (int i = 0; i < forasyncDim; i++) {
+                ss << ", const int ___iter" << i;
+            }
+        } else {
+            assert(forasyncDim == -1);
         }
-    } else {
-        assert(forasyncDim == -1);
+        ss << ");\n";
     }
-    ss << ");\n";
 
-    if (isAcceleratable) {
-        ss << "#endif\n";
-    }
     return ss.str();
 }
 
@@ -1143,15 +1147,13 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
         std::string contextName, std::vector<clang::ValueDecl *> *captured,
         std::string bodyStr, bool isFuture, OMPClauses *clauses,
         bool wrapBodyInFinish, bool waitAtEnd,
-        bool isAcceleratable, std::vector<const clang::ValueDecl *> *condVars) {
+        std::vector<const clang::ValueDecl *> *condVars) {
     assert(!(isForasyncClosure && isAsyncClosure));
     std::vector<OMPReductionVar> *reductions = clauses->getReductions();
     std::vector<OMPVarInfo> *vars = clauses->getVarInfo(captured);
 
     std::stringstream ss;
-    if (isAcceleratable) {
-        ss << "\n\n#ifndef OMP_TO_HCLIB_ENABLE_GPU\n";
-    }
+
     ss << "\nstatic ";
     if (isFuture) {
         ss << "void *";
@@ -1305,9 +1307,6 @@ std::string OMPToHClib::getClosureDef(std::string closureName,
     }
 
     ss << "}\n\n";
-    if (isAcceleratable) {
-        ss << "#endif\n";
-    }
 
     return ss.str();
 }
@@ -1414,6 +1413,19 @@ std::string OMPToHClib::getContextSetup(PragmaNode *node,
     return ss.str();
 }
 
+void OMPToHClib::removePragma(PragmaNode *node) {
+    std::string bodyStr;
+    if (node->getBody()) {
+        bodyStr = stmtToString(node->getBody());
+    } else {
+        bodyStr = "";
+    }
+
+    const bool failed = rewriter->ReplaceText(clang::SourceRange(
+                node->getStartLoc(), node->getEndLoc()), bodyStr);
+    assert(!failed);
+}
+
 void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
     assert(getCurrentLexicalDepth() == 1);
     popScope();
@@ -1438,57 +1450,65 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
             std::string pragmaName = node->getPragmaName();
 
             if (pragmaName == "omp_to_hclib") {
-                if (foundOmpToHclibLaunch) {
-                    std::cerr << "Found multiple locations where the " <<
-                        "omp_to_hclib pragma is used. This use case is " <<
-                        "currently unsupported." << std::endl;
-                    exit(1);
+                if (target == HCLIB) {
+                    if (foundOmpToHclibLaunch) {
+                        std::cerr << "Found multiple locations where the " <<
+                            "omp_to_hclib pragma is used. This use case is " <<
+                            "currently unsupported." << std::endl;
+                        exit(1);
+                    }
+                    foundOmpToHclibLaunch = true;
+
+                    OMPClauses *generatedClauses = new OMPClauses();
+                    std::vector<clang::ValueDecl *> *captures = node->getCaptures();
+                    for (std::vector<clang::ValueDecl *>::iterator i =
+                            captures->begin(), e = captures->end(); i != e; i++) {
+                        generatedClauses->addClauseArg("private",
+                                (*i)->getNameAsString());
+                    }
+
+                    std::string launchBody = stmtToString(node->getBody());
+                    std::string launchStruct = getStructDef(
+                            "main_entrypoint_ctx", captures, generatedClauses);
+                    std::string closureFunction = getClosureDef(
+                            "main_entrypoint", false, false, "main_entrypoint_ctx",
+                            captures, launchBody, false, generatedClauses, false, false);
+                    std::string contextSetup = getContextSetup(node,
+                            "main_entrypoint_ctx", captures,
+                            generatedClauses);
+                    std::string launchStr = contextSetup +
+                        "const char *deps[] = { \"system\" };\n" +
+                        "hclib_launch(main_entrypoint, new_ctx, deps, 1);\n";
+
+                    bool failed = rewriter->ReplaceText(
+                            clang::SourceRange(node->getStartLoc(),
+                                node->getEndLoc()), launchStr);
+                    assert(!failed);
+
+                    accumulatedStructDefs += launchStruct;
+                    accumulatedKernelDecls += closureFunction;
+                } else {
+                    removePragma(node);
                 }
-                foundOmpToHclibLaunch = true;
-
-                OMPClauses *generatedClauses = new OMPClauses();
-                std::vector<clang::ValueDecl *> *captures = node->getCaptures();
-                for (std::vector<clang::ValueDecl *>::iterator i =
-                        captures->begin(), e = captures->end(); i != e; i++) {
-                    generatedClauses->addClauseArg("private",
-                            (*i)->getNameAsString());
-                }
-
-                std::string launchBody = stmtToString(node->getBody());
-                std::string launchStruct = getStructDef(
-                        "main_entrypoint_ctx", captures, generatedClauses);
-                std::string closureFunction = getClosureDef(
-                        "main_entrypoint", false, false, "main_entrypoint_ctx",
-                        captures, launchBody, false, generatedClauses, false, false, false);
-                std::string contextSetup = getContextSetup(node,
-                        "main_entrypoint_ctx", captures,
-                        generatedClauses);
-                std::string launchStr = contextSetup +
-                    "const char *deps[] = { \"system\" };\n" +
-                    "hclib_launch(main_entrypoint, new_ctx, deps, 1);\n";
-
-                bool failed = rewriter->ReplaceText(
-                        clang::SourceRange(node->getStartLoc(),
-                            node->getEndLoc()), launchStr);
-                assert(!failed);
-
-                accumulatedStructDefs += launchStruct;
-                accumulatedKernelDecls += closureFunction;
             } else if (pragmaName == "omp") {
                 std::string ompCmd = node->getPragmaCmd();
                 OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
 
                 if (ompCmd == "critical") {
-                    const clang::Stmt *body = node->getBody();
+                    if (target == HCLIB) {
+                        const clang::Stmt *body = node->getBody();
 
-                    std::string lock = getCriticalSectionLockStr(criticalSectionId);
-                    std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
-                    criticalSectionId++;
+                        std::string lock = getCriticalSectionLockStr(criticalSectionId);
+                        std::string unlock = getCriticalSectionUnlockStr(criticalSectionId);
+                        criticalSectionId++;
 
-                    const bool failed = rewriter->ReplaceText(
-                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                            lock + stmtToString(body) + unlock);
-                    assert(!failed);
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                                lock + stmtToString(body) + unlock);
+                        assert(!failed);
+                    } else {
+                        removePragma(node);
+                    }
                 } else if (ompCmd == "atomic") {
                     // For now we implement atomic with rather heavyweight locks
                     // TODO, use actual atomic instructions
@@ -1527,10 +1547,15 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         exit(1);
                     }
                 } else if (ompCmd == "taskwait") {
-                    const bool failed = rewriter->ReplaceText(
-                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                            " hclib_end_finish(); hclib_start_finish(); ");
-                    assert(!failed);
+                    if (target == HCLIB) {
+                        const bool failed = rewriter->ReplaceText(
+                                clang::SourceRange(node->getStartLoc(),
+                                    node->getEndLoc()),
+                                " hclib_end_finish(); hclib_start_finish(); ");
+                        assert(!failed);
+                    } else {
+                        removePragma(node);
+                    }
                 } else if (ompCmd == "single" || ompCmd == "master") {
                     assert(node->getParent()); // should not be root
                     assert(node->getParent()->getPragmaName() == "omp");
@@ -1548,142 +1573,161 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         exit(1);
                     }
 
-                    const clang::CompoundStmt *parentCmpd =
-                        clang::dyn_cast<clang::CompoundStmt>(
-                                node->getParent()->getBody());
-                    assert(parentCmpd);
-                    assert(parentCmpd->size() == 2);
-                    clang::CompoundStmt::const_body_iterator bodyIter = parentCmpd->body_begin();
-                    assert(*bodyIter == node->getMarker());
-                    bodyIter++;
-                    assert(*bodyIter == node->getBody());
+                    if (target == HCLIB) {
+                        const clang::CompoundStmt *parentCmpd =
+                            clang::dyn_cast<clang::CompoundStmt>(
+                                    node->getParent()->getBody());
+                        assert(parentCmpd);
+                        assert(parentCmpd->size() == 2);
+                        clang::CompoundStmt::const_body_iterator bodyIter = parentCmpd->body_begin();
+                        assert(*bodyIter == node->getMarker());
+                        bodyIter++;
+                        assert(*bodyIter == node->getBody());
 
-                    /*
-                     * Verify that at least one of these pragmas does not
-                     * have the nowait clause.
-                     */
-                    OMPClauses *parentClauses = getOMPClausesForMarker(
-                            node->getParent()->getMarker());
-                    assert(!clauses->hasClause("nowait") ||
-                            !parentClauses->hasClause("nowait"));
+                        /*
+                         * Verify that at least one of these pragmas does not
+                         * have the nowait clause.
+                         */
+                        OMPClauses *parentClauses = getOMPClausesForMarker(
+                                node->getParent()->getMarker());
+                        assert(!clauses->hasClause("nowait") ||
+                                !parentClauses->hasClause("nowait"));
 
-                    // Insert finish
-                    const clang::Stmt *body = node->getBody();
+                        // Insert finish
+                        const clang::Stmt *body = node->getBody();
 
-                    if (ompCmd == "master") {
-                        std::string bodyStr = stmtToStringWithSharedVars(body,
-                                clauses->getSharedVarInfo(node->getCaptures()));
+                        if (ompCmd == "master") {
+                            std::string bodyStr = stmtToStringWithSharedVars(body,
+                                    clauses->getSharedVarInfo(node->getCaptures()));
 
-                        bool isAcceleratable = false;
-                        accumulatedKernelDecls += getClosureDecl(
-                                node->getLbl() + ASYNC_SUFFIX, false, -1, true,
-                                isAcceleratable);
+                            bool isAcceleratable = false;
+                            accumulatedKernelDecls += getClosureDecl(
+                                    node->getLbl() + ASYNC_SUFFIX, false, -1, true,
+                                    isAcceleratable);
 
-                        accumulatedKernelDefs += getClosureDef(
-                                node->getLbl() + ASYNC_SUFFIX, false, true,
-                                node->getLbl(), node->getCaptures(),
-                                bodyStr, true, clauses, canLaunchTasks(body), true, false);
+                            accumulatedKernelDefs += getClosureDef(
+                                    node->getLbl() + ASYNC_SUFFIX, false, true,
+                                    node->getLbl(), node->getCaptures(),
+                                    bodyStr, true, clauses, canLaunchTasks(body), true);
 
-                        const std::string structDef = getStructDef(
-                                node->getLbl(), node->getCaptures(), clauses);
-                        accumulatedStructDefs += structDef;
+                            const std::string structDef = getStructDef(
+                                    node->getLbl(), node->getCaptures(), clauses);
+                            accumulatedStructDefs += structDef;
 
-                        std::stringstream contextCreation;
-                        contextCreation << "\n" << getContextSetup(node,
-                                node->getLbl(), node->getCaptures(), clauses);
-                        contextCreation << "hclib_future_t *fut = " <<
-                            "hclib_async_future(" << node->getLbl() <<
-                            ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, " <<
-                            "hclib_get_master_place());\n";
-                        contextCreation << "hclib_future_wait(fut);\n";
-                        // Add braces to ensure we don't change control flow
-                        const bool failed = rewriter->ReplaceText(
-                                clang::SourceRange(node->getParent()->getStartLoc(),
-                                    node->getParent()->getEndLoc()),
-                                " { " + contextCreation.str() + " } ");
-                        assert(!failed);
-                    } else { // single
-                        const bool failed = rewriter->ReplaceText(
-                                clang::SourceRange(node->getParent()->getStartLoc(),
-                                    node->getParent()->getEndLoc()),
-                                "hclib_start_finish(); " + stmtToString(body) +
-                                    " ; hclib_end_finish(); ");
-                        assert(!failed);
+                            std::stringstream contextCreation;
+                            contextCreation << "\n" << getContextSetup(node,
+                                    node->getLbl(), node->getCaptures(), clauses);
+                            contextCreation << "hclib_future_t *fut = " <<
+                                "hclib_async_future(" << node->getLbl() <<
+                                ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, " <<
+                                "hclib_get_master_place());\n";
+                            contextCreation << "hclib_future_wait(fut);\n";
+                            // Add braces to ensure we don't change control flow
+                            const bool failed = rewriter->ReplaceText(
+                                    clang::SourceRange(node->getParent()->getStartLoc(),
+                                        node->getParent()->getEndLoc()),
+                                    " { " + contextCreation.str() + " } ");
+                            assert(!failed);
+                        } else { // single
+                            const bool failed = rewriter->ReplaceText(
+                                    clang::SourceRange(node->getParent()->getStartLoc(),
+                                        node->getParent()->getEndLoc()),
+                                    "hclib_start_finish(); " + stmtToString(body) +
+                                        " ; hclib_end_finish(); ");
+                            assert(!failed);
+                        }
+                    } else {
+                        removePragma(node->getParent());
+                        removePragma(node);
                     }
                 } else if (ompCmd == "task") {
-                    const clang::Stmt *body = node->getBody();
-                    OMPClauses *clauses = getOMPClausesForMarker(
-                            node->getMarker());
-                    std::string bodyStr = stmtToStringWithSharedVars(body,
-                            clauses->getSharedVarInfo(node->getCaptures()));
+                    switch (target) {
+                        case (HCLIB): {
+                            const clang::Stmt *body = node->getBody();
+                            OMPClauses *clauses = getOMPClausesForMarker(
+                                    node->getMarker());
+                            std::string bodyStr = stmtToStringWithSharedVars(body,
+                                    clauses->getSharedVarInfo(node->getCaptures()));
 
-                    bool isAcceleratable = false;
-                    accumulatedKernelDecls += getClosureDecl(
-                            node->getLbl() + ASYNC_SUFFIX, false, -1,
-                            clauses->hasClause("depend"), isAcceleratable);
+                            bool isAcceleratable = false;
+                            accumulatedKernelDecls += getClosureDecl(
+                                    node->getLbl() + ASYNC_SUFFIX, false, -1,
+                                    clauses->hasClause("depend"), isAcceleratable);
 
-                    accumulatedKernelDefs += getClosureDef(
-                            node->getLbl() + ASYNC_SUFFIX, false, true,
-                            node->getLbl(), node->getCaptures(),
-                            bodyStr, clauses->hasClause("depend"), clauses, canLaunchTasks(body), false, false);
+                            accumulatedKernelDefs += getClosureDef(
+                                    node->getLbl() + ASYNC_SUFFIX, false, true,
+                                    node->getLbl(), node->getCaptures(),
+                                    bodyStr, clauses->hasClause("depend"),
+                                    clauses, canLaunchTasks(body), false);
 
-                    const std::string structDef = getStructDef(
-                            node->getLbl(), node->getCaptures(), clauses);
-                    accumulatedStructDefs += structDef;
+                            const std::string structDef = getStructDef(
+                                    node->getLbl(), node->getCaptures(), clauses);
+                            accumulatedStructDefs += structDef;
 
-                    std::stringstream contextCreation;
-                    contextCreation << "\n" << getContextSetup(node,
-                            node->getLbl(), node->getCaptures(), clauses);
+                            std::stringstream contextCreation;
+                            contextCreation << "\n" << getContextSetup(node,
+                                    node->getLbl(), node->getCaptures(), clauses);
 
-                    if (clauses->hasClause("if")) {
-                        // We have already asserted there is only one if arg
-                        std::string ifArg = clauses->getSingleArg("if");
-                        // If the if condition is false, just call the task body sequentially
-                        contextCreation << "if (!(" << ifArg << ")) {\n";
-                        contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(new_ctx);\n";
-                        contextCreation << "} else {\n";
-                    }
+                            if (clauses->hasClause("if")) {
+                                // We have already asserted there is only one if arg
+                                std::string ifArg = clauses->getSingleArg("if");
+                                // If the if condition is false, just call the task body sequentially
+                                contextCreation << "if (!(" << ifArg << ")) {\n";
+                                contextCreation << "    " << node->getLbl() << ASYNC_SUFFIX << "(new_ctx);\n";
+                                contextCreation << "} else {\n";
+                            }
 
-                    if (clauses->hasClause("depend")) {
-                        OMPDependencies *depends = new OMPDependencies(
-                                clauses->getArgs("depend"));
-                        std::vector<OMPDependency> *in =
-                            depends->getInDependencies();
-                        std::vector<OMPDependency> *out =
-                            depends->getOutDependencies();
-                        contextCreation << "hclib_emulate_omp_task(" <<
-                            node->getLbl() << ASYNC_SUFFIX <<
-                            ", new_ctx, ANY_PLACE, " << in->size() << ", " <<
-                            out->size();
+                            if (clauses->hasClause("depend")) {
+                                OMPDependencies *depends = new OMPDependencies(
+                                        clauses->getArgs("depend"));
+                                std::vector<OMPDependency> *in =
+                                    depends->getInDependencies();
+                                std::vector<OMPDependency> *out =
+                                    depends->getOutDependencies();
+                                contextCreation << "hclib_emulate_omp_task(" <<
+                                    node->getLbl() << ASYNC_SUFFIX <<
+                                    ", new_ctx, ANY_PLACE, " << in->size() << ", " <<
+                                    out->size();
 
-                        for (std::vector<OMPDependency>::iterator i =
-                                in->begin(), e = in->end(); i != e; i++) {
-                            OMPDependency curr = *i;
-                            contextCreation << ", " << curr.getAddrStr() <<
-                                ", " << curr.getLengthStr();
+                                for (std::vector<OMPDependency>::iterator i =
+                                        in->begin(), e = in->end(); i != e; i++) {
+                                    OMPDependency curr = *i;
+                                    contextCreation << ", " << curr.getAddrStr() <<
+                                        ", " << curr.getLengthStr();
+                                }
+                                for (std::vector<OMPDependency>::iterator i =
+                                        out->begin(), e = out->end(); i != e; i++) {
+                                    OMPDependency curr = *i;
+                                    contextCreation << ", " << curr.getAddrStr() <<
+                                        ", " << curr.getLengthStr();
+                                }
+                                contextCreation << ");\n";
+
+                            } else {
+                                contextCreation << "hclib_async(" << node->getLbl() <<
+                                    ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, ANY_PLACE);\n";
+                            }
+
+                            if (clauses->hasClause("if")) {
+                                contextCreation << "}\n";
+                            }
+
+                            // Add braces to ensure we don't change control flow
+                            const bool failed = rewriter->ReplaceText(
+                                    clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
+                                    " { " + contextCreation.str() + " } ");
+                            assert(!failed);
+                            break;
                         }
-                        for (std::vector<OMPDependency>::iterator i =
-                                out->begin(), e = out->end(); i != e; i++) {
-                            OMPDependency curr = *i;
-                            contextCreation << ", " << curr.getAddrStr() <<
-                                ", " << curr.getLengthStr();
-                        }
-                        contextCreation << ");\n";
-
-                    } else {
-                        contextCreation << "hclib_async(" << node->getLbl() <<
-                            ASYNC_SUFFIX << ", new_ctx, NO_FUTURE, ANY_PLACE);\n";
+                        case (CUDA):
+                            removePragma(node);
+                            break;
+                        default:
+                            std::cerr << "OMP command " << ompCmd <<
+                                " unsupported by target language " << target <<
+                                std::endl;
+                            exit(1);
                     }
-
-                    if (clauses->hasClause("if")) {
-                        contextCreation << "}\n";
-                    }
-
-                    // Add braces to ensure we don't change control flow
-                    const bool failed = rewriter->ReplaceText(
-                            clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                            " { " + contextCreation.str() + " } ");
-                    assert(!failed);
                 } else if (ompCmd == "parallel") {
                     OMPClauses *clauses = getOMPClausesForMarker(node->getMarker());
 
@@ -1746,9 +1790,11 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                             originalBodyStr = stmtToString(currLoop->getBody());
                             body = currLoop->getBody();
-                            bodyStr = stmtToStringWithSharedVars(
-                                    currLoop->getBody(),
-                                    clauses->getSharedVarInfo(node->getCaptures()));
+                            if (target == HCLIB) {
+                                bodyStr = stmtToStringWithSharedVars(
+                                        currLoop->getBody(),
+                                        clauses->getSharedVarInfo(node->getCaptures()));
+                            }
 
                             loopConfiguration << "domain["  << l << "].low = " <<
                                 lowStr << ";\n";
@@ -1774,6 +1820,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 accumulated_cond.at(0)->getNameAsString(),
                                 originalBodyStr, body, node->getCaptures(),
                                 clauses, &functor_parameters);
+
                         std::stringstream constructor_params;
                         for (std::vector<CUDAParameter>::iterator i =
                                 functor_parameters.begin(), e =
@@ -1792,25 +1839,25 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                         }
 
                         std::stringstream contextCreation;
-                        contextCreation << "\n" <<
-                            getContextSetup(node, node->getLbl(),
-                                    node->getCaptures(), clauses);
-                        contextCreation << loopConfiguration.str();
+                        if (target == HCLIB) {
+                            contextCreation << "\n" <<
+                                getContextSetup(node, node->getLbl(),
+                                        node->getCaptures(), clauses);
+                            contextCreation << loopConfiguration.str();
 
-                        const std::string structDef = getStructDef(
-                                node->getLbl(), node->getCaptures(), clauses);
-                        accumulatedStructDefs += structDef;
+                            const std::string structDef = getStructDef(
+                                    node->getLbl(), node->getCaptures(), clauses);
+                            accumulatedStructDefs += structDef;
 
-                        accumulatedKernelDefs += getClosureDef(
-                                node->getLbl() + ASYNC_SUFFIX, true, false,
-                                node->getLbl(), node->getCaptures(),
-                                bodyStr, false, clauses,
-                                canLaunchTasks(forLoop), false, isAcceleratable,
-                                &condVars);
+                            accumulatedKernelDefs += getClosureDef(
+                                    node->getLbl() + ASYNC_SUFFIX, true, false,
+                                    node->getLbl(), node->getCaptures(),
+                                    bodyStr, false, clauses,
+                                    canLaunchTasks(forLoop), false, &condVars);
+                        }
 
                         // For now only support offload of 1D parallel loops
-                        if (isAcceleratable) {
-                            contextCreation << "#ifdef OMP_TO_HCLIB_ENABLE_GPU\n";
+                        if (target == CUDA && isAcceleratable) {
                             contextCreation << "hclib::future_t *fut = " <<
                                 "hclib::forasync_cuda((" <<
                                 accumulated_high.at(0) << ") - (" <<
@@ -1819,31 +1866,38 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                                 "(" << constructor_params.str() <<
                                 "), hclib::get_closest_gpu_locale(), NULL);\n";
                             contextCreation << "fut->wait();\n";
-                            contextCreation << "#else\n";
-                        }
-                        contextCreation << "hclib_future_t *fut = " <<
-                            "hclib_forasync_future((void *)" <<
-                            node->getLbl() << ASYNC_SUFFIX << ", new_ctx, " <<
-                            nLoops << ", domain, HCLIB_FORASYNC_MODE);\n";
-                        contextCreation << "hclib_future_wait(fut);\n";
-                        if (isAcceleratable) {
-                            contextCreation << "#endif\n";
-                        }
-                        contextCreation << "free(new_ctx);\n";
+                        } else if (target == HCLIB) {
+                            contextCreation << "hclib_future_t *fut = " <<
+                                "hclib_forasync_future((void *)" <<
+                                node->getLbl() << ASYNC_SUFFIX << ", new_ctx, " <<
+                                nLoops << ", domain, HCLIB_FORASYNC_MODE);\n";
+                            contextCreation << "hclib_future_wait(fut);\n";
+                            contextCreation << "free(new_ctx);\n";
 
-                        for (std::vector<OMPReductionVar>::iterator i =
-                                reductions->begin(), e = reductions->end();
-                                i != e; i++) {
-                            OMPReductionVar var = *i;
-                            contextCreation << var.getVar() << " = " <<
-                                "new_ctx->" << var.getVar() << ";\n";
+                            for (std::vector<OMPReductionVar>::iterator i =
+                                    reductions->begin(), e = reductions->end();
+                                    i != e; i++) {
+                                OMPReductionVar var = *i;
+                                contextCreation << var.getVar() << " = " <<
+                                    "new_ctx->" << var.getVar() << ";\n";
+                            }
                         }
 
-                        // Add braces to ensure we don't change control flow
-                        const bool failed = rewriter->ReplaceText(
-                                clang::SourceRange(node->getStartLoc(), node->getEndLoc()),
-                                " { " + contextCreation.str() + " } ");
-                        assert(!failed);
+                        if ((target == CUDA && isAcceleratable) ||
+                                target == HCLIB) {
+                            // Add braces to ensure we don't change control flow
+                            const bool failed = rewriter->ReplaceText(
+                                    clang::SourceRange(node->getStartLoc(),
+                                        node->getEndLoc()),
+                                    " { " + contextCreation.str() + " } ");
+                            assert(!failed);
+                        } else {
+                            /*
+                             * Failed to do code generation for this parallel
+                             * region.
+                             */
+                            removePragma(node);
+                        }
                     } else {
                         std::cerr << "Parallel pragma without a for at line " <<
                             node->getStartLine() << std::endl;
@@ -1851,10 +1905,7 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                     }
                 } else if (ompCmd == "simd") {
                     // Do nothing for now, just delete this pragma
-                    std::string bodyStr = stmtToString(node->getBody());
-                    const bool failed = rewriter->ReplaceText(clang::SourceRange(
-                                node->getStartLoc(), node->getEndLoc()), bodyStr);
-                    assert(!failed);
+                    removePragma(node);
                 } else {
                     std::cerr << "Unhandled OMP command \"" << ompCmd << "\"" <<
                         std::endl;
@@ -1870,7 +1921,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
         }
 
         if (accumulatedStructDefs.length() > 0 ||
-                accumulatedKernelDefs.length() > 0) {
+                accumulatedKernelDefs.length() > 0 ||
+                accumulatedKernelDecls.length() > 0) {
             clang::SourceLocation insertLoc = func->getLocStart();
             if (func->getTemplatedKind() == clang::FunctionDecl::TemplatedKind::TK_FunctionTemplateSpecialization) {
                 insertLoc = func->getPrimaryTemplate()->getLocStart();
