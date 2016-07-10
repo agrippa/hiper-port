@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -46,10 +68,6 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 class pragma136_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     bool* h_graph_mask;
     struct Node* h_graph_nodes;
     int* h_graph_edges;
@@ -93,20 +111,8 @@ class pragma136_omp_parallel_hclib_async {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 class pragma153_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     bool* h_updating_graph_mask;
     bool* h_graph_mask;
     bool* h_graph_visited;
@@ -225,17 +231,11 @@ void BFSGraph( int argc, char** argv)
 
             //omp_set_num_threads(num_omp_threads);
  { const int niters = (no_of_nodes) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask));
  } 
 
  { const int niters = (no_of_nodes) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop));
  } 
             k++;
         }

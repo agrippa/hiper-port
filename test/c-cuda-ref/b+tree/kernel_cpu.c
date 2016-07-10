@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -41,10 +63,6 @@
 
 class pragma93_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     int i;
     volatile long maxheight;
     int thid;
@@ -129,14 +147,6 @@ class pragma93_omp_parallel_hclib_async {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 void 
 kernel_cpu(	int cores_arg,
 
@@ -187,10 +197,7 @@ kernel_cpu(	int cores_arg,
 
 	// process number of querries
  { const int niters = (count) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma93_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, keys, offset, knodes_elem, ans, records));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma93_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, keys, offset, knodes_elem, ans, records));
  } 
 
 	time2 = get_time();

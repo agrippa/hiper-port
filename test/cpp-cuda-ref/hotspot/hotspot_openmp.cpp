@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -57,10 +79,6 @@ int num_omp_threads;
  */
 class pragma72_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     int chunk;
     volatile int chunks_in_col;
     int chunks_in_row;
@@ -196,14 +214,6 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col,
 					  FLOAT Cap_1, FLOAT Rx_1, FLOAT Ry_1, FLOAT Rz_1, 
 					  FLOAT step)
@@ -217,10 +227,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
 
 	// omp_set_num_threads(num_omp_threads);
  { const int niters = (num_chunk) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma72_omp_parallel_hclib_async(chunk, chunks_in_col, chunks_in_row, row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma72_omp_parallel_hclib_async(chunk, chunks_in_col, chunks_in_row, row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result));
  } 
 } 
 

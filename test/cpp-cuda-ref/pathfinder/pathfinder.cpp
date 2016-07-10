@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -92,10 +114,6 @@ int main(int argc, char** argv)
 
 class pragma114_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     int min;
     int* volatile src;
     volatile int cols;
@@ -135,14 +153,6 @@ class pragma114_omp_parallel_hclib_async {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 void run(int argc, char** argv)
 {
     init(argc, argv);
@@ -157,16 +167,12 @@ void run(int argc, char** argv)
 
     pin_stats_reset();
 
-hclib_pragma_marker("omp_to_hclib", "");
-    for (int t = 0; t < rows-1; t++) {
+for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
  { const int niters = (cols) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma114_omp_parallel_hclib_async(min, src, cols, dst, data, t));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma114_omp_parallel_hclib_async(min, src, cols, dst, data, t));
  } 
     }
 

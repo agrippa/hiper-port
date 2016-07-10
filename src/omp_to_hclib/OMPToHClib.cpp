@@ -825,10 +825,6 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "class " << closureName << " {\n";
     ss << "    private:\n";
 
-    ss << "        __device__ int hclib_get_current_worker() {" << std::endl;
-    ss << "            return blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
-    ss << "        }" << std::endl << std::endl;
-
     for (std::vector<const clang::FunctionDecl *>::iterator i =
             info.called_begin(), e = info.called_end(); i != e; i++) {
         const clang::FunctionDecl *func = (*i)->getMostRecentDecl();
@@ -1133,19 +1129,6 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "            }" << std::endl;
     ss << "        }\n";
     ss << "};\n\n";
-
-    if (!haveWrittenWrapperKernel) {
-        ss << "template<class functor_type>" << std::endl;
-        ss << "__global__ void wrapper_kernel(unsigned niters, " <<
-            "functor_type functor) {" << std::endl;
-        ss << "    const int tid = blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
-        ss << "    if (tid < niters) {" << std::endl;
-        ss << "        functor(tid);" << std::endl;
-        ss << "    }" << std::endl;
-        ss << "}" << std::endl << std::endl;
-
-        haveWrittenWrapperKernel = true;
-    }
 
     return ss.str();
 }
@@ -1927,18 +1910,10 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             contextCreation << "const int niters = (" <<
                                 accumulated_high.at(0) << ") - (" <<
                                 accumulated_low.at(0) << ");" << std::endl;
-                            contextCreation << "const int threads_per_block " <<
-                                "= 256;" << std::endl;
-                            contextCreation << "const int nblocks = " <<
-                                "(niters + threads_per_block - 1) / " <<
-                                "threads_per_block;" << std::endl;
-                            contextCreation << "wrapper_kernel<<<nblocks, " <<
-                                "threads_per_block>>>(niters, " <<
+                            contextCreation << "kernel_launcher(niters, " <<
                                 node->getLbl() << ASYNC_SUFFIX <<
                                 "(" << constructor_params.str() <<
                                 "));" << std::endl;
-                            contextCreation << "cudaDeviceSynchronize();" <<
-                                std::endl;
                         } else if (target == HCLIB) {
                             contextCreation << "hclib_future_t *fut = " <<
                                 "hclib_forasync_future((void *)" <<

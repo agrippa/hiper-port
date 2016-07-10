@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -102,10 +124,6 @@ void usage(int argc, char **argv)
 
 class pragma110_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ int maximum( int a,
 		 int b,
 		 int c) {
@@ -193,20 +211,8 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 class pragma162_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ int maximum( int a,
 		 int b,
 		 int c) {
@@ -300,10 +306,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { const int niters = (blk) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma110_omp_parallel_hclib_async(blk, referrence, max_cols, input_itemsets, penalty));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma110_omp_parallel_hclib_async(blk, referrence, max_cols, input_itemsets, penalty));
  } 
     }    
         
@@ -312,10 +315,7 @@ cudaDeviceSynchronize();
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { const int niters = ((max_cols - 1) / 16) - (blk - 1);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma162_omp_parallel_hclib_async(max_cols, blk, referrence, input_itemsets, penalty));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma162_omp_parallel_hclib_async(max_cols, blk, referrence, input_itemsets, penalty));
  } 
     }
 

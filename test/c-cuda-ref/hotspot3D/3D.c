@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -141,10 +163,6 @@ float accuracy(float *arr1, float *arr2, int len)
 }
 class pragma167_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     volatile int ny;
     volatile int nx;
     int z;
@@ -225,14 +243,6 @@ class pragma167_omp_parallel_hclib_async {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 void computeTempOMP(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 
@@ -257,10 +267,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
         do {
             int z; 
  { const int niters = (nz) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma167_omp_parallel_hclib_async(ny, nx, z, nz, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma167_omp_parallel_hclib_async(ny, nx, z, nz, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
  } 
             float *t = tIn_t;
             tIn_t = tOut_t;

@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -123,10 +145,6 @@ float euclid_dist_2(float *pt1,
 /*----< kmeans_clustering() >---------------------------------------------*/
 class pragma179_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ int find_nearest_point(float  *pt,          /* [nfeatures] */
                        int     nfeatures,
                        float *pts,         /* [npts][nfeatures] */
@@ -224,14 +242,6 @@ float euclid_dist_2(float *pt1,
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
                           int     nfeatures,
                           int     npoints,
@@ -286,10 +296,7 @@ float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
         delta = 0.0;
         {
  { const int niters = (npoints) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers));
  } 
         } /* end of #pragma omp parallel */
 

@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -352,10 +374,6 @@ int findIndexBin(double * CDF, int beginIndex, int endIndex, double value){
 */
 class pragma383_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double* volatile weights;
     int x;
     volatile int Nparticles;
@@ -379,20 +397,8 @@ class pragma383_omp_parallel_hclib_async {
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 class pragma398_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double* volatile arrayX;
     int x;
     volatile double xe;
@@ -425,10 +431,6 @@ class pragma398_omp_parallel_hclib_async {
 
 class pragma412_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ double randn(int * seed, int index) {
             {
 	/*Box-Muller algorithm*/
@@ -484,10 +486,6 @@ class pragma412_omp_parallel_hclib_async {
 
 class pragma420_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ double roundDouble(double value) {
             {
 	int newValue = (int)(value);
@@ -573,10 +571,6 @@ class pragma420_omp_parallel_hclib_async {
 
 class pragma443_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double* volatile weights;
     int x;
     double* volatile likelihood;
@@ -602,10 +596,6 @@ class pragma443_omp_parallel_hclib_async {
 
 class pragma450_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double sumWeights;
     double* volatile weights;
     int x;
@@ -631,10 +621,6 @@ class pragma450_omp_parallel_hclib_async {
 
 class pragma456_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double* volatile weights;
     int x;
     volatile double sumWeights;
@@ -660,10 +646,6 @@ class pragma456_omp_parallel_hclib_async {
 
 class pragma465_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double xe;
     double* volatile arrayX;
     int x;
@@ -699,10 +681,6 @@ class pragma465_omp_parallel_hclib_async {
 
 class pragma490_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     double* volatile u;
     int x;
     volatile double u1;
@@ -731,10 +709,6 @@ class pragma490_omp_parallel_hclib_async {
 
 class pragma498_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
         __device__ int findIndex(double * CDF, int lengthCDF, double value) {
             {
 	int index = -1;
@@ -826,10 +800,7 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 	//initial weights are all equal (1/Nparticles)
 	double * weights = (double *)malloc(sizeof(double)*Nparticles);
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma383_omp_parallel_hclib_async(weights, x, Nparticles));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma383_omp_parallel_hclib_async(weights, x, Nparticles));
  } 
 	long long get_weights = get_time();
 	printf("TIME TO GET WEIGHTSTOOK: %f\n", elapsed_time(get_neighbors, get_weights));
@@ -843,10 +814,7 @@ cudaDeviceSynchronize();
 	double * u = (double *)malloc(sizeof(double)*Nparticles);
 	int * ind = (int*)malloc(sizeof(int)*countOnes*Nparticles);
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma398_omp_parallel_hclib_async(arrayX, x, xe, arrayY, ye));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma398_omp_parallel_hclib_async(arrayX, x, xe, arrayY, ye));
  } 
 	int k;
 	
@@ -858,46 +826,31 @@ cudaDeviceSynchronize();
 		//draws sample from motion model (random walk). The only prior information
 		//is that the object moves 2x as fast as in the y direction
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma412_omp_parallel_hclib_async(arrayX, x, A, C, M, seed, arrayY));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma412_omp_parallel_hclib_async(arrayX, x, A, C, M, seed, arrayY));
  } 
 		long long error = get_time();
 		printf("TIME TO SET ERROR TOOK: %f\n", elapsed_time(set_arrays, error));
 		//particle filter likelihood
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma420_omp_parallel_hclib_async(y, countOnes, indX, arrayX, x, objxy, indY, arrayY, ind, IszY, Nfr, k, max_size, likelihood, I));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma420_omp_parallel_hclib_async(y, countOnes, indX, arrayX, x, objxy, indY, arrayY, ind, IszY, Nfr, k, max_size, likelihood, I));
  } 
 		long long likelihood_time = get_time();
 		printf("TIME TO GET LIKELIHOODS TOOK: %f\n", elapsed_time(error, likelihood_time));
 		// update & normalize weights
 		// using equation (63) of Arulampalam Tutorial
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma443_omp_parallel_hclib_async(weights, x, likelihood));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma443_omp_parallel_hclib_async(weights, x, likelihood));
  } 
 		long long exponential = get_time();
 		printf("TIME TO GET EXP TOOK: %f\n", elapsed_time(likelihood_time, exponential));
 		double sumWeights = 0;
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma450_omp_parallel_hclib_async(sumWeights, weights, x));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma450_omp_parallel_hclib_async(sumWeights, weights, x));
  } 
 		long long sum_time = get_time();
 		printf("TIME TO SUM WEIGHTS TOOK: %f\n", elapsed_time(exponential, sum_time));
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma456_omp_parallel_hclib_async(weights, x, sumWeights));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma456_omp_parallel_hclib_async(weights, x, sumWeights));
  } 
 		long long normalize = get_time();
 		printf("TIME TO NORMALIZE WEIGHTS TOOK: %f\n", elapsed_time(sum_time, normalize));
@@ -905,10 +858,7 @@ cudaDeviceSynchronize();
 		ye = 0;
 		// estimate the object location by expected values
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma465_omp_parallel_hclib_async(xe, arrayX, x, weights, ye, arrayY));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma465_omp_parallel_hclib_async(xe, arrayX, x, weights, ye, arrayY));
  } 
 		long long move_time = get_time();
 		printf("TIME TO MOVE OBJECT TOOK: %f\n", elapsed_time(normalize, move_time));
@@ -931,20 +881,14 @@ cudaDeviceSynchronize();
 		printf("TIME TO CALC CUM SUM TOOK: %f\n", elapsed_time(move_time, cum_sum));
 		double u1 = (1/((double)(Nparticles)))*randu(seed, 0);
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma490_omp_parallel_hclib_async(u, x, u1, Nparticles));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma490_omp_parallel_hclib_async(u, x, u1, Nparticles));
  } 
 		long long u_time = get_time();
 		printf("TIME TO CALC U TOOK: %f\n", elapsed_time(cum_sum, u_time));
 		int j, i;
 		
  { const int niters = (Nparticles) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma498_omp_parallel_hclib_async(i, CDF, Nparticles, u, j, xj, arrayX, yj, arrayY));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma498_omp_parallel_hclib_async(i, CDF, Nparticles, u, j, xj, arrayX, yj, arrayY));
  } 
 		long long xyj_time = get_time();
 		printf("TIME TO CALC NEW ARRAY X AND Y TOOK: %f\n", elapsed_time(u_time, xyj_time));

@@ -161,8 +161,6 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::vector<std::string> compatiblePthreadAPIs;
 
         std::set<const clang::DeclRefExpr *> sharedVarsReplaced;
-
-        bool haveWrittenWrapperKernel = false;
 };
 
 #endif

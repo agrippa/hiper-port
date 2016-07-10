@@ -1,3 +1,25 @@
+#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, CUDA Launch Error - %sn, cudaGetErrorString(err));
+        exit(2);
+    }
+}
 #include "hclib.h"
 #ifdef __cplusplus
 #include "hclib_cpp.h"
@@ -41,10 +63,6 @@ void lud_diagonal_omp (float* a, int size, int offset)
 // implements block LU factorization 
 class pragma61_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     float* a;
     int size;
     volatile int offset;
@@ -113,20 +131,8 @@ for (j =0; j < BS; j++){
         }
 };
 
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
 class pragma113_omp_parallel_hclib_async {
     private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
     volatile int offset;
     int chunk_idx;
     volatile int chunks_in_inter_row;
@@ -199,10 +205,7 @@ void lud_omp(float *a, int size)
         // calculate perimeter block matrices
         // 
  { const int niters = (chunks_in_inter_row) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx));
  } 
         
         // update interior block matrices
@@ -210,10 +213,7 @@ cudaDeviceSynchronize();
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
  { const int niters = (chunks_per_inter) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size));
-cudaDeviceSynchronize();
+kernel_launcher(niters, pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size));
  } 
     }
 

@@ -147,7 +147,7 @@ until [[ $CHANGED -eq 0 ]]; do
     [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Converting OMP parallelism to HClib'
     $OMP_TO_HCLIB -o $TMP_OUTPUT -c $CRITICAL_SECTION_ID \
         -r $CRITICAL_SECTION_ID_FILE -n $CHECK_FOR_PTHREAD -s $USES_SHMEM_FILE \
-        -l $TARGET_LANG $PREV -- $INCLUDE $USER_INCLUDES $DEFINES \
+        -l $TARGET_LANG $PREV -- $INCLUDE $USER_INCLUDES $DEFINES -D__device__= -D__global__= \
         -I$HCLIB_ROOT/include -I$HCLIB_ROOT/../modules/system/inc
 
     PREV_CRITICAL_SECTION_ID=$CRITICAL_SECTION_ID
@@ -169,19 +169,48 @@ until [[ $CHANGED -eq 0 ]]; do
     CHECK_FOR_PTHREAD=false
 done
 
-N_PRAGMA_MARKERS=$(cat $PREV | grep "extern void hclib_pragma_marker" | wc -l)
-if [[ $N_PRAGMA_MARKERS -ne 1 ]]; then
+N_PRAGMA_MARKERS=$(cat $PREV | grep "^hclib_pragma_marker" | wc -l)
+if [[ $N_PRAGMA_MARKERS -ne 0 ]]; then
     echo Unexpected number of leftover pragma markers \($N_PRAGMA_MARKERS\) in \
         $PREV, should only be the top-level declaration
     exit 1
 fi
 
 USES_SHMEM=$(cat $USES_SHMEM_FILE)
-[[ $VERBOSE == 1 ]] && echo "DEBUG >>> Producing final output file at $OUTPUT_PATH from $PREV"
 if [[ $USES_SHMEM -eq 0 ]]; then
-    cat $PREV | grep -v "extern void hclib_pragma_marker" | grep -v "hclib_openshmem" > $OUTPUT_PATH
+    cat $PREV | grep -v "extern void hclib_pragma_marker" | grep -v "hclib_openshmem" > ${OUTPUT_PATH}.body
 else
-    cat $PREV | grep -v "extern void hclib_pragma_marker" > $OUTPUT_PATH
+    cat $PREV | grep -v "extern void hclib_pragma_marker" > ${OUTPUT_PATH}.body
+fi
+
+DID_CUDA_TRANSFORMS=$(cat $PREV | grep '^class pragma' | wc -l)
+[[ $VERBOSE == 1 ]] && echo "DEBUG >>> Producing final output file at $OUTPUT_PATH from $PREV"
+if [[ $TARGET_LANG == 'CUDA' ]] && [[ $DID_CUDA_TRANSFORMS -ne 0 ]]; then
+    echo "#include <stdio.h>
+__device__ int hclib_get_current_worker() {
+    return blockIdx.x * blockDim.x + threadIdx.x;
+}
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+template<class functor_type>
+static void kernel_launcher(unsigned niters, functor_type functor) {
+    const int threads_per_block = 256;
+    const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    const cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "CUDA Launch Error - %s\n", cudaGetErrorString(err));
+        exit(2);
+    }
+}" > ${OUTPUT_PATH}.header
+    cat ${OUTPUT_PATH}.header ${OUTPUT_PATH}.body > $OUTPUT_PATH
+else
+    mv ${OUTPUT_PATH}.body $OUTPUT_PATH
 fi
 
 if [[ $KEEP == 0 ]]; then
