@@ -142,6 +142,14 @@ class pragma135_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 class pragma168_omp_parallel_hclib_async {
     private:
         __device__ int hclib_get_current_worker() {
@@ -321,11 +329,17 @@ for (iter=0; iter< niter; iter++){
         q0sqr   = varROI / (meanROI*meanROI);
 		
 
- { hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma135_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (rows) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma135_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c));
+cudaDeviceSynchronize();
  } 
- { hclib::future_t *fut = hclib::forasync_cuda((rows) - (0), pragma168_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (rows) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma168_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda));
+cudaDeviceSynchronize();
  } 
 
 	}

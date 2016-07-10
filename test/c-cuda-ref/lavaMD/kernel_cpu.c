@@ -212,6 +212,14 @@ class pragma123_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 void  kernel_cpu(	par_str par, 
 					dim_str dim,
 					box_str* box,
@@ -284,8 +292,11 @@ void  kernel_cpu(	par_str par,
 	//	PROCESS INTERACTIONS
 	//======================================================================================================================================================150
 
- { hclib::future_t *fut = hclib::forasync_cuda((dim.number_boxes) - (0), pragma123_omp_parallel_hclib_async(first_i, box, l, rA, rv, fA, fv, k, pointer, first_j, rB, qB, qv, i, j, r2, u2, a2, vij, fs, d, fxij, fyij, fzij), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (dim.number_boxes) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma123_omp_parallel_hclib_async(first_i, box, l, rA, rv, fA, fv, k, pointer, first_j, rB, qB, qv, i, j, r2, u2, a2, vij, fs, d, fxij, fyij, fzij));
+cudaDeviceSynchronize();
  }  // for l
     }
 

@@ -384,6 +384,14 @@ class pragma399_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 class pragma475_omp_parallel_hclib_async {
     private:
         __device__ int hclib_get_current_worker() {
@@ -523,8 +531,11 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	
 	// OpenMP parallelization
 //	#pragma omp parallel for 
- { hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma399_omp_parallel_hclib_async(points, i, x, switch_membership, cost_of_opening_x, lower, center_table), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (k2) - (k1);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma399_omp_parallel_hclib_async(points, i, x, switch_membership, cost_of_opening_x, lower, center_table));
+cudaDeviceSynchronize();
  } 
 
 #ifdef PROFILE
@@ -576,8 +587,11 @@ fut->wait();
 
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
- { hclib::future_t *fut = hclib::forasync_cuda((k2) - (k1), pragma475_omp_parallel_hclib_async(gl_lower, center_table, points, switch_membership, x), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (k2) - (k1);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma475_omp_parallel_hclib_async(gl_lower, center_table, points, switch_membership, x));
+cudaDeviceSynchronize();
  } 
 		
     for( int i = k1; i < k2; i++ ) {

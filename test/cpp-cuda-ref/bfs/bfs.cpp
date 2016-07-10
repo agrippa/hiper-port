@@ -91,6 +91,14 @@ class pragma136_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 class pragma153_omp_parallel_hclib_async {
     private:
         __device__ int hclib_get_current_worker() {
@@ -212,12 +220,18 @@ void BFSGraph( int argc, char** argv)
             stop=false;
 
             //omp_set_num_threads(num_omp_threads);
- { hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (no_of_nodes) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask));
+cudaDeviceSynchronize();
  } 
 
- { hclib::future_t *fut = hclib::forasync_cuda((no_of_nodes) - (0), pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (no_of_nodes) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop));
+cudaDeviceSynchronize();
  } 
             k++;
         }

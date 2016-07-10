@@ -219,6 +219,14 @@ class pragma179_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
                           int     nfeatures,
                           int     npoints,
@@ -272,8 +280,11 @@ float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
     do {
         delta = 0.0;
         {
- { hclib::future_t *fut = hclib::forasync_cuda((npoints) - (0), pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (npoints) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers));
+cudaDeviceSynchronize();
  } 
         } /* end of #pragma omp parallel */
 

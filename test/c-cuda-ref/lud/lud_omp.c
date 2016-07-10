@@ -111,6 +111,14 @@ for (j =0; j < BS; j++){
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 class pragma113_omp_parallel_hclib_async {
     private:
         __device__ int hclib_get_current_worker() {
@@ -186,16 +194,22 @@ void lud_omp(float *a, int size)
         
         // calculate perimeter block matrices
         // 
- { hclib::future_t *fut = hclib::forasync_cuda((chunks_in_inter_row) - (0), pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (chunks_in_inter_row) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx));
+cudaDeviceSynchronize();
  } 
         
         // update interior block matrices
         //
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
- { hclib::future_t *fut = hclib::forasync_cuda((chunks_per_inter) - (0), pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (chunks_per_inter) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size));
+cudaDeviceSynchronize();
  } 
     }
 

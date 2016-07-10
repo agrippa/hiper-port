@@ -220,6 +220,14 @@ class pragma167_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 void computeTempOMP(float *pIn, float* tIn, float *tOut, 
         int nx, int ny, int nz, float Cap, 
         float Rx, float Ry, float Rz, 
@@ -243,8 +251,11 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
 
         do {
             int z; 
- { hclib::future_t *fut = hclib::forasync_cuda((nz) - (0), pragma167_omp_parallel_hclib_async(ny, nx, z, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (nz) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma167_omp_parallel_hclib_async(ny, nx, z, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
+cudaDeviceSynchronize();
  } 
             float *t = tIn_t;
             tIn_t = tOut_t;

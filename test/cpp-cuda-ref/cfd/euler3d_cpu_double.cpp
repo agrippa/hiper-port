@@ -80,10 +80,21 @@ class pragma63_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 void copy(double *dst, double *src, int N)
 {
- { hclib::future_t *fut = hclib::forasync_cuda((N) - (0), pragma63_omp_parallel_hclib_async(dst, src), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (N) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma63_omp_parallel_hclib_async(dst, src));
+cudaDeviceSynchronize();
  } 
 } 
 
@@ -153,8 +164,11 @@ class pragma112_omp_parallel_hclib_async {
 
 void initialize_variables(int nelr, double* variables)
 {
- { hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma112_omp_parallel_hclib_async(variables, ff_variable), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (nelr) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma112_omp_parallel_hclib_async(variables, ff_variable));
+cudaDeviceSynchronize();
  } 
 } 
 
@@ -267,8 +281,11 @@ class pragma165_omp_parallel_hclib_async {
 
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
- { hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma165_omp_parallel_hclib_async(variables, step_factors, areas), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (nelr) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma165_omp_parallel_hclib_async(variables, step_factors, areas));
+cudaDeviceSynchronize();
  } 
 } 
 
@@ -494,8 +511,11 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 {
 	double smoothing_coefficient = double(0.2f);
 
- { hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, &ff_flux_contribution_density_energy, &ff_flux_contribution_momentum_x, &ff_flux_contribution_momentum_y, &ff_flux_contribution_momentum_z, fluxes), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (nelr) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma196_omp_parallel_hclib_async(variables, elements_surrounding_elements, normals, smoothing_coefficient, ff_variable, &ff_flux_contribution_density_energy, &ff_flux_contribution_momentum_x, &ff_flux_contribution_momentum_y, &ff_flux_contribution_momentum_z, fluxes));
+cudaDeviceSynchronize();
  } 
 } 
 
@@ -540,8 +560,11 @@ class pragma327_omp_parallel_hclib_async {
 
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
- { hclib::future_t *fut = hclib::forasync_cuda((nelr) - (0), pragma327_omp_parallel_hclib_async(step_factors, j, variables, old_variables, fluxes), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (nelr) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma327_omp_parallel_hclib_async(step_factors, j, variables, old_variables, fluxes));
+cudaDeviceSynchronize();
  } 
 } 
 /*

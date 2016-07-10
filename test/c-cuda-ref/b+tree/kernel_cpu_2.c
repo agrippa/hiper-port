@@ -159,6 +159,14 @@ class pragma103_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 void 
 kernel_cpu_2(	int cores_arg,
 
@@ -212,8 +220,11 @@ kernel_cpu_2(	int cores_arg,
 	int bid;
 
 	// process number of querries
- { hclib::future_t *fut = hclib::forasync_cuda((count) - (0), pragma103_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, start, knodes_elem, offset, lastKnode, end, offset_2, recstart, reclength), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (count) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma103_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, start, knodes_elem, offset, lastKnode, end, offset_2, recstart, reclength));
+cudaDeviceSynchronize();
  } 
 
 	time2 = get_time();

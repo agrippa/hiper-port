@@ -180,6 +180,14 @@ class pragma121_omp_parallel_hclib_async {
         }
 };
 
+template<class functor_type>
+__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
 MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	int i, n, k;
 	// Compute the sine and cosine of the angle to each point in each sample circle
@@ -208,8 +216,11 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	MAT * gicov = m_get(height, width);
 	
 	// Split the work among multiple threads, if OPEN is defined
- { hclib::future_t *fut = hclib::forasync_cuda((width - MaxR) - (MaxR), pragma121_omp_parallel_hclib_async(MaxR, height, tY, i, tX, grad_x, cos_angle, grad_y, sin_angle, gicov), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (width - MaxR) - (MaxR);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma121_omp_parallel_hclib_async(MaxR, height, tY, i, tX, grad_x, cos_angle, grad_y, sin_angle, gicov));
+cudaDeviceSynchronize();
  } 
 	
 	return gicov;
@@ -303,8 +314,11 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
 	
 	// Split the work among multiple threads, if OPEN is defined
- { hclib::future_t *fut = hclib::forasync_cuda((img_in->m) - (0), pragma196_omp_parallel_hclib_async(img_in, strel, i, el_center_i, el_center_j, dilated), hclib::get_closest_gpu_locale(), NULL);
-fut->wait();
+ { const int niters = (img_in->m) - (0);
+const int threads_per_block = 256;
+const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma196_omp_parallel_hclib_async(img_in, strel, i, el_center_i, el_center_j, dilated));
+cudaDeviceSynchronize();
  } 
 
 	return dilated;

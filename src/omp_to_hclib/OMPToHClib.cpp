@@ -1079,7 +1079,18 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "        }\n";
     ss << "};\n\n";
 
-    // TODO handle toBeTransferred
+    if (!haveWrittenWrapperKernel) {
+        ss << "template<class functor_type>" << std::endl;
+        ss << "__global__ void wrapper_kernel(unsigned niters, " <<
+            "functor_type functor) {" << std::endl;
+        ss << "    const int tid = blockIdx.x * blockDim.x + threadIdx.x;" << std::endl;
+        ss << "    if (tid < niters) {" << std::endl;
+        ss << "        functor(tid);" << std::endl;
+        ss << "    }" << std::endl;
+        ss << "}" << std::endl << std::endl;
+
+        haveWrittenWrapperKernel = true;
+    }
 
     return ss.str();
 }
@@ -1858,14 +1869,21 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
 
                         // For now only support offload of 1D parallel loops
                         if (target == CUDA && isAcceleratable) {
-                            contextCreation << "hclib::future_t *fut = " <<
-                                "hclib::forasync_cuda((" <<
+                            contextCreation << "const int niters = (" <<
                                 accumulated_high.at(0) << ") - (" <<
-                                accumulated_low.at(0) << "), " <<
+                                accumulated_low.at(0) << ");" << std::endl;
+                            contextCreation << "const int threads_per_block " <<
+                                "= 256;" << std::endl;
+                            contextCreation << "const int nblocks = " <<
+                                "(niters + threads_per_block - 1) / " <<
+                                "threads_per_block;" << std::endl;
+                            contextCreation << "wrapper_kernel<<<nblocks, " <<
+                                "threads_per_block>>>(niters, " <<
                                 node->getLbl() << ASYNC_SUFFIX <<
                                 "(" << constructor_params.str() <<
-                                "), hclib::get_closest_gpu_locale(), NULL);\n";
-                            contextCreation << "fut->wait();\n";
+                                "));" << std::endl;
+                            contextCreation << "cudaDeviceSynchronize();" <<
+                                std::endl;
                         } else if (target == HCLIB) {
                             contextCreation << "hclib_future_t *fut = " <<
                                 "hclib_forasync_future((void *)" <<
