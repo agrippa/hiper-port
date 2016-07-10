@@ -116,6 +116,7 @@ class OMPToHClib : public clang::ConstStmtVisitor<OMPToHClib> {
         std::string getCaptureStr(clang::ValueDecl *decl);
         std::string getUnpackStr(clang::ValueDecl *decl);
         std::string getArraySizeExpr(clang::QualType qualType);
+        bool checkForPointersInRecord(const clang::RecordType *record);
 
         bool canLaunchTasks(const clang::Stmt *body);
 

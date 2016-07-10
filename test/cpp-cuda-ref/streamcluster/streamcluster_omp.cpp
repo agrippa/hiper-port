@@ -309,147 +309,6 @@ float pspeedy(Points *points, float z, long *kcenter, int pid)
 /* z is the facility cost, x is the number of this point in the array 
    points */
 
-class pragma399_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ float dist(Point p1, Point p2, int dim) {
-            {
-  int i;
-  float result=0.0;
-  for (i=0;i<dim;i++)
-    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
-#ifdef INSERT_WASTE
-  double s = waste(result);
-  result += s;
-  result -= s;
-#endif
-  return(result);
-}
-        }
-    Points* volatile points;
-    int i;
-    volatile long x;
-    bool* volatile switch_membership;
-    double cost_of_opening_x;
-    double* volatile lower;
-    int* volatile center_table;
-
-    public:
-        pragma399_omp_parallel_hclib_async(Points* set_points,
-                int set_i,
-                long set_x,
-                bool* set_switch_membership,
-                double set_cost_of_opening_x,
-                double* set_lower,
-                int* set_center_table) {
-            points = set_points;
-            i = set_i;
-            x = set_x;
-            switch_membership = set_switch_membership;
-            cost_of_opening_x = set_cost_of_opening_x;
-            lower = set_lower;
-            center_table = set_center_table;
-
-        }
-
-        __device__ void operator()(int i) {
-            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
-                {
-    float x_cost = dist(points->p[i], points->p[x], points->dim) 
-      * points->p[i].weight;
-    float current_cost = points->p[i].cost;
-		
-    if ( x_cost < current_cost ) {
-
-      // point i would save cost just by switching to x
-      // (note that i cannot be a median, 
-      // or else dist(p[i], p[x]) would be 0)			
-      switch_membership[i] = 1;
-      cost_of_opening_x += x_cost - current_cost;			
-    } else {
-
-      // cost of assigning i to x is at least current assignment cost of i
-
-      // consider the savings that i's **current** median would realize
-      // if we reassigned that median and all its members to x;
-      // note we've already accounted for the fact that the median
-      // would save z by closing; now we have to subtract from the savings
-      // the extra cost of reassigning that median and its members 
-      int assign = points->p[i].assign;
-      lower[center_table[assign]] += current_cost - x_cost;			
-    }
-  }
-            }
-        }
-};
-
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
-class pragma475_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ float dist(Point p1, Point p2, int dim) {
-            {
-  int i;
-  float result=0.0;
-  for (i=0;i<dim;i++)
-    result += (p1.coord[i] - p2.coord[i])*(p1.coord[i] - p2.coord[i]);
-#ifdef INSERT_WASTE
-  double s = waste(result);
-  result += s;
-  result -= s;
-#endif
-  return(result);
-}
-        }
-    double* volatile gl_lower;
-    int* volatile center_table;
-    Points* volatile points;
-    bool* volatile switch_membership;
-    volatile long x;
-
-    public:
-        pragma475_omp_parallel_hclib_async(double* set_gl_lower,
-                int* set_center_table,
-                Points* set_points,
-                bool* set_switch_membership,
-                long set_x) {
-            gl_lower = set_gl_lower;
-            center_table = set_center_table;
-            points = set_points;
-            switch_membership = set_switch_membership;
-            x = set_x;
-
-        }
-
-        __device__ void operator()(int i) {
-            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
-                {
-      bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
-      if ( switch_membership[i] || close_center ) {
-				// Either i's median (which may be i itself) is closing,
-				// or i is closer to x than to its current median
-				points->p[i].cost = points->p[i].weight *
-					dist(points->p[i], points->p[x], points->dim);
-				points->p[i].assign = x;
-      }
-    }
-            }
-        }
-};
-
 double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 {
   //  printf("pgain pthread %d begin\n",pid);
@@ -535,12 +394,31 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	
 	// OpenMP parallelization
 //	#pragma omp parallel for 
- { const int niters = (k2) - (k1);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma399_omp_parallel_hclib_async(points, i, x, switch_membership, cost_of_opening_x, lower, center_table));
-cudaDeviceSynchronize();
- } 
+for ( i = k1; i < k2; i++ ) {
+    float x_cost = dist(points->p[i], points->p[x], points->dim) 
+      * points->p[i].weight;
+    float current_cost = points->p[i].cost;
+		
+    if ( x_cost < current_cost ) {
+
+      // point i would save cost just by switching to x
+      // (note that i cannot be a median, 
+      // or else dist(p[i], p[x]) would be 0)			
+      switch_membership[i] = 1;
+      cost_of_opening_x += x_cost - current_cost;			
+    } else {
+
+      // cost of assigning i to x is at least current assignment cost of i
+
+      // consider the savings that i's **current** median would realize
+      // if we reassigned that median and all its members to x;
+      // note we've already accounted for the fact that the median
+      // would save z by closing; now we have to subtract from the savings
+      // the extra cost of reassigning that median and its members 
+      int assign = points->p[i].assign;
+      lower[center_table[assign]] += current_cost - x_cost;			
+    }
+  }
 
 #ifdef PROFILE
   double t2 = gettime();
@@ -591,12 +469,16 @@ cudaDeviceSynchronize();
 
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
- { const int niters = (k2) - (k1);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma475_omp_parallel_hclib_async(gl_lower, center_table, points, switch_membership, x));
-cudaDeviceSynchronize();
- } 
+for ( int i = k1; i < k2; i++ ) {
+      bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
+      if ( switch_membership[i] || close_center ) {
+				// Either i's median (which may be i itself) is closing,
+				// or i is closer to x than to its current median
+				points->p[i].cost = points->p[i].weight *
+					dist(points->p[i], points->p[x], points->dim);
+				points->p[i].assign = x;
+      }
+    }
 		
     for( int i = k1; i < k2; i++ ) {
       if( is_center[i] && gl_lower[center_table[i]] > 0 ) {
@@ -630,7 +512,7 @@ cudaDeviceSynchronize();
 #endif
 	//printf("cost=%f\n", -gl_cost_of_opening_x);
   return -gl_cost_of_opening_x;
-} 
+}
 
 
 /* facility location on the points using local search */

@@ -678,6 +678,13 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
             const clang::Type *nested = elaborated->getNamedType().getTypePtr();
             if (const clang::RecordType *record =
                     clang::dyn_cast<clang::RecordType>(nested)) {
+                if (checkForPointersInRecord(record)) {
+                    std::cerr << "getCUDAFunctorDef: Found captured record " <<
+                        "type \"" << record->getDecl()->getNameAsString() <<
+                        "\" has pointer fields." << std::endl;
+                    return false;
+                }
+
                 const std::string typdefStr =
                     typdef->getDecl()->getNameAsString();
                 ss << "    " << typdefStr << "* " <<
@@ -718,6 +725,13 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
         }
     } else if (const clang::RecordType *record =
             clang::dyn_cast<clang::RecordType>(pointee)) {
+        if (checkForPointersInRecord(record)) {
+            std::cerr << "getCUDAFunctorDef: Found captured record " <<
+                "type \"" << record->getDecl()->getNameAsString() <<
+                "\" has pointer fields." << std::endl;
+            return false;
+        }
+
         ss << "    struct " << record->getDecl()->getNameAsString() << "* " <<
             (isShared ? "volatile" : "") << ref->getNameAsString() << ";" <<
             std::endl;
@@ -737,6 +751,26 @@ bool OMPToHClib::handleCapturedPointer(const clang::PointerType *pointer,
     }
 
     return true;
+}
+
+bool OMPToHClib::checkForPointersInRecord(const clang::RecordType *record) {
+    clang::RecordDecl *decl = record->getDecl();
+
+    for (clang::RecordDecl::field_iterator i = decl->field_begin(),
+            e = decl->field_end(); i != e; i++) {
+        const clang::FieldDecl *field = *i;
+        const clang::Type *fieldType = field->getType().getTypePtr();
+        if (clang::isa<clang::PointerType>(fieldType)) {
+            return true;
+        } else if (const clang::RecordType *nested =
+                clang::dyn_cast<clang::RecordType>(fieldType)) {
+            if (checkForPointersInRecord(nested)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
@@ -933,6 +967,14 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                         }
                     } else if (const clang::RecordType *record =
                             clang::dyn_cast<clang::RecordType>(ref->getType())) {
+                        if (checkForPointersInRecord(record)) {
+                            std::cerr << "getCUDAFunctorDef: Found captured " <<
+                                "record type \"" <<
+                                record->getDecl()->getNameAsString() <<
+                                "\" has pointer fields." << std::endl;
+                            return "";
+                        }
+
                         ss << "    struct " <<
                             record->getDecl()->getNameAsString() << " " <<
                             ref->getNameAsString() << ";" << std::endl;
@@ -1009,6 +1051,14 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
                             const clang::Type *nested = elaborated->getNamedType().getTypePtr();
                             if (const clang::RecordType *record =
                                     clang::dyn_cast<clang::RecordType>(nested)) {
+                                if (checkForPointersInRecord(record)) {
+                                    std::cerr << "getCUDAFunctorDef: Found " <<
+                                        "captured record type \"" <<
+                                        record->getDecl()->getNameAsString() <<
+                                        "\" has pointer fields." << std::endl;
+                                    return "";
+                                }
+
                                 const std::string typdefStr =
                                     typedefType->getDecl()->getNameAsString();
                                 ss << "    " << typdefStr << " " <<

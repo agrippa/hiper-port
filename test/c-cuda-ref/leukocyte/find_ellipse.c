@@ -88,56 +88,35 @@ MAT * chop_flip_image(unsigned char *image, int height, int width, int top, int 
 
 // Given x- and y-gradients of a video frame, computes the GICOV
 //  score for each sample ellipse at every pixel in the frame
-class pragma121_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
+MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
+	int i, n, k;
+	// Compute the sine and cosine of the angle to each point in each sample circle
+	//  (which are the same across all sample circles)
+	double sin_angle[NPOINTS], cos_angle[NPOINTS], theta[NPOINTS];
+	for (n = 0; n < NPOINTS; n++) {
+		theta[n] = (double) n * 2.0 * PI / (double) NPOINTS;
+		sin_angle[n] = sin(theta[n]);
+		cos_angle[n] = cos(theta[n]);
+	}
 
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
-        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
-            {	((A)->me[(i)][(j)] = (val)); }
-        }
-    volatile int MaxR;
-    volatile int height;
-    volatile int tY[7][150];
-    int i;
-    volatile int tX[7][150];
-    MAT* volatile grad_x;
-    volatile double cos_angle[150];
-    MAT* volatile grad_y;
-    volatile double sin_angle[150];
-    MAT* volatile gicov;
-
-    public:
-        pragma121_omp_parallel_hclib_async(int set_MaxR,
-                int set_height,
-                int set_tY[7][150],
-                int set_i,
-                int set_tX[7][150],
-                MAT* set_grad_x,
-                double set_cos_angle[150],
-                MAT* set_grad_y,
-                double set_sin_angle[150],
-                MAT* set_gicov) {
-            MaxR = set_MaxR;
-            height = set_height;
-            memcpy((void *)tY, (void *)set_tY, sizeof(tY));
-            i = set_i;
-            memcpy((void *)tX, (void *)set_tX, sizeof(tX));
-            grad_x = set_grad_x;
-            memcpy((void *)cos_angle, (void *)set_cos_angle, sizeof(cos_angle));
-            grad_y = set_grad_y;
-            memcpy((void *)sin_angle, (void *)set_sin_angle, sizeof(sin_angle));
-            gicov = set_gicov;
-
-        }
-
-        __device__ void operator()(int i) {
-            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
-                {
+	// Compute the (x,y) pixel offsets of each sample point in each sample circle
+	int tX[NCIRCLES][NPOINTS], tY[NCIRCLES][NPOINTS];
+	for (k = 0; k < NCIRCLES; k++) {
+		double rad = (double) (MIN_RAD + 2 * k); 
+		for (n = 0; n < NPOINTS; n++) {
+			tX[k][n] = (int) (cos(theta[n]) * rad);
+			tY[k][n] = (int) (sin(theta[n]) * rad);
+		}
+	}
+	
+	int MaxR = MAX_RAD + 2;
+	
+	// Allocate memory for the result matrix
+	int height = grad_x->m, width = grad_x->n;
+	MAT * gicov = m_get(height, width);
+	
+	// Split the work among multiple threads, if OPEN is defined
+for (i = MaxR; i < width - MaxR; i++) {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
 		
@@ -178,55 +157,9 @@ class pragma121_omp_parallel_hclib_async {
 			}
 		}
 	}
-            }
-        }
-};
-
-template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
-    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (tid < niters) {
-        functor(tid);
-    }
-}
-
-MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
-	int i, n, k;
-	// Compute the sine and cosine of the angle to each point in each sample circle
-	//  (which are the same across all sample circles)
-	double sin_angle[NPOINTS], cos_angle[NPOINTS], theta[NPOINTS];
-	for (n = 0; n < NPOINTS; n++) {
-		theta[n] = (double) n * 2.0 * PI / (double) NPOINTS;
-		sin_angle[n] = sin(theta[n]);
-		cos_angle[n] = cos(theta[n]);
-	}
-
-	// Compute the (x,y) pixel offsets of each sample point in each sample circle
-	int tX[NCIRCLES][NPOINTS], tY[NCIRCLES][NPOINTS];
-	for (k = 0; k < NCIRCLES; k++) {
-		double rad = (double) (MIN_RAD + 2 * k); 
-		for (n = 0; n < NPOINTS; n++) {
-			tX[k][n] = (int) (cos(theta[n]) * rad);
-			tY[k][n] = (int) (sin(theta[n]) * rad);
-		}
-	}
-	
-	int MaxR = MAX_RAD + 2;
-	
-	// Allocate memory for the result matrix
-	int height = grad_x->m, width = grad_x->n;
-	MAT * gicov = m_get(height, width);
-	
-	// Split the work among multiple threads, if OPEN is defined
- { const int niters = (width - MaxR) - (MaxR);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma121_omp_parallel_hclib_async(MaxR, height, tY, i, tX, grad_x, cos_angle, grad_y, sin_angle, gicov));
-cudaDeviceSynchronize();
- } 
 	
 	return gicov;
-} 
+}
 
 
 // Returns a circular structuring element of the specified radius
@@ -249,44 +182,14 @@ MAT * structuring_element(int radius) {
 
 // Performs an image dilation on the specified matrix
 //  using the specified structuring element
-class pragma196_omp_parallel_hclib_async {
-    private:
-        __device__ int hclib_get_current_worker() {
-            return blockIdx.x * blockDim.x + threadIdx.x;
-        }
-
-        __device__ inline double m_get_val(MAT *A, int i, int j) {
-            {	return ((A)->me[(i)][(j)]); }
-        }
-        __device__ inline void m_set_val(MAT *A, int i, int j, double val) {
-            {	((A)->me[(i)][(j)] = (val)); }
-        }
-    MAT* volatile img_in;
-    MAT* volatile strel;
-    int i;
-    volatile int el_center_i;
-    volatile int el_center_j;
-    MAT* volatile dilated;
-
-    public:
-        pragma196_omp_parallel_hclib_async(MAT* set_img_in,
-                MAT* set_strel,
-                int set_i,
-                int set_el_center_i,
-                int set_el_center_j,
-                MAT* set_dilated) {
-            img_in = set_img_in;
-            strel = set_strel;
-            i = set_i;
-            el_center_i = set_el_center_i;
-            el_center_j = set_el_center_j;
-            dilated = set_dilated;
-
-        }
-
-        __device__ void operator()(int i) {
-            for (int __dummy_iter = 0; __dummy_iter < 1; __dummy_iter++) {
-                {
+MAT * dilate_f(MAT * img_in, MAT * strel) {
+	MAT * dilated = m_get(img_in->m, img_in->n);
+	
+	// Find the center of the structuring element
+	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
+	
+	// Split the work among multiple threads, if OPEN is defined
+for (i = 0; i < img_in->m; i++) {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {
 			double max = 0.0, temp;
@@ -307,26 +210,9 @@ class pragma196_omp_parallel_hclib_async {
 			m_set_val(dilated, i, j, max);
 		}
 	}
-            }
-        }
-};
-
-MAT * dilate_f(MAT * img_in, MAT * strel) {
-	MAT * dilated = m_get(img_in->m, img_in->n);
-	
-	// Find the center of the structuring element
-	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
-	
-	// Split the work among multiple threads, if OPEN is defined
- { const int niters = (img_in->m) - (0);
-const int threads_per_block = 256;
-const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma196_omp_parallel_hclib_async(img_in, strel, i, el_center_i, el_center_j, dilated));
-cudaDeviceSynchronize();
- } 
 
 	return dilated;
-} 
+}
 
 
 //M = # of sampling points in each segment
