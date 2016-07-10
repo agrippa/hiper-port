@@ -601,8 +601,9 @@ void OMPToHClib::traverseFunctorBody(const clang::Stmt *curr,
         traverseFunctorBody(ret->getRetValue(), acc, beneathFunctionCall);
     } else if (const clang::ConditionalOperator *cond =
             clang::dyn_cast<clang::ConditionalOperator>(curr)) {
-        traverseFunctorBody(cond->getLHS(), acc, beneathFunctionCall);
-        traverseFunctorBody(cond->getRHS(), acc, beneathFunctionCall);
+        traverseFunctorBody(cond->getCond(), acc, beneathFunctionCall);
+        traverseFunctorBody(cond->getTrueExpr(), acc, beneathFunctionCall);
+        traverseFunctorBody(cond->getFalseExpr(), acc, beneathFunctionCall);
     } else if (const clang::CXXConstructExpr *constr =
             clang::dyn_cast<clang::CXXConstructExpr>(curr)) {
         for (unsigned i = 0; i < constr->getNumArgs(); i++) {

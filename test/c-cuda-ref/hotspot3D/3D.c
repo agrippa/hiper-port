@@ -148,6 +148,7 @@ class pragma167_omp_parallel_hclib_async {
     volatile int ny;
     volatile int nx;
     int z;
+    volatile int nz;
     float* volatile tOut_t;
     volatile float cc;
     float* volatile tIn_t;
@@ -166,6 +167,7 @@ class pragma167_omp_parallel_hclib_async {
         pragma167_omp_parallel_hclib_async(int set_ny,
                 int set_nx,
                 int set_z,
+                int set_nz,
                 float* set_tOut_t,
                 float set_cc,
                 float* set_tIn_t,
@@ -182,6 +184,7 @@ class pragma167_omp_parallel_hclib_async {
             ny = set_ny;
             nx = set_nx;
             z = set_z;
+            nz = set_nz;
             tOut_t = set_tOut_t;
             cc = set_cc;
             tIn_t = set_tIn_t;
@@ -256,7 +259,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
  { const int niters = (nz) - (0);
 const int threads_per_block = 256;
 const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
-wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma167_omp_parallel_hclib_async(ny, nx, z, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
+wrapper_kernel<<<nblocks, threads_per_block>>>(niters, pragma167_omp_parallel_hclib_async(ny, nx, z, nz, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
 cudaDeviceSynchronize();
  } 
             float *t = tIn_t;
