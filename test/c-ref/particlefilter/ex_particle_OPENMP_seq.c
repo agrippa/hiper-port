@@ -1370,7 +1370,7 @@ static void pragma420_omp_parallel_hclib_async(void *____arg, const int ___iter0
 			for(y = 0; y < (*(ctx->countOnes_ptr)); y++){
 				indX = roundDouble((*(ctx->arrayX_ptr))[x]) + (*(ctx->objxy_ptr))[y*2 + 1];
 				indY = roundDouble((*(ctx->arrayY_ptr))[x]) + (*(ctx->objxy_ptr))[y*2];
-				(*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y] = fabs(indX*(*(ctx->IszY_ptr))*(*(ctx->Nfr_ptr)) + indY*(*(ctx->Nfr_ptr)) + (*(ctx->k_ptr)));
+				(*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y] = fabs((double)(indX*(*(ctx->IszY_ptr))*(*(ctx->Nfr_ptr)) + indY*(*(ctx->Nfr_ptr)) + (*(ctx->k_ptr))));
 				if((*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y] >= (*(ctx->max_size_ptr)))
 					(*(ctx->ind_ptr))[x*(*(ctx->countOnes_ptr)) + y] = 0;
 			}

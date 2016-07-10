@@ -558,7 +558,7 @@ class pragma420_omp_parallel_hclib_async {
 			for(y = 0; y < countOnes; y++){
 				indX = roundDouble(arrayX[x]) + objxy[y*2 + 1];
 				indY = roundDouble(arrayY[x]) + objxy[y*2];
-				ind[x*countOnes + y] = fabs(indX*IszY*Nfr + indY*Nfr + k);
+				ind[x*countOnes + y] = fabs((double)(indX*IszY*Nfr + indY*Nfr + k));
 				if(ind[x*countOnes + y] >= max_size)
 					ind[x*countOnes + y] = 0;
 			}
