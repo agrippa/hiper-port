@@ -189,11 +189,11 @@ class pragma110_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
                 memcpy((void *)(&referrence), (void *)(&tmp), sizeof(void *));
             }
-            if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
                 memcpy((void *)(&input_itemsets), (void *)(&tmp), sizeof(void *));
             }
@@ -336,11 +336,11 @@ class pragma162_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
                 memcpy((void *)(&referrence), (void *)(&tmp), sizeof(void *));
             }
-            if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
                 memcpy((void *)(&input_itemsets), (void *)(&tmp), sizeof(void *));
             }

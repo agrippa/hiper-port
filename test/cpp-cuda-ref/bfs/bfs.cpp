@@ -127,27 +127,27 @@ class pragma136_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_mask - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_mask), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_graph_nodes == NULL && (char *)h_h_graph_nodes >= (char *)host_allocations[i] && ((char *)h_h_graph_nodes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_nodes == NULL && (char *)h_h_graph_nodes >= (char *)host_allocations[i] && ((char *)h_h_graph_nodes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_nodes - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_nodes), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_graph_edges == NULL && (char *)h_h_graph_edges >= (char *)host_allocations[i] && ((char *)h_h_graph_edges - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_edges == NULL && (char *)h_h_graph_edges >= (char *)host_allocations[i] && ((char *)h_h_graph_edges - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_edges - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_edges), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_visited - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_visited), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_cost == NULL && (char *)h_h_cost >= (char *)host_allocations[i] && ((char *)h_h_cost - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_cost == NULL && (char *)h_h_cost >= (char *)host_allocations[i] && ((char *)h_h_cost - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_cost - (char *)host_allocations[i]);
                 memcpy((void *)(&h_cost), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]);
                 memcpy((void *)(&h_updating_graph_mask), (void *)(&tmp), sizeof(void *));
             }
@@ -246,15 +246,15 @@ class pragma153_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]);
                 memcpy((void *)(&h_updating_graph_mask), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_mask - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_mask), (void *)(&tmp), sizeof(void *));
             }
-            if (h_h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_h_graph_visited - (char *)host_allocations[i]);
                 memcpy((void *)(&h_graph_visited), (void *)(&tmp), sizeof(void *));
             }

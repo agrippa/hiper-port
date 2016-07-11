@@ -119,11 +119,11 @@ class pragma63_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_dst == NULL && (char *)h_dst >= (char *)host_allocations[i] && ((char *)h_dst - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (dst == NULL && (char *)h_dst >= (char *)host_allocations[i] && ((char *)h_dst - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_dst - (char *)host_allocations[i]);
                 memcpy((void *)(&dst), (void *)(&tmp), sizeof(void *));
             }
-            if (h_src == NULL && (char *)h_src >= (char *)host_allocations[i] && ((char *)h_src - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (src == NULL && (char *)h_src >= (char *)host_allocations[i] && ((char *)h_src - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_src - (char *)host_allocations[i]);
                 memcpy((void *)(&src), (void *)(&tmp), sizeof(void *));
             }
@@ -244,7 +244,7 @@ class pragma112_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
                 memcpy((void *)(&variables), (void *)(&tmp), sizeof(void *));
             }
@@ -397,15 +397,15 @@ class pragma165_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
                 memcpy((void *)(&variables), (void *)(&tmp), sizeof(void *));
             }
-            if (h_step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_step_factors - (char *)host_allocations[i]);
                 memcpy((void *)(&step_factors), (void *)(&tmp), sizeof(void *));
             }
-            if (h_areas == NULL && (char *)h_areas >= (char *)host_allocations[i] && ((char *)h_areas - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (areas == NULL && (char *)h_areas >= (char *)host_allocations[i] && ((char *)h_areas - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_areas - (char *)host_allocations[i]);
                 memcpy((void *)(&areas), (void *)(&tmp), sizeof(void *));
             }
@@ -579,19 +579,19 @@ class pragma196_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
                 memcpy((void *)(&variables), (void *)(&tmp), sizeof(void *));
             }
-            if (h_elements_surrounding_elements == NULL && (char *)h_elements_surrounding_elements >= (char *)host_allocations[i] && ((char *)h_elements_surrounding_elements - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (elements_surrounding_elements == NULL && (char *)h_elements_surrounding_elements >= (char *)host_allocations[i] && ((char *)h_elements_surrounding_elements - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_elements_surrounding_elements - (char *)host_allocations[i]);
                 memcpy((void *)(&elements_surrounding_elements), (void *)(&tmp), sizeof(void *));
             }
-            if (h_normals == NULL && (char *)h_normals >= (char *)host_allocations[i] && ((char *)h_normals - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (normals == NULL && (char *)h_normals >= (char *)host_allocations[i] && ((char *)h_normals - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_normals - (char *)host_allocations[i]);
                 memcpy((void *)(&normals), (void *)(&tmp), sizeof(void *));
             }
-            if (h_fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_fluxes - (char *)host_allocations[i]);
                 memcpy((void *)(&fluxes), (void *)(&tmp), sizeof(void *));
             }
@@ -813,19 +813,19 @@ class pragma327_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_step_factors - (char *)host_allocations[i]);
                 memcpy((void *)(&step_factors), (void *)(&tmp), sizeof(void *));
             }
-            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
                 memcpy((void *)(&variables), (void *)(&tmp), sizeof(void *));
             }
-            if (h_old_variables == NULL && (char *)h_old_variables >= (char *)host_allocations[i] && ((char *)h_old_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (old_variables == NULL && (char *)h_old_variables >= (char *)host_allocations[i] && ((char *)h_old_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_old_variables - (char *)host_allocations[i]);
                 memcpy((void *)(&old_variables), (void *)(&tmp), sizeof(void *));
             }
-            if (h_fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_fluxes - (char *)host_allocations[i]);
                 memcpy((void *)(&fluxes), (void *)(&tmp), sizeof(void *));
             }

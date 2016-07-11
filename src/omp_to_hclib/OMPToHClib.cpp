@@ -1176,7 +1176,7 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
             e = toBeTransferred->end(); i != e; i++) {
         OMPVarInfo curr = *i;
         const std::string varname = curr.getDecl()->getNameAsString();
-        ss << "            if (h_" << varname << " == NULL && (char *)h_" << varname <<
+        ss << "            if (" << varname << " == NULL && (char *)h_" << varname <<
             " >= (char *)host_allocations[i] && ((char *)h_" << varname <<
             " - (char *)host_allocations[i]) < host_allocation_sizes[i]) {" <<
             std::endl;

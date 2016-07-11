@@ -186,35 +186,35 @@ class pragma123_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_box == NULL && (char *)h_box >= (char *)host_allocations[i] && ((char *)h_box - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (box == NULL && (char *)h_box >= (char *)host_allocations[i] && ((char *)h_box - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_box - (char *)host_allocations[i]);
                 memcpy((void *)(&box), (void *)(&tmp), sizeof(void *));
             }
-            if (h_rA == NULL && (char *)h_rA >= (char *)host_allocations[i] && ((char *)h_rA - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (rA == NULL && (char *)h_rA >= (char *)host_allocations[i] && ((char *)h_rA - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_rA - (char *)host_allocations[i]);
                 memcpy((void *)(&rA), (void *)(&tmp), sizeof(void *));
             }
-            if (h_rv == NULL && (char *)h_rv >= (char *)host_allocations[i] && ((char *)h_rv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (rv == NULL && (char *)h_rv >= (char *)host_allocations[i] && ((char *)h_rv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_rv - (char *)host_allocations[i]);
                 memcpy((void *)(&rv), (void *)(&tmp), sizeof(void *));
             }
-            if (h_fA == NULL && (char *)h_fA >= (char *)host_allocations[i] && ((char *)h_fA - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (fA == NULL && (char *)h_fA >= (char *)host_allocations[i] && ((char *)h_fA - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_fA - (char *)host_allocations[i]);
                 memcpy((void *)(&fA), (void *)(&tmp), sizeof(void *));
             }
-            if (h_fv == NULL && (char *)h_fv >= (char *)host_allocations[i] && ((char *)h_fv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (fv == NULL && (char *)h_fv >= (char *)host_allocations[i] && ((char *)h_fv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_fv - (char *)host_allocations[i]);
                 memcpy((void *)(&fv), (void *)(&tmp), sizeof(void *));
             }
-            if (h_rB == NULL && (char *)h_rB >= (char *)host_allocations[i] && ((char *)h_rB - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (rB == NULL && (char *)h_rB >= (char *)host_allocations[i] && ((char *)h_rB - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_rB - (char *)host_allocations[i]);
                 memcpy((void *)(&rB), (void *)(&tmp), sizeof(void *));
             }
-            if (h_qB == NULL && (char *)h_qB >= (char *)host_allocations[i] && ((char *)h_qB - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (qB == NULL && (char *)h_qB >= (char *)host_allocations[i] && ((char *)h_qB - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_qB - (char *)host_allocations[i]);
                 memcpy((void *)(&qB), (void *)(&tmp), sizeof(void *));
             }
-            if (h_qv == NULL && (char *)h_qv >= (char *)host_allocations[i] && ((char *)h_qv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+            if (qv == NULL && (char *)h_qv >= (char *)host_allocations[i] && ((char *)h_qv - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_qv - (char *)host_allocations[i]);
                 memcpy((void *)(&qv), (void *)(&tmp), sizeof(void *));
             }
