@@ -140,23 +140,23 @@ class pragma93_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_knodes == NULL && h_knodes >= host_allocations[i] && (h_knodes - host_allocations[i]) < host_allocation_sizes[i]) {
-                knodes = device_allocations[i] + (h_knodes - host_allocations[i]);
+            if (h_knodes == NULL && (char *)h_knodes >= (char *)host_allocations[i] && ((char *)h_knodes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                knodes = (char *)device_allocations[i] + ((char *)h_knodes - (char *)host_allocations[i]);
             }
-            if (h_currKnode == NULL && h_currKnode >= host_allocations[i] && (h_currKnode - host_allocations[i]) < host_allocation_sizes[i]) {
-                currKnode = device_allocations[i] + (h_currKnode - host_allocations[i]);
+            if (h_currKnode == NULL && (char *)h_currKnode >= (char *)host_allocations[i] && ((char *)h_currKnode - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                currKnode = (char *)device_allocations[i] + ((char *)h_currKnode - (char *)host_allocations[i]);
             }
-            if (h_keys == NULL && h_keys >= host_allocations[i] && (h_keys - host_allocations[i]) < host_allocation_sizes[i]) {
-                keys = device_allocations[i] + (h_keys - host_allocations[i]);
+            if (h_keys == NULL && (char *)h_keys >= (char *)host_allocations[i] && ((char *)h_keys - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                keys = (char *)device_allocations[i] + ((char *)h_keys - (char *)host_allocations[i]);
             }
-            if (h_offset == NULL && h_offset >= host_allocations[i] && (h_offset - host_allocations[i]) < host_allocation_sizes[i]) {
-                offset = device_allocations[i] + (h_offset - host_allocations[i]);
+            if (h_offset == NULL && (char *)h_offset >= (char *)host_allocations[i] && ((char *)h_offset - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                offset = (char *)device_allocations[i] + ((char *)h_offset - (char *)host_allocations[i]);
             }
-            if (h_ans == NULL && h_ans >= host_allocations[i] && (h_ans - host_allocations[i]) < host_allocation_sizes[i]) {
-                ans = device_allocations[i] + (h_ans - host_allocations[i]);
+            if (h_ans == NULL && (char *)h_ans >= (char *)host_allocations[i] && ((char *)h_ans - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                ans = (char *)device_allocations[i] + ((char *)h_ans - (char *)host_allocations[i]);
             }
-            if (h_records == NULL && h_records >= host_allocations[i] && (h_records - host_allocations[i]) < host_allocation_sizes[i]) {
-                records = device_allocations[i] + (h_records - host_allocations[i]);
+            if (h_records == NULL && (char *)h_records >= (char *)host_allocations[i] && ((char *)h_records - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                records = (char *)device_allocations[i] + ((char *)h_records - (char *)host_allocations[i]);
             }
         }
 

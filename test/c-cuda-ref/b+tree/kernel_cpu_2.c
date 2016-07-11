@@ -161,32 +161,32 @@ class pragma103_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_knodes == NULL && h_knodes >= host_allocations[i] && (h_knodes - host_allocations[i]) < host_allocation_sizes[i]) {
-                knodes = device_allocations[i] + (h_knodes - host_allocations[i]);
+            if (h_knodes == NULL && (char *)h_knodes >= (char *)host_allocations[i] && ((char *)h_knodes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                knodes = (char *)device_allocations[i] + ((char *)h_knodes - (char *)host_allocations[i]);
             }
-            if (h_currKnode == NULL && h_currKnode >= host_allocations[i] && (h_currKnode - host_allocations[i]) < host_allocation_sizes[i]) {
-                currKnode = device_allocations[i] + (h_currKnode - host_allocations[i]);
+            if (h_currKnode == NULL && (char *)h_currKnode >= (char *)host_allocations[i] && ((char *)h_currKnode - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                currKnode = (char *)device_allocations[i] + ((char *)h_currKnode - (char *)host_allocations[i]);
             }
-            if (h_start == NULL && h_start >= host_allocations[i] && (h_start - host_allocations[i]) < host_allocation_sizes[i]) {
-                start = device_allocations[i] + (h_start - host_allocations[i]);
+            if (h_start == NULL && (char *)h_start >= (char *)host_allocations[i] && ((char *)h_start - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                start = (char *)device_allocations[i] + ((char *)h_start - (char *)host_allocations[i]);
             }
-            if (h_offset == NULL && h_offset >= host_allocations[i] && (h_offset - host_allocations[i]) < host_allocation_sizes[i]) {
-                offset = device_allocations[i] + (h_offset - host_allocations[i]);
+            if (h_offset == NULL && (char *)h_offset >= (char *)host_allocations[i] && ((char *)h_offset - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                offset = (char *)device_allocations[i] + ((char *)h_offset - (char *)host_allocations[i]);
             }
-            if (h_lastKnode == NULL && h_lastKnode >= host_allocations[i] && (h_lastKnode - host_allocations[i]) < host_allocation_sizes[i]) {
-                lastKnode = device_allocations[i] + (h_lastKnode - host_allocations[i]);
+            if (h_lastKnode == NULL && (char *)h_lastKnode >= (char *)host_allocations[i] && ((char *)h_lastKnode - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                lastKnode = (char *)device_allocations[i] + ((char *)h_lastKnode - (char *)host_allocations[i]);
             }
-            if (h_end == NULL && h_end >= host_allocations[i] && (h_end - host_allocations[i]) < host_allocation_sizes[i]) {
-                end = device_allocations[i] + (h_end - host_allocations[i]);
+            if (h_end == NULL && (char *)h_end >= (char *)host_allocations[i] && ((char *)h_end - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                end = (char *)device_allocations[i] + ((char *)h_end - (char *)host_allocations[i]);
             }
-            if (h_offset_2 == NULL && h_offset_2 >= host_allocations[i] && (h_offset_2 - host_allocations[i]) < host_allocation_sizes[i]) {
-                offset_2 = device_allocations[i] + (h_offset_2 - host_allocations[i]);
+            if (h_offset_2 == NULL && (char *)h_offset_2 >= (char *)host_allocations[i] && ((char *)h_offset_2 - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                offset_2 = (char *)device_allocations[i] + ((char *)h_offset_2 - (char *)host_allocations[i]);
             }
-            if (h_recstart == NULL && h_recstart >= host_allocations[i] && (h_recstart - host_allocations[i]) < host_allocation_sizes[i]) {
-                recstart = device_allocations[i] + (h_recstart - host_allocations[i]);
+            if (h_recstart == NULL && (char *)h_recstart >= (char *)host_allocations[i] && ((char *)h_recstart - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                recstart = (char *)device_allocations[i] + ((char *)h_recstart - (char *)host_allocations[i]);
             }
-            if (h_reclength == NULL && h_reclength >= host_allocations[i] && (h_reclength - host_allocations[i]) < host_allocation_sizes[i]) {
-                reclength = device_allocations[i] + (h_reclength - host_allocations[i]);
+            if (h_reclength == NULL && (char *)h_reclength >= (char *)host_allocations[i] && ((char *)h_reclength - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                reclength = (char *)device_allocations[i] + ((char *)h_reclength - (char *)host_allocations[i]);
             }
         }
 
