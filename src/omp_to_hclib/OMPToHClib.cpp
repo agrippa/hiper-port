@@ -1176,12 +1176,12 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
             e = toBeTransferred->end(); i != e; i++) {
         OMPVarInfo curr = *i;
         const std::string varname = curr.getDecl()->getNameAsString();
-        ss << "            if (h_" << varname << " == NULL && h_" << varname <<
-            " >= host_allocations[i] && (h_" << varname <<
-            " - host_allocations[i]) < host_allocation_sizes[i]) {" <<
+        ss << "            if (h_" << varname << " == NULL && (char *)h_" << varname <<
+            " >= (char *)host_allocations[i] && ((char *)h_" << varname <<
+            " - (char *)host_allocations[i]) < host_allocation_sizes[i]) {" <<
             std::endl;
-        ss << "                " << varname << " = device_allocations[i] + " <<
-            "(h_" << varname << " - host_allocations[i]);" << std::endl;
+        ss << "                " << varname << " = (char *)device_allocations[i] + " <<
+            "((char *)h_" << varname << " - (char *)host_allocations[i]);" << std::endl;
         ss << "            }" << std::endl;
     }
     ss << "        }" << std::endl;

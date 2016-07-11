@@ -127,23 +127,23 @@ class pragma136_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_h_graph_mask == NULL && h_h_graph_mask >= host_allocations[i] && (h_h_graph_mask - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_mask = device_allocations[i] + (h_h_graph_mask - host_allocations[i]);
+            if (h_h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_mask = (char *)device_allocations[i] + ((char *)h_h_graph_mask - (char *)host_allocations[i]);
             }
-            if (h_h_graph_nodes == NULL && h_h_graph_nodes >= host_allocations[i] && (h_h_graph_nodes - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_nodes = device_allocations[i] + (h_h_graph_nodes - host_allocations[i]);
+            if (h_h_graph_nodes == NULL && (char *)h_h_graph_nodes >= (char *)host_allocations[i] && ((char *)h_h_graph_nodes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_nodes = (char *)device_allocations[i] + ((char *)h_h_graph_nodes - (char *)host_allocations[i]);
             }
-            if (h_h_graph_edges == NULL && h_h_graph_edges >= host_allocations[i] && (h_h_graph_edges - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_edges = device_allocations[i] + (h_h_graph_edges - host_allocations[i]);
+            if (h_h_graph_edges == NULL && (char *)h_h_graph_edges >= (char *)host_allocations[i] && ((char *)h_h_graph_edges - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_edges = (char *)device_allocations[i] + ((char *)h_h_graph_edges - (char *)host_allocations[i]);
             }
-            if (h_h_graph_visited == NULL && h_h_graph_visited >= host_allocations[i] && (h_h_graph_visited - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_visited = device_allocations[i] + (h_h_graph_visited - host_allocations[i]);
+            if (h_h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_visited = (char *)device_allocations[i] + ((char *)h_h_graph_visited - (char *)host_allocations[i]);
             }
-            if (h_h_cost == NULL && h_h_cost >= host_allocations[i] && (h_h_cost - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_cost = device_allocations[i] + (h_h_cost - host_allocations[i]);
+            if (h_h_cost == NULL && (char *)h_h_cost >= (char *)host_allocations[i] && ((char *)h_h_cost - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_cost = (char *)device_allocations[i] + ((char *)h_h_cost - (char *)host_allocations[i]);
             }
-            if (h_h_updating_graph_mask == NULL && h_h_updating_graph_mask >= host_allocations[i] && (h_h_updating_graph_mask - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_updating_graph_mask = device_allocations[i] + (h_h_updating_graph_mask - host_allocations[i]);
+            if (h_h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_updating_graph_mask = (char *)device_allocations[i] + ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]);
             }
         }
 
@@ -240,14 +240,14 @@ class pragma153_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_h_updating_graph_mask == NULL && h_h_updating_graph_mask >= host_allocations[i] && (h_h_updating_graph_mask - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_updating_graph_mask = device_allocations[i] + (h_h_updating_graph_mask - host_allocations[i]);
+            if (h_h_updating_graph_mask == NULL && (char *)h_h_updating_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_updating_graph_mask = (char *)device_allocations[i] + ((char *)h_h_updating_graph_mask - (char *)host_allocations[i]);
             }
-            if (h_h_graph_mask == NULL && h_h_graph_mask >= host_allocations[i] && (h_h_graph_mask - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_mask = device_allocations[i] + (h_h_graph_mask - host_allocations[i]);
+            if (h_h_graph_mask == NULL && (char *)h_h_graph_mask >= (char *)host_allocations[i] && ((char *)h_h_graph_mask - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_mask = (char *)device_allocations[i] + ((char *)h_h_graph_mask - (char *)host_allocations[i]);
             }
-            if (h_h_graph_visited == NULL && h_h_graph_visited >= host_allocations[i] && (h_h_graph_visited - host_allocations[i]) < host_allocation_sizes[i]) {
-                h_graph_visited = device_allocations[i] + (h_h_graph_visited - host_allocations[i]);
+            if (h_h_graph_visited == NULL && (char *)h_h_graph_visited >= (char *)host_allocations[i] && ((char *)h_h_graph_visited - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                h_graph_visited = (char *)device_allocations[i] + ((char *)h_h_graph_visited - (char *)host_allocations[i]);
             }
         }
 

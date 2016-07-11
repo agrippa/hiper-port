@@ -162,14 +162,14 @@ class pragma72_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_power == NULL && h_power >= host_allocations[i] && (h_power - host_allocations[i]) < host_allocation_sizes[i]) {
-                power = device_allocations[i] + (h_power - host_allocations[i]);
+            if (h_power == NULL && (char *)h_power >= (char *)host_allocations[i] && ((char *)h_power - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                power = (char *)device_allocations[i] + ((char *)h_power - (char *)host_allocations[i]);
             }
-            if (h_temp == NULL && h_temp >= host_allocations[i] && (h_temp - host_allocations[i]) < host_allocation_sizes[i]) {
-                temp = device_allocations[i] + (h_temp - host_allocations[i]);
+            if (h_temp == NULL && (char *)h_temp >= (char *)host_allocations[i] && ((char *)h_temp - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                temp = (char *)device_allocations[i] + ((char *)h_temp - (char *)host_allocations[i]);
             }
-            if (h_result == NULL && h_result >= host_allocations[i] && (h_result - host_allocations[i]) < host_allocation_sizes[i]) {
-                result = device_allocations[i] + (h_result - host_allocations[i]);
+            if (h_result == NULL && (char *)h_result >= (char *)host_allocations[i] && ((char *)h_result - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                result = (char *)device_allocations[i] + ((char *)h_result - (char *)host_allocations[i]);
             }
         }
 

@@ -189,11 +189,11 @@ class pragma110_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_referrence == NULL && h_referrence >= host_allocations[i] && (h_referrence - host_allocations[i]) < host_allocation_sizes[i]) {
-                referrence = device_allocations[i] + (h_referrence - host_allocations[i]);
+            if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                referrence = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
             }
-            if (h_input_itemsets == NULL && h_input_itemsets >= host_allocations[i] && (h_input_itemsets - host_allocations[i]) < host_allocation_sizes[i]) {
-                input_itemsets = device_allocations[i] + (h_input_itemsets - host_allocations[i]);
+            if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                input_itemsets = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
             }
         }
 
@@ -334,11 +334,11 @@ class pragma162_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_referrence == NULL && h_referrence >= host_allocations[i] && (h_referrence - host_allocations[i]) < host_allocation_sizes[i]) {
-                referrence = device_allocations[i] + (h_referrence - host_allocations[i]);
+            if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                referrence = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
             }
-            if (h_input_itemsets == NULL && h_input_itemsets >= host_allocations[i] && (h_input_itemsets - host_allocations[i]) < host_allocation_sizes[i]) {
-                input_itemsets = device_allocations[i] + (h_input_itemsets - host_allocations[i]);
+            if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                input_itemsets = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
             }
         }
 

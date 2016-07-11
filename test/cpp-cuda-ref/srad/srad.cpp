@@ -168,35 +168,35 @@ class pragma135_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_J == NULL && h_J >= host_allocations[i] && (h_J - host_allocations[i]) < host_allocation_sizes[i]) {
-                J = device_allocations[i] + (h_J - host_allocations[i]);
+            if (h_J == NULL && (char *)h_J >= (char *)host_allocations[i] && ((char *)h_J - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                J = (char *)device_allocations[i] + ((char *)h_J - (char *)host_allocations[i]);
             }
-            if (h_dN == NULL && h_dN >= host_allocations[i] && (h_dN - host_allocations[i]) < host_allocation_sizes[i]) {
-                dN = device_allocations[i] + (h_dN - host_allocations[i]);
+            if (h_dN == NULL && (char *)h_dN >= (char *)host_allocations[i] && ((char *)h_dN - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dN = (char *)device_allocations[i] + ((char *)h_dN - (char *)host_allocations[i]);
             }
-            if (h_iN == NULL && h_iN >= host_allocations[i] && (h_iN - host_allocations[i]) < host_allocation_sizes[i]) {
-                iN = device_allocations[i] + (h_iN - host_allocations[i]);
+            if (h_iN == NULL && (char *)h_iN >= (char *)host_allocations[i] && ((char *)h_iN - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                iN = (char *)device_allocations[i] + ((char *)h_iN - (char *)host_allocations[i]);
             }
-            if (h_dS == NULL && h_dS >= host_allocations[i] && (h_dS - host_allocations[i]) < host_allocation_sizes[i]) {
-                dS = device_allocations[i] + (h_dS - host_allocations[i]);
+            if (h_dS == NULL && (char *)h_dS >= (char *)host_allocations[i] && ((char *)h_dS - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dS = (char *)device_allocations[i] + ((char *)h_dS - (char *)host_allocations[i]);
             }
-            if (h_iS == NULL && h_iS >= host_allocations[i] && (h_iS - host_allocations[i]) < host_allocation_sizes[i]) {
-                iS = device_allocations[i] + (h_iS - host_allocations[i]);
+            if (h_iS == NULL && (char *)h_iS >= (char *)host_allocations[i] && ((char *)h_iS - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                iS = (char *)device_allocations[i] + ((char *)h_iS - (char *)host_allocations[i]);
             }
-            if (h_dW == NULL && h_dW >= host_allocations[i] && (h_dW - host_allocations[i]) < host_allocation_sizes[i]) {
-                dW = device_allocations[i] + (h_dW - host_allocations[i]);
+            if (h_dW == NULL && (char *)h_dW >= (char *)host_allocations[i] && ((char *)h_dW - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dW = (char *)device_allocations[i] + ((char *)h_dW - (char *)host_allocations[i]);
             }
-            if (h_jW == NULL && h_jW >= host_allocations[i] && (h_jW - host_allocations[i]) < host_allocation_sizes[i]) {
-                jW = device_allocations[i] + (h_jW - host_allocations[i]);
+            if (h_jW == NULL && (char *)h_jW >= (char *)host_allocations[i] && ((char *)h_jW - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                jW = (char *)device_allocations[i] + ((char *)h_jW - (char *)host_allocations[i]);
             }
-            if (h_dE == NULL && h_dE >= host_allocations[i] && (h_dE - host_allocations[i]) < host_allocation_sizes[i]) {
-                dE = device_allocations[i] + (h_dE - host_allocations[i]);
+            if (h_dE == NULL && (char *)h_dE >= (char *)host_allocations[i] && ((char *)h_dE - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dE = (char *)device_allocations[i] + ((char *)h_dE - (char *)host_allocations[i]);
             }
-            if (h_jE == NULL && h_jE >= host_allocations[i] && (h_jE - host_allocations[i]) < host_allocation_sizes[i]) {
-                jE = device_allocations[i] + (h_jE - host_allocations[i]);
+            if (h_jE == NULL && (char *)h_jE >= (char *)host_allocations[i] && ((char *)h_jE - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                jE = (char *)device_allocations[i] + ((char *)h_jE - (char *)host_allocations[i]);
             }
-            if (h_c == NULL && h_c >= host_allocations[i] && (h_c - host_allocations[i]) < host_allocation_sizes[i]) {
-                c = device_allocations[i] + (h_c - host_allocations[i]);
+            if (h_c == NULL && (char *)h_c >= (char *)host_allocations[i] && ((char *)h_c - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                c = (char *)device_allocations[i] + ((char *)h_c - (char *)host_allocations[i]);
             }
         }
 
@@ -361,29 +361,29 @@ class pragma168_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_c == NULL && h_c >= host_allocations[i] && (h_c - host_allocations[i]) < host_allocation_sizes[i]) {
-                c = device_allocations[i] + (h_c - host_allocations[i]);
+            if (h_c == NULL && (char *)h_c >= (char *)host_allocations[i] && ((char *)h_c - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                c = (char *)device_allocations[i] + ((char *)h_c - (char *)host_allocations[i]);
             }
-            if (h_iS == NULL && h_iS >= host_allocations[i] && (h_iS - host_allocations[i]) < host_allocation_sizes[i]) {
-                iS = device_allocations[i] + (h_iS - host_allocations[i]);
+            if (h_iS == NULL && (char *)h_iS >= (char *)host_allocations[i] && ((char *)h_iS - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                iS = (char *)device_allocations[i] + ((char *)h_iS - (char *)host_allocations[i]);
             }
-            if (h_jE == NULL && h_jE >= host_allocations[i] && (h_jE - host_allocations[i]) < host_allocation_sizes[i]) {
-                jE = device_allocations[i] + (h_jE - host_allocations[i]);
+            if (h_jE == NULL && (char *)h_jE >= (char *)host_allocations[i] && ((char *)h_jE - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                jE = (char *)device_allocations[i] + ((char *)h_jE - (char *)host_allocations[i]);
             }
-            if (h_dN == NULL && h_dN >= host_allocations[i] && (h_dN - host_allocations[i]) < host_allocation_sizes[i]) {
-                dN = device_allocations[i] + (h_dN - host_allocations[i]);
+            if (h_dN == NULL && (char *)h_dN >= (char *)host_allocations[i] && ((char *)h_dN - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dN = (char *)device_allocations[i] + ((char *)h_dN - (char *)host_allocations[i]);
             }
-            if (h_dS == NULL && h_dS >= host_allocations[i] && (h_dS - host_allocations[i]) < host_allocation_sizes[i]) {
-                dS = device_allocations[i] + (h_dS - host_allocations[i]);
+            if (h_dS == NULL && (char *)h_dS >= (char *)host_allocations[i] && ((char *)h_dS - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dS = (char *)device_allocations[i] + ((char *)h_dS - (char *)host_allocations[i]);
             }
-            if (h_dW == NULL && h_dW >= host_allocations[i] && (h_dW - host_allocations[i]) < host_allocation_sizes[i]) {
-                dW = device_allocations[i] + (h_dW - host_allocations[i]);
+            if (h_dW == NULL && (char *)h_dW >= (char *)host_allocations[i] && ((char *)h_dW - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dW = (char *)device_allocations[i] + ((char *)h_dW - (char *)host_allocations[i]);
             }
-            if (h_dE == NULL && h_dE >= host_allocations[i] && (h_dE - host_allocations[i]) < host_allocation_sizes[i]) {
-                dE = device_allocations[i] + (h_dE - host_allocations[i]);
+            if (h_dE == NULL && (char *)h_dE >= (char *)host_allocations[i] && ((char *)h_dE - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dE = (char *)device_allocations[i] + ((char *)h_dE - (char *)host_allocations[i]);
             }
-            if (h_J == NULL && h_J >= host_allocations[i] && (h_J - host_allocations[i]) < host_allocation_sizes[i]) {
-                J = device_allocations[i] + (h_J - host_allocations[i]);
+            if (h_J == NULL && (char *)h_J >= (char *)host_allocations[i] && ((char *)h_J - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                J = (char *)device_allocations[i] + ((char *)h_J - (char *)host_allocations[i]);
             }
         }
 

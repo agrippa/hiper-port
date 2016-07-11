@@ -119,11 +119,11 @@ class pragma63_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_dst == NULL && h_dst >= host_allocations[i] && (h_dst - host_allocations[i]) < host_allocation_sizes[i]) {
-                dst = device_allocations[i] + (h_dst - host_allocations[i]);
+            if (h_dst == NULL && (char *)h_dst >= (char *)host_allocations[i] && ((char *)h_dst - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                dst = (char *)device_allocations[i] + ((char *)h_dst - (char *)host_allocations[i]);
             }
-            if (h_src == NULL && h_src >= host_allocations[i] && (h_src - host_allocations[i]) < host_allocation_sizes[i]) {
-                src = device_allocations[i] + (h_src - host_allocations[i]);
+            if (h_src == NULL && (char *)h_src >= (char *)host_allocations[i] && ((char *)h_src - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                src = (char *)device_allocations[i] + ((char *)h_src - (char *)host_allocations[i]);
             }
         }
 
@@ -242,8 +242,8 @@ class pragma112_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && h_variables >= host_allocations[i] && (h_variables - host_allocations[i]) < host_allocation_sizes[i]) {
-                variables = device_allocations[i] + (h_variables - host_allocations[i]);
+            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                variables = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
             }
         }
 
@@ -394,14 +394,14 @@ class pragma165_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && h_variables >= host_allocations[i] && (h_variables - host_allocations[i]) < host_allocation_sizes[i]) {
-                variables = device_allocations[i] + (h_variables - host_allocations[i]);
+            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                variables = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
             }
-            if (h_step_factors == NULL && h_step_factors >= host_allocations[i] && (h_step_factors - host_allocations[i]) < host_allocation_sizes[i]) {
-                step_factors = device_allocations[i] + (h_step_factors - host_allocations[i]);
+            if (h_step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                step_factors = (char *)device_allocations[i] + ((char *)h_step_factors - (char *)host_allocations[i]);
             }
-            if (h_areas == NULL && h_areas >= host_allocations[i] && (h_areas - host_allocations[i]) < host_allocation_sizes[i]) {
-                areas = device_allocations[i] + (h_areas - host_allocations[i]);
+            if (h_areas == NULL && (char *)h_areas >= (char *)host_allocations[i] && ((char *)h_areas - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                areas = (char *)device_allocations[i] + ((char *)h_areas - (char *)host_allocations[i]);
             }
         }
 
@@ -573,17 +573,17 @@ class pragma196_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_variables == NULL && h_variables >= host_allocations[i] && (h_variables - host_allocations[i]) < host_allocation_sizes[i]) {
-                variables = device_allocations[i] + (h_variables - host_allocations[i]);
+            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                variables = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
             }
-            if (h_elements_surrounding_elements == NULL && h_elements_surrounding_elements >= host_allocations[i] && (h_elements_surrounding_elements - host_allocations[i]) < host_allocation_sizes[i]) {
-                elements_surrounding_elements = device_allocations[i] + (h_elements_surrounding_elements - host_allocations[i]);
+            if (h_elements_surrounding_elements == NULL && (char *)h_elements_surrounding_elements >= (char *)host_allocations[i] && ((char *)h_elements_surrounding_elements - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                elements_surrounding_elements = (char *)device_allocations[i] + ((char *)h_elements_surrounding_elements - (char *)host_allocations[i]);
             }
-            if (h_normals == NULL && h_normals >= host_allocations[i] && (h_normals - host_allocations[i]) < host_allocation_sizes[i]) {
-                normals = device_allocations[i] + (h_normals - host_allocations[i]);
+            if (h_normals == NULL && (char *)h_normals >= (char *)host_allocations[i] && ((char *)h_normals - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                normals = (char *)device_allocations[i] + ((char *)h_normals - (char *)host_allocations[i]);
             }
-            if (h_fluxes == NULL && h_fluxes >= host_allocations[i] && (h_fluxes - host_allocations[i]) < host_allocation_sizes[i]) {
-                fluxes = device_allocations[i] + (h_fluxes - host_allocations[i]);
+            if (h_fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                fluxes = (char *)device_allocations[i] + ((char *)h_fluxes - (char *)host_allocations[i]);
             }
         }
 
@@ -803,17 +803,17 @@ class pragma327_omp_parallel_hclib_async {
             fprintf(stderr, "CUDA Error @ %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err));
             exit(3);
         }
-            if (h_step_factors == NULL && h_step_factors >= host_allocations[i] && (h_step_factors - host_allocations[i]) < host_allocation_sizes[i]) {
-                step_factors = device_allocations[i] + (h_step_factors - host_allocations[i]);
+            if (h_step_factors == NULL && (char *)h_step_factors >= (char *)host_allocations[i] && ((char *)h_step_factors - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                step_factors = (char *)device_allocations[i] + ((char *)h_step_factors - (char *)host_allocations[i]);
             }
-            if (h_variables == NULL && h_variables >= host_allocations[i] && (h_variables - host_allocations[i]) < host_allocation_sizes[i]) {
-                variables = device_allocations[i] + (h_variables - host_allocations[i]);
+            if (h_variables == NULL && (char *)h_variables >= (char *)host_allocations[i] && ((char *)h_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                variables = (char *)device_allocations[i] + ((char *)h_variables - (char *)host_allocations[i]);
             }
-            if (h_old_variables == NULL && h_old_variables >= host_allocations[i] && (h_old_variables - host_allocations[i]) < host_allocation_sizes[i]) {
-                old_variables = device_allocations[i] + (h_old_variables - host_allocations[i]);
+            if (h_old_variables == NULL && (char *)h_old_variables >= (char *)host_allocations[i] && ((char *)h_old_variables - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                old_variables = (char *)device_allocations[i] + ((char *)h_old_variables - (char *)host_allocations[i]);
             }
-            if (h_fluxes == NULL && h_fluxes >= host_allocations[i] && (h_fluxes - host_allocations[i]) < host_allocation_sizes[i]) {
-                fluxes = device_allocations[i] + (h_fluxes - host_allocations[i]);
+            if (h_fluxes == NULL && (char *)h_fluxes >= (char *)host_allocations[i] && ((char *)h_fluxes - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
+                fluxes = (char *)device_allocations[i] + ((char *)h_fluxes - (char *)host_allocations[i]);
             }
         }
 
