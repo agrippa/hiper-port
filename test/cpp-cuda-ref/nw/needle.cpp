@@ -15,7 +15,15 @@ static void kernel_launcher(unsigned niters, functor_type functor) {
     const int threads_per_block = 256;
     const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
     functor.transfer_to_device();
+    const unsigned long long start = capp_current_time_ns();
     wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "CUDA Error while synchronizing kernel - %s\n", cudaGetErrorString(err));
+        exit(2);
+    }
+    const unsigned long long end = capp_current_time_ns();
+    fprintf(stderr, "CAPP %llu ns\n", end - start);
     functor.transfer_from_device();
 }
 #ifdef __cplusplus
