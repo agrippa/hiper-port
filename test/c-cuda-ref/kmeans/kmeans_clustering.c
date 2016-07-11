@@ -252,19 +252,24 @@ float euclid_dist_2(float *pt1,
             exit(3);
         }
             if (h_feature == NULL && (char *)h_feature >= (char *)host_allocations[i] && ((char *)h_feature - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                feature = (char *)device_allocations[i] + ((char *)h_feature - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_feature - (char *)host_allocations[i]);
+                memcpy(&feature, &tmp, sizeof(void *));
             }
             if (h_clusters == NULL && (char *)h_clusters >= (char *)host_allocations[i] && ((char *)h_clusters - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                clusters = (char *)device_allocations[i] + ((char *)h_clusters - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_clusters - (char *)host_allocations[i]);
+                memcpy(&clusters, &tmp, sizeof(void *));
             }
             if (h_membership == NULL && (char *)h_membership >= (char *)host_allocations[i] && ((char *)h_membership - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                membership = (char *)device_allocations[i] + ((char *)h_membership - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_membership - (char *)host_allocations[i]);
+                memcpy(&membership, &tmp, sizeof(void *));
             }
             if (h_partial_new_centers_len == NULL && (char *)h_partial_new_centers_len >= (char *)host_allocations[i] && ((char *)h_partial_new_centers_len - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                partial_new_centers_len = (char *)device_allocations[i] + ((char *)h_partial_new_centers_len - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_partial_new_centers_len - (char *)host_allocations[i]);
+                memcpy(&partial_new_centers_len, &tmp, sizeof(void *));
             }
             if (h_partial_new_centers == NULL && (char *)h_partial_new_centers >= (char *)host_allocations[i] && ((char *)h_partial_new_centers - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                partial_new_centers = (char *)device_allocations[i] + ((char *)h_partial_new_centers - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_partial_new_centers - (char *)host_allocations[i]);
+                memcpy(&partial_new_centers, &tmp, sizeof(void *));
             }
         }
 

@@ -190,10 +190,12 @@ class pragma110_omp_parallel_hclib_async {
             exit(3);
         }
             if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                referrence = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
+                memcpy(&referrence, &tmp, sizeof(void *));
             }
             if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                input_itemsets = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
+                memcpy(&input_itemsets, &tmp, sizeof(void *));
             }
         }
 
@@ -335,10 +337,12 @@ class pragma162_omp_parallel_hclib_async {
             exit(3);
         }
             if (h_referrence == NULL && (char *)h_referrence >= (char *)host_allocations[i] && ((char *)h_referrence - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                referrence = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_referrence - (char *)host_allocations[i]);
+                memcpy(&referrence, &tmp, sizeof(void *));
             }
             if (h_input_itemsets == NULL && (char *)h_input_itemsets >= (char *)host_allocations[i] && ((char *)h_input_itemsets - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
-                input_itemsets = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
+                char *tmp = (char *)device_allocations[i] + ((char *)h_input_itemsets - (char *)host_allocations[i]);
+                memcpy(&input_itemsets, &tmp, sizeof(void *));
             }
         }
 

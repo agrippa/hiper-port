@@ -1180,8 +1180,11 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
             " >= (char *)host_allocations[i] && ((char *)h_" << varname <<
             " - (char *)host_allocations[i]) < host_allocation_sizes[i]) {" <<
             std::endl;
-        ss << "                " << varname << " = (char *)device_allocations[i] + " <<
-            "((char *)h_" << varname << " - (char *)host_allocations[i]);" << std::endl;
+        ss << "                char *tmp = (char *)device_allocations[i] + " <<
+            "((char *)h_" << varname << " - (char *)host_allocations[i]);" <<
+            std::endl;
+        ss << "                memcpy(&" << varname <<
+            ", &tmp, sizeof(void *));" << std::endl;
         ss << "            }" << std::endl;
     }
     ss << "        }" << std::endl;
