@@ -1192,7 +1192,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
             e = toBeTransferred->end(); i != e; i++) {
         OMPVarInfo curr = *i;
-        ss << "        assert(" << curr.getDecl()->getNameAsString() << ");" <<
+        ss << "        assert(" << curr.getDecl()->getNameAsString() <<
+            " || h_" << curr.getDecl()->getNameAsString() << " == NULL);" <<
             std::endl;
     }
     ss << std::endl;
