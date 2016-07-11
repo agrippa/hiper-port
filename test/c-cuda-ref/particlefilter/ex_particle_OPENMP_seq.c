@@ -416,7 +416,7 @@ class pragma383_omp_parallel_hclib_async {
         }
             if (h_weights == NULL && (char *)h_weights >= (char *)host_allocations[i] && ((char *)h_weights - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_weights - (char *)host_allocations[i]);
-                memcpy(&weights, &tmp, sizeof(void *));
+                memcpy((void *)(&weights), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -500,11 +500,11 @@ class pragma398_omp_parallel_hclib_async {
         }
             if (h_arrayX == NULL && (char *)h_arrayX >= (char *)host_allocations[i] && ((char *)h_arrayX - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayX - (char *)host_allocations[i]);
-                memcpy(&arrayX, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayX), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayY == NULL && (char *)h_arrayY >= (char *)host_allocations[i] && ((char *)h_arrayY - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayY - (char *)host_allocations[i]);
-                memcpy(&arrayY, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayY), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -615,15 +615,15 @@ class pragma412_omp_parallel_hclib_async {
         }
             if (h_arrayX == NULL && (char *)h_arrayX >= (char *)host_allocations[i] && ((char *)h_arrayX - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayX - (char *)host_allocations[i]);
-                memcpy(&arrayX, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayX), (void *)(&tmp), sizeof(void *));
             }
             if (h_seed == NULL && (char *)h_seed >= (char *)host_allocations[i] && ((char *)h_seed - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_seed - (char *)host_allocations[i]);
-                memcpy(&seed, &tmp, sizeof(void *));
+                memcpy((void *)(&seed), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayY == NULL && (char *)h_arrayY >= (char *)host_allocations[i] && ((char *)h_arrayY - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayY - (char *)host_allocations[i]);
-                memcpy(&arrayY, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayY), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -757,27 +757,27 @@ class pragma420_omp_parallel_hclib_async {
         }
             if (h_arrayX == NULL && (char *)h_arrayX >= (char *)host_allocations[i] && ((char *)h_arrayX - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayX - (char *)host_allocations[i]);
-                memcpy(&arrayX, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayX), (void *)(&tmp), sizeof(void *));
             }
             if (h_objxy == NULL && (char *)h_objxy >= (char *)host_allocations[i] && ((char *)h_objxy - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_objxy - (char *)host_allocations[i]);
-                memcpy(&objxy, &tmp, sizeof(void *));
+                memcpy((void *)(&objxy), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayY == NULL && (char *)h_arrayY >= (char *)host_allocations[i] && ((char *)h_arrayY - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayY - (char *)host_allocations[i]);
-                memcpy(&arrayY, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayY), (void *)(&tmp), sizeof(void *));
             }
             if (h_ind == NULL && (char *)h_ind >= (char *)host_allocations[i] && ((char *)h_ind - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_ind - (char *)host_allocations[i]);
-                memcpy(&ind, &tmp, sizeof(void *));
+                memcpy((void *)(&ind), (void *)(&tmp), sizeof(void *));
             }
             if (h_likelihood == NULL && (char *)h_likelihood >= (char *)host_allocations[i] && ((char *)h_likelihood - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_likelihood - (char *)host_allocations[i]);
-                memcpy(&likelihood, &tmp, sizeof(void *));
+                memcpy((void *)(&likelihood), (void *)(&tmp), sizeof(void *));
             }
             if (h_I == NULL && (char *)h_I >= (char *)host_allocations[i] && ((char *)h_I - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_I - (char *)host_allocations[i]);
-                memcpy(&I, &tmp, sizeof(void *));
+                memcpy((void *)(&I), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -875,11 +875,11 @@ class pragma443_omp_parallel_hclib_async {
         }
             if (h_weights == NULL && (char *)h_weights >= (char *)host_allocations[i] && ((char *)h_weights - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_weights - (char *)host_allocations[i]);
-                memcpy(&weights, &tmp, sizeof(void *));
+                memcpy((void *)(&weights), (void *)(&tmp), sizeof(void *));
             }
             if (h_likelihood == NULL && (char *)h_likelihood >= (char *)host_allocations[i] && ((char *)h_likelihood - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_likelihood - (char *)host_allocations[i]);
-                memcpy(&likelihood, &tmp, sizeof(void *));
+                memcpy((void *)(&likelihood), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -956,7 +956,7 @@ class pragma450_omp_parallel_hclib_async {
         }
             if (h_weights == NULL && (char *)h_weights >= (char *)host_allocations[i] && ((char *)h_weights - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_weights - (char *)host_allocations[i]);
-                memcpy(&weights, &tmp, sizeof(void *));
+                memcpy((void *)(&weights), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -1032,7 +1032,7 @@ class pragma456_omp_parallel_hclib_async {
         }
             if (h_weights == NULL && (char *)h_weights >= (char *)host_allocations[i] && ((char *)h_weights - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_weights - (char *)host_allocations[i]);
-                memcpy(&weights, &tmp, sizeof(void *));
+                memcpy((void *)(&weights), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -1121,15 +1121,15 @@ class pragma465_omp_parallel_hclib_async {
         }
             if (h_arrayX == NULL && (char *)h_arrayX >= (char *)host_allocations[i] && ((char *)h_arrayX - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayX - (char *)host_allocations[i]);
-                memcpy(&arrayX, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayX), (void *)(&tmp), sizeof(void *));
             }
             if (h_weights == NULL && (char *)h_weights >= (char *)host_allocations[i] && ((char *)h_weights - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_weights - (char *)host_allocations[i]);
-                memcpy(&weights, &tmp, sizeof(void *));
+                memcpy((void *)(&weights), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayY == NULL && (char *)h_arrayY >= (char *)host_allocations[i] && ((char *)h_arrayY - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayY - (char *)host_allocations[i]);
-                memcpy(&arrayY, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayY), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -1211,7 +1211,7 @@ class pragma490_omp_parallel_hclib_async {
         }
             if (h_u == NULL && (char *)h_u >= (char *)host_allocations[i] && ((char *)h_u - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_u - (char *)host_allocations[i]);
-                memcpy(&u, &tmp, sizeof(void *));
+                memcpy((void *)(&u), (void *)(&tmp), sizeof(void *));
             }
         }
 
@@ -1331,27 +1331,27 @@ class pragma498_omp_parallel_hclib_async {
         }
             if (h_CDF == NULL && (char *)h_CDF >= (char *)host_allocations[i] && ((char *)h_CDF - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_CDF - (char *)host_allocations[i]);
-                memcpy(&CDF, &tmp, sizeof(void *));
+                memcpy((void *)(&CDF), (void *)(&tmp), sizeof(void *));
             }
             if (h_u == NULL && (char *)h_u >= (char *)host_allocations[i] && ((char *)h_u - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_u - (char *)host_allocations[i]);
-                memcpy(&u, &tmp, sizeof(void *));
+                memcpy((void *)(&u), (void *)(&tmp), sizeof(void *));
             }
             if (h_xj == NULL && (char *)h_xj >= (char *)host_allocations[i] && ((char *)h_xj - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_xj - (char *)host_allocations[i]);
-                memcpy(&xj, &tmp, sizeof(void *));
+                memcpy((void *)(&xj), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayX == NULL && (char *)h_arrayX >= (char *)host_allocations[i] && ((char *)h_arrayX - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayX - (char *)host_allocations[i]);
-                memcpy(&arrayX, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayX), (void *)(&tmp), sizeof(void *));
             }
             if (h_yj == NULL && (char *)h_yj >= (char *)host_allocations[i] && ((char *)h_yj - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_yj - (char *)host_allocations[i]);
-                memcpy(&yj, &tmp, sizeof(void *));
+                memcpy((void *)(&yj), (void *)(&tmp), sizeof(void *));
             }
             if (h_arrayY == NULL && (char *)h_arrayY >= (char *)host_allocations[i] && ((char *)h_arrayY - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_arrayY - (char *)host_allocations[i]);
-                memcpy(&arrayY, &tmp, sizeof(void *));
+                memcpy((void *)(&arrayY), (void *)(&tmp), sizeof(void *));
             }
         }
 

@@ -164,15 +164,15 @@ class pragma72_omp_parallel_hclib_async {
         }
             if (h_power == NULL && (char *)h_power >= (char *)host_allocations[i] && ((char *)h_power - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_power - (char *)host_allocations[i]);
-                memcpy(&power, &tmp, sizeof(void *));
+                memcpy((void *)(&power), (void *)(&tmp), sizeof(void *));
             }
             if (h_temp == NULL && (char *)h_temp >= (char *)host_allocations[i] && ((char *)h_temp - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_temp - (char *)host_allocations[i]);
-                memcpy(&temp, &tmp, sizeof(void *));
+                memcpy((void *)(&temp), (void *)(&tmp), sizeof(void *));
             }
             if (h_result == NULL && (char *)h_result >= (char *)host_allocations[i] && ((char *)h_result - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_result - (char *)host_allocations[i]);
-                memcpy(&result, &tmp, sizeof(void *));
+                memcpy((void *)(&result), (void *)(&tmp), sizeof(void *));
             }
         }
 

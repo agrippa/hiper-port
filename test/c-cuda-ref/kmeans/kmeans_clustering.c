@@ -253,23 +253,23 @@ float euclid_dist_2(float *pt1,
         }
             if (h_feature == NULL && (char *)h_feature >= (char *)host_allocations[i] && ((char *)h_feature - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_feature - (char *)host_allocations[i]);
-                memcpy(&feature, &tmp, sizeof(void *));
+                memcpy((void *)(&feature), (void *)(&tmp), sizeof(void *));
             }
             if (h_clusters == NULL && (char *)h_clusters >= (char *)host_allocations[i] && ((char *)h_clusters - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_clusters - (char *)host_allocations[i]);
-                memcpy(&clusters, &tmp, sizeof(void *));
+                memcpy((void *)(&clusters), (void *)(&tmp), sizeof(void *));
             }
             if (h_membership == NULL && (char *)h_membership >= (char *)host_allocations[i] && ((char *)h_membership - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_membership - (char *)host_allocations[i]);
-                memcpy(&membership, &tmp, sizeof(void *));
+                memcpy((void *)(&membership), (void *)(&tmp), sizeof(void *));
             }
             if (h_partial_new_centers_len == NULL && (char *)h_partial_new_centers_len >= (char *)host_allocations[i] && ((char *)h_partial_new_centers_len - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_partial_new_centers_len - (char *)host_allocations[i]);
-                memcpy(&partial_new_centers_len, &tmp, sizeof(void *));
+                memcpy((void *)(&partial_new_centers_len), (void *)(&tmp), sizeof(void *));
             }
             if (h_partial_new_centers == NULL && (char *)h_partial_new_centers >= (char *)host_allocations[i] && ((char *)h_partial_new_centers - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_partial_new_centers - (char *)host_allocations[i]);
-                memcpy(&partial_new_centers, &tmp, sizeof(void *));
+                memcpy((void *)(&partial_new_centers), (void *)(&tmp), sizeof(void *));
             }
         }
 

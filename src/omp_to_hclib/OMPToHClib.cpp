@@ -1183,8 +1183,8 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
         ss << "                char *tmp = (char *)device_allocations[i] + " <<
             "((char *)h_" << varname << " - (char *)host_allocations[i]);" <<
             std::endl;
-        ss << "                memcpy(&" << varname <<
-            ", &tmp, sizeof(void *));" << std::endl;
+        ss << "                memcpy((void *)(&" << varname <<
+            "), (void *)(&tmp), sizeof(void *));" << std::endl;
         ss << "            }" << std::endl;
     }
     ss << "        }" << std::endl;

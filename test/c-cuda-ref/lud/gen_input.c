@@ -105,15 +105,15 @@ class pragma87_omp_parallel_hclib_async {
         }
             if (h_L == NULL && (char *)h_L >= (char *)host_allocations[i] && ((char *)h_L - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_L - (char *)host_allocations[i]);
-                memcpy(&L, &tmp, sizeof(void *));
+                memcpy((void *)(&L), (void *)(&tmp), sizeof(void *));
             }
             if (h_U == NULL && (char *)h_U >= (char *)host_allocations[i] && ((char *)h_U - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_U - (char *)host_allocations[i]);
-                memcpy(&U, &tmp, sizeof(void *));
+                memcpy((void *)(&U), (void *)(&tmp), sizeof(void *));
             }
             if (h_A == NULL && (char *)h_A >= (char *)host_allocations[i] && ((char *)h_A - (char *)host_allocations[i]) < host_allocation_sizes[i]) {
                 char *tmp = (char *)device_allocations[i] + ((char *)h_A - (char *)host_allocations[i]);
-                memcpy(&A, &tmp, sizeof(void *));
+                memcpy((void *)(&A), (void *)(&tmp), sizeof(void *));
             }
         }
 
