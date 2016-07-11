@@ -833,6 +833,10 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
 
     ss << "class " << closureName << " {\n";
     ss << "    private:\n";
+    ss << "        void **host_allocations;" << std::endl;
+    ss << "        size_t *host_allocation_sizes;" << std::endl;
+    ss << "        unsigned nallocations;" << std::endl;
+    ss << "        void **device_allocations;" << std::endl;
 
     for (std::vector<const clang::FunctionDecl *>::iterator i =
             info.called_begin(), e = info.called_end(); i != e; i++) {
@@ -1140,34 +1144,68 @@ std::string OMPToHClib::getCUDAFunctorDef(std::string closureName,
     ss << "        }" << std::endl;
     ss << std::endl;
     ss << "    void transfer_to_device() {" << std::endl;
+    ss << "        int i;" << std::endl;
     ss << "        cudaError_t err;" << std::endl;
+    ss << std::endl;
+    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
+            e = toBeTransferred->end(); i != e; i++) {
+        OMPVarInfo curr = *i;
+        ss << "        " << curr.getDecl()->getNameAsString() << " = NULL;" <<
+            std::endl;
+    }
+    ss << std::endl;
+    ss << "        get_underlying_allocations(&host_allocations, " <<
+        "&host_allocation_sizes, &nallocations, " << toBeTransferred->size();
+    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
+            e = toBeTransferred->end(); i != e; i++) {
+        OMPVarInfo curr = *i;
+        ss << ", h_" << curr.getDecl()->getNameAsString();
+    }
+    ss << ");" << std::endl;
+    ss << "        device_allocations = (void **)malloc(" <<
+        "nallocations * sizeof(void *));" << std::endl;
+    ss << "        for (i = 0; i < nallocations; i++) {" << std::endl;
+    ss << "            err = cudaMalloc((void **)&device_allocations[i], " <<
+        "host_allocation_sizes[i]);" << std::endl;
+    ss << cudaErrorCheckingStr;
+    ss << "            err = cudaMemcpy((void *)device_allocations[i], " <<
+        "(void *)host_allocations[i], host_allocation_sizes[i], " <<
+        "cudaMemcpyHostToDevice);" << std::endl;
+    ss << cudaErrorCheckingStr;
     for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
             e = toBeTransferred->end(); i != e; i++) {
         OMPVarInfo curr = *i;
         const std::string varname = curr.getDecl()->getNameAsString();
-        ss << "        err = cudaMalloc((void **)&" << varname <<
-            ", get_size_from_allocation(h_" << varname << "));" << std::endl;
-        ss << cudaErrorCheckingStr;
-        ss << "        err = cudaMemcpy((void *)" << varname <<
-            ", (void *)h_" << varname << ", get_size_from_allocation(h_" <<
-            varname << "), cudaMemcpyHostToDevice);" << std::endl;
-        ss << cudaErrorCheckingStr;
+        ss << "            if (h_" << varname << " == NULL && h_" << varname <<
+            " >= host_allocations[i] && (h_" << varname <<
+            " - host_allocations[i]) < host_allocation_sizes[i]) {" <<
+            std::endl;
+        ss << "                " << varname << " = device_allocations[i] + " <<
+            "(h_" << varname << " - host_allocations[i]);" << std::endl;
+        ss << "            }" << std::endl;
     }
+    ss << "        }" << std::endl;
+    ss << std::endl;
+    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
+            e = toBeTransferred->end(); i != e; i++) {
+        OMPVarInfo curr = *i;
+        ss << "        assert(" << curr.getDecl()->getNameAsString() << ");" <<
+            std::endl;
+    }
+    ss << std::endl;
     ss << "    }" << std::endl;
     ss << std::endl;
     ss << "    void transfer_from_device() {" << std::endl;
     ss << "        cudaError_t err;" << std::endl;
-    for (std::vector<OMPVarInfo>::iterator i = toBeTransferred->begin(),
-            e = toBeTransferred->end(); i != e; i++) {
-        OMPVarInfo curr = *i;
-        const std::string varname = curr.getDecl()->getNameAsString();
-        ss << "        err = cudaMemcpy((void *)h_" << varname <<
-            ", (void *)" << varname << ", get_size_from_allocation(h_" <<
-            varname << "), cudaMemcpyDeviceToHost);" << std::endl;
-        ss << cudaErrorCheckingStr;
-        ss << "        err = cudaFree(" << varname << ");" << std::endl;
-        ss << cudaErrorCheckingStr;
-    }
+    ss << "        int i;" << std::endl;
+    ss << "        for (i = 0; i < nallocations; i++) {" << std::endl;
+    ss << "            err = cudaMemcpy((void *)host_allocations[i], " <<
+        "(void *)device_allocations[i], host_allocation_sizes[i], " <<
+        "cudaMemcpyDeviceToHost);" << std::endl;
+    ss << cudaErrorCheckingStr;
+    ss << "            err = cudaFree(device_allocations[i]);" << std::endl;
+    ss << cudaErrorCheckingStr;
+    ss << "        }" << std::endl;
     ss << "    }" << std::endl;
     ss << std::endl;
     ss << "        __device__ void operator()(int " << iterator << ") {\n";
