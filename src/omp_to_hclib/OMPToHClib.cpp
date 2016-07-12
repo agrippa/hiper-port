@@ -2000,7 +2000,8 @@ void OMPToHClib::postFunctionVisit(clang::FunctionDecl *func) {
                             contextCreation << "const int niters = (" <<
                                 accumulated_high.at(0) << ") - (" <<
                                 accumulated_low.at(0) << ");" << std::endl;
-                            contextCreation << "kernel_launcher(niters, " <<
+                            contextCreation << "kernel_launcher(\"" <<
+                                node->getLbl() << "\", niters, " <<
                                 node->getLbl() << ASYNC_SUFFIX <<
                                 "(" << constructor_params.str() <<
                                 "));" << std::endl;
