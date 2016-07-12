@@ -1,5 +1,6 @@
 #include <sys/time.h>
 #include <time.h>
+#include <stdio.h>
 static unsigned long long current_time_ns() {
 #ifdef __MACH__
     clock_serv_t cclock;
