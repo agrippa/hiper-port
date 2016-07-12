@@ -139,7 +139,7 @@ for (i = 0; i < rec_count; i++){
             float tmp_lat = atof(rec_iter);
             float tmp_long = atof(rec_iter+5);
 			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
-        } ; 
+        }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma118_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -162,7 +162,7 @@ printf("pragma118_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	}
+	} ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 //End while loop

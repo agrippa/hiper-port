@@ -430,7 +430,7 @@ for ( i = k1; i < k2; i++ ) {
       int assign = points->p[i].assign;
       lower[center_table[assign]] += current_cost - x_cost;			
     }
-  } ; 
+  }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma390_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -495,7 +495,7 @@ for ( int i = k1; i < k2; i++ ) {
 					dist(points->p[i], points->p[x], points->dim);
 				points->p[i].assign = x;
       }
-    } ; 
+    }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma466_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -816,7 +816,7 @@ while(1) {
       { 
 	break;
       }
-  }
+  } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

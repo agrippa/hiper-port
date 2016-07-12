@@ -518,7 +518,7 @@ for (si = 0; si < nseqs; si++) {
          } // for (j)
       } // end parallel for (i)
    } // end parallel
-   }
+   } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

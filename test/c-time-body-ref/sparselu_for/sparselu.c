@@ -310,7 +310,7 @@ for (kk=0; kk<bots_arg_size; kk++)
    }
    }
    bots_message(" completed!\n");
-   }
+   } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

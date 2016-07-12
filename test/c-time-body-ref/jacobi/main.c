@@ -229,7 +229,7 @@ const unsigned long long full_program_start = current_time_ns();
     if (params.string2display !=0)
       printf("%s", params.string2display);
     printf("\n");
-    }
+    } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

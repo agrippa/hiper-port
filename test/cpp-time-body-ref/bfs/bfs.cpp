@@ -157,7 +157,7 @@ for(int tid = 0; tid < no_of_nodes; tid++ )
                         }
                     }
                 }
-            } ; 
+            }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma127_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -172,14 +172,14 @@ for(int tid=0; tid< no_of_nodes ; tid++ )
                     stop=true;
                     h_updating_graph_mask[tid]=false;
                 }
-            } ; 
+            }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma144_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
             k++;
         }
 	while(stop);
-    }
+    } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

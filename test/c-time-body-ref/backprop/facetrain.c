@@ -40,7 +40,7 @@ const unsigned long long full_program_start = current_time_ns();
 {
     float out_err, hid_err;
     bpnn_train_kernel(net, &out_err, &hid_err);
-  }
+  } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

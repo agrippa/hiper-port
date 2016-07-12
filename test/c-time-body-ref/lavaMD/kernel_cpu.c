@@ -209,11 +209,11 @@ for(l=0; l<dim.number_boxes; l=l+1){
 
 		} // for k
 
-	} ; 
+	}
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma114_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
  // for l
-    }
+    } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 

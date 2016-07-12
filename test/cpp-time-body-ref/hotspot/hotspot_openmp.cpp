@@ -156,7 +156,7 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
                     (amb_temp - temp[r*col+c]) * Rz_1));
             }
         }
-    } ; 
+    }
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma63_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -311,7 +311,7 @@ int main(int argc, char **argv)
     long long start_time = get_time();
 
 const unsigned long long full_program_start = current_time_ns();
-compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols)
+compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 ;

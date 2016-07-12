@@ -745,7 +745,7 @@ const unsigned long long full_program_start = current_time_ns();
   t2 = uts_wctime();
   et = t2 - t1;
   showStats(et);
-  }
+  } ; 
 const unsigned long long full_program_end = current_time_ns();
 printf("full_program %llu ns", full_program_end - full_program_start);
 
