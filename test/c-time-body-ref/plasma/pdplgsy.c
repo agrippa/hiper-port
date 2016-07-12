@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /**
  *
  * @file pdplgsy.c
@@ -39,12 +56,8 @@ void plasma_pdplgsy_quark( double bump, PLASMA_desc A, unsigned long long int se
 #if defined(USE_OMPEXT)
 omp_set_task_affinity( (n%4)*6+(m%6) );
 #endif
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(out:dA[0:ldam*tempnn]) untied
-#else
 #pragma omp task depend(out:dA[0:ldam*tempnn])
-#endif
-            CORE_dplgsy( bump, tempmm, tempnn, dA, ldam, A.m, m*A.mb, n*A.nb, seed );
+CORE_dplgsy( bump, tempmm, tempnn, dA, ldam, A.m, m*A.mb, n*A.nb, seed );
         }
     }
 }

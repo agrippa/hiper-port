@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /*
  *         ---- The Unbalanced Tree Search (UTS) Benchmark ----
  *  
@@ -477,8 +494,8 @@ void genChildren(Node * parent, Node * child) {
   t_metadata[omp_get_thread_num()].ntasks += 1;
 #endif
 
-#pragma omp atomic
-  n_nodes += 1;
+#pragma omp atomic 
+n_nodes += 1;
 
   numChildren = uts_numChildren(parent);
   childType   = uts_childType(parent);
@@ -512,12 +529,8 @@ void genChildren(Node * parent, Node * child) {
 
       Node parent = *child;
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
-#else
-#pragma omp task  firstprivate(parent) if(parent.height < 9)
-#endif
-      {
+#pragma omp task untied firstprivate(parent) if(parent.height < 9)
+{
           Node child;
           initNode(&child);
 
@@ -527,8 +540,8 @@ void genChildren(Node * parent, Node * child) {
       }
     }
   } else {
-#pragma omp atomic
-      n_leaves += 1;
+#pragma omp atomic 
+n_leaves += 1;
   }
 }
 
@@ -705,7 +718,8 @@ int main(int argc, char *argv[]) {
     initHist();
 #endif  
 
-  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+const unsigned long long full_program_start = current_time_ns();
+{
   /* cancellable barrier initialization (single threaded under OMP) */
 
   double t1, t2, et;
@@ -718,10 +732,10 @@ int main(int argc, char *argv[]) {
   t1 = uts_wctime();
 
 /********** SPMD Parallel Region **********/
-#pragma omp parallel
-  {
-#pragma omp single
-      {
+#pragma omp parallel 
+{
+#pragma omp single 
+{
           Node child;
           initNode(&child);
           genChildren(&root, &child);
@@ -731,7 +745,10 @@ int main(int argc, char *argv[]) {
   t2 = uts_wctime();
   et = t2 - t1;
   showStats(et);
-  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  }
+const unsigned long long full_program_end = current_time_ns();
+printf("full_program %llu ns", full_program_end - full_program_start);
+
 /********** End Parallel Region **********/
 
   return 0;

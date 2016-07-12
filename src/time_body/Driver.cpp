@@ -22,8 +22,14 @@ using namespace clang::tooling;
 
 static llvm::cl::OptionCategory ToolingSampleCategory("omp-to-hclib options");
 static llvm::cl::opt<std::string> outputFile("o");
+static llvm::cl::opt<std::string> enableFullProgram("f");
+static llvm::cl::opt<std::string> enableParallelFor("l");
 
 static TimeBodyPass *transform = NULL;
+FunctionDecl *curr_func_decl = NULL;
+std::vector<ValueDecl *> globals;
+std::vector<std::string> discoveredGlobals;
+int timingScope = NONE;
 
 class TransformASTConsumer : public ASTConsumer {
 public:
@@ -36,7 +42,10 @@ public:
 
           std::cerr << "Visiting " << fdecl->getNameAsString() << std::endl;
 
+          curr_func_decl = fdecl;
+          transform->preFunctionVisit(fdecl);
           transform->Visit(fdecl->getBody());
+          transform->postFunctionVisit(fdecl);
       }
   }
 
@@ -47,12 +56,46 @@ public:
     transform->setRewriter(R);
     transform->setContext(Context);
 
+    for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
+        Decl *toplevel = *b;
+
+        if (VarDecl *vdecl = clang::dyn_cast<VarDecl>(toplevel)) {
+            clang::ValueDecl *asValue = clang::dyn_cast<clang::ValueDecl>(
+                    toplevel);
+            if (std::find(discoveredGlobals.begin(), discoveredGlobals.end(),
+                        asValue->getNameAsString()) == discoveredGlobals.end()) {
+                globals.push_back(asValue);
+            }
+            discoveredGlobals.push_back(asValue->getNameAsString());
+        } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(
+                    toplevel)) {
+            for (DeclContext::decl_iterator di = ldecl->decls_begin(),
+                    de = ldecl->decls_end(); di != de; di++) {
+                Decl *curr_linkage_decl = *di;
+                if (VarDecl *vdecl = clang::dyn_cast<VarDecl>(
+                            curr_linkage_decl)) {
+                    clang::ValueDecl *asValue =
+                        clang::dyn_cast<clang::ValueDecl>(curr_linkage_decl);
+                    if (std::find(discoveredGlobals.begin(),
+                                discoveredGlobals.end(),
+                                asValue->getNameAsString()) ==
+                            discoveredGlobals.end()) {
+                        globals.push_back(asValue);
+                    }
+                    discoveredGlobals.push_back(asValue->getNameAsString());
+                }
+            }
+        }
+    }
+
     // For each top-level function defined
     for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
         Decl *toplevel = *b;
 
         if (FunctionDecl *fdecl = clang::dyn_cast<FunctionDecl>(toplevel)) {
             handleFunctionDecl(fdecl);
+        } else if (FunctionTemplateDecl *tdecl = clang::dyn_cast<FunctionTemplateDecl>(toplevel)) {
+            handleFunctionDecl(tdecl->getTemplatedDecl());
         } else if (LinkageSpecDecl *ldecl = clang::dyn_cast<LinkageSpecDecl>(
                     toplevel)) {
             for (DeclContext::decl_iterator di = ldecl->decls_begin(),
@@ -127,6 +170,16 @@ int main(int argc, const char **argv) {
   CommonOptionsParser op(argc, argv, ToolingSampleCategory);
 
   check_opt(outputFile, "Output file");
+  // check_opt(enableFullProgram, "Enable full program");
+  // check_opt(enableParallelFor, "Enable parallel for");
+
+  if (std::string(enableFullProgram.c_str()) == "enable") {
+      timingScope |= FULL_PROGRAM;
+  }
+
+  if (std::string(enableParallelFor.c_str()) == "enable") {
+      timingScope |= PARALLEL_FOR;
+  }
 
   assert(op.getSourcePathList().size() == 1);
 

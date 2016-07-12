@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /**
  *
  * @file pdgetrf_rectil.c
@@ -54,12 +71,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
         double *dA = A(k, k);
         int *dB = IPIV(k);
         PLASMA_desc pDesc = plasma_desc_submatrix(A, tempk, k*A.nb, tempm, tempkn);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:A.mb*A.nb]) depend(out:dB[0:pDesc.n]) untied
-#else
 #pragma omp task depend(inout:dA[0:A.mb*A.nb]) depend(out:dB[0:pDesc.n])
-#endif
-        {
+{
             int info[3];
             info[1] = 0;
             info[2] = 1;
@@ -81,12 +94,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
             double *dA = A(k, n);
             double *dB = A(k, k);
             int *dipiv = IPIV(k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:1]) depend(in:dB[0:ldak], dipiv[0:tempkm]) untied
-#else
 #pragma omp task depend(inout:dA[0:1]) depend(in:dB[0:ldak], dipiv[0:tempkm])
-#endif
-            CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak);
+CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak);
 
             m = k+1;
             if ( m < A.mt ) {
@@ -96,12 +105,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
                 double *dA = A(m , k);
                 double *dB = A(k , n);
                 double *dC = A(m , n);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb]) untied
-#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])
-#endif
-                cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                         tempmm, tempnn, A.nb,
                         mzone, dA, ldam,
                         dB, ldak,
@@ -117,12 +122,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
                     double *dC = A(m , n);
                     double *fake1 = A(k+1, n);
                     double *fake2 = (double *)fakedep;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb]) untied
-#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb])
-#endif
-                        cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                                 tempmm, tempnn, A.nb,
                                 mzone, dA, ldam,
                                 dB, ldak,
@@ -153,12 +154,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
             double *prevSwap = A(k-1, n);
             int *dipiv = IPIV(k);
             PLASMA_desc descA = plasma_desc_submatrix(A, tempk, n*A.nb, tempm, tempnn);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb]) untied
-#else
 #pragma omp task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb])
-#endif
-            CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
+CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
         }
     }
 }

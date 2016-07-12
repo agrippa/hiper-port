@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /**
  *
  * @file pdgeqrf.c
@@ -42,12 +59,8 @@ void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 #if defined(USE_OMPEXT)
 omp_set_task_priority(1);
 #endif
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout: dA[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb]) untied
-#else
 #pragma omp task depend(inout: dA[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])
-#endif
-        {
+{
             double tau[T.nb];
             double work[ib * T.nb];
             CORE_dgeqrt(tempkm, tempkn, ib, dA, ldak, dT, T.mb, &tau[0], &work[0]);
@@ -58,12 +71,8 @@ omp_set_task_priority(1);
             double *dA = A(k, k);
             double *dT = T(k, k);
             double *dC = A(k, n);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in: dA[0:T.nb*T.nb], dT[0:ib*T.nb]) depend(inout:dC[0:T.nb*T.nb]) untied
-#else
 #pragma omp task depend(in: dA[0:T.nb*T.nb], dT[0:ib*T.nb]) depend(inout:dC[0:T.nb*T.nb])
-#endif
-            {
+{
                 double work[T.nb * ib];
                 CORE_dormqr(PlasmaLeft, PlasmaTrans,
                         tempkm, tempnn, tempkm, ib,
@@ -79,12 +88,8 @@ omp_set_task_priority(1);
             double *dA = A(k, k);
             double *dB = A(m, k);
             double *dT = T(m, k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb]) untied
-#else
 #pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])
-#endif
-            {
+{
                 double tau[T.nb];
                 double work[ib * T.nb];
                 CORE_dtsqrt(tempmm, tempkn, ib,
@@ -99,12 +104,8 @@ omp_set_task_priority(1);
                 double *dB = A(m, n);
                 double *dV = A(m, k);
                 double *dT = T(m, k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(in:dV[0:T.nb*T.nb], dT[0:ib*T.nb]) untied
-#else
 #pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(in:dV[0:T.nb*T.nb], dT[0:ib*T.nb])
-#endif
-                {
+{
                     double work[ib * T.nb];
                     CORE_dtsmqr(PlasmaLeft, PlasmaTrans,
                             A.mb, tempnn, tempmm, tempnn, A.nb, ib,

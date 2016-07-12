@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /**
  *
  * @file pdpotrf.c
@@ -55,12 +72,8 @@ void plasma_pdpotrf_quark(PLASMA_enum uplo, PLASMA_desc A)
 #if defined(USE_OMPEXT)
 omp_set_task_priority(1);
 #endif
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:A.mb*A.mb]) untied
-#else
 #pragma omp task depend(inout:dA[0:A.mb*A.mb])
-#endif
-            {
+{
                 LAPACKE_dpotrf_work(LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), tempkm, dA, ldak);
             }
 
@@ -68,12 +81,8 @@ omp_set_task_priority(1);
                 tempmm = m == A.nt-1 ? A.n-m*A.nb : A.nb;
                 double *dA = A(k, k);
                 double *dB = A(k, m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
-#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
-#endif
-                cblas_dtrsm(
+cblas_dtrsm(
                         CblasColMajor,
                         (CBLAS_SIDE)PlasmaLeft, (CBLAS_UPLO)PlasmaUpper,
                         (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_DIAG)PlasmaNonUnit,
@@ -86,12 +95,8 @@ omp_set_task_priority(1);
                 ldam = BLKLDD(A, m);
                 double *dA = A(k, m);
                 double *dB = A(m, m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
-#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
-#endif
-                {
+{
                     cblas_dsyrk(
                             CblasColMajor,
                             (CBLAS_UPLO)PlasmaUpper, (CBLAS_TRANSPOSE)PlasmaTrans,
@@ -104,12 +109,8 @@ omp_set_task_priority(1);
                     double *dA = A(k , n);
                     double *dB = A(k , m);
                     double *dC = A(n , m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb]) untied
-#else
 #pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])
-#endif
-                    cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                             A.mb, tempmm, A.mb,
                             mzone, dA, ldak,
                             dB, ldak,

@@ -80,7 +80,7 @@ for FILE in $FILES; do
 
     CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $TEST_OUTPUT -I $DIRNAME -v -l HCLIB"
     CUDA_CMD="$SCRIPT_DIR/../src/omp_to_hclib.sh -i $FILE -o $CUDA_OUTPUT -I $DIRNAME -v -l CUDA"
-    TIME_BODY_CMD="$SCRIPT_DIR/../src/time_body.sh -i $FILE -o $TIME_BODY_OUTPUT -I $DIRNAME -v"
+    TIME_BODY_CMD="$SCRIPT_DIR/../src/time_body.sh -i $FILE -o $TIME_BODY_OUTPUT -I $DIRNAME -v -f -p"
     BALANCE_CMD="$SCRIPT_DIR/../src/measure_load_balance.sh -i $FILE -o $BALANCE_OUTPUT -I $DIRNAME -v"
     for P in "${!defines[@]}"; do
         if [[ "$(stat_file $P)" == "$(stat_file $FILE)" ]]; then

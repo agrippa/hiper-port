@@ -1,4 +1,21 @@
-#include "hclib.h"
+#include <sys/time.h>
+#include <time.h>
+unsigned long long current_time_ns() {
+#ifdef __MACH__
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    unsigned long long s = 1000000000ULL * (unsigned long long)mts.tv_sec;
+    return (unsigned long long)mts.tv_nsec + s;
+#else
+    struct timespec t ={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    unsigned long long s = 1000000000ULL * (unsigned long long)t.tv_sec;
+    return (((unsigned long long)t.tv_nsec)) + s;
+#endif
+}
 /**
  *
  * @generated d Tue Jan  7 11:45:24 2014
@@ -31,10 +48,10 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
 
     int* piv = (int*)malloc(N * sizeof(double));
 
-#pragma omp parallel
-    {
-#pragma omp single
-        {
+#pragma omp parallel 
+{
+#pragma omp single 
+{
     plasma_pdpltmg_quark(*descA, 3456);
         }
     }
@@ -47,10 +64,10 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     }
 
     START_TIMING();
-#pragma omp parallel
-    {
-#pragma omp single
-        {
+#pragma omp parallel 
+{
+#pragma omp single 
+{
     plasma_pdgetrf_rectil_quark(*descA, piv);
         }
     }
