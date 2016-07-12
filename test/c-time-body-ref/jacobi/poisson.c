@@ -111,17 +111,10 @@ double run(struct user_parameters* params)
        Set the initial solution estimate UNEW.
        We are "allowed" to pick up the boundary conditions exactly.
        */
-#pragma omp parallel
     {
-#pragma omp single
         //for collapse(2)
         for (j = 0; j < ny; j+= block_size) {
             for (i = 0; i < nx; i+= block_size) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(i,j) private(ii,jj) untied
-#else
-#pragma omp task firstprivate(i,j) private(ii,jj)
-#endif
                 for (jj=j; jj<j+block_size; ++jj) {
                     for (ii=i; ii<i+block_size; ++ii)
                     {
@@ -224,17 +217,10 @@ void rhs(int nx, int ny, double *f, int block_size)
     // The "boundary" entries of F store the boundary values of the solution.
     // The "interior" entries of F store the right hand sides of the Poisson equation.
 
-#pragma omp parallel
     {
-#pragma omp single
     //for collapse(2)
     for (j = 0; j < ny; j+=block_size) {
         for (i = 0; i < nx; i+=block_size) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(block_size,i,j,nx,ny) private(ii,jj,x,y) untied
-#else
-#pragma omp task firstprivate(block_size,i,j,nx,ny) private(ii,jj,x,y)
-#endif
             for (jj=j; jj<j+block_size; ++jj)
             {
                 y = (double) (jj) / (double) (ny - 1);

@@ -544,11 +544,12 @@ int main(int argc, char *argv []){
 	//	PROCESSING
 	//====================================================================================================
 
-		#pragma omp parallel for
-		for(i=0; i<public_s.allPoints; i++){
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for
+for(i=0; i<public_s.allPoints; i++){
 			kernel(	public_s,
 						private_s[i]);
-		}
+		} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma548_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 	//====================================================================================================
 	//	FREE MEMORY FOR FRAME

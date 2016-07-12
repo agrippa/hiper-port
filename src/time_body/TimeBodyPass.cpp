@@ -17,6 +17,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "OMPClauses.h"
 #include "TimeBodyPass.h"
 
 void TimeBodyPass::setParent(const clang::Stmt *child,
@@ -117,11 +118,7 @@ const clang::Stmt *TimeBodyPass::getBodyForMarker(const clang::CallExpr *call) {
     std::string pragmaName = getPragmaNameForMarker(call);
     std::string pragmaArgs = getPragmaArgumentsForMarker(call);
 
-    if (pragmaName == "omp_to_hclib") {
-        return getBodyFrom(call, "omp_to_hclib");
-    } else {
-        return NULL;
-    }
+    return getBodyFrom(call, pragmaName);
 }
 
 void TimeBodyPass::VisitStmt(const clang::Stmt *s) {
@@ -140,20 +137,57 @@ void TimeBodyPass::VisitStmt(const clang::Stmt *s) {
             if (call->getDirectCallee()) {
                 const clang::FunctionDecl *callee = call->getDirectCallee();
                 std::string calleeName = callee->getNameAsString();
-                bool abort = false;
 
                 if (calleeName == "hclib_pragma_marker") {
-                    const clang::Stmt *body = getBodyForMarker(call);
-                    if (body) {
-                        std::string launchBody = stmtToString(body);
+                    bool handled = false;
 
-                        std::stringstream ss;
-                        ss << "unsigned long long ____hclib_start_time = hclib_current_time_ns(); ";
-                        ss << launchBody;
-                        ss << " ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); ";
-                        ss << "printf(\"\\nHCLIB TIME \%llu ns\\n\", ____hclib_end_time - ____hclib_start_time);";
-                        bool failed = rewriter->ReplaceText(body->getSourceRange(), ss.str());
-                        assert(!failed);
+                    const clang::Stmt *body = getBodyForMarker(call);
+                    std::string pragma_type = getPragmaNameForMarker(call);
+                    std::string pragma_cmd = getPragmaArgumentsForMarker(call);
+
+                    if (pragma_type == "omp" && body) {
+                        size_t ompPragmaNameEnd = pragma_cmd.find(' ');
+
+                        std::string ompPragma, ompClauses;
+                        if (ompPragmaNameEnd == std::string::npos) {
+                            // No clauses
+                            ompPragma = pragma_cmd;
+                            ompClauses = "";
+                        } else {
+                            ompPragma = pragma_cmd.substr(0, ompPragmaNameEnd);
+                            ompClauses = pragma_cmd.substr(ompPragmaNameEnd + 1);
+                        }
+
+                        OMPClauses clauses(ompClauses);
+
+                        if (ompPragma == "parallel" &&
+                                clauses.hasClause("for")) {
+                            clang::SourceLocation start = call->getLocStart();
+                            clang::PresumedLoc presumedStart =
+                                SM->getPresumedLoc(start);
+                            int startLine = presumedStart.getLine();
+
+                            std::stringstream lbl;
+                            lbl << "pragma" << startLine << "_omp_parallel" <<
+                                std::flush;
+
+                            std::string launchBody = stmtToString(body);
+
+                            std::stringstream ss;
+                            ss << "unsigned long long ____hclib_start_time = hclib_current_time_ns();" << std::endl;
+                            ss << "#pragma omp parallel " << ompClauses << std::endl;
+                            ss << launchBody;
+                            ss << " ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); ";
+                            ss << "printf(\"" << lbl.str() <<
+                                " \%llu ns\\n\", ____hclib_end_time - " <<
+                                "____hclib_start_time);";
+                            bool failed = rewriter->ReplaceText(
+                                    clang::SourceRange(start,
+                                        body->getLocEnd()), ss.str());
+                            assert(!failed);
+
+                            handled = true;
+                        }
                     }
                 }
             }

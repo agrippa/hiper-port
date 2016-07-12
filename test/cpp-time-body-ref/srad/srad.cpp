@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
    
 	printf("Start the SRAD main loop\n");
 
-	unsigned long long ____hclib_start_time = hclib_current_time_ns(); for (iter=0; iter< niter; iter++){
+	for (iter=0; iter< niter; iter++){
 		sum=0; sum2=0;     
 		for (i=r1; i<=r2; i++) {
             for (j=c1; j<=c2; j++) {
@@ -122,8 +122,9 @@ int main(int argc, char* argv[])
         q0sqr   = varROI / (meanROI*meanROI);
 		
 
-		#pragma omp parallel for shared(J, dN, dS, dW, dE, c, rows, cols, iN, iS, jW, jE) private(i, j, k, Jc, G2, L, num, den, qsqr)
-		for (int i = 0 ; i < rows ; i++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared(J, dN, dS, dW, dE, c, rows, cols, iN, iS, jW, jE) private(i, j, k, Jc, G2, L, num, den, qsqr)
+for (int i = 0 ; i < rows ; i++) {
             for (int j = 0; j < cols; j++) { 
 		
 				k = i * cols + j;
@@ -154,9 +155,10 @@ int main(int argc, char* argv[])
    
 		}
   
-    }
-		#pragma omp parallel for shared(J, c, rows, cols, lambda) private(i, j, k, D, cS, cN, cW, cE)
-		for (int i = 0; i < rows; i++) {
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma127_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared(J, c, rows, cols, lambda) private(i, j, k, D, cS, cN, cW, cE)
+for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {        
 
                 // current index
@@ -180,9 +182,9 @@ int main(int argc, char* argv[])
 	            #ifdef OUTPUT
                 //printf("\n"); 
                 #endif //output
-	     }
+	     } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma160_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
-	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+	}
 
 
 #ifdef OUTPUT

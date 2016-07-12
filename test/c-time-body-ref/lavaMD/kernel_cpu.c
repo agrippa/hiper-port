@@ -104,14 +104,15 @@ void  kernel_cpu(	par_str par,
 
 	time3 = get_time();
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
 
 	//======================================================================================================================================================150
 	//	PROCESS INTERACTIONS
 	//======================================================================================================================================================150
 
-	#pragma omp	parallel for  				private(i, j, k)  				private(first_i, rA, fA)  				private(pointer, first_j, rB, qB)  				private(r2, u2, fs, vij, fxij, fyij, fzij, d)
-	for(l=0; l<dim.number_boxes; l=l+1){
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for private(i, j, k) private(first_i, rA, fA) private(pointer, first_j, rB, qB) private(r2, u2, fs, vij, fxij, fyij, fzij, d)
+for(l=0; l<dim.number_boxes; l=l+1){
 
 		//------------------------------------------------------------------------------------------100
 		//	home box - box parameters
@@ -190,8 +191,8 @@ void  kernel_cpu(	par_str par,
 
 		} // for k
 
-	} // for l
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma115_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time); // for l
+    }
 
 	time4 = get_time();
 

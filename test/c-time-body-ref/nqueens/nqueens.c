@@ -124,11 +124,6 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(n, csols, i, j, a, depth, solutions) untied
-#else
-#pragma omp task  firstprivate(n, csols, i, j, a, depth, solutions)
-#endif
 		{
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = (char *)malloc(n * sizeof(char));
@@ -139,20 +134,17 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
 		}
 	}
 
-	#pragma omp taskwait
 	for ( i = 0; i < n; i++) *solutions += csols[i];
     free(csols);
 }
 
 void find_queens (int size)
 {
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
 	total_count=0;
 
         bots_message("Computing N-Queens algorithm (n=%d) ", size);
-	#pragma omp parallel
 	{
-		#pragma omp single
 		{
 			char *a;
 
@@ -161,7 +153,7 @@ void find_queens (int size)
 		}
 	}
 	bots_message(" completed!\n");
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 }
 
 

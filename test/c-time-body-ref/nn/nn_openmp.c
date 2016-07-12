@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 	float *z;
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
-	unsigned long long ____hclib_start_time = hclib_current_time_ns(); while(!done) {
+	while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
 		if( rec_count != REC_WINDOW ) {
@@ -114,13 +114,14 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-        #pragma omp parallel for shared (z, target_lat, target_long) private(i,rec_iter)
-        for (i = 0; i < rec_count; i++){
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared (z, target_lat, target_long) private(i,rec_iter)
+for (i = 0; i < rec_count; i++){
 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
             float tmp_lat = atof(rec_iter);
             float tmp_long = atof(rec_iter+5);
 			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
-        }
+        } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma119_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 		
         for( i = 0 ; i < rec_count ; i++ ) {
@@ -140,7 +141,7 @@ int main(int argc, char* argv[]) {
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);//End while loop
+	}//End while loop
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {

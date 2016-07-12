@@ -178,20 +178,13 @@ unsigned long long parallel_uts ( Node *root )
 
    bots_message("Computing Unbalance Tree Search algorithm ");
 
-   unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
-   #pragma omp parallel  
+   {
        {
-      #pragma omp single nowait
            {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
         num_nodes = parTreeSearch( 0, root, root->numChildren );
            }
        }
-   } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+   }
 
    bots_message(" completed!");
 
@@ -219,15 +212,9 @@ unsigned long long parTreeSearch(int depth, Node *parent, int numChildren)
 
      nodePtr->numChildren = uts_numChildren(nodePtr);
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(i, nodePtr) shared(partialCount) untied
-#else
-#pragma omp task  firstprivate(i, nodePtr) shared(partialCount)
-#endif
         partialCount[i] = parTreeSearch(depth+1, nodePtr, nodePtr->numChildren);
   }
 
-  #pragma omp taskwait
 
   for (i = 0; i < numChildren; i++) {
      subtreesize += partialCount[i];

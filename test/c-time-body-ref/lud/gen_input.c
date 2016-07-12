@@ -59,8 +59,9 @@ int main (int argc, char **argv){
         return 1;
     }
 
-#pragma omp parallel for default(none)     private(i,j) shared(L,U,MatrixDim)
-    for (i=0; i < MatrixDim; i ++){
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(none) private(i,j) shared(L,U,MatrixDim)
+for (i=0; i < MatrixDim; i ++){
         for (j=0; j < MatrixDim; j++){
             if ( i == j) {
                 L[i * MatrixDim + j] = 1.0;
@@ -73,17 +74,18 @@ int main (int argc, char **argv){
                 U[i * MatrixDim + j] = 0;
             }
         }
-    }
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma63_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
-#pragma omp parallel for default(none)      private(i,j,k,sum) shared(L,U,A,MatrixDim)
-    for (i=0; i < MatrixDim; i++ ) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(none) private(i,j,k,sum) shared(L,U,A,MatrixDim)
+for (i=0; i < MatrixDim; i++ ) {
         for (j=0; j < MatrixDim; j++){
             sum = 0;
             for(k=0; k < MatrixDim; k++)
                 sum += L[i * MatrixDim + k]*U[k * MatrixDim + j];
             A[i * MatrixDim + j] = sum;
         }
-    }
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma79_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
     for (i=0; i < MatrixDim; i ++) {
         for (j=0; j < MatrixDim; j++)

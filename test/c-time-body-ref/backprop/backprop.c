@@ -222,9 +222,9 @@ void bpnn_layerforward(float *l1, float *l2, float **conn, int n1, int n2)
 
   /*** Set up thresholding unit ***/
   l1[0] = 1.0;
-  #pragma omp parallel for shared(conn, n1, n2, l1) private(k, j) reduction(+: sum) schedule(static)
-  /*** For each unit in second layer ***/
-  for (j = 1; j <= n2; j++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared(conn, n1, n2, l1) private(k, j) reduction(+: sum) schedule(static)
+for (j = 1; j <= n2; j++) {
 
     /*** Compute weighted sum of its inputs ***/
     sum = 0.0;
@@ -232,7 +232,7 @@ void bpnn_layerforward(float *l1, float *l2, float **conn, int n1, int n2)
       sum += conn[k][j] * l1[k]; 
     }
     l2[j] = squash(sum);
-  }
+  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma234_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 //extern "C"
@@ -284,14 +284,15 @@ void bpnn_adjust_weights(float *delta, int ndelta, float *ly, int nly, float **w
   //eta = 0.3;
   //momentum = 0.3;
 
-  #pragma omp parallel for         shared(oldw, w, delta)  	  private(j, k, new_dw)  	  firstprivate(ndelta, nly) 
-  for (j = 1; j <= ndelta; j++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared(oldw, w, delta) private(j, k, new_dw) firstprivate(ndelta, nly)
+for (j = 1; j <= ndelta; j++) {
     for (k = 0; k <= nly; k++) {
       new_dw = ((ETA * delta[j] * ly[k]) + (MOMENTUM * oldw[k][j]));
 	  w[k][j] += new_dw;
 	  oldw[k][j] = new_dw;
     }
-  }
+  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma296_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 
@@ -314,7 +315,7 @@ void bpnn_feedforward(BPNN *net)
 
 void bpnn_train(BPNN *net, float *eo, float *eh)
 {
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
   int in, hid, out;
   float out_err, hid_err;
 
@@ -341,7 +342,7 @@ void bpnn_train(BPNN *net, float *eo, float *eh)
       net->hidden_weights, net->hidden_prev_weights);
   bpnn_adjust_weights(net->hidden_delta, hid, net->input_units, in,
       net->input_weights, net->input_prev_weights);
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 
 }
 

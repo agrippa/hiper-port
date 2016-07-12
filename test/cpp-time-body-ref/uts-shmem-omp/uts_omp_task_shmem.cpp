@@ -523,7 +523,6 @@ void genChildren(Node * parent, Node * child) {
   t_metadata[omp_get_thread_num()].ntasks += 1;
 #endif
 
-#pragma omp atomic
   n_nodes += 1;
 
   numChildren = uts_numChildren(parent);
@@ -567,11 +566,6 @@ void genChildren(Node * parent, Node * child) {
           shmem_clear_lock(&steal_buffer_locks[pe]);
       }
       if (!made_available_for_stealing) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
-#else
-#pragma omp task  firstprivate(parent) if(parent.height < 9)
-#endif
           {
               Node child;
               initNode(&child);
@@ -583,7 +577,6 @@ void genChildren(Node * parent, Node * child) {
       }
     }
   } else {
-#pragma omp atomic
       n_leaves += 1;
   }
 }
@@ -713,7 +706,7 @@ int main(int argc, char *argv[]) {
 #endif
   memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
 
-  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+  {
 
   shmem_init();
 
@@ -744,9 +737,7 @@ int main(int argc, char *argv[]) {
   t1 = uts_wctime();
 
 /********** SPMD Parallel Region **********/
-#pragma omp parallel
   {
-#pragma omp master
       {
           int first = 1;
 
@@ -763,7 +754,6 @@ retry:
           }
           first = 0;
 
-#pragma omp taskwait
 
           if (n_buffered_steals > 0) {
               shmem_set_lock(&steal_buffer_locks[pe]);
@@ -810,7 +800,7 @@ retry:
       shmem_barrier_all();
   }
 #endif
-  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  }
 
   shmem_finalize();
   return 0;

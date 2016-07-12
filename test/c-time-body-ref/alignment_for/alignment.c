@@ -443,10 +443,11 @@ int pairalign()
    maxres = get_matrix(matptr, mat_xref, 10);
    if (maxres == 0) return(-1);
 
-   unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+   {
 
-   #pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
-  for (si = 0; si < nseqs; si++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
+for (si = 0; si < nseqs; si++) {
      n = seqlen_array[si+1];
      for (i = 1, len1 = 0; i <= n; i++) {
         char c = seq_array[si+1][i];
@@ -458,11 +459,6 @@ int pairalign()
         if ( n == 0 || m == 0 ) {
            bench_output[si*nseqs+sj] = (int) 1.0;
         } else {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore) untied
-#else
-#pragma omp task  private(i,gg,len2,mm_score) firstprivate(m,n,si,sj,len1) shared(nseqs, bench_output,seqlen_array,seq_array,gap_pos1,gap_pos2,pw_ge_penalty,pw_go_penalty,mat_avscore)
-#endif
            {
               int se1, se2, sb1, sb2, maxscore, seq1, seq2, g, gh;
               int displ[2*MAX_ALN_LENGTH+1];
@@ -501,8 +497,8 @@ int pairalign()
            } // end task
         } // end if (n == 0 || m == 0)
      } // for (j)
-  } // end parallel for (i)
-   } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma450_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time); // end parallel for (i)
+   }
    return 0;
 }
 

@@ -418,11 +418,6 @@ void sim_village_par(struct Village *village)
    vlist = village->forward;
    while(vlist)
    {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(vlist, village) untied
-#else
-#pragma omp task  firstprivate(vlist, village)
-#endif
       sim_village_par(vlist);
       vlist = vlist->next;
    }
@@ -436,7 +431,6 @@ void sim_village_par(struct Village *village)
    /* Uses lists v->hosp->waiting, and v->hosp->assess */
    check_patients_waiting(village);
 
-#pragma omp taskwait
 
    /* Uses lists v->hosp->realloc, v->hosp->asses and v->hosp->waiting */
    check_patients_realloc(village);
@@ -552,21 +546,14 @@ int check_village(struct Village *top)
 void sim_village_main_par(struct Village *top)
 {
     long i;
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
-#pragma omp parallel
+    {
         {
-#pragma omp single
             {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
                 {
                     for (i = 0; i < sim_time; i++) sim_village_par(top);   
                 }
             }
         }
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 }
 

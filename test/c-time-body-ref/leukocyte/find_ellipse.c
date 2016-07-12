@@ -109,9 +109,9 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	MAT * gicov = m_get(height, width);
 	
 	// Split the work among multiple threads, if OPEN is defined
-	#pragma omp parallel for
-	// Scan from left to right, top to bottom, computing GICOV values
-	for (i = MaxR; i < width - MaxR; i++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for
+for (i = MaxR; i < width - MaxR; i++) {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
 		
@@ -151,7 +151,7 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 				}
 			}
 		}
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma113_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 	
 	return gicov;
 }
@@ -184,9 +184,9 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
 	
 	// Split the work among multiple threads, if OPEN is defined
-	#pragma omp parallel for
-	// Iterate across the input matrix
-	for (i = 0; i < img_in->m; i++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for
+for (i = 0; i < img_in->m; i++) {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {
 			double max = 0.0, temp;
@@ -206,7 +206,7 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 			// Store the maximum value found
 			m_set_val(dilated, i, j, max);
 		}
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma188_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 	return dilated;
 }

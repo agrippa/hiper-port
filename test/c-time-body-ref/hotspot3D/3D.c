@@ -155,8 +155,9 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
 
         do {
             int z; 
-#pragma omp parallel for 
-            for (z = 0; z < nz; z++) {
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for
+for (z = 0; z < nz; z++) {
                 int y;
                 for (y = 0; y < ny; y++) {
                     int x;
@@ -173,7 +174,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
                             + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
                     }
                 }
-            }
+            } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma159_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
             float *t = tIn_t;
             tIn_t = tOut_t;
             tOut_t = t; 
@@ -249,7 +250,7 @@ int main(int argc, char** argv)
 
     memcpy(tempCopy,tempIn, size * sizeof(float));
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
     struct timeval start, stop;
     float time;
     gettimeofday(&start,NULL);
@@ -261,7 +262,7 @@ int main(int argc, char** argv)
     float acc = accuracy(tempOut,answer,numRows*numCols*layers);
     printf("Time: %.3f (s)\n",time);
     printf("Accuracy: %e\n",acc);
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
     writeoutput(tempOut,numRows, numCols, layers, ofile);
     free(tempIn);
     free(tempOut); free(powerIn);

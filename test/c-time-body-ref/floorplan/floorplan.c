@@ -212,11 +212,6 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  private(board, footprint,area) firstprivate(NWS,i,j,id,nn) shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) untied
-#else
-#pragma omp task  private(board, footprint,area) firstprivate(NWS,i,j,id,nn) shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode)
-#endif
 {
 	  struct cell cells[N+1];
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
@@ -244,7 +239,6 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 
 /* if area is minimum, update global values */
 		  if (area < MIN_AREA) {
-#pragma omp critical
 			  if (area < MIN_AREA) {
 				  MIN_AREA         = area;
 				  MIN_FOOTPRINT[0] = footprint[0];
@@ -256,7 +250,6 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
- 	    #pragma omp atomic
  	      nnc += add_cell(cells[id].next, footprint, board,cells, 0);
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -268,7 +261,6 @@ _end:;
 }
       }
 }
-#pragma omp taskwait
 return nnc+nnl;
 }
 
@@ -297,19 +289,17 @@ void floorplan_init (char *filename)
 
 void compute_floorplan (void)
 {
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
         coor footprint;
         /* footprint of initial board is zero */
         footprint[0] = 0;
         footprint[1] = 0;
         bots_message("Computing floorplan ");
-#pragma omp parallel
         {
-#pragma omp single
             bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
         }
         bots_message(" completed!\n");
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 }
 
 void floorplan_end (void)

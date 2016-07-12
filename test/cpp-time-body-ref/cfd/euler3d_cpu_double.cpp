@@ -51,11 +51,12 @@ void dealloc(T* array)
 
 void copy(double *dst, double *src, int N)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < N; i++)
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(shared) schedule(static)
+for(int i = 0; i < N; i++)
 	{
 		dst[i] = src[i];
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma55_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 
@@ -100,11 +101,12 @@ cfd_double3 ff_flux_contribution_density_energy;
 
 void initialize_variables(int nelr, double* variables)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(shared) schedule(static)
+for(int i = 0; i < nelr; i++)
 	{
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma104_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy)
@@ -153,8 +155,9 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(shared) schedule(static)
+for(int i = 0; i < nelr; i++)
 	{
 		double density = variables[NVAR*i + VAR_DENSITY];
 
@@ -171,7 +174,7 @@ void compute_step_factor(int nelr, double* variables, double* areas, double* ste
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
 		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma157_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 
@@ -184,8 +187,9 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 {
 	double smoothing_coefficient = double(0.2f);
 
-	#pragma omp parallel for default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(shared) schedule(static)
+for(int i = 0; i < nelr; i++)
 	{
 		int j, nb;
 		cfd_double3 normal; double normal_len;
@@ -310,13 +314,14 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
 		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
 		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma188_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
-	#pragma omp parallel for  default(shared) schedule(static)
-	for(int i = 0; i < nelr; i++)
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for default(shared) schedule(static)
+for(int i = 0; i < nelr; i++)
 	{
 		double factor = step_factors[i]/double(RK+1-j);
 
@@ -325,7 +330,7 @@ void time_step(int j, int nelr, double* old_variables, double* variables, double
 		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
 		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
 		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma319_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 /*
  * Main function
@@ -339,7 +344,7 @@ int main(int argc, char** argv)
 	}
 	const char* data_file_name = argv[1];
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
 	// set far field conditions
 	{
 		const double angle_of_attack = double(3.1415926535897931 / 180.0) * double(deg_angle_of_attack);
@@ -456,7 +461,7 @@ int main(int argc, char** argv)
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 
 	std::cout << "Done..." << std::endl;
 

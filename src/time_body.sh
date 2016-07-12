@@ -113,7 +113,7 @@ echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragm
 cat $INPUT_PATH >> $WITH_HEADER
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
-cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS true > $WITH_PRAGMA_MARKERS
+cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS false > $WITH_PRAGMA_MARKERS
 
 TRANSFORMED=$DIRNAME/$FILE_PREFIX.$NAME.hclib.$EXTENSION
 $TIME_BODY -o $TRANSFORMED $WITH_PRAGMA_MARKERS -- $INCLUDE $USER_INCLUDES $DEFINES -I$HCLIB_ROOT/include

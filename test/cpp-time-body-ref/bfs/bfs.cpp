@@ -114,7 +114,7 @@ void BFSGraph( int argc, char** argv)
 	
 	printf("Start traversing the tree\n");
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+    {
 	int k=0;
 	bool stop;
 	do
@@ -123,8 +123,9 @@ void BFSGraph( int argc, char** argv)
             stop=false;
 
             //omp_set_num_threads(num_omp_threads);
-    #pragma omp parallel for firstprivate(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask)
-            for(int tid = 0; tid < no_of_nodes; tid++ )
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for firstprivate(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask)
+for(int tid = 0; tid < no_of_nodes; tid++ )
             {
                 if (h_graph_mask[tid] == true){ 
                     h_graph_mask[tid]=false;
@@ -138,10 +139,11 @@ void BFSGraph( int argc, char** argv)
                         }
                     }
                 }
-            }
+            } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma128_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
-    #pragma omp parallel for firstprivate(h_updating_graph_mask, h_graph_mask, h_graph_visited)
-            for(int tid=0; tid< no_of_nodes ; tid++ )
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for firstprivate(h_updating_graph_mask, h_graph_mask, h_graph_visited)
+for(int tid=0; tid< no_of_nodes ; tid++ )
             {
                 if (h_updating_graph_mask[tid] == true){
                     h_graph_mask[tid]=true;
@@ -149,11 +151,11 @@ void BFSGraph( int argc, char** argv)
                     stop=true;
                     h_updating_graph_mask[tid]=false;
                 }
-            }
+            } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma145_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
             k++;
         }
 	while(stop);
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 
 	//Store the result into a file
 	FILE *fpo = fopen("result.txt","w");

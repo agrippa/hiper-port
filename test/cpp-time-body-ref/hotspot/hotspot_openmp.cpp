@@ -60,8 +60,9 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
     int chunks_in_col = row/BLOCK_SIZE_R;
 
 	// omp_set_num_threads(num_omp_threads);
-    #pragma omp parallel for shared(power, temp, result) private(chunk, r, c, delta) firstprivate(row, col, num_chunk, chunks_in_row) schedule(static)
-    for ( chunk = 0; chunk < num_chunk; ++chunk )
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for shared(power, temp, result) private(chunk, r, c, delta) firstprivate(row, col, num_chunk, chunks_in_row) schedule(static)
+for ( chunk = 0; chunk < num_chunk; ++chunk )
     {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 
@@ -128,7 +129,6 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
         }
 
         for ( r = r_start; r < r_start + BLOCK_SIZE_R; ++r ) {
-#pragma omp simd        
             for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
             /* Update Temperatures */
                 result[r*col+c] =temp[r*col+c]+ 
@@ -138,7 +138,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
                     (amb_temp - temp[r*col+c]) * Rz_1));
             }
         }
-    }
+    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma64_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 }
 
 /* Transient solver driver routine: simply converts the heat 
@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 	
     long long start_time = get_time();
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);;
+    compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
 
     long long end_time = get_time();
 

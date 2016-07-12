@@ -81,8 +81,9 @@ kernel_cpu(	int cores_arg,
 	int i;
 
 	// process number of querries
-	#pragma omp parallel for private (i, thid)
-	for(bid = 0; bid < count; bid++){
+unsigned long long ____hclib_start_time = hclib_current_time_ns();
+#pragma omp parallel for private (i, thid)
+for(bid = 0; bid < count; bid++){
 
 		// process levels of the tree
 		for(i = 0; i < maxheight; i++){
@@ -118,7 +119,7 @@ kernel_cpu(	int cores_arg,
 
 		}
 
-	}
+	} ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("pragma85_omp_parallel %llu ns\n", ____hclib_end_time - ____hclib_start_time);
 
 	time2 = get_time();
     }

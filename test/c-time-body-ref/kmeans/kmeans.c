@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
     }     
 	printf("I/O completed\n");	
 
-    unsigned long long ____hclib_start_time = hclib_current_time_ns(); for (i=0; i<nloops; i++) {
+    for (i=0; i<nloops; i++) {
         
         cluster_centres = NULL;
         cluster(numObjects,
@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
                 &cluster_centres   
                );
      
-    } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+    }
 	
 
 	printf("number of Clusters %d\n",nclusters); 

@@ -19,10 +19,10 @@ void backprop_face()
   load(net);
   //entering the training kernel, only one iteration
   printf("Starting training kernel\n");
-  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+  {
     float out_err, hid_err;
     bpnn_train_kernel(net, &out_err, &hid_err);
-  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  }
   bpnn_free(net);
   printf("Training done\n");
 }

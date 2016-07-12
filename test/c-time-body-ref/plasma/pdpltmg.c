@@ -33,11 +33,6 @@ void plasma_pdpltmg_quark(PLASMA_desc A, unsigned long long int seed)
         for (n = 0; n < A.nt; n++) {
             tempnn = n == A.nt-1 ? A.n-n*A.nb : A.nb;
             double *dA = A(m, n);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(out:dA[0:tempnn*ldam]) untied
-#else
-#pragma omp task depend(out:dA[0:tempnn*ldam])
-#endif
             CORE_dplrnt(tempmm, tempnn, dA, ldam, A.m, m*A.mb, n*A.nb, seed);
         }
     }

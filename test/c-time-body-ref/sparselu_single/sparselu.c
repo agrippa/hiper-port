@@ -219,27 +219,15 @@ void sparselu_par_call(float **BENCH)
 
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-   unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
-#pragma omp parallel
+   {
        {
-#pragma omp single nowait
            {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
                for (kk=0; kk<bots_arg_size; kk++) 
                {
                    lu0(BENCH[kk*bots_arg_size+kk]);
                    for (jj=kk+1; jj<bots_arg_size; jj++)
                        if (BENCH[kk*bots_arg_size+jj] != NULL)
                        {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj) shared(BENCH)
-#endif
                            {
                            fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
                            }
@@ -247,40 +235,28 @@ void sparselu_par_call(float **BENCH)
                    for (ii=kk+1; ii<bots_arg_size; ii++) 
                        if (BENCH[ii*bots_arg_size+kk] != NULL)
                        {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, ii) shared(BENCH)
-#endif
                            {
                            bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
                            }
                        }
 
-#pragma omp taskwait
 
                    for (ii=kk+1; ii<bots_arg_size; ii++)
                        if (BENCH[ii*bots_arg_size+kk] != NULL)
                            for (jj=kk+1; jj<bots_arg_size; jj++)
                                if (BENCH[kk*bots_arg_size+jj] != NULL)
                                {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH)
-#endif
                                    {
                                    if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();
                                    bmod(BENCH[ii*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
                                    }
                                }
 
-#pragma omp taskwait
                }
 
            }
        }
-   } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+   }
    bots_message(" completed!\n");
 }
 

@@ -477,7 +477,6 @@ void genChildren(Node * parent, Node * child) {
   t_metadata[omp_get_thread_num()].ntasks += 1;
 #endif
 
-#pragma omp atomic
   n_nodes += 1;
 
   numChildren = uts_numChildren(parent);
@@ -512,11 +511,6 @@ void genChildren(Node * parent, Node * child) {
 
       Node parent = *child;
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
-#else
-#pragma omp task  firstprivate(parent) if(parent.height < 9)
-#endif
       {
           Node child;
           initNode(&child);
@@ -527,7 +521,6 @@ void genChildren(Node * parent, Node * child) {
       }
     }
   } else {
-#pragma omp atomic
       n_leaves += 1;
   }
 }
@@ -705,7 +698,7 @@ int main(int argc, char *argv[]) {
     initHist();
 #endif  
 
-  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+  {
   /* cancellable barrier initialization (single threaded under OMP) */
 
   double t1, t2, et;
@@ -718,9 +711,7 @@ int main(int argc, char *argv[]) {
   t1 = uts_wctime();
 
 /********** SPMD Parallel Region **********/
-#pragma omp parallel
   {
-#pragma omp single
       {
           Node child;
           initNode(&child);
@@ -731,7 +722,7 @@ int main(int argc, char *argv[]) {
   t2 = uts_wctime();
   et = t2 - t1;
   showStats(et);
-  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  }
 /********** End Parallel Region **********/
 
   return 0;

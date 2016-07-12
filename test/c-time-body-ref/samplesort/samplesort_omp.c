@@ -119,20 +119,13 @@ void par_sort(void* arg) {
 
   if (right - left + 1 > HC_GRANULARITY) {
     int index = partition(data, left, right);
-#pragma omp parallel
     {
-#pragma omp single nowait
         {
         if (left < index - 1) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = left;
           buf->right = index - 1; 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task untied
-#else
-#pragma omp task
-#endif
           {
               par_sort(buf);
           }
@@ -142,11 +135,6 @@ void par_sort(void* arg) {
           buf->buffer = data;
           buf->left = index;
           buf->right = right; 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task untied
-#else
-#pragma omp task
-#endif
           {
               par_sort(buf);
           }
@@ -171,7 +159,7 @@ void sorting(TYPE* buffer, int size) {
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
-  unsigned long long ____hclib_start_time = hclib_current_time_ns(); {
+  {
   shmem_init (); 
   /* Variable Declarations */
 
@@ -373,6 +361,6 @@ int main (int argc, char *argv[]) {
 
    /**** Finalize ****/
   shmem_finalize();
-  } ; unsigned long long ____hclib_end_time = hclib_current_time_ns(); printf("\nHCLIB TIME %llu ns\n", ____hclib_end_time - ____hclib_start_time);
+  }
 }
 

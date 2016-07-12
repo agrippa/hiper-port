@@ -33,7 +33,7 @@ LIBS=-Wl,--start-group -lclangAST -lclangAnalysis -lclangBasic -lclangDriver -lc
 	 -lclangTooling -Wl,--end-group `${LLVM_CONFIG} --ldflags --libs --system-libs`
 endif
 
-OBJS=Driver.o TimeBodyPass.o
+OBJS=Driver.o TimeBodyPass.o SingleClauseArgs.o OMPClauses.o
 
 ${EXE}: ${OBJS}
 	${GXX} ${GXX_FLAGS} ${INCLUDES} ${OBJS} -o ${EXE} ${LIBS}
