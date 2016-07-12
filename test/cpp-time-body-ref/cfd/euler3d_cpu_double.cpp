@@ -73,7 +73,7 @@ void copy(double *dst, double *src, int N)
 for(int i = 0; i < N; i++)
 	{
 		dst[i] = src[i];
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma54_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -126,7 +126,7 @@ void initialize_variables(int nelr, double* variables)
 for(int i = 0; i < nelr; i++)
 	{
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma103_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -197,7 +197,7 @@ for(int i = 0; i < nelr; i++)
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
 		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -340,7 +340,7 @@ for(int i = 0; i < nelr; i++)
 		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
 		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
 		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma187_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -359,7 +359,7 @@ for(int i = 0; i < nelr; i++)
 		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
 		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
 		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma318_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

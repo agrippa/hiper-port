@@ -136,7 +136,7 @@ for(bid = 0; bid < count; bid++){
 
 		}
 
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma84_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

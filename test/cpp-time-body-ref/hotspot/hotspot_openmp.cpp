@@ -156,7 +156,7 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
                     (amb_temp - temp[r*col+c]) * Rz_1));
             }
         }
-    }
+    } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma63_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

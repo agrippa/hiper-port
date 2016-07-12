@@ -91,7 +91,7 @@ for (i=0; i < MatrixDim; i ++){
                 U[i * MatrixDim + j] = 0;
             }
         }
-    }
+    } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma62_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -105,7 +105,7 @@ for (i=0; i < MatrixDim; i++ ) {
                 sum += L[i * MatrixDim + k]*U[k * MatrixDim + j];
             A[i * MatrixDim + j] = sum;
         }
-    }
+    } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma78_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
