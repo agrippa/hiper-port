@@ -125,41 +125,32 @@ void nqueens(int n, int j, char *a, int *solutions, int depth)
      	/* try each possible position for queen <j> */
 	for (i = 0; i < n; i++) {
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(n, csols, i, j, a, depth, solutions) untied
-#else
-#pragma omp task  firstprivate(n, csols, i, j, a, depth, solutions)
-#endif
-;
-		{ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(n, csols, i, j, a, depth, solutions)", "pragma129_omp_task");
+		{
 	  		/* allocate a temporary array and copy <a> into it */
 	  		char * b = (char *)malloc(n * sizeof(char));
 	  		memcpy(b, a, j * sizeof(char));
 	  		b[j] = (char) i;
 	  		if (ok(j + 1, b))
        				nqueens(n, j + 1, b,&csols[i],depth); //FIXME: depth or depth+1 ???
-		} ; }
-
+		}
 	}
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma140_omp_taskwait");
 	for ( i = 0; i < n; i++) *solutions += csols[i];
     free(csols);
 }
 
 void find_queens (int size)
 {
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma147_omp_to_hclib");
+    {
 	total_count=0;
 
         bots_message("Computing N-Queens algorithm (n=%d) ", size);
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma152_omp_parallel");
 	{
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma154_omp_single");
 		{
 			char *a;
 
@@ -168,14 +159,7 @@ void find_queens (int size)
 		}
 	}
 	bots_message(" completed!\n");
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 }
 
 

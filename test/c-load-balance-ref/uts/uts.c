@@ -179,32 +179,17 @@ unsigned long long parallel_uts ( Node *root )
 
    bots_message("Computing Unbalance Tree Search algorithm ");
 
-{
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma183_omp_to_hclib");
+   {
+hclib_pragma_marker("omp", "parallel", "pragma185_omp_parallel");
        {
-#pragma omp single nowait
-;
+hclib_pragma_marker("omp", "single nowait", "pragma187_omp_single");
            {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-        { ____num_tasks[omp_get_thread_num()]++;
-num_nodes = parTreeSearch( 0, root, root->numChildren ) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma189_omp_task");
+        num_nodes = parTreeSearch( 0, root, root->numChildren );
            }
        }
-   } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+   }
 
    bots_message(" completed!");
 
@@ -232,19 +217,11 @@ unsigned long long parTreeSearch(int depth, Node *parent, int numChildren)
 
      nodePtr->numChildren = uts_numChildren(nodePtr);
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(i, nodePtr) shared(partialCount) untied
-#else
-#pragma omp task  firstprivate(i, nodePtr) shared(partialCount)
-#endif
-;
-        { ____num_tasks[omp_get_thread_num()]++;
-partialCount[i] = parTreeSearch(depth+1, nodePtr, nodePtr->numChildren) ; }
-;
+hclib_pragma_marker("omp", "task untied firstprivate(i, nodePtr) shared(partialCount)", "pragma221_omp_task");
+        partialCount[i] = parTreeSearch(depth+1, nodePtr, nodePtr->numChildren);
   }
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma225_omp_taskwait");
 
   for (i = 0; i < numChildren; i++) {
      subtreesize += partialCount[i];

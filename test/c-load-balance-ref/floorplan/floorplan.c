@@ -213,13 +213,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
       nnl += nn;
 /* for all possible locations */
       for (j = 0; j < nn; j++) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  private(board, footprint,area) firstprivate(NWS,i,j,id,nn) shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode) untied
-#else
-#pragma omp task  private(board, footprint,area) firstprivate(NWS,i,j,id,nn) shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode)
-#endif
-;
-{ ____num_tasks[omp_get_thread_num()]++;
+hclib_pragma_marker("omp", "task untied private(board, footprint,area) firstprivate(NWS,i,j,id,nn) shared(FOOTPRINT,BOARD,CELLS,MIN_AREA,MIN_FOOTPRINT,N,BEST_BOARD,nnc,bots_verbose_mode)", "pragma223_omp_task");
 {
 	  struct cell cells[N+1];
 	  memcpy(cells,CELLS,sizeof(struct cell)*(N+1));
@@ -247,8 +241,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 
 /* if area is minimum, update global values */
 		  if (area < MIN_AREA) {
-#pragma omp critical
-;
+hclib_pragma_marker("omp", "critical", "pragma251_omp_critical");
 			  if (area < MIN_AREA) {
 				  MIN_AREA         = area;
 				  MIN_FOOTPRINT[0] = footprint[0];
@@ -260,8 +253,7 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
 
 /* if area is less than best area */
           } else if (area < MIN_AREA) {
-#pragma omp atomic
-;
+hclib_pragma_marker("omp", "atomic", "pragma263_omp_atomic");
  	      nnc += add_cell(cells[id].next, footprint, board,cells, 0);
 /* if area is greater than or equal to best area, prune search */
           } else {
@@ -270,12 +262,10 @@ static int add_cell(int id, coor FOOTPRINT, ibrd BOARD, struct cell *CELLS, int 
  
 	  }
 _end:;  
-} ; }
-
+}
       }
 }
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma275_omp_taskwait");
 return nnc+nnl;
 }
 
@@ -304,28 +294,20 @@ void floorplan_init (char *filename)
 
 void compute_floorplan (void)
 {
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma304_omp_to_hclib");
+    {
         coor footprint;
         /* footprint of initial board is zero */
         footprint[0] = 0;
         footprint[1] = 0;
         bots_message("Computing floorplan ");
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma311_omp_parallel");
         {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma313_omp_single");
             bots_number_of_tasks = add_cell(1, footprint, board, gcells, 0);
         }
         bots_message(" completed!\n");
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 }
 
 void floorplan_end (void)

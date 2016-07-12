@@ -523,7 +523,7 @@ void initRootNode(Node * root, int type)
  * details depend on tree type, node type and shape function
  *
  */
-typedef struct _pragma579_omp_task {
+typedef struct _pragma569_omp_task {
     Node parent;
     int (*made_available_for_stealing_ptr);
     int (*i_ptr);
@@ -534,9 +534,9 @@ typedef struct _pragma579_omp_task {
     int (*numChildren_ptr);
     int (*childType_ptr);
     Node (*(*child_ptr));
- } pragma579_omp_task;
+ } pragma569_omp_task;
 
-static void pragma579_omp_task_hclib_async(void *____arg);
+static void pragma569_omp_task_hclib_async(void *____arg);
 void genChildren(Node * parent, Node * child) {
   int parentHeight = parent->height;
   int numChildren, childType;
@@ -589,7 +589,7 @@ __sync_fetch_and_add(&(n_nodes), 1); ;
       }
       if (!made_available_for_stealing) {
  { 
-pragma579_omp_task *new_ctx = (pragma579_omp_task *)malloc(sizeof(pragma579_omp_task));
+pragma569_omp_task *new_ctx = (pragma569_omp_task *)malloc(sizeof(pragma569_omp_task));
 new_ctx->parent = parent;
 new_ctx->made_available_for_stealing_ptr = &(made_available_for_stealing);
 new_ctx->i_ptr = &(i);
@@ -601,9 +601,9 @@ new_ctx->numChildren_ptr = &(numChildren);
 new_ctx->childType_ptr = &(childType);
 new_ctx->child_ptr = &(child);
 if (!(parent.height < 9)) {
-    pragma579_omp_task_hclib_async(new_ctx);
+    pragma569_omp_task_hclib_async(new_ctx);
 } else {
-hclib_async(pragma579_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+hclib_async(pragma569_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 }
  } 
       }
@@ -612,8 +612,8 @@ hclib_async(pragma579_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
 __sync_fetch_and_add(&(n_leaves), 1); ;
   }
 } 
-static void pragma579_omp_task_hclib_async(void *____arg) {
-    pragma579_omp_task *ctx = (pragma579_omp_task *)____arg;
+static void pragma569_omp_task_hclib_async(void *____arg) {
+    pragma569_omp_task *ctx = (pragma569_omp_task *)____arg;
     Node parent; parent = ctx->parent;
     hclib_start_finish();
 {
@@ -747,16 +747,16 @@ void showStats(double elapsedSecs) {
  *     - UPC is SPMD starting with main, OpenMP goes SPMD after
  *       parsing parameters
  */
-typedef struct _pragma793_omp_master {
+typedef struct _pragma745_omp_master {
     double (*t1_ptr);
     double (*t2_ptr);
     double (*et_ptr);
     Node (*root_ptr);
     int (*argc_ptr);
     char (*(*(*argv_ptr)));
- } pragma793_omp_master;
+ } pragma745_omp_master;
 
-static void *pragma793_omp_master_hclib_async(void *____arg);
+static void *pragma745_omp_master_hclib_async(void *____arg);
 typedef struct _main_entrypoint_ctx {
     Node root;
     int argc;
@@ -801,14 +801,14 @@ static void main_entrypoint(void *____arg) {
 
 /********** SPMD Parallel Region **********/
  { 
-pragma793_omp_master *new_ctx = (pragma793_omp_master *)malloc(sizeof(pragma793_omp_master));
+pragma745_omp_master *new_ctx = (pragma745_omp_master *)malloc(sizeof(pragma745_omp_master));
 new_ctx->t1_ptr = &(t1);
 new_ctx->t2_ptr = &(t2);
 new_ctx->et_ptr = &(et);
 new_ctx->root_ptr = &(root);
 new_ctx->argc_ptr = &(argc);
 new_ctx->argv_ptr = &(argv);
-hclib_future_t *fut = hclib_async_future(pragma793_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
+hclib_future_t *fut = hclib_async_future(pragma745_omp_master_hclib_async, new_ctx, NO_FUTURE, hclib_get_master_place());
 hclib_future_wait(fut);
  } 
 
@@ -860,8 +860,8 @@ hclib_launch(main_entrypoint, new_ctx, deps, 1);
   ;
   return 0;
 }  
-static void *pragma793_omp_master_hclib_async(void *____arg) {
-    pragma793_omp_master *ctx = (pragma793_omp_master *)____arg;
+static void *pragma745_omp_master_hclib_async(void *____arg) {
+    pragma745_omp_master *ctx = (pragma745_omp_master *)____arg;
     hclib_start_finish();
 {
           int first = 1;

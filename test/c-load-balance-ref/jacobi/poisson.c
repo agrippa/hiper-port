@@ -112,22 +112,14 @@ double run(struct user_parameters* params)
        Set the initial solution estimate UNEW.
        We are "allowed" to pick up the boundary conditions exactly.
        */
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma116_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma118_omp_single");
         //for collapse(2)
         for (j = 0; j < ny; j+= block_size) {
             for (i = 0; i < nx; i+= block_size) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(i,j) private(ii,jj) untied
-#else
-#pragma omp task firstprivate(i,j) private(ii,jj)
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-for (jj=j; jj<j+block_size; ++jj) {
+hclib_pragma_marker("omp", "task firstprivate(i,j) private(ii,jj)", "pragma122_omp_task");
+                for (jj=j; jj<j+block_size; ++jj) {
                     for (ii=i; ii<i+block_size; ++ii)
                     {
                         if (ii == 0 || ii == nx - 1 || jj == 0 || jj == ny - 1) {
@@ -136,8 +128,7 @@ for (jj=j; jj<j+block_size; ++jj) {
                             (unew)[ii * ny + jj] = 0.0;
                         }
                     }
-                } ; }
-
+                }
             }
         }
     }
@@ -230,22 +221,14 @@ void rhs(int nx, int ny, double *f, int block_size)
     // The "boundary" entries of F store the boundary values of the solution.
     // The "interior" entries of F store the right hand sides of the Poisson equation.
 
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma225_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma227_omp_single");
     //for collapse(2)
     for (j = 0; j < ny; j+=block_size) {
         for (i = 0; i < nx; i+=block_size) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(block_size,i,j,nx,ny) private(ii,jj,x,y) untied
-#else
-#pragma omp task firstprivate(block_size,i,j,nx,ny) private(ii,jj,x,y)
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-for (jj=j; jj<j+block_size; ++jj)
+hclib_pragma_marker("omp", "task firstprivate(block_size,i,j,nx,ny) private(ii,jj,x,y)", "pragma231_omp_task");
+            for (jj=j; jj<j+block_size; ++jj)
             {
                 y = (double) (jj) / (double) (ny - 1);
                 for (ii=i; ii<i+block_size; ++ii)
@@ -256,8 +239,7 @@ for (jj=j; jj<j+block_size; ++jj)
                     else
                         (f)[ii * ny + jj] = - uxxyy_exact(x, y);
                 }
-            } ; }
-
+            }
         }
     }
     }

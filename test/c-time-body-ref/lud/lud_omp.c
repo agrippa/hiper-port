@@ -160,7 +160,7 @@ for (j = 0; j < BS; j++) {
             }
         } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma105_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma106_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }
 

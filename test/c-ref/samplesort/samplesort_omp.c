@@ -119,6 +119,16 @@ typedef struct sort_data_t {
   int right;
 } sort_data_t;
 
+typedef struct _pragma130_omp_task {
+    sort_data_t (*(*buf_ptr));
+    int (*index_ptr);
+    sort_data_t (*(*in_ptr));
+    unsigned long (*(*data_ptr));
+    int (*left_ptr);
+    int (*right_ptr);
+    void (*(*arg_ptr));
+ } pragma130_omp_task;
+
 typedef struct _pragma140_omp_task {
     sort_data_t (*(*buf_ptr));
     int (*index_ptr);
@@ -129,18 +139,8 @@ typedef struct _pragma140_omp_task {
     void (*(*arg_ptr));
  } pragma140_omp_task;
 
-typedef struct _pragma150_omp_task {
-    sort_data_t (*(*buf_ptr));
-    int (*index_ptr);
-    sort_data_t (*(*in_ptr));
-    unsigned long (*(*data_ptr));
-    int (*left_ptr);
-    int (*right_ptr);
-    void (*(*arg_ptr));
- } pragma150_omp_task;
-
+static void pragma130_omp_task_hclib_async(void *____arg);
 static void pragma140_omp_task_hclib_async(void *____arg);
-static void pragma150_omp_task_hclib_async(void *____arg);
 void par_sort(void* arg) {
   sort_data_t *in = (sort_data_t*) arg;
   TYPE* data = in->buffer;
@@ -156,6 +156,23 @@ hclib_start_finish(); {
           buf->left = left;
           buf->right = index - 1; 
  { 
+pragma130_omp_task *new_ctx = (pragma130_omp_task *)malloc(sizeof(pragma130_omp_task));
+new_ctx->buf_ptr = &(buf);
+new_ctx->index_ptr = &(index);
+new_ctx->in_ptr = &(in);
+new_ctx->data_ptr = &(data);
+new_ctx->left_ptr = &(left);
+new_ctx->right_ptr = &(right);
+new_ctx->arg_ptr = &(arg);
+hclib_async(pragma130_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
+ } 
+        }
+        if (index < right) {
+          sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
+          buf->buffer = data;
+          buf->left = index;
+          buf->right = right; 
+ { 
 pragma140_omp_task *new_ctx = (pragma140_omp_task *)malloc(sizeof(pragma140_omp_task));
 new_ctx->buf_ptr = &(buf);
 new_ctx->index_ptr = &(index);
@@ -167,23 +184,6 @@ new_ctx->arg_ptr = &(arg);
 hclib_async(pragma140_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
  } 
         }
-        if (index < right) {
-          sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
-          buf->buffer = data;
-          buf->left = index;
-          buf->right = right; 
- { 
-pragma150_omp_task *new_ctx = (pragma150_omp_task *)malloc(sizeof(pragma150_omp_task));
-new_ctx->buf_ptr = &(buf);
-new_ctx->index_ptr = &(index);
-new_ctx->in_ptr = &(in);
-new_ctx->data_ptr = &(data);
-new_ctx->left_ptr = &(left);
-new_ctx->right_ptr = &(right);
-new_ctx->arg_ptr = &(arg);
-hclib_async(pragma150_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
- } 
-        }
         } ; hclib_end_finish(); 
   }
   else {
@@ -192,8 +192,8 @@ hclib_async(pragma150_omp_task_hclib_async, new_ctx, NO_FUTURE, ANY_PLACE);
   }
   free(arg);
 } 
-static void pragma140_omp_task_hclib_async(void *____arg) {
-    pragma140_omp_task *ctx = (pragma140_omp_task *)____arg;
+static void pragma130_omp_task_hclib_async(void *____arg) {
+    pragma130_omp_task *ctx = (pragma130_omp_task *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));
@@ -203,8 +203,8 @@ static void pragma140_omp_task_hclib_async(void *____arg) {
 }
 
 
-static void pragma150_omp_task_hclib_async(void *____arg) {
-    pragma150_omp_task *ctx = (pragma150_omp_task *)____arg;
+static void pragma140_omp_task_hclib_async(void *____arg) {
+    pragma140_omp_task *ctx = (pragma140_omp_task *)____arg;
     hclib_start_finish();
 {
               par_sort((*(ctx->buf_ptr)));

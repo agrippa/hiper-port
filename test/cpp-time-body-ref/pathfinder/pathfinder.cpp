@@ -133,7 +133,7 @@ for(int n = 0; n < cols; n++){
           dst[n] = data[t+1 * cols + n]+min;
         } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma105_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma104_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     } ; 
 const unsigned long long full_program_end = current_time_ns();

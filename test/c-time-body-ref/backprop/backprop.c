@@ -260,7 +260,7 @@ for (j = 1; j <= n2; j++) {
     l2[j] = squash(sum);
   } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma233_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma232_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
@@ -323,7 +323,7 @@ for (j = 1; j <= ndelta; j++) {
     }
   } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma295_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma297_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 

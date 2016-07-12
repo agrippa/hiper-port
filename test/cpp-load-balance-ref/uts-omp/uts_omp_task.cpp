@@ -478,8 +478,7 @@ void genChildren(Node * parent, Node * child) {
   t_metadata[omp_get_thread_num()].ntasks += 1;
 #endif
 
-#pragma omp atomic
-;
+hclib_pragma_marker("omp", "atomic", "pragma482_omp_atomic");
   n_nodes += 1;
 
   numChildren = uts_numChildren(parent);
@@ -514,26 +513,18 @@ void genChildren(Node * parent, Node * child) {
 
       Node parent = *child;
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
-#else
-#pragma omp task  firstprivate(parent) if(parent.height < 9)
-#endif
-;
-      { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(parent) if(parent.height < 9)", "pragma517_omp_task");
+      {
           Node child;
           initNode(&child);
 
           if (parent.numChildren < 0) {
               genChildren(&parent, &child);
           }
-      } ; }
-
+      }
     }
   } else {
-#pragma omp atomic
-;
+hclib_pragma_marker("omp", "atomic", "pragma528_omp_atomic");
       n_leaves += 1;
   }
 }
@@ -711,7 +702,8 @@ int main(int argc, char *argv[]) {
     initHist();
 #endif  
 
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma706_omp_to_hclib");
+  {
   /* cancellable barrier initialization (single threaded under OMP) */
 
   double t1, t2, et;
@@ -724,11 +716,9 @@ int main(int argc, char *argv[]) {
   t1 = uts_wctime();
 
 /********** SPMD Parallel Region **********/
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma720_omp_parallel");
   {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma722_omp_single");
       {
           Node child;
           initNode(&child);
@@ -739,14 +729,7 @@ int main(int argc, char *argv[]) {
   t2 = uts_wctime();
   et = t2 - t1;
   showStats(et);
-  } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+  }
 /********** End Parallel Region **********/
 
   return 0;

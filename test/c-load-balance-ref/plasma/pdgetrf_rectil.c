@@ -55,21 +55,14 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
         double *dA = A(k, k);
         int *dB = IPIV(k);
         PLASMA_desc pDesc = plasma_desc_submatrix(A, tempk, k*A.nb, tempm, tempkn);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:A.mb*A.nb]) depend(out:dB[0:pDesc.n]) untied
-#else
-#pragma omp task depend(inout:dA[0:A.mb*A.nb]) depend(out:dB[0:pDesc.n])
-#endif
-;
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(inout:dA[0:A.mb*A.nb]) depend(out:dB[0:pDesc.n])", "pragma59_omp_task");
+        {
             int info[3];
             info[1] = 0;
             info[2] = 1;
 
             CORE_dgetrf_rectil( pDesc, dB, info );
-        } ; }
-
+        }
 
         /*
          * Update the trailing submatrix
@@ -85,15 +78,8 @@ void plasma_pdgetrf_rectil_quark(PLASMA_desc A, int *IPIV)
             double *dA = A(k, n);
             double *dB = A(k, k);
             int *dipiv = IPIV(k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:1]) depend(in:dB[0:ldak], dipiv[0:tempkm]) untied
-#else
-#pragma omp task depend(inout:dA[0:1]) depend(in:dB[0:ldak], dipiv[0:tempkm])
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak) ; }
-;
+hclib_pragma_marker("omp", "task depend(inout:dA[0:1]) depend(in:dB[0:ldak], dipiv[0:tempkm])", "pragma82_omp_task");
+            CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak);
 
             m = k+1;
             if ( m < A.mt ) {
@@ -103,19 +89,12 @@ CORE_dswptr_ontile(descA, 1, tempkm, dipiv, 1, dB, ldak) ; }
                 double *dA = A(m , k);
                 double *dB = A(k , n);
                 double *dC = A(m , n);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb]) untied
-#else
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])", "pragma93_omp_task");
+                cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                         tempmm, tempnn, A.nb,
                         mzone, dA, ldam,
                         dB, ldak,
-                        zone, dC, ldam) ; }
-;
+                        zone, dC, ldam);
 
                 for (m = k+2; m < A.mt; m++)
                 {
@@ -127,19 +106,12 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
                     double *dC = A(m , n);
                     double *fake1 = A(k+1, n);
                     double *fake2 = (double *)fakedep;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb]) untied
-#else
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb])
-#endif
-;
-                        { ____num_tasks[omp_get_thread_num()]++;
-cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb], fake2[0:1]) depend(inout:dC[0:A.mb*A.mb], fake1[0:A.mb*A.nb])", "pragma110_omp_task");
+                        cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                                 tempmm, tempnn, A.nb,
                                 mzone, dA, ldam,
                                 dB, ldak,
-                                zone, dC, ldam) ; }
-;
+                                zone, dC, ldam);
                 }
             }
         }
@@ -166,15 +138,8 @@ cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaNoTrans, (CBLAS_TRANSPOSE)Plas
             double *prevSwap = A(k-1, n);
             int *dipiv = IPIV(k);
             PLASMA_desc descA = plasma_desc_submatrix(A, tempk, n*A.nb, tempm, tempnn);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb]) untied
-#else
-#pragma omp task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb])
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1) ; }
-;
+hclib_pragma_marker("omp", "task depend(inout:Aij[0:1],fakedep) depend(in:dipiv[0:mintmp], prevSwap[0:A.lm*A.nb])", "pragma142_omp_task");
+            CORE_dlaswp_ontile(descA, 1, mintmp, dipiv, 1);
         }
     }
 }

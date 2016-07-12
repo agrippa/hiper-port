@@ -124,7 +124,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-class pragma110_omp_parallel_hclib_async {
+class pragma100_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -156,7 +156,7 @@ class pragma110_omp_parallel_hclib_async {
     int penalty;
 
     public:
-        pragma110_omp_parallel_hclib_async(int set_blk,
+        pragma100_omp_parallel_hclib_async(int set_blk,
                 int* set_referrence,
                 int set_max_cols,
                 int* set_input_itemsets,
@@ -271,7 +271,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
         }
 };
 
-class pragma162_omp_parallel_hclib_async {
+class pragma155_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -303,7 +303,7 @@ class pragma162_omp_parallel_hclib_async {
     int penalty;
 
     public:
-        pragma162_omp_parallel_hclib_async(int set_max_cols,
+        pragma155_omp_parallel_hclib_async(int set_max_cols,
                 int set_blk,
                 int* set_referrence,
                 int* set_input_itemsets,
@@ -424,7 +424,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { const int niters = (blk) - (0);
-kernel_launcher("pragma110_omp_parallel", niters, pragma110_omp_parallel_hclib_async(blk, referrence, max_cols, input_itemsets, penalty));
+kernel_launcher("pragma100_omp_parallel", niters, pragma100_omp_parallel_hclib_async(blk, referrence, max_cols, input_itemsets, penalty));
  } 
     }    
         
@@ -433,7 +433,7 @@ kernel_launcher("pragma110_omp_parallel", niters, pragma110_omp_parallel_hclib_a
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
  { const int niters = ((max_cols - 1) / 16) - (blk - 1);
-kernel_launcher("pragma162_omp_parallel", niters, pragma162_omp_parallel_hclib_async(max_cols, blk, referrence, input_itemsets, penalty));
+kernel_launcher("pragma155_omp_parallel", niters, pragma155_omp_parallel_hclib_async(max_cols, blk, referrence, input_itemsets, penalty));
  } 
     }
 

@@ -34,7 +34,7 @@ std::string PragmaNode::getPragmaName() {
         // Root node only
         return "root";
     }
-    assert(marker->getNumArgs() == 2);
+    assert(marker->getNumArgs() == 3);
     const clang::Expr *pragmaNameArg = marker->getArg(0);
     while (clang::isa<clang::ImplicitCastExpr>(pragmaNameArg)) {
         pragmaNameArg = clang::dyn_cast<clang::ImplicitCastExpr>(
@@ -48,7 +48,7 @@ std::string PragmaNode::getPragmaName() {
 }
 
 std::string PragmaNode::getPragmaArguments() {
-    assert(marker->getNumArgs() == 2);
+    assert(marker->getNumArgs() == 3);
     const clang::Expr *pragmaArgsArg = marker->getArg(1);
     while (clang::isa<clang::ImplicitCastExpr>(pragmaArgsArg)) {
         pragmaArgsArg = clang::dyn_cast<clang::ImplicitCastExpr>(
@@ -90,10 +90,18 @@ void PragmaNode::setParent(PragmaNode *setParent) {
 }
 
 std::string PragmaNode::getLbl() {
-    std::stringstream lbl;
-    lbl << "pragma" << getStartLine() << "_" << getPragmaName() << "_" <<
-        getPragmaCmd() << std::flush;
-    return lbl.str();
+    assert(marker->getNumArgs() == 3);
+
+    const clang::Expr *pragmaNameArg = marker->getArg(2);
+    while (clang::isa<clang::ImplicitCastExpr>(pragmaNameArg)) {
+        pragmaNameArg = clang::dyn_cast<clang::ImplicitCastExpr>(
+                pragmaNameArg)->getSubExpr();
+    }
+    const clang::StringLiteral *literal = clang::dyn_cast<clang::StringLiteral>(
+            pragmaNameArg);
+    assert(literal);
+    std::string pragmaName = literal->getString().str();
+    return pragmaName;
 }
 
 clang::SourceLocation PragmaNode::getStartLoc() {

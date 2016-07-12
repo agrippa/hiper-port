@@ -85,7 +85,8 @@ int main(int argc, char* argv[]) {
 	float *z;
 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
 
-while(!done) {
+hclib_pragma_marker("omp_to_hclib", "", "pragma89_omp_to_hclib");
+	while(!done) {
 		//Read in REC_WINDOW number of records
 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
 		if( rec_count != REC_WINDOW ) {
@@ -115,16 +116,13 @@ while(!done) {
 			}
 		}
 
-#pragma omp parallel for shared (z, target_lat, target_long) private(i,rec_iter)
-;
-        for (i = 0; i < rec_count; i++){ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for shared (z, target_lat, target_long) private(i,rec_iter)", "pragma120_omp_parallel");
+        for (i = 0; i < rec_count; i++){
 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
             float tmp_lat = atof(rec_iter);
             float tmp_long = atof(rec_iter+5);
 			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
-        } ; }
-
+        }
 
 		
         for( i = 0 ; i < rec_count ; i++ ) {
@@ -144,14 +142,7 @@ while(!done) {
 			  	neighbors[max_idx].dist = z[i];
 			}
 		}
-	} ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-//End while loop
+	}//End while loop
 
 	fprintf(stderr, "The %d nearest neighbors are:\n", k);
 	for( j = 0 ; j < k ; j++ ) {

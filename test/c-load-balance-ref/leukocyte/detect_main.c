@@ -44,7 +44,8 @@ int main(int argc, char ** argv) {
 	MAT *grad_y = gradient_y(image_chopped);
 	
 	m_free(image_chopped);
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma48_omp_to_hclib");
+    {
 	// Get GICOV matrix corresponding to image gradients
 	long long GICOV_start_time = get_time();
 	MAT *gicov = ellipsematching(grad_x, grad_y);
@@ -260,14 +261,7 @@ int main(int argc, char ** argv) {
 	int num_snaxels = 20;
 	ellipsetrack(cell_file, QAX_CENTERS, QAY_CENTERS, k_count, radius, num_snaxels, num_frames);
 	printf("           Total: %.5f seconds\n", ((float) (get_time() - tracking_start_time)) / (float) (1000*1000*num_frames));
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 	
 	// Report total program execution time
     printf("\nTotal application run time: %.5f seconds\n", ((float) (get_time() - program_start_time)) / (1000*1000));

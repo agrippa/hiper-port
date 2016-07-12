@@ -220,91 +220,53 @@ void sparselu_par_call(float **BENCH)
 
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-{
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma224_omp_to_hclib");
+   {
+hclib_pragma_marker("omp", "parallel", "pragma226_omp_parallel");
        {
-#pragma omp single nowait
-;
+hclib_pragma_marker("omp", "single nowait", "pragma228_omp_single");
            {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-               { ____num_tasks[omp_get_thread_num()]++;
-for (kk=0; kk<bots_arg_size; kk++) 
+hclib_pragma_marker("omp", "task untied", "pragma230_omp_task");
+               for (kk=0; kk<bots_arg_size; kk++) 
                {
                    lu0(BENCH[kk*bots_arg_size+kk]);
                    for (jj=kk+1; jj<bots_arg_size; jj++)
                        if (BENCH[kk*bots_arg_size+jj] != NULL)
                        {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj) shared(BENCH)
-#endif
-;
-                           { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, jj) shared(BENCH)", "pragma237_omp_task");
+                           {
                            fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
-                           } ; }
-
+                           }
                        }
                    for (ii=kk+1; ii<bots_arg_size; ii++) 
                        if (BENCH[ii*bots_arg_size+kk] != NULL)
                        {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, ii) shared(BENCH)
-#endif
-;
-                           { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, ii) shared(BENCH)", "pragma245_omp_task");
+                           {
                            bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
-                           } ; }
-
+                           }
                        }
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma251_omp_taskwait");
 
                    for (ii=kk+1; ii<bots_arg_size; ii++)
                        if (BENCH[ii*bots_arg_size+kk] != NULL)
                            for (jj=kk+1; jj<bots_arg_size; jj++)
                                if (BENCH[kk*bots_arg_size+jj] != NULL)
                                {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH)
-#endif
-;
-                                   { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, jj, ii) shared(BENCH)", "pragma258_omp_task");
+                                   {
                                    if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();
                                    bmod(BENCH[ii*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
-                                   } ; }
-
+                                   }
                                }
 
-#pragma omp taskwait
-;
-               } ; }
-
+hclib_pragma_marker("omp", "taskwait", "pragma265_omp_taskwait");
+               }
 
            }
        }
-   } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+   }
    bots_message(" completed!\n");
 }
 

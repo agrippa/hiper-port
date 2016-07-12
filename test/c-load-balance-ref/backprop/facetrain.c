@@ -20,17 +20,11 @@ void backprop_face()
   load(net);
   //entering the training kernel, only one iteration
   printf("Starting training kernel\n");
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma24_omp_to_hclib");
+  {
     float out_err, hid_err;
     bpnn_train_kernel(net, &out_err, &hid_err);
-  } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+  }
   bpnn_free(net);
   printf("Training done\n");
 }

@@ -52,14 +52,11 @@ void dealloc(T* array)
 
 void copy(double *dst, double *src, int N)
 {
-#pragma omp parallel for default(shared) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for default(shared) schedule(static)", "pragma56_omp_parallel");
 	for(int i = 0; i < N; i++)
-	{ ____num_tasks[omp_get_thread_num()]++;
-{
+	{
 		dst[i] = src[i];
-	} ; }
-
+	}
 }
 
 
@@ -104,14 +101,11 @@ cfd_double3 ff_flux_contribution_density_energy;
 
 void initialize_variables(int nelr, double* variables)
 {
-#pragma omp parallel for default(shared) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for default(shared) schedule(static)", "pragma105_omp_parallel");
 	for(int i = 0; i < nelr; i++)
-	{ ____num_tasks[omp_get_thread_num()]++;
-{
+	{
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
-	} ; }
-
+	}
 }
 
 inline void compute_flux_contribution(double& density, cfd_double3& momentum, double& density_energy, double& pressure, cfd_double3& velocity, cfd_double3& fc_momentum_x, cfd_double3& fc_momentum_y, cfd_double3& fc_momentum_z, cfd_double3& fc_density_energy)
@@ -160,11 +154,9 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
-#pragma omp parallel for default(shared) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for default(shared) schedule(static)", "pragma158_omp_parallel");
 	for(int i = 0; i < nelr; i++)
-	{ ____num_tasks[omp_get_thread_num()]++;
-{
+	{
 		double density = variables[NVAR*i + VAR_DENSITY];
 
 		cfd_double3 momentum;
@@ -180,8 +172,7 @@ void compute_step_factor(int nelr, double* variables, double* areas, double* ste
 
 		// dt = double(0.5) * std::sqrt(areas[i]) /  (||v|| + c).... but when we do time stepping, this later would need to be divided by the area, so we just do it all at once
 		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
-	} ; }
-
+	}
 }
 
 
@@ -194,11 +185,9 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 {
 	double smoothing_coefficient = double(0.2f);
 
-#pragma omp parallel for default(shared) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for default(shared) schedule(static)", "pragma189_omp_parallel");
 	for(int i = 0; i < nelr; i++)
-	{ ____num_tasks[omp_get_thread_num()]++;
-{
+	{
 		int j, nb;
 		cfd_double3 normal; double normal_len;
 		double factor;
@@ -322,17 +311,14 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 		fluxes[i*NVAR + (VAR_MOMENTUM+1)] = flux_i_momentum.y;
 		fluxes[i*NVAR + (VAR_MOMENTUM+2)] = flux_i_momentum.z;
 		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
-	} ; }
-
+	}
 }
 
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
-#pragma omp parallel for default(shared) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for default(shared) schedule(static)", "pragma320_omp_parallel");
 	for(int i = 0; i < nelr; i++)
-	{ ____num_tasks[omp_get_thread_num()]++;
-{
+	{
 		double factor = step_factors[i]/double(RK+1-j);
 
 		variables[NVAR*i + VAR_DENSITY] = old_variables[NVAR*i + VAR_DENSITY] + factor*fluxes[NVAR*i + VAR_DENSITY];
@@ -340,8 +326,7 @@ void time_step(int j, int nelr, double* old_variables, double* variables, double
 		variables[NVAR*i + (VAR_MOMENTUM+0)] = old_variables[NVAR*i + (VAR_MOMENTUM+0)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+0)];
 		variables[NVAR*i + (VAR_MOMENTUM+1)] = old_variables[NVAR*i + (VAR_MOMENTUM+1)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+1)];
 		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
-	} ; }
-
+	}
 }
 /*
  * Main function
@@ -355,7 +340,8 @@ int main(int argc, char** argv)
 	}
 	const char* data_file_name = argv[1];
 
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma344_omp_to_hclib");
+    {
 	// set far field conditions
 	{
 		const double angle_of_attack = double(3.1415926535897931 / 180.0) * double(deg_angle_of_attack);
@@ -472,14 +458,7 @@ int main(int argc, char** argv)
 	dealloc<double>(old_variables);
 	dealloc<double>(fluxes);
 	dealloc<double>(step_factors);
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 
 	std::cout << "Done..." << std::endl;
 

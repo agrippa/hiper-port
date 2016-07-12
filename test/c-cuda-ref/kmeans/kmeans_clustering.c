@@ -145,7 +145,7 @@ float euclid_dist_2(float *pt1,
 
 
 /*----< kmeans_clustering() >---------------------------------------------*/
-class pragma179_omp_parallel_hclib_async {
+class pragma173_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -203,7 +203,7 @@ float euclid_dist_2(float *pt1,
     float* volatile h_partial_new_centers;
 
     public:
-        pragma179_omp_parallel_hclib_async(int set_index,
+        pragma173_omp_parallel_hclib_async(int set_index,
                 float* set_feature,
                 int set_i,
                 int set_nfeatures,
@@ -377,7 +377,7 @@ float* kmeans_clustering(float *feature,    /* in: [npoints][nfeatures] */
         delta = 0.0;
         {
  { const int niters = (npoints) - (0);
-kernel_launcher("pragma179_omp_parallel", niters, pragma179_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers));
+kernel_launcher("pragma173_omp_parallel", niters, pragma173_omp_parallel_hclib_async(index, feature, i, nfeatures, clusters, nclusters, membership, delta, partial_new_centers_len, j, partial_new_centers));
  } 
         } /* end of #pragma omp parallel */
 

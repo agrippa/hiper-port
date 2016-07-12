@@ -194,7 +194,7 @@ for (z = 0; z < nz; z++) {
                 }
             } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma158_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma157_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
             float *t = tIn_t;
             tIn_t = tOut_t;

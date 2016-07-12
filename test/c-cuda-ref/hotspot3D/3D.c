@@ -163,7 +163,7 @@ float accuracy(float *arr1, float *arr2, int len)
 
 
 }
-class pragma167_omp_parallel_hclib_async {
+class pragma157_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -191,7 +191,7 @@ class pragma167_omp_parallel_hclib_async {
     volatile float amb_temp;
 
     public:
-        pragma167_omp_parallel_hclib_async(int set_ny,
+        pragma157_omp_parallel_hclib_async(int set_ny,
                 int set_nx,
                 int set_z,
                 int set_nz,
@@ -334,7 +334,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
         do {
             int z; 
  { const int niters = (nz) - (0);
-kernel_launcher("pragma167_omp_parallel", niters, pragma167_omp_parallel_hclib_async(ny, nx, z, nz, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
+kernel_launcher("pragma157_omp_parallel", niters, pragma157_omp_parallel_hclib_async(ny, nx, z, nz, tOut_t, cc, tIn_t, cw, ce, cs, cn, cb, ct, dt, Cap, pIn, amb_temp));
  } 
             float *t = tIn_t;
             tIn_t = tOut_t;

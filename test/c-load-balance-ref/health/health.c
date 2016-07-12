@@ -419,15 +419,8 @@ void sim_village_par(struct Village *village)
    vlist = village->forward;
    while(vlist)
    {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(vlist, village) untied
-#else
-#pragma omp task  firstprivate(vlist, village)
-#endif
-;
-      { ____num_tasks[omp_get_thread_num()]++;
-sim_village_par(vlist) ; }
-;
+hclib_pragma_marker("omp", "task untied firstprivate(vlist, village)", "pragma423_omp_task");
+      sim_village_par(vlist);
       vlist = vlist->next;
    }
 
@@ -440,8 +433,7 @@ sim_village_par(vlist) ; }
    /* Uses lists v->hosp->waiting, and v->hosp->assess */
    check_patients_waiting(village);
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma437_omp_taskwait");
 
    /* Uses lists v->hosp->realloc, v->hosp->asses and v->hosp->waiting */
    check_patients_realloc(village);
@@ -557,33 +549,18 @@ int check_village(struct Village *top)
 void sim_village_main_par(struct Village *top)
 {
     long i;
-{
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma553_omp_to_hclib");
+    {
+hclib_pragma_marker("omp", "parallel", "pragma555_omp_parallel");
         {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma557_omp_single");
             {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied", "pragma559_omp_task");
+                {
                     for (i = 0; i < sim_time; i++) sim_village_par(top);   
-                } ; }
-
+                }
             }
         }
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 }
 

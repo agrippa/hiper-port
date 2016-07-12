@@ -27,7 +27,7 @@
 /***************************************************************************//**
  *  Parallel tile matrix generation - dynamic scheduling
  **/
-typedef struct _pragma45_omp_task {
+typedef struct _pragma35_omp_task {
     double (*(*dA_ptr));
     int (*m_ptr);
     int (*n_ptr);
@@ -36,9 +36,9 @@ typedef struct _pragma45_omp_task {
     int (*tempnn_ptr);
     PLASMA_desc (*A_ptr);
     unsigned long long (*seed_ptr);
- } pragma45_omp_task;
+ } pragma35_omp_task;
 
-static void *pragma45_omp_task_hclib_async(void *____arg);
+static void *pragma35_omp_task_hclib_async(void *____arg);
 void plasma_pdpltmg_quark(PLASMA_desc A, unsigned long long int seed)
 {
     int m, n;
@@ -53,7 +53,7 @@ void plasma_pdpltmg_quark(PLASMA_desc A, unsigned long long int seed)
             tempnn = n == A.nt-1 ? A.n-n*A.nb : A.nb;
             double *dA = A(m, n);
  { 
-pragma45_omp_task *new_ctx = (pragma45_omp_task *)malloc(sizeof(pragma45_omp_task));
+pragma35_omp_task *new_ctx = (pragma35_omp_task *)malloc(sizeof(pragma35_omp_task));
 new_ctx->dA_ptr = &(dA);
 new_ctx->m_ptr = &(m);
 new_ctx->n_ptr = &(n);
@@ -62,13 +62,13 @@ new_ctx->tempmm_ptr = &(tempmm);
 new_ctx->tempnn_ptr = &(tempnn);
 new_ctx->A_ptr = &(A);
 new_ctx->seed_ptr = &(seed);
-hclib_emulate_omp_task(pragma45_omp_task_hclib_async, new_ctx, ANY_PLACE, 0, 1, (dA) + (0), tempnn*ldam);
+hclib_emulate_omp_task(pragma35_omp_task_hclib_async, new_ctx, ANY_PLACE, 0, 1, (dA) + (0), tempnn*ldam);
  } ;
         }
     }
 } 
-static void *pragma45_omp_task_hclib_async(void *____arg) {
-    pragma45_omp_task *ctx = (pragma45_omp_task *)____arg;
+static void *pragma35_omp_task_hclib_async(void *____arg) {
+    pragma35_omp_task *ctx = (pragma35_omp_task *)____arg;
     hclib_start_finish();
 CORE_dplrnt((*(ctx->tempmm_ptr)), (*(ctx->tempnn_ptr)), (*(ctx->dA_ptr)), (*(ctx->ldam_ptr)), (*(ctx->A_ptr)).m, (*(ctx->m_ptr))*(*(ctx->A_ptr)).mb, (*(ctx->n_ptr))*(*(ctx->A_ptr)).nb, (*(ctx->seed_ptr))) ;     ; hclib_end_finish_nonblocking();
 

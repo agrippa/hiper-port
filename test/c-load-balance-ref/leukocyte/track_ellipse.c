@@ -82,11 +82,9 @@ void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np,
 		}
 		
 		// Split the work among multiple threads, if OPEN is defined
-#pragma omp parallel for private(i, j)
-;
+hclib_pragma_marker("omp", "parallel for private(i, j)", "pragma86_omp_parallel");
 		// Track each cell
-		for (cell_num = 0; cell_num < Nc; cell_num++) { ____num_tasks[omp_get_thread_num()]++;
-{
+		for (cell_num = 0; cell_num < Nc; cell_num++) {
 			// Make copies of the current cell's location
 			double xci = xc[cell_num][frame_num];
 			double yci = yc[cell_num][frame_num];
@@ -165,8 +163,7 @@ void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np,
 			// Free temporary memory
 			m_free(IMGVF);
 			free(ri);
-	    } ; }
-
+	    }
 
 #ifdef OUTPUT
 		if (frame_num == Nf)

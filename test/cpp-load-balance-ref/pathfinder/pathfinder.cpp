@@ -98,14 +98,13 @@ void run(int argc, char** argv)
 
     pin_stats_reset();
 
-for (int t = 0; t < rows-1; t++) {
+hclib_pragma_marker("omp_to_hclib", "", "pragma102_omp_to_hclib");
+    for (int t = 0; t < rows-1; t++) {
         temp = src;
         src = dst;
         dst = temp;
-#pragma omp parallel for private(min)
-;
-        for(int n = 0; n < cols; n++){ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for private(min)", "pragma107_omp_parallel");
+        for(int n = 0; n < cols; n++){
           min = src[n];
           if (n > 0) {
               min = src[n - 1] < min ? src[n - 1] : min;
@@ -114,16 +113,8 @@ for (int t = 0; t < rows-1; t++) {
               min = src[n + 1] < min ? src[n + 1] : min;
           }
           dst[n] = data[t+1 * cols + n]+min;
-        } ; }
-
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+        }
     }
-}
-
 
     pin_stats_pause(cycles);
     pin_stats_dump(cycles);

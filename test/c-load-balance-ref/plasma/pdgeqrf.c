@@ -43,33 +43,20 @@ void plasma_pdgeqrf_quark(PLASMA_desc A, PLASMA_desc T, int ib)
 #if defined(USE_OMPEXT)
 omp_set_task_priority(1);
 #endif
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout: dA[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb]) untied
-#else
-#pragma omp task depend(inout: dA[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])
-#endif
-;
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(inout: dA[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])", "pragma47_omp_task");
+        {
             double tau[T.nb];
             double work[ib * T.nb];
             CORE_dgeqrt(tempkm, tempkn, ib, dA, ldak, dT, T.mb, &tau[0], &work[0]);
-        } ; }
-
+        }
 
         for (n = k+1; n < A.nt; n++) {
             tempnn = n == A.nt-1 ? A.n-n*A.nb : A.nb;
             double *dA = A(k, k);
             double *dT = T(k, k);
             double *dC = A(k, n);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in: dA[0:T.nb*T.nb], dT[0:ib*T.nb]) depend(inout:dC[0:T.nb*T.nb]) untied
-#else
-#pragma omp task depend(in: dA[0:T.nb*T.nb], dT[0:ib*T.nb]) depend(inout:dC[0:T.nb*T.nb])
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(in: dA[0:T.nb*T.nb], dT[0:ib*T.nb]) depend(inout:dC[0:T.nb*T.nb])", "pragma59_omp_task");
+            {
                 double work[T.nb * ib];
                 CORE_dormqr(PlasmaLeft, PlasmaTrans,
                         tempkm, tempnn, tempkm, ib,
@@ -77,8 +64,7 @@ omp_set_task_priority(1);
                         dT, T.mb,
                         dC, ldak,
                         &work[0], T.nb);
-            } ; }
-
+            }
         }
         for (m = k+1; m < A.mt; m++) {
             tempmm = m == A.mt-1 ? A.m-m*A.mb : A.mb;
@@ -86,22 +72,15 @@ omp_set_task_priority(1);
             double *dA = A(k, k);
             double *dB = A(m, k);
             double *dT = T(m, k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb]) untied
-#else
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(out:dT[0:ib*T.nb])", "pragma76_omp_task");
+            {
                 double tau[T.nb];
                 double work[ib * T.nb];
                 CORE_dtsqrt(tempmm, tempkn, ib,
                         dA, ldak,
                         dB, ldam,
                         dT, T.mb, &tau[0], &work[0]);
-            } ; }
-
+            }
 
             for (n = k+1; n < A.nt; n++) {
                 tempnn = n == A.nt-1 ? A.n-n*A.nb : A.nb;
@@ -109,14 +88,8 @@ omp_set_task_priority(1);
                 double *dB = A(m, n);
                 double *dV = A(m, k);
                 double *dT = T(m, k);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(in:dV[0:T.nb*T.nb], dT[0:ib*T.nb]) untied
-#else
-#pragma omp task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(in:dV[0:T.nb*T.nb], dT[0:ib*T.nb])
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(inout:dA[0:T.nb*T.nb], dB[0:T.nb*T.nb]) depend(in:dV[0:T.nb*T.nb], dT[0:ib*T.nb])", "pragma92_omp_task");
+                {
                     double work[ib * T.nb];
                     CORE_dtsmqr(PlasmaLeft, PlasmaTrans,
                             A.mb, tempnn, tempmm, tempnn, A.nb, ib,
@@ -124,8 +97,7 @@ omp_set_task_priority(1);
                             dB, ldam,
                             dV, ldam,
                             dT, T.mb, &work[0], ib);
-                } ; }
-
+                }
             }
         }
     }

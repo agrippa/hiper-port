@@ -114,7 +114,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-class pragma114_omp_parallel_hclib_async {
+class pragma104_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -131,7 +131,7 @@ class pragma114_omp_parallel_hclib_async {
     volatile int t;
 
     public:
-        pragma114_omp_parallel_hclib_async(int set_min,
+        pragma104_omp_parallel_hclib_async(int set_min,
                 int* set_src,
                 int set_cols,
                 int* set_dst,
@@ -239,7 +239,7 @@ for (int t = 0; t < rows-1; t++) {
         src = dst;
         dst = temp;
  { const int niters = (cols) - (0);
-kernel_launcher("pragma114_omp_parallel", niters, pragma114_omp_parallel_hclib_async(min, src, cols, dst, data, t));
+kernel_launcher("pragma104_omp_parallel", niters, pragma104_omp_parallel_hclib_async(min, src, cols, dst, data, t));
  } 
     }
 

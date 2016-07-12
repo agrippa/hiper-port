@@ -35,7 +35,8 @@ void lud_diagonal_omp (float* a, int size, int offset)
 // implements block LU factorization 
 void lud_omp(float *a, int size)
 {
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma39_omp_to_hclib");
+    {
     int offset, chunk_idx, size_inter, chunks_in_inter_row, chunks_per_inter;
 
     for (offset = 0; offset < size - BS ; offset += BS)
@@ -49,18 +50,15 @@ void lud_omp(float *a, int size)
         
         // calculate perimeter block matrices
         // 
-#pragma omp parallel for default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)
-;
+hclib_pragma_marker("omp", "parallel for default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)", "pragma55_omp_parallel");
         for ( chunk_idx = 0; chunk_idx < chunks_in_inter_row; chunk_idx++)
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+        {
             int i, j, k, i_global, j_global, i_here, j_here;
             float sum;           
             float temp[BS*BS] __attribute__ ((aligned (64)));
 
             for (i = 0; i < BS; i++) {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma63_omp_simd");
                 for (j =0; j < BS; j++){
                     temp[i*BS + j] = a[size*(i + offset) + offset + j ];
                 }
@@ -99,18 +97,15 @@ void lud_omp(float *a, int size)
                 }
             }
 
-        } ; }
-
+        }
         
         // update interior block matrices
         //
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
-#pragma omp parallel for schedule(auto) default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)
-;
+hclib_pragma_marker("omp", "parallel for schedule(auto) default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)", "pragma109_omp_parallel");
         for  (chunk_idx =0; chunk_idx < chunks_per_inter; chunk_idx++)
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+        {
             int i, j, k, i_global, j_global;
             float temp_top[BS*BS] __attribute__ ((aligned (64)));
             float temp_left[BS*BS] __attribute__ ((aligned (64)));
@@ -120,8 +115,7 @@ void lud_omp(float *a, int size)
             j_global = offset + BS * (1 + chunk_idx%chunks_in_inter_row);
 
             for (i = 0; i < BS; i++) {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma121_omp_simd");
                 for (j =0; j < BS; j++){
                     temp_top[i*BS + j]  = a[size*(i + offset) + j + j_global ];
                     temp_left[i*BS + j] = a[size*(i + i_global) + offset + j];
@@ -131,30 +125,20 @@ void lud_omp(float *a, int size)
             for (i = 0; i < BS; i++)
             {
                 for (k=0; k < BS; k++) {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma131_omp_simd");
                     for (j = 0; j < BS; j++) {
                         sum[j] += temp_left[BS*i + k] * temp_top[BS*k + j];
                     }
                 }
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma136_omp_simd");
                 for (j = 0; j < BS; j++) {
                     BB((i+i_global),(j+j_global)) -= sum[j];
                     sum[j] = 0.f;
                 }
             }
-        } ; }
-
+        }
     }
 
     lud_diagonal_omp(a, size, offset);
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 }

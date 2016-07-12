@@ -110,11 +110,9 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	MAT * gicov = m_get(height, width);
 	
 	// Split the work among multiple threads, if OPEN is defined
-#pragma omp parallel for
-;
+hclib_pragma_marker("omp", "parallel for", "pragma114_omp_parallel");
 	// Scan from left to right, top to bottom, computing GICOV values
-	for (i = MaxR; i < width - MaxR; i++) { ____num_tasks[omp_get_thread_num()]++;
-{
+	for (i = MaxR; i < width - MaxR; i++) {
 		double Grad[NPOINTS];
 		int j, k, n, x, y;
 		
@@ -154,8 +152,7 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 				}
 			}
 		}
-	} ; }
-
+	}
 	
 	return gicov;
 }
@@ -188,11 +185,9 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
 	
 	// Split the work among multiple threads, if OPEN is defined
-#pragma omp parallel for
-;
+hclib_pragma_marker("omp", "parallel for", "pragma189_omp_parallel");
 	// Iterate across the input matrix
-	for (i = 0; i < img_in->m; i++) { ____num_tasks[omp_get_thread_num()]++;
-{
+	for (i = 0; i < img_in->m; i++) {
 		int j, el_i, el_j, x, y;
 		for (j = 0; j < img_in->n; j++) {
 			double max = 0.0, temp;
@@ -212,8 +207,7 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 			// Store the maximum value found
 			m_set_val(dilated, i, j, max);
 		}
-	} ; }
-
+	}
 
 	return dilated;
 }

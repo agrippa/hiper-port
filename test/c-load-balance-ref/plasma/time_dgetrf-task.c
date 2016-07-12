@@ -32,11 +32,9 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
 
     int* piv = (int*)malloc(N * sizeof(double));
 
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma36_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma38_omp_single");
         {
     plasma_pdpltmg_quark(*descA, 3456);
         }
@@ -50,11 +48,9 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     }
 
     START_TIMING();
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma52_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma54_omp_single");
         {
     plasma_pdgetrf_rectil_quark(*descA, piv);
         }

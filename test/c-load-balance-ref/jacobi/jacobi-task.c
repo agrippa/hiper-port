@@ -13,39 +13,23 @@ void sweep (int nx, int ny, double dx, double dy, double *f,
     // double (*u)[nx][ny] = (double (*)[nx][ny])u_;
     // double (*unew)[nx][ny] = (double (*)[nx][ny])unew_;
 
-#pragma omp parallel shared (f, u, unew) private (i, it, j) firstprivate(nx, ny, dx, dy, itold, itnew)
-;
+hclib_pragma_marker("omp", "parallel shared (f, u, unew) private (i, it, j) firstprivate(nx, ny, dx, dy, itold, itnew)", "pragma17_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma19_omp_single");
     {
         for (it = itold + 1; it <= itnew; it++) {
             // Save the current estimate.
             for (i = 0; i < nx; i++) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(i, ny) private(j) shared(u, unew) untied
-#else
-#pragma omp task firstprivate(i, ny) private(j) shared(u, unew)
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-for (j = 0; j < ny; j++) {
+hclib_pragma_marker("omp", "task firstprivate(i, ny) private(j) shared(u, unew)", "pragma24_omp_task");
+                for (j = 0; j < ny; j++) {
                     (u)[i * ny + j] = (unew)[i * ny + j];
-                } ; }
-
+                }
             }
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma29_omp_taskwait");
             // Compute a new estimate.
             for (i = 0; i < nx; i++) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task firstprivate(i, dx, dy, nx, ny) private(j) shared(u, unew, f) untied
-#else
-#pragma omp task firstprivate(i, dx, dy, nx, ny) private(j) shared(u, unew, f)
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-for (j = 0; j < ny; j++) {
+hclib_pragma_marker("omp", "task firstprivate(i, dx, dy, nx, ny) private(j) shared(u, unew, f)", "pragma32_omp_task");
+                for (j = 0; j < ny; j++) {
                     if (i == 0 || j == 0 || i == nx - 1 || j == ny - 1) {
                         (unew)[i * ny + j] = (f)[i * ny + j];
                     } else {
@@ -53,11 +37,9 @@ for (j = 0; j < ny; j++) {
                                                 + (u)[i * ny + (j-1)] + (u)[(i+1) * ny + j]
                                                 + (f)[i * ny + j] * dx * dy);
                     }
-                } ; }
-
+                }
             }
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma43_omp_taskwait");
         }
     }
     }

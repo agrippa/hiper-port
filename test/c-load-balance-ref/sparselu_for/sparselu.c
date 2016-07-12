@@ -251,14 +251,13 @@ void sparselu_par_call(float **BENCH)
 {
    int ii, jj, kk;
  
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma255_omp_to_hclib");
+   {
    bots_message("Computing SparseLU Factorization (%dx%d matrix with %dx%d blocks) ",
            bots_arg_size,bots_arg_size,bots_arg_size_1,bots_arg_size_1);
-#pragma omp parallel private(kk)
-;
+hclib_pragma_marker("omp", "parallel private(kk)", "pragma259_omp_parallel");
    {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma261_omp_single");
    for (kk=0; kk<bots_arg_size; kk++) 
    {
       lu0(BENCH[kk*bots_arg_size+kk]);
@@ -266,32 +265,18 @@ void sparselu_par_call(float **BENCH)
       for (jj=kk+1; jj<bots_arg_size; jj++)
          if (BENCH[kk*bots_arg_size+jj] != NULL)
          {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj) shared(BENCH)
-#endif
-;
-             { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, jj) shared(BENCH)", "pragma269_omp_task");
+             {
             fwd(BENCH[kk*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj]);
-             } ; }
-
+             }
          }
       for (ii=kk+1; ii<bots_arg_size; ii++) 
          if (BENCH[ii*bots_arg_size+kk] != NULL)
          {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, ii) shared(BENCH)
-#endif
-;
-             { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, ii) shared(BENCH)", "pragma277_omp_task");
+             {
             bdiv (BENCH[kk*bots_arg_size+kk], BENCH[ii*bots_arg_size+kk]);
-             } ; }
-
+             }
          }
 
       for (ii=kk+1; ii<bots_arg_size; ii++)
@@ -299,31 +284,17 @@ void sparselu_par_call(float **BENCH)
             for (jj=kk+1; jj<bots_arg_size; jj++)
                if (BENCH[kk*bots_arg_size+jj] != NULL)
                {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH) untied
-#else
-#pragma omp task  firstprivate(kk, jj, ii) shared(BENCH)
-#endif
-;
-                   { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(kk, jj, ii) shared(BENCH)", "pragma288_omp_task");
+                   {
                      if (BENCH[ii*bots_arg_size+jj]==NULL) BENCH[ii*bots_arg_size+jj] = allocate_clean_block();
                      bmod(BENCH[ii*bots_arg_size+kk], BENCH[kk*bots_arg_size+jj], BENCH[ii*bots_arg_size+jj]);
-                   } ; }
-
+                   }
                }
 
    }
    }
    bots_message(" completed!\n");
-   } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+   }
 }
 
 void sparselu_fini (float **BENCH, char *pass)

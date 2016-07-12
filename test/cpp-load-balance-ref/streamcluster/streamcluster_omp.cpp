@@ -388,10 +388,8 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	
 	// OpenMP parallelization
 //	#pragma omp parallel for 
-#pragma omp parallel for reduction(+: cost_of_opening_x)
-;
-  for ( i = k1; i < k2; i++ ) { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for reduction(+: cost_of_opening_x)", "pragma392_omp_parallel");
+  for ( i = k1; i < k2; i++ ) {
     float x_cost = dist(points->p[i], points->p[x], points->dim) 
       * points->p[i].weight;
     float current_cost = points->p[i].cost;
@@ -415,8 +413,7 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
       int assign = points->p[i].assign;
       lower[center_table[assign]] += current_cost - x_cost;			
     }
-  } ; }
-
+  }
 
 #ifdef PROFILE
   double t2 = gettime();
@@ -467,10 +464,8 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
-#pragma omp parallel for
-;
-    for ( int i = k1; i < k2; i++ ) { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for", "pragma468_omp_parallel");
+    for ( int i = k1; i < k2; i++ ) {
       bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
       if ( switch_membership[i] || close_center ) {
 				// Either i's median (which may be i itself) is closing,
@@ -479,8 +474,7 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 					dist(points->p[i], points->p[x], points->dim);
 				points->p[i].assign = x;
       }
-    } ; }
-
+    }
 		
     for( int i = k1; i < k2; i++ ) {
       if( is_center[i] && gl_lower[center_table[i]] > 0 ) {
@@ -747,7 +741,8 @@ float pkmedian(Points *points, long kmin, long kmax, long* kfinal,
     }
 
 
-while(1) {
+hclib_pragma_marker("omp_to_hclib", "", "pragma745_omp_to_hclib");
+  while(1) {
 		d++;
 #ifdef PRINTINFO
     if( pid==0 )
@@ -797,14 +792,7 @@ while(1) {
       { 
 	break;
       }
-  } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+  }
 
   //clean up...
   if( pid==0 ) {

@@ -195,7 +195,8 @@ int main(int argc, char **argv) {
     }     
 	printf("I/O completed\n");	
 
-for (i=0; i<nloops; i++) {
+hclib_pragma_marker("omp_to_hclib", "", "pragma199_omp_to_hclib");
+    for (i=0; i<nloops; i++) {
         
         cluster_centres = NULL;
         cluster(numObjects,
@@ -206,14 +207,7 @@ for (i=0; i<nloops; i++) {
                 &cluster_centres   
                );
      
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 	
 
 	printf("number of Clusters %d\n",nclusters); 

@@ -56,77 +56,49 @@ void plasma_pdpotrf_quark(PLASMA_enum uplo, PLASMA_desc A)
 #if defined(USE_OMPEXT)
 omp_set_task_priority(1);
 #endif
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(inout:dA[0:A.mb*A.mb]) untied
-#else
-#pragma omp task depend(inout:dA[0:A.mb*A.mb])
-#endif
-;
-            { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(inout:dA[0:A.mb*A.mb])", "pragma60_omp_task");
+            {
                 LAPACKE_dpotrf_work(LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), tempkm, dA, ldak);
-            } ; }
-
+            }
 
             for (m = k+1; m < A.nt; m++) {
                 tempmm = m == A.nt-1 ? A.n-m*A.nb : A.nb;
                 double *dA = A(k, k);
                 double *dB = A(k, m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
-#else
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-cblas_dtrsm(
+hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])", "pragma69_omp_task");
+                cblas_dtrsm(
                         CblasColMajor,
                         (CBLAS_SIDE)PlasmaLeft, (CBLAS_UPLO)PlasmaUpper,
                         (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_DIAG)PlasmaNonUnit,
                         A.mb, tempmm,
                         zone, dA, ldak,
-                        dB, ldak) ; }
-;
+                        dB, ldak);
             }
             for (m = k+1; m < A.nt; m++) {
                 tempmm = m == A.nt-1 ? A.n-m*A.nb : A.nb;
                 ldam = BLKLDD(A, m);
                 double *dA = A(k, m);
                 double *dB = A(m, m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb]) untied
-#else
-#pragma omp task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb]) depend(inout:dB[0:A.mb*A.mb])", "pragma83_omp_task");
+                {
                     cblas_dsyrk(
                             CblasColMajor,
                             (CBLAS_UPLO)PlasmaUpper, (CBLAS_TRANSPOSE)PlasmaTrans,
                             tempmm, A.mb,
                             (-1.0), dA, ldak,
                             (1.0), dB, ldam);
-                } ; }
-
+                }
 
                 for (n = k+1; n < m; n++) {
                     double *dA = A(k , n);
                     double *dB = A(k , m);
                     double *dC = A(n , m);
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb]) untied
-#else
-#pragma omp task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])
-#endif
-;
-                    { ____num_tasks[omp_get_thread_num()]++;
-cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
+hclib_pragma_marker("omp", "task depend(in:dA[0:A.mb*A.mb], dB[0:A.mb*A.mb]) depend(inout:dC[0:A.mb*A.mb])", "pragma97_omp_task");
+                    cblas_dgemm(CblasColMajor, (CBLAS_TRANSPOSE)PlasmaTrans, (CBLAS_TRANSPOSE)PlasmaNoTrans,
                             A.mb, tempmm, A.mb,
                             mzone, dA, ldak,
                             dB, ldak,
-                            zone, dC, A.mb) ; }
-;
+                            zone, dC, A.mb);
                 }
             }
         }

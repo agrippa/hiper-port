@@ -68,7 +68,7 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 //Apply BFS on a Graph using CUDA
 ////////////////////////////////////////////////////////////////////////////////
-class pragma136_omp_parallel_hclib_async {
+class pragma126_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -88,7 +88,7 @@ class pragma136_omp_parallel_hclib_async {
     bool* h_h_updating_graph_mask;
 
     public:
-        pragma136_omp_parallel_hclib_async(bool* set_h_graph_mask,
+        pragma126_omp_parallel_hclib_async(bool* set_h_graph_mask,
                 struct Node* set_h_graph_nodes,
                 int* set_h_graph_edges,
                 bool* set_h_graph_visited,
@@ -199,7 +199,7 @@ class pragma136_omp_parallel_hclib_async {
         }
 };
 
-class pragma153_omp_parallel_hclib_async {
+class pragma143_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -214,7 +214,7 @@ class pragma153_omp_parallel_hclib_async {
     volatile bool stop;
 
     public:
-        pragma153_omp_parallel_hclib_async(bool* set_h_updating_graph_mask,
+        pragma143_omp_parallel_hclib_async(bool* set_h_updating_graph_mask,
                 bool* set_h_graph_mask,
                 bool* set_h_graph_visited,
                 bool set_stop) {
@@ -384,11 +384,11 @@ void BFSGraph( int argc, char** argv)
 
             //omp_set_num_threads(num_omp_threads);
  { const int niters = (no_of_nodes) - (0);
-kernel_launcher("pragma136_omp_parallel", niters, pragma136_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask));
+kernel_launcher("pragma126_omp_parallel", niters, pragma126_omp_parallel_hclib_async(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask));
  } 
 
  { const int niters = (no_of_nodes) - (0);
-kernel_launcher("pragma153_omp_parallel", niters, pragma153_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop));
+kernel_launcher("pragma143_omp_parallel", niters, pragma143_omp_parallel_hclib_async(h_updating_graph_mask, h_graph_mask, h_graph_visited, stop));
  } 
             k++;
         }

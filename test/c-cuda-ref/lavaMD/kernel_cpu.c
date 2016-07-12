@@ -69,7 +69,7 @@ static void kernel_launcher(const char *kernel_lbl, unsigned niters, functor_typ
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-class pragma123_omp_parallel_hclib_async {
+class pragma117_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -109,7 +109,7 @@ class pragma123_omp_parallel_hclib_async {
     double fzij;
 
     public:
-        pragma123_omp_parallel_hclib_async(long set_first_i,
+        pragma117_omp_parallel_hclib_async(long set_first_i,
                 box_str* set_box,
                 int set_l,
                 FOUR_VECTOR* set_rA,
@@ -407,7 +407,7 @@ void  kernel_cpu(	par_str par,
 	//======================================================================================================================================================150
 
  { const int niters = (dim.number_boxes) - (0);
-kernel_launcher("pragma123_omp_parallel", niters, pragma123_omp_parallel_hclib_async(first_i, box, l, rA, rv, fA, fv, k, pointer, first_j, rB, qB, qv, i, j, r2, u2, a2, vij, fs, d, fxij, fyij, fzij));
+kernel_launcher("pragma117_omp_parallel", niters, pragma117_omp_parallel_hclib_async(first_i, box, l, rA, rv, fA, fv, k, pointer, first_j, rB, qB, qv, i, j, r2, u2, a2, vij, fs, d, fxij, fyij, fzij));
  }  // for l
     }
 

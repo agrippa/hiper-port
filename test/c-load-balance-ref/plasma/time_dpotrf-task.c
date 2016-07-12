@@ -33,11 +33,9 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
     double* ptr = malloc(N * N * sizeof(double));
     PLASMA_Desc_Create(&descA, ptr, PlasmaRealDouble, NB, NB, NB*NB, N, N, 0, 0, N, N);
 
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma37_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma39_omp_single");
         {
     plasma_pdplgsy_quark( (double)N, *descA, 51 );
         }
@@ -52,11 +50,9 @@ RunTest(real_Double_t *t_, struct user_parameters* params)
 
     /* PLASMA DPOSV */
     START_TIMING();
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma54_omp_parallel");
     {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma56_omp_single");
         {
     plasma_pdpotrf_quark(uplo, *descA);
         }

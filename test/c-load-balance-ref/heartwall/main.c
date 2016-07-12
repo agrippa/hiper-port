@@ -545,14 +545,11 @@ int main(int argc, char *argv []){
 	//	PROCESSING
 	//====================================================================================================
 
-#pragma omp parallel for
-;
-		for(i=0; i<public_s.allPoints; i++){ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for", "pragma549_omp_parallel");
+		for(i=0; i<public_s.allPoints; i++){
 			kernel(	public_s,
 						private_s[i]);
-		} ; }
-
+		}
 
 	//====================================================================================================
 	//	FREE MEMORY FOR FRAME

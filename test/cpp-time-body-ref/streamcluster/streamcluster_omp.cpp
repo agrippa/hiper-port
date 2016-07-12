@@ -433,7 +433,7 @@ for ( i = k1; i < k2; i++ ) {
     }
   } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma390_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma389_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 #ifdef PROFILE
@@ -498,7 +498,7 @@ for ( int i = k1; i < k2; i++ ) {
       }
     } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma466_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma465_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 		
     for( int i = k1; i < k2; i++ ) {

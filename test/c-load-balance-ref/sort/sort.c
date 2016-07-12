@@ -335,27 +335,12 @@ void cilkmerge_par(ELM *low1, ELM *high1, ELM *low2, ELM *high2, ELM *lowdest)
       * the appropriate location
       */
      *(lowdest + lowsize + 1) = *split1;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilkmerge_par(low1, split1 - 1, low2, split2, lowdest) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilkmerge_par(split1 + 1, high1, split2 + 1, high2,
-		     lowdest + lowsize + 2) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma351_omp_task");
+     cilkmerge_par(low1, split1 - 1, low2, split2, lowdest);
+hclib_pragma_marker("omp", "task untied", "pragma353_omp_task");
+     cilkmerge_par(split1 + 1, high1, split2 + 1, high2,
+		     lowdest + lowsize + 2);
+hclib_pragma_marker("omp", "taskwait", "pragma356_omp_taskwait");
 
      return;
 }
@@ -386,65 +371,21 @@ void cilksort_par(ELM *low, ELM *tmp, long size)
      D = C + quarter;
      tmpD = tmpC + quarter;
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilksort_par(A, tmpA, quarter) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilksort_par(B, tmpB, quarter) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilksort_par(C, tmpC, quarter) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilksort_par(D, tmpD, size - 3 * quarter) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma387_omp_task");
+     cilksort_par(A, tmpA, quarter);
+hclib_pragma_marker("omp", "task untied", "pragma389_omp_task");
+     cilksort_par(B, tmpB, quarter);
+hclib_pragma_marker("omp", "task untied", "pragma391_omp_task");
+     cilksort_par(C, tmpC, quarter);
+hclib_pragma_marker("omp", "task untied", "pragma393_omp_task");
+     cilksort_par(D, tmpD, size - 3 * quarter);
+hclib_pragma_marker("omp", "taskwait", "pragma395_omp_taskwait");
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilkmerge_par(A, A + quarter - 1, B, B + quarter - 1, tmpA) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-     { ____num_tasks[omp_get_thread_num()]++;
-cilkmerge_par(C, C + quarter - 1, D, low + size - 1, tmpC) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma397_omp_task");
+     cilkmerge_par(A, A + quarter - 1, B, B + quarter - 1, tmpA);
+hclib_pragma_marker("omp", "task untied", "pragma399_omp_task");
+     cilkmerge_par(C, C + quarter - 1, D, low + size - 1, tmpC);
+hclib_pragma_marker("omp", "taskwait", "pragma401_omp_taskwait");
 
      cilkmerge_par(tmpA, tmpC - 1, tmpC, tmpA + size - 1, A);
 }
@@ -516,34 +457,19 @@ void sort_init ( void )
 void sort_par ( void )
 {
 	bots_message("Computing multisort algorithm (n=%d) ", bots_arg_size);
-{
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma473_omp_to_hclib");
+    {
+hclib_pragma_marker("omp", "parallel", "pragma475_omp_parallel");
         {
-#pragma omp single nowait
-;
+hclib_pragma_marker("omp", "single nowait", "pragma477_omp_single");
             {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-                { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied", "pragma479_omp_task");
+                {
                     cilksort_par(array, tmp, bots_arg_size);
-                } ; }
-
+                }
             }
         }
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
 	bots_message(" completed!\n");
 }
 

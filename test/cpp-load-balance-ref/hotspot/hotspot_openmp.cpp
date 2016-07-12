@@ -61,11 +61,9 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
     int chunks_in_col = row/BLOCK_SIZE_R;
 
 	// omp_set_num_threads(num_omp_threads);
-#pragma omp parallel for shared(power, temp, result) private(chunk, r, c, delta) firstprivate(row, col, num_chunk, chunks_in_row) schedule(static)
-;
+hclib_pragma_marker("omp", "parallel for shared(power, temp, result) private(chunk, r, c, delta) firstprivate(row, col, num_chunk, chunks_in_row) schedule(static)", "pragma65_omp_parallel");
     for ( chunk = 0; chunk < num_chunk; ++chunk )
-    { ____num_tasks[omp_get_thread_num()]++;
-{
+    {
         int r_start = BLOCK_SIZE_R*(chunk/chunks_in_col);
         int c_start = BLOCK_SIZE_C*(chunk%chunks_in_row); 
         int r_end = r_start + BLOCK_SIZE_R > row ? row : r_start + BLOCK_SIZE_R;
@@ -131,8 +129,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
         }
 
         for ( r = r_start; r < r_start + BLOCK_SIZE_R; ++r ) {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma133_omp_simd");
             for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
             /* Update Temperatures */
                 result[r*col+c] =temp[r*col+c]+ 
@@ -142,8 +139,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
                     (amb_temp - temp[r*col+c]) * Rz_1));
             }
         }
-    } ; }
-
+    }
 }
 
 /* Transient solver driver routine: simply converts the heat 
@@ -294,14 +290,8 @@ int main(int argc, char **argv)
 	
     long long start_time = get_time();
 
-compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols) ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma294_omp_to_hclib");
+    compute_tran_temp(result,sim_time, temp, power, grid_rows, grid_cols);
 
     long long end_time = get_time();
 

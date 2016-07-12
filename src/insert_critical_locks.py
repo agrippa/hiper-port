@@ -18,7 +18,7 @@ expected_header = ['#include "hclib.h"',
                    '#include "hclib_cuda.h"',
                    '#endif',
                    '#endif',
-                   'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);']
+                   'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments, const char *lbl);']
 
 
 for expected in expected_header:

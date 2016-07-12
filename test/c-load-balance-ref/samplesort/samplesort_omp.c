@@ -120,45 +120,29 @@ void par_sort(void* arg) {
 
   if (right - left + 1 > HC_GRANULARITY) {
     int index = partition(data, left, right);
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma124_omp_parallel");
     {
-#pragma omp single nowait
-;
+hclib_pragma_marker("omp", "single nowait", "pragma126_omp_single");
         {
         if (left < index - 1) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = left;
           buf->right = index - 1; 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task untied
-#else
-#pragma omp task
-#endif
-;
-          { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task", "pragma133_omp_task");
+          {
               par_sort(buf);
-          } ; }
-
+          }
         }
         if (index < right) {
           sort_data_t* buf = (sort_data_t*) malloc(sizeof(sort_data_t)); 
           buf->buffer = data;
           buf->left = index;
           buf->right = right; 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task untied
-#else
-#pragma omp task
-#endif
-;
-          { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task", "pragma143_omp_task");
+          {
               par_sort(buf);
-          } ; }
-
+          }
         }
         }
     }
@@ -180,7 +164,8 @@ void sorting(TYPE* buffer, int size) {
 
 int main (int argc, char *argv[]) {
   /**** Initialising ****/
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma168_omp_to_hclib");
+  {
   shmem_init (); 
   /* Variable Declarations */
 
@@ -382,13 +367,6 @@ int main (int argc, char *argv[]) {
 
    /**** Finalize ****/
   shmem_finalize();
-  } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+  }
 }
 

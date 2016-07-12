@@ -110,6 +110,7 @@ DEFINES="-D_FORTIFY_SOURCE=0 $USER_DEFINES"
 
 WITH_HEADER=$DIRNAME/$FILE_PREFIX.$NAME.header.$EXTENSION
 WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
+WITH_BOTH=$DIRNAME/$FILE_PREFIX.$NAME.header.pragma_markers.$EXTENSION
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Prepending header'
 echo '#include "hclib.h"' > $WITH_HEADER
@@ -121,15 +122,13 @@ echo '#ifdef __CUDACC__' >> $WITH_HEADER
 echo '#include "hclib_cuda.h"' >> $WITH_HEADER
 echo '#endif' >> $WITH_HEADER
 echo '#endif' >> $WITH_HEADER
-echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_HEADER
-cat $INPUT_PATH >> $WITH_HEADER
-
-[[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
-cat $WITH_HEADER | python $REPLACE_PRAGMAS_WITH_FUNCTIONS > $WITH_PRAGMA_MARKERS
+echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments, const char *lbl);' >> $WITH_HEADER
+cat $INPUT_PATH | python $REPLACE_PRAGMAS_WITH_FUNCTIONS > $WITH_PRAGMA_MARKERS
+cat $WITH_HEADER $WITH_PRAGMA_MARKERS > $WITH_BOTH
 
 COUNT=1
 CHANGED=1
-PREV=$WITH_PRAGMA_MARKERS
+PREV=$WITH_BOTH
 CHECK_FOR_PTHREAD=true
 CRITICAL_SECTION_ID=0
 USES_SHMEM_FILE=$DIRNAME/$FILE_PREFIX.$NAME.uses_shmem.info

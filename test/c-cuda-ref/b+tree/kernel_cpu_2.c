@@ -69,7 +69,7 @@ static void kernel_launcher(const char *kernel_lbl, unsigned niters, functor_typ
 //	PLASMAKERNEL_GPU
 //========================================================================================================================================================================================================200
 
-class pragma103_omp_parallel_hclib_async {
+class pragma93_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -101,7 +101,7 @@ class pragma103_omp_parallel_hclib_async {
     int* volatile h_reclength;
 
     public:
-        pragma103_omp_parallel_hclib_async(int set_i,
+        pragma93_omp_parallel_hclib_async(int set_i,
                 long set_maxheight,
                 int set_thid,
                 int set_threadsPerBlock,
@@ -342,7 +342,7 @@ kernel_cpu_2(	int cores_arg,
 
 	// process number of querries
  { const int niters = (count) - (0);
-kernel_launcher("pragma103_omp_parallel", niters, pragma103_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, start, knodes_elem, offset, lastKnode, end, offset_2, recstart, reclength));
+kernel_launcher("pragma93_omp_parallel", niters, pragma93_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, start, knodes_elem, offset, lastKnode, end, offset_2, recstart, reclength));
  } 
 
 	time2 = get_time();

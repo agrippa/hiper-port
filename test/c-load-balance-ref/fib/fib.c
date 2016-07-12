@@ -43,27 +43,12 @@ long long fib (int n)
 	long long x, y;
 	if (n < 2) return n;
 
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  shared(x) firstprivate(n) untied
-#else
-#pragma omp task  shared(x) firstprivate(n)
-#endif
-;
-	{ ____num_tasks[omp_get_thread_num()]++;
-x = fib(n - 1) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  shared(y) firstprivate(n) untied
-#else
-#pragma omp task  shared(y) firstprivate(n)
-#endif
-;
-	{ ____num_tasks[omp_get_thread_num()]++;
-y = fib(n - 2) ; }
-;
+hclib_pragma_marker("omp", "task untied shared(x) firstprivate(n)", "pragma47_omp_task");
+	x = fib(n - 1);
+hclib_pragma_marker("omp", "task untied shared(y) firstprivate(n)", "pragma49_omp_task");
+	y = fib(n - 2);
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma52_omp_taskwait");
 	return x + y;
 }
 
@@ -72,24 +57,16 @@ static long long par_res, seq_res;
 
 void fib0 (int n)
 {
-{
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma61_omp_to_hclib");
+    {
+hclib_pragma_marker("omp", "parallel", "pragma63_omp_parallel");
         {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma65_omp_single");
             {
                 par_res = fib(n);
             }
         }
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
     bots_message("Fibonacci result for %d is %lld\n",n,par_res);
 }
 

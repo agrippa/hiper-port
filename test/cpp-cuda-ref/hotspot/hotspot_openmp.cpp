@@ -79,7 +79,7 @@ int num_omp_threads;
  * advances the solution of the discretized difference equations 
  * by one time step
  */
-class pragma72_omp_parallel_hclib_async {
+class pragma62_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -106,7 +106,7 @@ class pragma72_omp_parallel_hclib_async {
     FLOAT* volatile h_result;
 
     public:
-        pragma72_omp_parallel_hclib_async(int set_chunk,
+        pragma62_omp_parallel_hclib_async(int set_chunk,
                 int set_chunks_in_col,
                 int set_chunks_in_row,
                 int set_row,
@@ -294,7 +294,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
 
 	// omp_set_num_threads(num_omp_threads);
  { const int niters = (num_chunk) - (0);
-kernel_launcher("pragma72_omp_parallel", niters, pragma72_omp_parallel_hclib_async(chunk, chunks_in_col, chunks_in_row, row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result));
+kernel_launcher("pragma62_omp_parallel", niters, pragma62_omp_parallel_hclib_async(chunk, chunks_in_col, chunks_in_row, row, col, r, c, delta, Cap_1, power, temp, Rx_1, Ry_1, amb_temp, Rz_1, result));
  } 
 } 
 

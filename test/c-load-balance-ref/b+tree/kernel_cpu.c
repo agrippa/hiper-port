@@ -82,10 +82,8 @@ kernel_cpu(	int cores_arg,
 	int i;
 
 	// process number of querries
-#pragma omp parallel for private (i, thid)
-;
-	for(bid = 0; bid < count; bid++){ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for private (i, thid)", "pragma86_omp_parallel");
+	for(bid = 0; bid < count; bid++){
 
 		// process levels of the tree
 		for(i = 0; i < maxheight; i++){
@@ -121,8 +119,7 @@ kernel_cpu(	int cores_arg,
 
 		}
 
-	} ; }
-
+	}
 
 	time2 = get_time();
     }

@@ -519,7 +519,7 @@ for (si = 0; si < nseqs; si++) {
      } // for (j)
   } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma449_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma448_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
  // end parallel for (i)
    } ; 
 const unsigned long long full_program_end = current_time_ns();

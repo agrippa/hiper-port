@@ -524,8 +524,7 @@ void genChildren(Node * parent, Node * child) {
   t_metadata[omp_get_thread_num()].ntasks += 1;
 #endif
 
-#pragma omp atomic
-;
+hclib_pragma_marker("omp", "atomic", "pragma528_omp_atomic");
   n_nodes += 1;
 
   numChildren = uts_numChildren(parent);
@@ -569,27 +568,19 @@ void genChildren(Node * parent, Node * child) {
           shmem_clear_lock(&steal_buffer_locks[pe]);
       }
       if (!made_available_for_stealing) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(parent) if(parent.height < 9) untied
-#else
-#pragma omp task  firstprivate(parent) if(parent.height < 9)
-#endif
-;
-          { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied firstprivate(parent) if(parent.height < 9)", "pragma572_omp_task");
+          {
               Node child;
               initNode(&child);
 
               if (parent.numChildren < 0) {
                   genChildren(&parent, &child);
               }
-          } ; }
-
+          }
       }
     }
   } else {
-#pragma omp atomic
-;
+hclib_pragma_marker("omp", "atomic", "pragma584_omp_atomic");
       n_leaves += 1;
   }
 }
@@ -719,7 +710,8 @@ int main(int argc, char *argv[]) {
 #endif
   memset(steal_buffer_locks, 0x00, MAX_SHMEM_THREADS * sizeof(long));
 
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma714_omp_to_hclib");
+  {
 
   shmem_init();
 
@@ -750,11 +742,9 @@ int main(int argc, char *argv[]) {
   t1 = uts_wctime();
 
 /********** SPMD Parallel Region **********/
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma746_omp_parallel");
   {
-#pragma omp master
-;
+hclib_pragma_marker("omp", "master", "pragma748_omp_master");
       {
           int first = 1;
 
@@ -771,8 +761,7 @@ retry:
           }
           first = 0;
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma765_omp_taskwait");
 
           if (n_buffered_steals > 0) {
               shmem_set_lock(&steal_buffer_locks[pe]);
@@ -819,14 +808,7 @@ retry:
       shmem_barrier_all();
   }
 #endif
-  } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+  }
 
   shmem_finalize();
   return 0;

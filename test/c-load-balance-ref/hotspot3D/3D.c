@@ -156,10 +156,8 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
 
         do {
             int z; 
-#pragma omp parallel for
-;
-            for (z = 0; z < nz; z++) { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for", "pragma160_omp_parallel");
+            for (z = 0; z < nz; z++) {
                 int y;
                 for (y = 0; y < ny; y++) {
                     int x;
@@ -176,8 +174,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
                             + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
                     }
                 }
-            } ; }
-
+            }
             float *t = tIn_t;
             tIn_t = tOut_t;
             tOut_t = t; 
@@ -253,7 +250,8 @@ int main(int argc, char** argv)
 
     memcpy(tempCopy,tempIn, size * sizeof(float));
 
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma254_omp_to_hclib");
+    {
     struct timeval start, stop;
     float time;
     gettimeofday(&start,NULL);
@@ -265,14 +263,7 @@ int main(int argc, char** argv)
     float acc = accuracy(tempOut,answer,numRows*numCols*layers);
     printf("Time: %.3f (s)\n",time);
     printf("Accuracy: %e\n",acc);
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
     }
-}
-
     writeoutput(tempOut,numRows, numCols, layers, ofile);
     free(tempIn);
     free(tempOut); free(powerIn);

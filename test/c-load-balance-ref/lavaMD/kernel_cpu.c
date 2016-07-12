@@ -105,16 +105,15 @@ void  kernel_cpu(	par_str par,
 
 	time3 = get_time();
 
-{
+hclib_pragma_marker("omp_to_hclib", "", "pragma109_omp_to_hclib");
+    {
 
 	//======================================================================================================================================================150
 	//	PROCESS INTERACTIONS
 	//======================================================================================================================================================150
 
-#pragma omp parallel for private(i, j, k) private(first_i, rA, fA) private(pointer, first_j, rB, qB) private(r2, u2, fs, vij, fxij, fyij, fzij, d)
-;
-	for(l=0; l<dim.number_boxes; l=l+1){ ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "parallel for private(i, j, k) private(first_i, rA, fA) private(pointer, first_j, rB, qB) private(r2, u2, fs, vij, fxij, fyij, fzij, d)", "pragma120_omp_parallel");
+	for(l=0; l<dim.number_boxes; l=l+1){
 
 		//------------------------------------------------------------------------------------------100
 		//	home box - box parameters
@@ -193,16 +192,8 @@ void  kernel_cpu(	par_str par,
 
 		} // for k
 
-	} ; }
- // for l
-    } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
+	} // for l
     }
-}
-
 
 	time4 = get_time();
 

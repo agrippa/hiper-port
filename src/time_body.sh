@@ -121,7 +121,7 @@ DEFINES="-D_FORTIFY_SOURCE=0 $USER_DEFINES"
 WITH_PRAGMA_MARKERS=$DIRNAME/$FILE_PREFIX.$NAME.pragma_markers.$EXTENSION
 
 [[ $VERBOSE == 1 ]] && echo 'DEBUG >>> Inserting pragma markers'
-echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments);' >> $WITH_PRAGMA_MARKERS
+echo 'extern void hclib_pragma_marker(const char *pragma_name, const char *pragma_arguments, const char *lbl);' >> $WITH_PRAGMA_MARKERS
 cat $INPUT_PATH | python $REPLACE_PRAGMAS_WITH_FUNCTIONS >> $WITH_PRAGMA_MARKERS
 
 COUNT=1

@@ -99,11 +99,9 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
 {
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
-#pragma omp parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)
-;
+hclib_pragma_marker("omp", "parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)", "pragma103_omp_parallel");
         for( int b_index_x = 0; b_index_x < blk; ++b_index_x)
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+        {
             int b_index_y = blk - 1 - b_index_x;
             int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
             int reference_l[BLOCK_SIZE * BLOCK_SIZE] __attribute__ ((aligned (64)));
@@ -111,8 +109,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy referrence to local memory
             for ( int i = 0; i < BLOCK_SIZE; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma113_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
                     reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
@@ -122,8 +119,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy input_itemsets to local memory
             for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma123_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
                 {
                     input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
@@ -144,27 +140,23 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy results to global memory
             for ( int i = 0; i < BLOCK_SIZE; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma144_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
                     input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j + 1];
                 }
             }
             
-        } ; }
-
+        }
     }    
         
     printf("Processing bottom-right matrix\n");
 
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
-#pragma omp parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)
-;
+hclib_pragma_marker("omp", "parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)", "pragma158_omp_parallel");
         for( int b_index_x = blk - 1; b_index_x < (max_cols-1)/BLOCK_SIZE; ++b_index_x)
-        { ____num_tasks[omp_get_thread_num()]++;
-{
+        {
             int b_index_y = (max_cols-1)/BLOCK_SIZE + blk - 2 - b_index_x;
 
             int input_itemsets_l[(BLOCK_SIZE + 1) *(BLOCK_SIZE+1)] __attribute__ ((aligned (64)));
@@ -173,8 +165,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy referrence to local memory
             for ( int i = 0; i < BLOCK_SIZE; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma169_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
                     reference_l[i*BLOCK_SIZE + j] = referrence[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1];
@@ -184,8 +175,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy input_itemsets to local memory
             for ( int i = 0; i < BLOCK_SIZE + 1; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma179_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE + 1; ++j)
                 {
                     input_itemsets_l[i*(BLOCK_SIZE + 1) + j] = input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i) + b_index_x*BLOCK_SIZE +  j];
@@ -206,15 +196,13 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
             // Copy results to global memory
             for ( int i = 0; i < BLOCK_SIZE; ++i )
             {
-#pragma omp simd
-;
+hclib_pragma_marker("omp", "simd", "pragma200_omp_simd");
                 for ( int j = 0; j < BLOCK_SIZE; ++j)
                 {
                     input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
                 }
             }
-        } ; }
-
+        }
     }
 
 }
@@ -290,15 +278,9 @@ runTest( int argc, char** argv)
    
     long long start_time = get_time();
 
-nw_optimized( input_itemsets, output_itemsets, referrence,
-        max_rows, max_cols, penalty ) ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma282_omp_to_hclib");
+    nw_optimized( input_itemsets, output_itemsets, referrence,
+        max_rows, max_cols, penalty );
 
     long long end_time = get_time();
 

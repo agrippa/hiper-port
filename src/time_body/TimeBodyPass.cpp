@@ -213,7 +213,7 @@ std::string TimeBodyPass::getPragmaNameForMarker(const clang::CallExpr *call) {
         // Root node only
         return "root";
     }
-    assert(call->getNumArgs() == 2);
+    assert(call->getNumArgs() == 3);
     const clang::Expr *pragmaNameArg = call->getArg(0);
     while (clang::isa<clang::ImplicitCastExpr>(pragmaNameArg)) {
         pragmaNameArg = clang::dyn_cast<clang::ImplicitCastExpr>(pragmaNameArg)->getSubExpr();
@@ -225,7 +225,7 @@ std::string TimeBodyPass::getPragmaNameForMarker(const clang::CallExpr *call) {
 }
 
 std::string TimeBodyPass::getPragmaArgumentsForMarker(const clang::CallExpr *call) {
-    assert(call->getNumArgs() == 2);
+    assert(call->getNumArgs() == 3);
     const clang::Expr *pragmaArgsArg = call->getArg(1);
     while (clang::isa<clang::ImplicitCastExpr>(pragmaArgsArg)) {
         pragmaArgsArg = clang::dyn_cast<clang::ImplicitCastExpr>(pragmaArgsArg)->getSubExpr();

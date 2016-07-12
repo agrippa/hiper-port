@@ -167,7 +167,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             
         } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma101_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma100_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }    
         
@@ -226,7 +226,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             }
         } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma155_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }
 

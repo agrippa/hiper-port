@@ -44,7 +44,7 @@ typedef float FP_NUMBER;
 #define GET_RAND_FP ((FP_NUMBER)rand()/((FP_NUMBER)(RAND_MAX)+(FP_NUMBER)(1)))
 char L_FNAME[32], U_FNAME[32], A_FNAME[32];
 
-class pragma87_omp_parallel_hclib_async {
+class pragma79_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -63,7 +63,7 @@ class pragma87_omp_parallel_hclib_async {
     FP_NUMBER* volatile h_A;
 
     public:
-        pragma87_omp_parallel_hclib_async(int set_j,
+        pragma79_omp_parallel_hclib_async(int set_j,
                 int set_MatrixDim,
                 FP_NUMBER set_sum,
                 int set_k,
@@ -216,7 +216,7 @@ for (i=0; i < MatrixDim; i ++){
     }
 
  { const int niters = (MatrixDim) - (0);
-kernel_launcher("pragma87_omp_parallel", niters, pragma87_omp_parallel_hclib_async(j, MatrixDim, sum, k, L, i, U, A));
+kernel_launcher("pragma79_omp_parallel", niters, pragma79_omp_parallel_hclib_async(j, MatrixDim, sum, k, L, i, U, A));
  } 
 
     for (i=0; i < MatrixDim; i ++) {

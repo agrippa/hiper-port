@@ -63,7 +63,7 @@ static void kernel_launcher(const char *kernel_lbl, unsigned niters, functor_typ
 //	KERNEL_CPU FUNCTION
 //========================================================================================================================================================================================================200
 
-class pragma93_omp_parallel_hclib_async {
+class pragma83_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -89,7 +89,7 @@ class pragma93_omp_parallel_hclib_async {
     record* volatile h_records;
 
     public:
-        pragma93_omp_parallel_hclib_async(int set_i,
+        pragma83_omp_parallel_hclib_async(int set_i,
                 long set_maxheight,
                 int set_thid,
                 int set_threadsPerBlock,
@@ -285,7 +285,7 @@ kernel_cpu(	int cores_arg,
 
 	// process number of querries
  { const int niters = (count) - (0);
-kernel_launcher("pragma93_omp_parallel", niters, pragma93_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, keys, offset, knodes_elem, ans, records));
+kernel_launcher("pragma83_omp_parallel", niters, pragma83_omp_parallel_hclib_async(i, maxheight, thid, threadsPerBlock, knodes, currKnode, bid, keys, offset, knodes_elem, ans, records));
  } 
 
 	time2 = get_time();

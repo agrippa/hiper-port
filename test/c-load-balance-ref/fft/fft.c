@@ -57,26 +57,11 @@ void compute_w_coefficients(int n, int a, int b, COMPLEX * W)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-compute_w_coefficients(n, a, ab, W) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-compute_w_coefficients(n, ab + 1, b, W) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma61_omp_task");
+	  compute_w_coefficients(n, a, ab, W);
+hclib_pragma_marker("omp", "task untied", "pragma63_omp_task");
+	  compute_w_coefficients(n, ab + 1, b, W);
+hclib_pragma_marker("omp", "taskwait", "pragma65_omp_taskwait");
      }
 }
 void compute_w_coefficients_seq(int n, int a, int b, COMPLEX * W)
@@ -149,26 +134,11 @@ void unshuffle(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-unshuffle(a, ab, in, out, r, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-unshuffle(ab, b, in, out, r, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma138_omp_task");
+	  unshuffle(a, ab, in, out, r, m);
+hclib_pragma_marker("omp", "task untied", "pragma140_omp_task");
+	  unshuffle(ab, b, in, out, r, m);
+hclib_pragma_marker("omp", "taskwait", "pragma142_omp_taskwait");
      }
 }
 void unshuffle_seq(int a, int b, COMPLEX * in, COMPLEX * out, int r, int m)
@@ -234,41 +204,19 @@ void fft_twiddle_gen1(COMPLEX * in, COMPLEX * out,
 void fft_twiddle_gen(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int r, int m)
 {
      if (i == i1 - 1) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_gen1(in + i, out + i, W,
-				 r, m, nW, nWdn * i, nWdn * m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma208_omp_task");
+	  fft_twiddle_gen1(in + i, out + i, W,
+				 r, m, nW, nWdn * i, nWdn * m);
      } else {
 	  int i2 = (i + i1) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_gen(i, i2, in, out, W, nW,
-				nWdn, r, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_gen(i2, i1, in, out, W, nW,
-				nWdn, r, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma213_omp_task");
+	  fft_twiddle_gen(i, i2, in, out, W, nW,
+				nWdn, r, m);
+hclib_pragma_marker("omp", "task untied", "pragma216_omp_task");
+	  fft_twiddle_gen(i2, i1, in, out, W, nW,
+				nWdn, r, m);
      }
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma220_omp_taskwait");
 }
 void fft_twiddle_gen_seq(int i, int i1, COMPLEX * in, COMPLEX * out, COMPLEX * W,
                          int nW, int nWdn, int r, int m)
@@ -326,26 +274,11 @@ void fft_twiddle_2(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma278_omp_task");
+	  fft_twiddle_2(a, ab, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "task untied", "pragma280_omp_task");
+	  fft_twiddle_2(ab, b, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "taskwait", "pragma282_omp_taskwait");
      }
 }
 void fft_twiddle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -395,26 +328,11 @@ void fft_unshuffle_2(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_2(a, ab, in, out, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_2(ab, b, in, out, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma332_omp_task");
+	  fft_unshuffle_2(a, ab, in, out, m);
+hclib_pragma_marker("omp", "task untied", "pragma334_omp_task");
+	  fft_unshuffle_2(ab, b, in, out, m);
+hclib_pragma_marker("omp", "taskwait", "pragma336_omp_taskwait");
      }
 }
 void fft_unshuffle_2_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -537,26 +455,11 @@ void fft_twiddle_4(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma459_omp_task");
+	  fft_twiddle_4(a, ab, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "task untied", "pragma461_omp_task");
+	  fft_twiddle_4(ab, b, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "taskwait", "pragma463_omp_taskwait");
      }
 }
 void fft_twiddle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -644,26 +547,11 @@ void fft_unshuffle_4(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_4(a, ab, in, out, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_4(ab, b, in, out, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma551_omp_task");
+	  fft_unshuffle_4(a, ab, in, out, m);
+hclib_pragma_marker("omp", "task untied", "pragma553_omp_task");
+	  fft_unshuffle_4(ab, b, in, out, m);
+hclib_pragma_marker("omp", "taskwait", "pragma555_omp_taskwait");
      }
 }
 void fft_unshuffle_4_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -945,26 +833,11 @@ void fft_twiddle_8(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int n
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma837_omp_task");
+	  fft_twiddle_8(a, ab, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "task untied", "pragma839_omp_task");
+	  fft_twiddle_8(ab, b, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "taskwait", "pragma841_omp_taskwait");
      }
 }
 void fft_twiddle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -1144,26 +1017,11 @@ void fft_unshuffle_8(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_8(a, ab, in, out, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_8(ab, b, in, out, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma1021_omp_task");
+	  fft_unshuffle_8(a, ab, in, out, m);
+hclib_pragma_marker("omp", "task untied", "pragma1023_omp_task");
+	  fft_unshuffle_8(ab, b, in, out, m);
+hclib_pragma_marker("omp", "taskwait", "pragma1025_omp_taskwait");
      }
 }
 void fft_unshuffle_8_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -1821,26 +1679,11 @@ void fft_twiddle_16(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma1683_omp_task");
+	  fft_twiddle_16(a, ab, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "task untied", "pragma1685_omp_task");
+	  fft_twiddle_16(ab, b, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "taskwait", "pragma1687_omp_taskwait");
      }
 }
 void fft_twiddle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -2236,26 +2079,11 @@ void fft_unshuffle_16(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_16(a, ab, in, out, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_16(ab, b, in, out, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma2083_omp_task");
+	  fft_unshuffle_16(a, ab, in, out, m);
+hclib_pragma_marker("omp", "task untied", "pragma2085_omp_task");
+	  fft_unshuffle_16(ab, b, in, out, m);
+hclib_pragma_marker("omp", "taskwait", "pragma2087_omp_taskwait");
      }
 }
 void fft_unshuffle_16_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -3793,26 +3621,11 @@ void fft_twiddle_32(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int 
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma3625_omp_task");
+	  fft_twiddle_32(a, ab, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "task untied", "pragma3627_omp_task");
+	  fft_twiddle_32(ab, b, in, out, W, nW, nWdn, m);
+hclib_pragma_marker("omp", "taskwait", "pragma3629_omp_taskwait");
      }
 }
 void fft_twiddle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, COMPLEX * W, int nW, int nWdn, int m)
@@ -4704,26 +4517,11 @@ void fft_unshuffle_32(int a, int b, COMPLEX * in, COMPLEX * out, int m)
 	  }
      } else {
 	  int ab = (a + b) / 2;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_32(a, ab, in, out, m) ; }
-;
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_32(ab, b, in, out, m) ; }
-;
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "task untied", "pragma4521_omp_task");
+	  fft_unshuffle_32(a, ab, in, out, m);
+hclib_pragma_marker("omp", "task untied", "pragma4523_omp_task");
+	  fft_unshuffle_32(ab, b, in, out, m);
+hclib_pragma_marker("omp", "taskwait", "pragma4525_omp_taskwait");
      }
 }
 void fft_unshuffle_32_seq(int a, int b, COMPLEX * in, COMPLEX * out, int m)
@@ -4861,143 +4659,56 @@ void fft_aux(int n, COMPLEX * in, COMPLEX * out, int *factors, COMPLEX * W, int 
 	   * recurse 
 	   */
 	  if (r == 32) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_32(0, m, in, out, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4663_omp_task");
+	       fft_unshuffle_32(0, m, in, out, m);
 	  } else if (r == 16) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_16(0, m, in, out, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4666_omp_task");
+	       fft_unshuffle_16(0, m, in, out, m);
 	  } else if (r == 8) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_8(0, m, in, out, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4669_omp_task");
+	       fft_unshuffle_8(0, m, in, out, m);
 	  } else if (r == 4) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_4(0, m, in, out, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4672_omp_task");
+	       fft_unshuffle_4(0, m, in, out, m);
 	  } else if (r == 2) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_unshuffle_2(0, m, in, out, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4675_omp_task");
+	       fft_unshuffle_2(0, m, in, out, m);
 	  } else
 	       unshuffle(0, m, in, out, r, m);
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma4680_omp_taskwait");
 
 	  for (k = 0; k < n; k += m) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  firstprivate(k) untied
-#else
-#pragma omp task  firstprivate(k)
-#endif
-;
-	       { ____num_tasks[omp_get_thread_num()]++;
-fft_aux(m, out + k, in + k, factors + 1, W, nW) ; }
-;
+hclib_pragma_marker("omp", "task untied firstprivate(k)", "pragma4683_omp_task");
+	       fft_aux(m, out + k, in + k, factors + 1, W, nW);
 	  }
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma4686_omp_taskwait");
      }
      /* 
       * now multiply by the twiddle factors, and perform m FFTs
       * of length r
       */
      if (r == 2) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_2(0, m, in, out, W, nW, nW / n, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4693_omp_task");
+	  fft_twiddle_2(0, m, in, out, W, nW, nW / n, m);
      } else if (r == 4) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_4(0, m, in, out, W, nW, nW / n, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4696_omp_task");
+	  fft_twiddle_4(0, m, in, out, W, nW, nW / n, m);
      } else if (r == 8) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_8(0, m, in, out, W, nW, nW / n, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4699_omp_task");
+	  fft_twiddle_8(0, m, in, out, W, nW, nW / n, m);
      } else if (r == 16) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_16(0, m, in, out, W, nW, nW / n, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4702_omp_task");
+	  fft_twiddle_16(0, m, in, out, W, nW, nW / n, m);
      } else if (r == 32) {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_32(0, m, in, out, W, nW, nW / n, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4705_omp_task");
+	  fft_twiddle_32(0, m, in, out, W, nW, nW / n, m);
      } else {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-	  { ____num_tasks[omp_get_thread_num()]++;
-fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m) ; }
-;
+hclib_pragma_marker("omp", "task untied", "pragma4708_omp_task");
+	  fft_twiddle_gen(0, m, in, out, W, nW, nW / n, r, m);
      }
 
-#pragma omp taskwait
-;
+hclib_pragma_marker("omp", "taskwait", "pragma4712_omp_taskwait");
 
      return;
 }
@@ -5078,25 +4789,17 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
 
 
      bots_message("Computing coefficients ");
-{
-     W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
-#pragma omp parallel
-;
+hclib_pragma_marker("omp_to_hclib", "", "pragma4793_omp_to_hclib");
      {
-#pragma omp single
-;
+     W = (COMPLEX *) malloc((n + 1) * sizeof(COMPLEX));
+hclib_pragma_marker("omp", "parallel", "pragma4796_omp_parallel");
+     {
+hclib_pragma_marker("omp", "single", "pragma4798_omp_single");
          {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-             { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied", "pragma4800_omp_task");
+             {
                  compute_w_coefficients(n, 0, n / 2, W);
-             } ; }
-
+             }
          }
      }
      bots_message(" completed!\n");
@@ -5112,35 +4815,19 @@ void fft(int n, COMPLEX * in, COMPLEX * out)
      } while (l > 1);
 
      bots_message("Computing FFT ");
-#pragma omp parallel
-;
+hclib_pragma_marker("omp", "parallel", "pragma4819_omp_parallel");
      {
-#pragma omp single
-;
+hclib_pragma_marker("omp", "single", "pragma4821_omp_single");
          {
-#ifdef HCLIB_TASK_UNTIED
-#pragma omp task  untied
-#else
-#pragma omp task 
-#endif
-;
-             { ____num_tasks[omp_get_thread_num()]++;
-{
+hclib_pragma_marker("omp", "task untied", "pragma4823_omp_task");
+             {
                  fft_aux(n, in, out, factors, W, n);
-             } ; }
-
+             }
          }
      }
 
      free(W);
-     } ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
-
+     }
      bots_message(" completed!\n");
 
      return;

@@ -2029,7 +2029,8 @@ main(	int argc,
 	printf("Waiting for command\n");
 	printf("> ");
 
-while (sscanf(commandPointer, "%c", &instruction) != EOF) {
+hclib_pragma_marker("omp_to_hclib", "", "pragma2033_omp_to_hclib");
+	while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 	  commandPointer++;
 		switch (instruction) {
 			// ----------------------------------------40
@@ -2429,14 +2430,7 @@ while (sscanf(commandPointer, "%c", &instruction) != EOF) {
 		}
 		printf("> ");
 
-	} ; {
-    int __i;
-    assert(omp_get_max_threads() <= 32);
-    for (__i = 0; __i < omp_get_max_threads(); __i++) {
-        fprintf(stderr, "Thread %d: %d\n", __i, ____num_tasks[__i]);
-    }
-}
- ;
+	} ;
 	printf("\n");
 
 	// ------------------------------------------------------------60

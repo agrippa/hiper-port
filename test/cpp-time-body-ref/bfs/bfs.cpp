@@ -160,7 +160,7 @@ for(int tid = 0; tid < no_of_nodes; tid++ )
                 }
             } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma127_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma126_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
  { const unsigned long long parallel_for_start = current_time_ns();
@@ -175,7 +175,7 @@ for(int tid=0; tid< no_of_nodes ; tid++ )
                 }
             } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma144_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma143_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
             k++;
         }

@@ -62,7 +62,7 @@ void usage(int argc, char **argv)
 	exit(1);
 }
 
-class pragma135_omp_parallel_hclib_async {
+class pragma125_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -99,7 +99,7 @@ class pragma135_omp_parallel_hclib_async {
     float* volatile h_c;
 
     public:
-        pragma135_omp_parallel_hclib_async(int set_cols,
+        pragma125_omp_parallel_hclib_async(int set_cols,
                 int set_k,
                 float set_Jc,
                 float* set_J,
@@ -278,7 +278,7 @@ class pragma135_omp_parallel_hclib_async {
         }
 };
 
-class pragma168_omp_parallel_hclib_async {
+class pragma158_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -310,7 +310,7 @@ class pragma168_omp_parallel_hclib_async {
     volatile float lambda;
 
     public:
-        pragma168_omp_parallel_hclib_async(int set_cols,
+        pragma158_omp_parallel_hclib_async(int set_cols,
                 int set_k,
                 float set_cN,
                 float* set_c,
@@ -556,10 +556,10 @@ for (iter=0; iter< niter; iter++){
 		
 
  { const int niters = (rows) - (0);
-kernel_launcher("pragma135_omp_parallel", niters, pragma135_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c));
+kernel_launcher("pragma125_omp_parallel", niters, pragma125_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c));
  } 
  { const int niters = (rows) - (0);
-kernel_launcher("pragma168_omp_parallel", niters, pragma168_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda));
+kernel_launcher("pragma158_omp_parallel", niters, pragma158_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda));
  } 
 
 	}

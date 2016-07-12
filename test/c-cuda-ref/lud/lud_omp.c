@@ -63,7 +63,7 @@ void lud_diagonal_omp (float* a, int size, int offset)
 }
 
 // implements block LU factorization 
-class pragma61_omp_parallel_hclib_async {
+class pragma52_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -76,7 +76,7 @@ class pragma61_omp_parallel_hclib_async {
     int chunk_idx;
 
     public:
-        pragma61_omp_parallel_hclib_async(float* set_a,
+        pragma52_omp_parallel_hclib_async(float* set_a,
                 int set_size,
                 int set_offset,
                 int set_chunk_idx) {
@@ -184,7 +184,7 @@ for (j =0; j < BS; j++){
         }
 };
 
-class pragma113_omp_parallel_hclib_async {
+class pragma106_omp_parallel_hclib_async {
     private:
         void **host_allocations;
         size_t *host_allocation_sizes;
@@ -198,7 +198,7 @@ class pragma113_omp_parallel_hclib_async {
     int size;
 
     public:
-        pragma113_omp_parallel_hclib_async(int set_offset,
+        pragma106_omp_parallel_hclib_async(int set_offset,
                 int set_chunk_idx,
                 int set_chunks_in_inter_row,
                 float* set_a,
@@ -309,7 +309,7 @@ void lud_omp(float *a, int size)
         // calculate perimeter block matrices
         // 
  { const int niters = (chunks_in_inter_row) - (0);
-kernel_launcher("pragma61_omp_parallel", niters, pragma61_omp_parallel_hclib_async(a, size, offset, chunk_idx));
+kernel_launcher("pragma52_omp_parallel", niters, pragma52_omp_parallel_hclib_async(a, size, offset, chunk_idx));
  } 
         
         // update interior block matrices
@@ -317,7 +317,7 @@ kernel_launcher("pragma61_omp_parallel", niters, pragma61_omp_parallel_hclib_asy
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
  { const int niters = (chunks_per_inter) - (0);
-kernel_launcher("pragma113_omp_parallel", niters, pragma113_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size));
+kernel_launcher("pragma106_omp_parallel", niters, pragma106_omp_parallel_hclib_async(offset, chunk_idx, chunks_in_inter_row, a, size));
  } 
     }
 
