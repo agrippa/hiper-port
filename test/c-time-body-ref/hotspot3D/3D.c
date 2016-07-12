@@ -191,7 +191,7 @@ for (z = 0; z < nz; z++) {
                             + cs * tIn_t[s] + cn * tIn_t[n] + cb * tIn_t[b] + ct * tIn_t[t]+(dt/Cap) * pIn[c] + ct*amb_temp;
                     }
                 }
-            }
+            } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma158_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

@@ -392,7 +392,7 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 #pragma omp parallel for shared(weights, Nparticles) private(x)
 for(x = 0; x < Nparticles; x++){
 		weights[x] = 1/((double)(Nparticles));
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma374_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -412,7 +412,7 @@ printf("pragma374_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 for(x = 0; x < Nparticles; x++){
 		arrayX[x] = xe;
 		arrayY[x] = ye;
-	}
+	} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma389_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -430,7 +430,7 @@ printf("pragma389_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 for(x = 0; x < Nparticles; x++){
 			arrayX[x] += 1 + 5*randn(seed, x);
 			arrayY[x] += -2 + 2*randn(seed, x);
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma403_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -456,7 +456,7 @@ for(x = 0; x < Nparticles; x++){
 			for(y = 0; y < countOnes; y++)
 				likelihood[x] += (pow((I[ind[x*countOnes + y]] - 100),2) - pow((I[ind[x*countOnes + y]]-228),2))/50.0;
 			likelihood[x] = likelihood[x]/((double) countOnes);
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma411_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -468,7 +468,7 @@ printf("pragma411_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 #pragma omp parallel for shared(Nparticles, weights, likelihood) private(x)
 for(x = 0; x < Nparticles; x++){
 			weights[x] = weights[x] * exp(likelihood[x]);
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma434_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -479,7 +479,7 @@ printf("pragma434_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 #pragma omp parallel for private(x) reduction(+:sumWeights)
 for(x = 0; x < Nparticles; x++){
 			sumWeights += weights[x];
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma441_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -489,7 +489,7 @@ printf("pragma441_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 #pragma omp parallel for shared(sumWeights, weights) private(x)
 for(x = 0; x < Nparticles; x++){
 			weights[x] = weights[x]/sumWeights;
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma447_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -503,7 +503,7 @@ printf("pragma447_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 for(x = 0; x < Nparticles; x++){
 			xe += arrayX[x] * weights[x];
 			ye += arrayY[x] * weights[x];
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma456_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -531,7 +531,7 @@ printf("pragma456_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 #pragma omp parallel for shared(u, u1, Nparticles) private(x)
 for(x = 0; x < Nparticles; x++){
 			u[x] = u1 + x/((double)(Nparticles));
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma481_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -548,7 +548,7 @@ for(j = 0; j < Nparticles; j++){
 			xj[j] = arrayX[i];
 			yj[j] = arrayY[i];
 			
-		}
+		} ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma489_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

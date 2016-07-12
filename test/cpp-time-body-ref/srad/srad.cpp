@@ -173,7 +173,7 @@ for (int i = 0 ; i < rows ; i++) {
    
 		}
   
-    }
+    } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma126_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -203,7 +203,7 @@ for (int i = 0; i < rows; i++) {
 	            #ifdef OUTPUT
                 //printf("\n"); 
                 #endif //output
-	     }
+	     } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma159_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

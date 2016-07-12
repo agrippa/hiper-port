@@ -164,7 +164,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
                 }
             }
             
-        }
+        } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma101_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -223,7 +223,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
                     input_itemsets[max_cols*(b_index_y*BLOCK_SIZE + i + 1) + b_index_x*BLOCK_SIZE +  j + 1] = input_itemsets_l[(i + 1)*(BLOCK_SIZE+1) + j +1];
                 }
             }
-        }
+        } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 

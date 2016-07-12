@@ -257,7 +257,7 @@ for (j = 1; j <= n2; j++) {
       sum += conn[k][j] * l1[k]; 
     }
     l2[j] = squash(sum);
-  }
+  } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma233_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
@@ -320,7 +320,7 @@ for (j = 1; j <= ndelta; j++) {
 	  w[k][j] += new_dw;
 	  oldw[k][j] = new_dw;
     }
-  }
+  } ; 
 const unsigned long long parallel_for_end = current_time_ns();
 printf("pragma295_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
