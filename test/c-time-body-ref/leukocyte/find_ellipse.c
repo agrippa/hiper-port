@@ -126,7 +126,7 @@ MAT * ellipsematching(MAT * grad_x, MAT * grad_y) {
 	MAT * gicov = m_get(height, width);
 	
 	// Split the work among multiple threads, if OPEN is defined
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for
 for (i = MaxR; i < width - MaxR; i++) {
 		double Grad[NPOINTS];
@@ -170,7 +170,7 @@ for (i = MaxR; i < width - MaxR; i++) {
 		}
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma112_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma112_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 	
 	return gicov;
@@ -204,7 +204,7 @@ MAT * dilate_f(MAT * img_in, MAT * strel) {
 	int el_center_i = strel->m / 2, el_center_j = strel->n / 2, i;
 	
 	// Split the work among multiple threads, if OPEN is defined
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for
 for (i = 0; i < img_in->m; i++) {
 		int j, el_i, el_j, x, y;
@@ -228,7 +228,7 @@ for (i = 0; i < img_in->m; i++) {
 		}
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma187_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma187_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 	return dilated;

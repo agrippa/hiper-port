@@ -34,23 +34,23 @@ void sweep (int nx, int ny, double dx, double dy, double *f_,
     for (it = itold + 1; it <= itnew; it++)
     {
         // Save the current estimate.
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(u_, unew_, f_, max_blocks_x, max_blocks_y, nx, ny, dx, dy, itold, itnew, block_size) private(it, block_x, block_y) collapse(2)
 for (block_x = 0; block_x < max_blocks_x; block_x++)
             for (block_y = 0; block_y < max_blocks_y; block_y++)
                 copy_block(nx, ny, block_x, block_y, u_, unew_, block_size)
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma20_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma20_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 ;
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(u_, unew_, f_, max_blocks_x, max_blocks_y, nx, ny, dx, dy, itold, itnew, block_size) private(it, block_x, block_y) collapse(2)
 for (block_x = 0; block_x < max_blocks_x; block_x++)
             for (block_y = 0; block_y < max_blocks_y; block_y++)
                 compute_estimate(block_x, block_y, u_, unew_, f_, dx, dy,
                                  nx, ny, block_size)
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma25_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma25_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 ;
     }
 }

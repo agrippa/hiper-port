@@ -141,7 +141,7 @@ const unsigned long long full_program_start = current_time_ns();
             stop=false;
 
             //omp_set_num_threads(num_omp_threads);
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for firstprivate(h_graph_mask, h_graph_nodes, h_graph_edges, h_graph_visited, h_cost, h_updating_graph_mask)
 for(int tid = 0; tid < no_of_nodes; tid++ )
             {
@@ -159,10 +159,10 @@ for(int tid = 0; tid < no_of_nodes; tid++ )
                 }
             }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma127_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma127_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for firstprivate(h_updating_graph_mask, h_graph_mask, h_graph_visited)
 for(int tid=0; tid< no_of_nodes ; tid++ )
             {
@@ -174,7 +174,7 @@ for(int tid=0; tid< no_of_nodes ; tid++ )
                 }
             }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma144_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma144_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
             k++;
         }

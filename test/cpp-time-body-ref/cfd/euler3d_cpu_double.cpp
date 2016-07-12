@@ -68,14 +68,14 @@ void dealloc(T* array)
 
 void copy(double *dst, double *src, int N)
 {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(shared) schedule(static)
 for(int i = 0; i < N; i++)
 	{
 		dst[i] = src[i];
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma54_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma54_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
@@ -121,14 +121,14 @@ cfd_double3 ff_flux_contribution_density_energy;
 
 void initialize_variables(int nelr, double* variables)
 {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(shared) schedule(static)
 for(int i = 0; i < nelr; i++)
 	{
 		for(int j = 0; j < NVAR; j++) variables[i*NVAR + j] = ff_variable[j];
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma103_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma103_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
@@ -178,7 +178,7 @@ inline double compute_speed_of_sound(double& density, double& pressure)
 
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(shared) schedule(static)
 for(int i = 0; i < nelr; i++)
 	{
@@ -199,7 +199,7 @@ for(int i = 0; i < nelr; i++)
 		step_factors[i] = double(0.5) / (std::sqrt(areas[i]) * (std::sqrt(speed_sqd) + speed_of_sound));
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
@@ -213,7 +213,7 @@ void compute_flux(int nelr, int* elements_surrounding_elements, double* normals,
 {
 	double smoothing_coefficient = double(0.2f);
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(shared) schedule(static)
 for(int i = 0; i < nelr; i++)
 	{
@@ -342,13 +342,13 @@ for(int i = 0; i < nelr; i++)
 		fluxes[i*NVAR + VAR_DENSITY_ENERGY] = flux_i_density_energy;
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma187_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma187_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(shared) schedule(static)
 for(int i = 0; i < nelr; i++)
 	{
@@ -361,7 +361,7 @@ for(int i = 0; i < nelr; i++)
 		variables[NVAR*i + (VAR_MOMENTUM+2)] = old_variables[NVAR*i + (VAR_MOMENTUM+2)] + factor*fluxes[NVAR*i + (VAR_MOMENTUM+2)];
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma318_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma318_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 /*

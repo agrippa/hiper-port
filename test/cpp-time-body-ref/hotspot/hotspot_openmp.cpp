@@ -77,7 +77,7 @@ void single_iteration(FLOAT *result, FLOAT *temp, FLOAT *power, int row, int col
     int chunks_in_col = row/BLOCK_SIZE_R;
 
 	// omp_set_num_threads(num_omp_threads);
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(power, temp, result) private(chunk, r, c, delta) firstprivate(row, col, num_chunk, chunks_in_row) schedule(static)
 for ( chunk = 0; chunk < num_chunk; ++chunk )
     {
@@ -158,7 +158,7 @@ for ( c = c_start; c < c_start + BLOCK_SIZE_C; ++c ) {
         }
     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma63_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma63_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 

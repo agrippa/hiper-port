@@ -66,7 +66,7 @@ const unsigned long long full_program_start = current_time_ns();
         
         // calculate perimeter block matrices
         // 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)
 for ( chunk_idx = 0; chunk_idx < chunks_in_inter_row; chunk_idx++)
         {
@@ -116,14 +116,14 @@ for (j =0; j < BS; j++){
 
         }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma52_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma52_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
         
         // update interior block matrices
         //
         chunks_per_inter = chunks_in_inter_row*chunks_in_inter_row;
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for schedule(auto) default(none) private(chunk_idx) firstprivate(size, a) shared(chunks_per_inter, chunks_in_inter_row, offset)
 for  (chunk_idx =0; chunk_idx < chunks_per_inter; chunk_idx++)
         {
@@ -159,7 +159,7 @@ for (j = 0; j < BS; j++) {
             }
         }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma105_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma105_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }
 

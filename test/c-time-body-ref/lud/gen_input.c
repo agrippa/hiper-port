@@ -76,7 +76,7 @@ int main (int argc, char **argv){
         return 1;
     }
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(none) private(i,j) shared(L,U,MatrixDim)
 for (i=0; i < MatrixDim; i ++){
         for (j=0; j < MatrixDim; j++){
@@ -93,10 +93,10 @@ for (i=0; i < MatrixDim; i ++){
         }
     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma62_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma62_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for default(none) private(i,j,k,sum) shared(L,U,A,MatrixDim)
 for (i=0; i < MatrixDim; i++ ) {
         for (j=0; j < MatrixDim; j++){
@@ -107,7 +107,7 @@ for (i=0; i < MatrixDim; i++ ) {
         }
     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma78_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma78_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
     for (i=0; i < MatrixDim; i ++) {

@@ -247,7 +247,7 @@ void bpnn_layerforward(float *l1, float *l2, float **conn, int n1, int n2)
 
   /*** Set up thresholding unit ***/
   l1[0] = 1.0;
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(conn, n1, n2, l1) private(k, j) reduction(+: sum) schedule(static)
 for (j = 1; j <= n2; j++) {
 
@@ -259,7 +259,7 @@ for (j = 1; j <= n2; j++) {
     l2[j] = squash(sum);
   }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma233_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma233_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 
@@ -312,7 +312,7 @@ void bpnn_adjust_weights(float *delta, int ndelta, float *ly, int nly, float **w
   //eta = 0.3;
   //momentum = 0.3;
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(oldw, w, delta) private(j, k, new_dw) firstprivate(ndelta, nly)
 for (j = 1; j <= ndelta; j++) {
     for (k = 0; k <= nly; k++) {
@@ -322,7 +322,7 @@ for (j = 1; j <= ndelta; j++) {
     }
   }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma295_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma295_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 }
 

@@ -140,7 +140,7 @@ for (iter=0; iter< niter; iter++){
         q0sqr   = varROI / (meanROI*meanROI);
 		
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(J, dN, dS, dW, dE, c, rows, cols, iN, iS, jW, jE) private(i, j, k, Jc, G2, L, num, den, qsqr)
 for (int i = 0 ; i < rows ; i++) {
             for (int j = 0; j < cols; j++) { 
@@ -175,9 +175,9 @@ for (int i = 0 ; i < rows ; i++) {
   
     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma126_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma126_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for shared(J, c, rows, cols, lambda) private(i, j, k, D, cS, cN, cW, cE)
 for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {        
@@ -205,7 +205,7 @@ for (int i = 0; i < rows; i++) {
                 #endif //output
 	     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma159_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma159_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 	}

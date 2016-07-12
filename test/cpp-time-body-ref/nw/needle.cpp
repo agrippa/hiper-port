@@ -115,7 +115,7 @@ void nw_optimized(int *input_itemsets, int *output_itemsets, int *referrence,
 {
     for( int blk = 1; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)
 for( int b_index_x = 0; b_index_x < blk; ++b_index_x)
         {
@@ -166,7 +166,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             
         }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma101_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma101_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }    
         
@@ -174,7 +174,7 @@ printf("pragma101_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 
     for ( int blk = 2; blk <= (max_cols-1)/BLOCK_SIZE; blk++ )
     {
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for schedule(static) shared(input_itemsets, referrence) firstprivate(blk, max_rows, max_cols, penalty)
 for( int b_index_x = blk - 1; b_index_x < (max_cols-1)/BLOCK_SIZE; ++b_index_x)
         {
@@ -225,7 +225,7 @@ for ( int j = 0; j < BLOCK_SIZE; ++j)
             }
         }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma156_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
     }
 

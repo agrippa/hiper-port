@@ -98,7 +98,7 @@ void ellipsetrack(avi_t *video, double *xc0, double *yc0, int Nc, int R, int Np,
 		}
 		
 		// Split the work among multiple threads, if OPEN is defined
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for private(i, j)
 for (cell_num = 0; cell_num < Nc; cell_num++) {
 			// Make copies of the current cell's location
@@ -181,7 +181,7 @@ for (cell_num = 0; cell_num < Nc; cell_num++) {
 			free(ri);
 	    }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma84_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma84_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 #ifdef OUTPUT

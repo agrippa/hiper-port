@@ -404,7 +404,7 @@ double pgain(long x, Points *points, double z, long int *numcenters, int pid)
 	
 	// OpenMP parallelization
 //	#pragma omp parallel for 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for reduction(+: cost_of_opening_x)
 for ( i = k1; i < k2; i++ ) {
     float x_cost = dist(points->p[i], points->p[x], points->dim) 
@@ -432,7 +432,7 @@ for ( i = k1; i < k2; i++ ) {
     }
   }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma390_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma390_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 #ifdef PROFILE
@@ -484,7 +484,7 @@ printf("pragma390_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
 
   if ( gl_cost_of_opening_x < 0 ) {
     //  we'd save money by opening x; we'll do it
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for
 for ( int i = k1; i < k2; i++ ) {
       bool close_center = gl_lower[center_table[points->p[i].assign]] > 0 ;
@@ -497,7 +497,7 @@ for ( int i = k1; i < k2; i++ ) {
       }
     }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma466_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma466_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 		
     for( int i = k1; i < k2; i++ ) {

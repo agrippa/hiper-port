@@ -98,7 +98,7 @@ kernel_cpu(	int cores_arg,
 	int i;
 
 	// process number of querries
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for private (i, thid)
 for(bid = 0; bid < count; bid++){
 
@@ -138,7 +138,7 @@ for(bid = 0; bid < count; bid++){
 
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma84_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma84_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
 
 	time2 = get_time();

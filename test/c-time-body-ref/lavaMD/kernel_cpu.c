@@ -128,7 +128,7 @@ const unsigned long long full_program_start = current_time_ns();
 	//	PROCESS INTERACTIONS
 	//======================================================================================================================================================150
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for private(i, j, k) private(first_i, rA, fA) private(pointer, first_j, rB, qB) private(r2, u2, fs, vij, fxij, fyij, fzij, d)
 for(l=0; l<dim.number_boxes; l=l+1){
 
@@ -211,7 +211,7 @@ for(l=0; l<dim.number_boxes; l=l+1){
 
 	}
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma114_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma114_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
  // for l
     }
 const unsigned long long full_program_end = current_time_ns();

@@ -463,7 +463,7 @@ int pairalign()
 const unsigned long long full_program_start = current_time_ns();
 {
 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for schedule(dynamic) private(i,n,si,sj,len1,m)
 for (si = 0; si < nseqs; si++) {
      n = seqlen_array[si+1];
@@ -518,7 +518,7 @@ for (si = 0; si < nseqs; si++) {
      } // for (j)
   }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma449_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma449_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
  // end parallel for (i)
    }
 const unsigned long long full_program_end = current_time_ns();

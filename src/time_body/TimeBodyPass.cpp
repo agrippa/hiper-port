@@ -129,7 +129,7 @@ void TimeBodyPass::postFunctionVisit(clang::FunctionDecl *func) {
 
                 if (ompCmd == "parallel" && clauses->hasClause("for") &&
                         timingScope & PARALLEL_FOR) {
-                    ss << "const unsigned long long parallel_for_start = " <<
+                    ss << " { const unsigned long long parallel_for_start = " <<
                         "current_time_ns();" << std::endl;
                     ss << "#pragma omp " << ompCmd << " " <<
                         clauses->getOriginalClauses() << std::endl;
@@ -137,7 +137,7 @@ void TimeBodyPass::postFunctionVisit(clang::FunctionDecl *func) {
                     ss << "const unsigned long long parallel_for_end = " <<
                         "current_time_ns();" << std::endl;
                     ss << "printf(\"" << node->getLbl() << " \%llu ns\", " <<
-                        "parallel_for_end - parallel_for_start);" << std::endl;
+                        "parallel_for_end - parallel_for_start); } " << std::endl;
                 } else {
                     ss << "#pragma omp " << ompCmd << " " <<
                         clauses->getOriginalClauses() << std::endl;

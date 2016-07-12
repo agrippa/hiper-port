@@ -172,7 +172,7 @@ void computeTempOMP(float *pIn, float* tIn, float *tOut,
 
         do {
             int z; 
-const unsigned long long parallel_for_start = current_time_ns();
+ { const unsigned long long parallel_for_start = current_time_ns();
 #pragma omp parallel for
 for (z = 0; z < nz; z++) {
                 int y;
@@ -193,7 +193,7 @@ for (z = 0; z < nz; z++) {
                 }
             }
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma158_omp_parallel %llu ns", parallel_for_end - parallel_for_start);
+printf("pragma158_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
 
             float *t = tIn_t;
             tIn_t = tOut_t;
