@@ -1,6 +1,6 @@
 #include <sys/time.h>
 #include <time.h>
-unsigned long long current_time_ns() {
+static unsigned long long current_time_ns() {
 #ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
