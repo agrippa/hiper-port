@@ -207,7 +207,7 @@ for (i=0; i<npoints; i++) {
 		       partial_new_centers[tid * nclusters * nfeatures + index * nfeatures + j] += feature[i * nfeatures + j];
             } ; 
 const unsigned long long parallel_for_end = current_time_ns();
-printf("pragma173_omp_parallel %llu ns", parallel_for_end - parallel_for_start); } 
+printf("pragma173_omp_parallel %llu ns\n", parallel_for_end - parallel_for_start); } 
 
         } /* end of #pragma omp parallel */
 

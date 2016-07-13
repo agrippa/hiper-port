@@ -118,7 +118,7 @@ void TimeBodyPass::postFunctionVisit(clang::FunctionDecl *func) {
                     ss << stmtToString(body) << " ; " << std::endl;
                     ss << "const unsigned long long full_program_end = " <<
                         "current_time_ns();" << std::endl;
-                    ss << "printf(\"full_program \%llu ns\", " <<
+                    ss << "printf(\"full_program \%llu ns\\n\", " <<
                         "full_program_end - full_program_start);" << std::endl;
                 } else {
                     ss << stmtToString(body) << std::endl;
@@ -136,7 +136,7 @@ void TimeBodyPass::postFunctionVisit(clang::FunctionDecl *func) {
                     ss << stmtToString(body) << " ; " << std::endl;
                     ss << "const unsigned long long parallel_for_end = " <<
                         "current_time_ns();" << std::endl;
-                    ss << "printf(\"" << node->getLbl() << " \%llu ns\", " <<
+                    ss << "printf(\"" << node->getLbl() << " \%llu ns\\n\", " <<
                         "parallel_for_end - parallel_for_start); } " << std::endl;
                 } else {
                     ss << "#pragma omp " << ompCmd << " " <<
