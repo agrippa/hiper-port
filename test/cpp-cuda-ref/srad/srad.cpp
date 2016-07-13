@@ -4,19 +4,19 @@ __device__ inline int hclib_get_current_worker() {
 }
 
 template<class functor_type>
-__global__ void wrapper_kernel(unsigned niters, functor_type functor) {
+__global__ void wrapper_kernel(unsigned iter_offset, unsigned niters, functor_type functor) {
     const int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if (tid < niters) {
-        functor(tid);
+        functor(iter_offset + tid);
     }
 }
 template<class functor_type>
-static void kernel_launcher(const char *kernel_lbl, unsigned niters, functor_type functor) {
+static void kernel_launcher(const char *kernel_lbl, unsigned iter_offset, unsigned niters, functor_type functor) {
     const int threads_per_block = 256;
     const int nblocks = (niters + threads_per_block - 1) / threads_per_block;
     functor.transfer_to_device();
     const unsigned long long start = capp_current_time_ns();
-    wrapper_kernel<<<nblocks, threads_per_block>>>(niters, functor);
+    wrapper_kernel<<<nblocks, threads_per_block>>>(iter_offset, niters, functor);
     cudaError_t err = cudaDeviceSynchronize();
     if (err != cudaSuccess) {
         fprintf(stderr, "CUDA Error while synchronizing kernel - %s\n", cudaGetErrorString(err));
@@ -556,10 +556,12 @@ for (iter=0; iter< niter; iter++){
 		
 
  { const int niters = (rows) - (0);
-kernel_launcher("pragma125_omp_parallel", niters, pragma125_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c));
+const int iters_offset = (0);
+kernel_launcher("pragma125_omp_parallel", iters_offset, niters, pragma125_omp_parallel_hclib_async(cols, k, Jc, J, dN, iN, dS, iS, dW, jW, dE, jE, G2, L, num, den, qsqr, q0sqr, c));
  } 
  { const int niters = (rows) - (0);
-kernel_launcher("pragma158_omp_parallel", niters, pragma158_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda));
+const int iters_offset = (0);
+kernel_launcher("pragma158_omp_parallel", iters_offset, niters, pragma158_omp_parallel_hclib_async(cols, k, cN, c, cS, iS, cW, cE, jE, D, dN, dS, dW, dE, J, lambda));
  } 
 
 	}
